@@ -27,6 +27,7 @@ export default function usersSettingsPage() {
   const router = useRouter();
   const [users, setUsers] = useState();
   const [roles, setRoles] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [logs, setLogs] = useState(initialLogs);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -57,6 +58,20 @@ export default function usersSettingsPage() {
     },
   ];
 
+  // Get current user from localStorage
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+        message.error("Error loading user data");
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (router.pathname === "/settings/users-settings") {
       setActive("1");
@@ -71,22 +86,37 @@ export default function usersSettingsPage() {
         setUsers(res.data);
       }
     } catch (error) {
-      message.error("Something went wrong");
+      message.error("Failed to fetch users");
     } finally {
       setLoading(false);
     }
   };
+
   const fetchRoles = async () => {
     setLoading(true);
     try {
       const res = await instance.get("/roles");
       if (res.status === 200) {
-        setRoles(res.data);
+        // If roles array is empty, create default roles
+        if (!res.data || res.data.length === 0) {
+          setRoles([
+            { id: 1, title: "Admin" },
+            { id: 2, title: "User" },
+          ]);
+        } else {
+          setRoles(res.data);
+        }
       } else {
-        message.error("Something went wrong while fetching roles.");
+        console.error("Failed to fetch roles:", res);
+        message.error("Failed to fetch roles");
       }
     } catch (error) {
-      message.error("Something went wrong while fetching roles.");
+      console.error("Error fetching roles:", error);
+      // Set default roles if API fails
+      setRoles([
+        { id: 1, title: "Admin" },
+        { id: 2, title: "User" },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -120,7 +150,15 @@ export default function usersSettingsPage() {
     fetchRoles();
   }, []);
 
-  console.log("Roles Users", roles);
+  // Debug logs
+  useEffect(() => {
+    console.log("Current User:", currentUser);
+    console.log("Roles:", roles);
+  }, [currentUser, roles]);
+
+  if (!currentUser) {
+    return null; // or a loading spinner
+  }
 
   return (
     <div className="mavecontainer">
@@ -130,15 +168,16 @@ export default function usersSettingsPage() {
         setActive={setActive}
         setCreateUser={setCreateUser}
         createUser={createUser}
-        handleCreateUser={handleCreateUser}
         fetchUsers={fetchUsers}
         roles={roles}
+        currentUser={currentUser}
       />
       <UserTable
         users={users}
         fetchUsers={fetchUsers}
         setUsers={setUsers}
         roles={roles}
+        currentUser={currentUser}
       />
     </div>
   );

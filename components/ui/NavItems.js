@@ -24,7 +24,11 @@ export default function NavItems({
 
   useEffect(() => {
     setTopNavData(TopNavData);
-    setChangeLogs(Changelog);
+    // Sort changelog by date in descending order and set the state
+    const sortedChangelog = Changelog.sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+    setChangeLogs(sortedChangelog);
   }, []);
 
   const userItems = [
@@ -76,8 +80,8 @@ export default function NavItems({
           onClick={() => router.push("/usermanual/changelog")}
         >
           {changeLogs && changeLogs.length > 0
-            ? changeLogs[0].version
-            : "v 1.0.0"}
+            ? `v${changeLogs[0].version}`
+            : "v1.0.0"}
         </Button>
       </div>
 

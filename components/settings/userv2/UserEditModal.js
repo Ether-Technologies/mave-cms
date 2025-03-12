@@ -5,21 +5,47 @@ import instance from "../../../axios";
 
 const { Option } = Select;
 
-const UserEditModal = ({ visible, user, onCancel, fetchUsers, roles }) => {
+const UserEditModal = ({
+  visible,
+  user,
+  onCancel,
+  fetchUsers,
+  roles,
+  currentUser,
+}) => {
   const [form] = Form.useForm();
   const [avatar, setAvatar] = useState(user?.profile_picture);
+  const [loading, setLoading] = useState(false);
+
+  // Check permissions
+  const isAdmin = currentUser?.role_id === "1";
+  const isEditingSelf = currentUser?.id === user?.id;
+  const isEditingAdmin = user?.role_id === "1";
+
+  // Determine if the current user can edit this user
+  const canEdit = isAdmin || isEditingSelf; // Admin can edit anyone, users can edit themselves
 
   useEffect(() => {
-    setAvatar(user?.profile_picture); // Set initial avatar state
-    form.setFieldsValue({
-      ...user,
-      role_id: parseInt(user?.role_id), // Set the initial role ID value correctly
-    });
-  }, [user, form]);
+    if (!canEdit) {
+      message.error("You don't have permission to edit this user");
+      onCancel();
+      return;
+    }
+
+    if (user) {
+      form.setFieldsValue({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role_id: user.role_id ? parseInt(user.role_id) : undefined,
+      });
+      setAvatar(user.profile_picture);
+    }
+  }, [user, form, canEdit, onCancel]);
 
   const handleUploadChange = (info) => {
     if (info.file.status === "done") {
-      setAvatar(info.file.response.url); // Adjust this according to your backend response
+      setAvatar(info.file.response.url);
       message.success(`${info.file.name} file uploaded successfully.`);
     } else if (info.file.status === "error") {
       message.error(`${info.file.name} file upload failed.`);
@@ -28,6 +54,23 @@ const UserEditModal = ({ visible, user, onCancel, fetchUsers, roles }) => {
 
   const handleUpdateUser = async (values) => {
     try {
+      setLoading(true);
+
+      // Only check role change permissions if the role is being changed
+      if (values.role_id !== user.role_id) {
+        // Prevent changing role to admin
+        if (values.role_id === 1 || values.role_id === "1") {
+          message.error("You don't have permission to create admin users");
+          return;
+        }
+
+        // Prevent admin from changing their own role
+        if (isEditingSelf) {
+          message.error("You cannot change your own role");
+          return;
+        }
+      }
+
       await instance.put(`/admin/user/${user.id}`, {
         ...values,
         profile_picture: avatar,
@@ -36,19 +79,22 @@ const UserEditModal = ({ visible, user, onCancel, fetchUsers, roles }) => {
       fetchUsers();
       onCancel();
     } catch (error) {
-      message.error("Failed to update user");
+      message.error(error.response?.data?.message || "Failed to update user");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Ensure role is correctly selected and mapped
-  const userRole = roles?.find((role) => role?.id === parseInt(user?.role_id));
+  // If user doesn't have permission, don't render the form
+  if (!canEdit) {
+    return null;
+  }
 
   return (
     <Modal
-      title="Edit User"
+      title={isEditingSelf ? "Edit Your Profile" : "Edit User"}
       open={visible}
       onCancel={onCancel}
-      onOk={() => form.submit()}
       footer={[
         <Button key="back" onClick={onCancel} danger>
           Cancel
@@ -56,6 +102,7 @@ const UserEditModal = ({ visible, user, onCancel, fetchUsers, roles }) => {
         <Button
           key="submit"
           type="primary"
+          loading={loading}
           style={{
             backgroundColor: "var(--theme)",
             borderColor: "var(--theme)",
@@ -67,16 +114,7 @@ const UserEditModal = ({ visible, user, onCancel, fetchUsers, roles }) => {
         </Button>,
       ]}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleUpdateUser}
-        initialValues={{
-          name: user?.name,
-          email: user?.email,
-          role_id: userRole?.id,
-        }}
-      >
+      <Form form={form} layout="vertical" onFinish={handleUpdateUser}>
         <Form.Item
           name="name"
           label="Name"
@@ -87,27 +125,29 @@ const UserEditModal = ({ visible, user, onCancel, fetchUsers, roles }) => {
         <Form.Item
           name="email"
           label="Email"
-          rules={[{ required: true, message: "Please enter the email" }]}
+          rules={[
+            { required: true, message: "Please enter the email" },
+            { type: "email", message: "Please enter a valid email" },
+          ]}
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          name="role_id"
-          label="Role"
-          rules={[{ required: true, message: "Please select the role" }]}
-        >
-          <Select value={userRole?.id} showSearch>
-            {roles?.map((role) => (
-              <Option key={role.id} value={role.id}>
-                {role.title}
-              </Option>
-            ))}
+        <Form.Item name="phone" label="Phone">
+          <Input />
+        </Form.Item>
+        <Form.Item name="role_id" label="Role">
+          <Select
+            disabled={isEditingSelf || isEditingAdmin}
+            allowClear={!isEditingSelf}
+          >
+            <Option value="2">User</Option>
+            {isEditingAdmin && <Option value="1">Admin</Option>}
           </Select>
         </Form.Item>
         <Form.Item label="Avatar">
           <Upload
             name="avatar"
-            action="/upload" // Adjust this URL to your backend endpoint
+            action="/upload"
             onChange={handleUploadChange}
             listType="picture"
           >

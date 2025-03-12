@@ -8,11 +8,13 @@ export default function UsersTopbar({
   active,
   setCreateUser,
   createUser,
-  handleCreateUser,
   fetchUsers,
   roles,
+  currentUser,
 }) {
-  console.log("Roles UsersTopbar", roles);
+  // Check if user has permission to create users
+  const canCreateUser = currentUser?.role_id === "1";
+
   return (
     <div
       className="top-nav"
@@ -63,6 +65,7 @@ export default function UsersTopbar({
         >
           {menuItems?.map((item) => (
             <div
+              key={item.key}
               style={{
                 color: active === item.key ? "var(--maveyellow)" : "black",
                 textDecoration: active === item.key ? "underline" : "none",
@@ -70,9 +73,7 @@ export default function UsersTopbar({
                 fontWeight: 500,
               }}
             >
-              <Link href={item.link} key={item.key}>
-                {item.title}
-              </Link>
+              <Link href={item.link}>{item.title}</Link>
             </div>
           ))}
         </div>
@@ -84,26 +85,28 @@ export default function UsersTopbar({
           gap: 10,
         }}
       >
-        <Button
-          type="primary"
-          style={{
-            marginBottom: 16,
-            backgroundColor: "var(--maveyellow)",
-            color: "white",
-          }}
-          icon={<PlusCircleOutlined />}
-          onClick={() => setCreateUser(true)}
-          disabled={active !== "1"}
-        >
-          Add User
-        </Button>
+        {canCreateUser && (
+          <Button
+            type="primary"
+            style={{
+              marginBottom: 16,
+              backgroundColor: "var(--maveyellow)",
+              color: "white",
+            }}
+            icon={<PlusCircleOutlined />}
+            onClick={() => setCreateUser(true)}
+            disabled={active !== "1"}
+          >
+            Add User
+          </Button>
+        )}
         {createUser && (
           <UserForm
             visible={createUser}
-            onCreate={handleCreateUser}
             onCancel={() => setCreateUser(false)}
             fetchUsers={fetchUsers}
             roles={roles}
+            currentUser={currentUser}
           />
         )}
       </div>

@@ -63,8 +63,13 @@ const SiteContent = ({ children }) => {
     if (isProtected && !token) {
       // Redirect to login if the page is protected and the user is not authenticated
       router.push("/login");
-    } else if (isPublicPage && token) {
+    } else if (
+      isPublicPage &&
+      token &&
+      currentRoute !== "/usermanual/changelog"
+    ) {
       // Redirect to home if the user is authenticated and tries to access a public page
+      // EXCEPT for the changelog page
       router.push("/");
     } else if (currentRoute === "/signup" && !allowSignup) {
       // Redirect to login if signup is not allowed

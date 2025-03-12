@@ -20,7 +20,7 @@ import instance from "../../../axios";
 
 const { Option } = Select;
 
-const UserTable = ({ users, fetchUsers, roles }) => {
+const UserTable = ({ users, fetchUsers, roles, currentUser }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
@@ -32,6 +32,9 @@ const UserTable = ({ users, fetchUsers, roles }) => {
   useEffect(() => {
     setFilteredUsers(users);
   }, [users]);
+
+  // Check permissions
+  const isAdmin = currentUser?.role_id === "1";
 
   // Handle selection of all rows (not header)
   const handleSelectAll = () => {
@@ -74,6 +77,20 @@ const UserTable = ({ users, fetchUsers, roles }) => {
 
   // Handle delete button click
   const handleDeleteUser = async (id) => {
+    const targetUser = users.find((u) => u.id === id);
+
+    // Prevent deleting admin users
+    if (targetUser?.role_id === "1") {
+      message.error("You cannot delete admin users");
+      return;
+    }
+
+    // Prevent deleting own account
+    if (targetUser?.id === currentUser?.id) {
+      message.error("You cannot delete your own account");
+      return;
+    }
+
     try {
       await instance.delete(`/admin/user/${id}`);
       message.success("User deleted successfully");
@@ -85,12 +102,24 @@ const UserTable = ({ users, fetchUsers, roles }) => {
 
   // Handle bulk delete
   const handleBulkDelete = async () => {
+    // Prevent deleting if any selected user is an admin
+    const hasAdmin = selectedRowKeys.some((id) => {
+      const user = users.find((u) => u.id === id);
+      return user?.role_id === "1";
+    });
+
+    if (hasAdmin) {
+      message.error("You cannot delete admin users");
+      return;
+    }
+
     try {
       await Promise.all(
         selectedRowKeys?.map((id) => instance.delete(`/admin/user/${id}`))
       );
       message.success("Selected users deleted successfully");
       fetchUsers();
+      setSelectedRowKeys([]); // Clear selection after delete
     } catch (error) {
       message.error("Failed to delete selected users");
     }
@@ -114,7 +143,12 @@ const UserTable = ({ users, fetchUsers, roles }) => {
       dataIndex: "avatar",
       key: "avatar",
       render: (_, record) => (
-        <Avatar src={record.profile_picture || "/default-avatar.png"} />
+        <Avatar
+          src={record.profile_picture || "/images/profile_avatar.png"}
+          style={{
+            border: "2px solid var(--theme)",
+          }}
+        />
       ),
     },
     {
@@ -129,60 +163,81 @@ const UserTable = ({ users, fetchUsers, roles }) => {
     },
     {
       title: "Role",
-      dataIndex: "role",
+      dataIndex: "role_id",
       key: "role",
-      render: (_, record) =>
-        record.role_mave ? record?.role_mave.title : "N/A",
+      render: (role_id) => {
+        switch (role_id) {
+          case "1":
+            return "Admin";
+          case "2":
+            return "User";
+          default:
+            return "N/A";
+        }
+      },
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => handleViewUser(record)}
-            style={{ backgroundColor: "var(--theme)", color: "white" }}
-          />
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleEditUser(record)}
-            style={{
-              backgroundColor: "transparent",
-              color: "var(--theme)",
-              border: "2px solid var(--theme)",
-            }}
-            disabled={record.role_id === "2"}
-          />
-          <Popconfirm
-            title="Are you sure to delete this user?"
-            onConfirm={() => handleDeleteUser(record.id)}
-            onCancel={() => message.info("User not deleted")}
-            okText="Yes"
-            cancelText="No"
-          >
+      render: (_, record) => {
+        const isSelf = record.id === currentUser?.id;
+        const isTargetAdmin = record.role_id === "1";
+        const canEdit = isAdmin && (!isTargetAdmin || isSelf);
+        const canDelete = isAdmin && !isTargetAdmin && !isSelf;
+
+        return (
+          <div style={{ display: "flex", gap: "1rem" }}>
             <Button
-              icon={<DeleteOutlined />}
-              danger
-              disabled={record.role_id === "2"}
+              icon={<EyeOutlined />}
+              onClick={() => handleViewUser(record)}
+              style={{ backgroundColor: "var(--theme)", color: "white" }}
             />
-          </Popconfirm>
-        </div>
-      ),
+            {canEdit && (
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => handleEditUser(record)}
+                style={{
+                  backgroundColor: "transparent",
+                  color: "var(--theme)",
+                  border: "2px solid var(--theme)",
+                }}
+              />
+            )}
+            {canDelete && (
+              <Popconfirm
+                title="Are you sure to delete this user?"
+                onConfirm={() => handleDeleteUser(record.id)}
+                onCancel={() => message.info("User not deleted")}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button icon={<DeleteOutlined />} danger />
+              </Popconfirm>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
+  // If not admin, don't show the checkbox column
+  if (!isAdmin) {
+    columns.shift(); // Remove the Select column
+  }
+
   return (
     <>
-      <TopBar
-        selectedRowKeys={selectedRowKeys}
-        onSearch={handleSearch}
-        onDelete={handleBulkDelete}
-        setIsFilterDrawerVisible={setIsFilterDrawerVisible}
-        setFilteredUsers={setFilteredUsers}
-        users={users}
-        onSelectAll={handleSelectAll}
-      />
+      {isAdmin && (
+        <TopBar
+          selectedRowKeys={selectedRowKeys}
+          onSearch={handleSearch}
+          onDelete={handleBulkDelete}
+          setIsFilterDrawerVisible={setIsFilterDrawerVisible}
+          setFilteredUsers={setFilteredUsers}
+          users={users}
+          onSelectAll={handleSelectAll}
+        />
+      )}
       <Table
         columns={columns}
         dataSource={filteredUsers}
@@ -199,12 +254,14 @@ const UserTable = ({ users, fetchUsers, roles }) => {
             onCancel={() => setIsEditModalVisible(false)}
             fetchUsers={fetchUsers}
             roles={roles}
+            currentUser={currentUser}
           />
           <UserViewModal
             visible={isViewModalVisible}
             user={selectedUser}
             onCancel={() => setIsViewModalVisible(false)}
             onEdit={() => handleEditUser(selectedUser)}
+            currentUser={currentUser}
           />
           <FilterDrawer
             visible={isFilterDrawerVisible}

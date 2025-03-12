@@ -1,937 +1,1015 @@
 [
     {
-        "version": "3.1.1",
-        "date": "2024-01-15",
-        "changes": {
-            "Feature": [
-                "Added new feature to the Gallery, user can refresh the gallery to see the updated media",
-                "Cloudinary tab is now available only if registered"
-            ],
-            "BugFix": [
-                "Gallery file format issue fixed"
-            ]
-        }
-    },
-    {
-        "version": "3.0.17",
-        "date": "2024-12-31",
-        "changes": {
-            "Feature": [
-                "Added tags to the Gallery, Cards and Sliders with advanced functionalities",
-                "User can search and filter the sliders by tags"
-            ],
-            "BugFix": [
-                "Tags field is fixed in slider creation drawer",
-                "Fixed critical issue in dynamic complex table in page builder"
-            ]
-        }
-    },
-    {
-        "version": "3.0.14",
-        "date": "2024-12-24",
-        "changes": {
-            "Feature": [
-                "Gallery and Cards got advanced searching and filtering options",
-                "Card and Image got new feature \"tag\" which can be used to filter and categorize"
-            ],
-            "BugFix": [
-                "Sorting issue in Gallery is fixed"
-            ]
-        }
-    },
-    {
-        "version": "3.0.12",
-        "date": "2024-12-23",
-        "changes": {
-            "Feature": [
-                "Introduced a whole new look for the CMS",
-                "Menu item link is rich with query params and parent page and id",
-                "Media and cards can be searched in page builder",
-                "User gets whole new footer builder alike page builder",
-                "Mave AI is now more intelligent and user friendly with conversational experience to build pages smartly"
-            ],
-            "BugFix": [
-                "Menu items parent issue fixed.",
-                "Query params issue fixed in media and cards search"
-            ]
-        }
-    },
-    {
-        "version": "3.0",
-        "date": "2024-10-30",
-        "changes": {
-            "Feature": [
-                "Introduced a whole new look for the CMS",
-                "Page Builder is completely revamped",
-                "You get a whole new experience with custom model, form and footer builder",
-                "User can create, update, delete and view models and create their own CMS",
-                "Page builder got some exciting new features and widgets like carousel, accordion, table, etc."
-            ],
-            "BugFix": [
-                "Fixed the issue where user could not match their current pages with links",
-                "Fixed the slider of cards issue. Users can modify fluently",
-                "Removed success and error messages from the page editor and components"
-            ]
-        }
-    },
-    {
-        "version": "2.3.21",
-        "date": "2024-09-22",
-        "changes": {
-            "Feature": [
-                "Added new icons in the sidebar",
-                "Mave logo has changed"
-            ],
-            "BugFix": [
-                "Fixed slider elements update issue/bug"
-            ]
-        }
-    },
-    {
-        "version": "2.3.19",
-        "date": "2024-08-11",
-        "changes": {
-            "Feature": [
-                "Introducing new dynamic form builder under Tools",
-                "User can create, update, delete and view forms",
-                "User can add fields in the form",
-                "User can add validation in the form fields",
-                "Added Terms and Conditions, Contributing, Issue Template, Pull Request Template, Code of Conduct in the CMS",
-                "User can check these documentation from User Manual > Documentation"
-            ],
-            "BugFix": [
-                "Fixed slider elements update issue/bug"
-            ]
-        }
-    },
-    {
-        "version": "2.3.1",
-        "date": "2024-05-21",
-        "changes": {
-            "Feature": [
-                "New UI appear if you are super admin"
-            ]
-        }
-    },
-    {
-        "version": "2.2.62",
-        "date": "2024-06-03",
-        "changes": {
-            "Feature": [
-                "Updated the Gallery view",
-                "User can copy, view and download the media"
-            ]
-        }
-    },
-    {
-        "version": "2.2.57",
-        "date": "2024-05-26",
-        "changes": {
-            "Feature": [
-                "User can create and update cards assigning pages and links"
-            ],
-            "BugFix": [
-                "Fixed the issue where user could not match their current pages with links"
-            ]
-        }
-    },
-    {
-        "version": "2.2.56",
-        "date": "2024-05-20",
-        "changes": {
-            "Feature": [
-                "User can see pages and Sub pages in the CMS Pages Gallery"
-            ],
-            "BugFix": [
-                "Fixed the slider of cards issue. Users can modify fluently"
-            ]
-        }
-    },
-    {
-        "version": "2.2.52",
-        "date": "2024-05-15",
-        "changes": {
-            "Feature": [
-                "Now user can add components in existing sections",
-                "User can get all types of media in the media library",
-                "Gallary got a new look"
-            ],
-            "BugFix": [
-                "User can create sliders seamlessly",
-                "Removed success and error messages from the page editor and components"
-            ]
-        }
-    },
-    {
-        "version": "2.2.48",
-        "date": "2024-05-09",
-        "changes": {
-            "Feature": [
-                "Introduced tab view in Sliders Component",
-                "User can Create, Edit, Update & Delete Slider of cards in the CMS",
-                "MAVE Logo got a new look"
-            ],
-            "BugFix": [
-                "User turn image sliders into card sliders and vice versa"
-            ]
-        }
-    },
-    {
-        "version": "2.2.42",
-        "date": "2024-04-25",
-        "changes": {
-            "Feature": [
-                "User can create and see blog posts in the CMS",
-                "User can update blog posts in the CMS",
-                "User can delete blog posts in the CMS",
-                "User can see the list of blog posts in the CMS",
-                "User can see the details of blog posts in the CMS",
-                "User can write with AI in the blog post editor",
-                "Blogs can be read in the CMS"
-            ]
-        }
-    },
-    {
-        "version": "2.2.43",
-        "date": "2024-05-06",
-        "changes": {
-            "BugFix": [
-                "Page editor mode shows the section title in the page editor",
-                "Fixed the issue where updating section did not close the editor mode",
-                "Edit Mode 2 is gone",
-                "Card multilingual title will only show if available"
-            ]
-        }
-    },
-    {
-        "version": "2.2.40",
-        "date": "2024-04-24",
-        "changes": {
-            "Feature": [
-                "User can add section title in the page editor"
-            ]
-        }
-    },
-    {
-        "version": "2.2.38",
-        "date": "2024-04-22",
-        "changes": {
-            "Feature": [
-                "Added Dual title and Description in page edit mode"
-            ]
-        }
-    },
-    {
-        "version": "2.2.36",
-        "date": "2024-04-02",
-        "changes": {
-            "Feature": [
-                "Added documentation & User Guide"
-            ]
-        }
-    },
-    {
-        "version": "2.2.35",
-        "date": "2024-03-27",
-        "changes": {
-            "Feature": [
-                "Added FAQ Page in the CMS",
-                "Added Support Page"
-            ]
-        }
-    },
-    {
-        "version": "2.2.34",
-        "date": "2024-03-23",
-        "changes": {
-            "Feature": [
-                "Rich text editors are now more upgraded and user friendly",
-                "Media selector is now more user friendly",
-                "Creator Studio has got feature to search pages by their name/title"
-            ]
-        }
-    },
-    {
-        "version": "2.2.26",
-        "date": "2024-03-19",
-        "changes": {
-            "Feature": [
-                "User can upload and see documents (e.g. PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX) in the CMS Documents Section in the Components",
-                "Users can delete files instantly without waiting for the request to be processed",
-                "Menu Items got parent menu feature. Now user can create nested menu items",
-                "User can see the parent menu of the menu item in the CMS",
-                "User can set 3 types of links in the menu item link: Independent, Page, Mega Menu"
-            ]
-        }
-    },
-    {
-        "version": "2.2.11",
-        "date": "2024-03-15",
-        "changes": {
-            "Feature": [
-                "Now admins can create user from MAVE Admin -> Profile",
-                "Now users can change theme to from top right corner of the CMS",
-                "Authorised users can see avatar in their profile picture",
-                "Media Library is now 1.2x faster than before",
-                "User can see tabs as Photos and Videos in Media Library"
-            ]
-        }
-    },
-    {
-        "version": "2.2.9",
-        "date": "2024-03-13",
-        "changes": {
-            "Feature": [
-                "Now user can update sliders more easily in the CMS page editor"
-            ],
-            "BugFix": [
-                "Users can now add & update multilingual title to sliders",
-                "Change of all pages names will no longer happen when updating a page"
-            ]
-        }
-    },
-    {
-        "version": "2.2.7",
-        "date": "2024-03-08",
-        "changes": {
-            "Feature": [
-                "Now user can update page slug in page editor",
-                "Changelog version automatically updates in the CMS from the changelog.json file"
-            ],
-            "BugFix": [
-                "Now user can add & update multilingual title to menu items"
-            ]
-        }
-    },
-    {
-        "version": "2.2.5",
-        "date": "2024-03-06",
-        "changes": {
-            "Feature": [
-                "Added 'Documents' in Components",
-                "User can upload documents in the CMS",
-                "User can view the uploaded documents in the CMS",
-                "User can delete the uploaded documents in the CMS"
-            ],
-            "BugFix": [
-                "Changing single media in page editor no longer changes all the media in the section",
-                "Fixed the position of 'Go Top' & 'Go Bottom' buttons in the page editor",
-                "Fixed Content view hide overflow"
-            ]
-        }
-    },
-    {
-        "version": "1.2.3",
-        "date": "2024-03-04",
-        "changes": {
-            "BugFix": [
-                "Creating new page will no longer change other pages names"
-            ]
-        }
-    },
-    {
-        "version": "0.1.93",
-        "date": "2024-02-05",
-        "changes": {
-            "Feature": [
-                "User needs to refresh page after adding component to see the edit or delete Section option",
-                "When creating a new page, user needs to manually refresh the page to access/expand the newly made Page."
-            ],
-            "BugFix": [
-                "When Viewing Navbar nested Menus in cms, all the nested menus become opened and can only be closed by pressing the menu of the 1st Nav bar",
-                "When creating new Navbar, it gets auto submitted when the menu is selected/clicked.",
-                "User Cannot Delete Pages.",
-                "When adding Images in a Section, User does not see media library but instead a drop down menu with Image IDs.",
-                "When adding Forms in a Section, the drop down menu shows no data.",
-                "When adding Events in a Section, the drop down menu shows no data.",
-                "After Editing a Section, a new section is created but only visually created.",
-                "After creating a card in a section, if User goes to Edit Mode and changes the card from the drop down menu, User gets redirected to a Application error page."
-            ]
-        }
-    },
-    {
-        "version": "0.1.94",
-        "date": "2024-02-10",
-        "changes": {
-            "Feature": [
-                "Need to Preview Media",
-                "Need to Preview Slider",
-                "Need to show 'Page Name' along with 'Page ID' in the pages list."
-            ],
-            "BugFix": [
-                "Menu items are premade, addtional menu items cannot be created",
-                "In the Navbar section, user is not able to update the menu of the Navbar.",
-                "Card-> Create New -> Select Media -> Unselect Media Option is not working.",
-                "Edit Section -> Add Component is not working",
-                "Edit Section -> Add Section Not working",
-                "Edit Section -> Updating one paragraph changes all other paragraphs in same section"
-            ]
-        }
-    },
-    {
         "version": "0.1.1",
+        "type": "patch",
         "date": "2023-08-21",
         "changes": {
-            "Feature": [
-                "Launched a Showcase Menu Items Component, enabling a visually appealing display of menu options.",
-                "Facilitated the creation of menu items, streamlining the process of menu management.",
-                "Optimized card deletion functionality, providing a user-friendly interface for content management.",
-                "Advanced the menu item editing process for more intuitive and efficient updates.",
-                "Simplified the menu item deletion process, enhancing content management efficiency.",
-                "Introduced Showcase Menus Component, elevating the presentation of various menus."
+            "Features": [
+                "Launched a Showcase Menu Items Component, for visually appealing menu displays",
+                "Facilitated menu item creation, streamlining menu management",
+                "Optimized card deletion functionality for user-friendly content management",
+                "Advanced the menu item editing process for more intuitive updates",
+                "Simplified the menu item deletion process for efficient content management",
+                "Introduced Showcase Menus Component for enhanced presentation of menus"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.3",
+        "type": "patch",
         "date": "2023-08-26",
         "changes": {
-            "Feature": [
-                "Enabled seamless creation of menus, enhancing the ease of navigation and organization.",
-                "Streamlined the menu editing process, allowing for quick and efficient updates.",
-                "Developed a user-friendly interface for menu deletion, ensuring a clean and organized menu structure.",
-                "Launched Showcase Navbar Component, offering a dynamic navigation experience.",
-                "Implemented a straightforward process for creating navigation bars, enhancing website usability.",
-                "Enhanced navbar editing functionality, providing flexible customization options."
+            "Features": [
+                "Enabled seamless creation of menus, improving navigation and organization",
+                "Streamlined the menu editing process for quick updates",
+                "Developed a user-friendly interface for menu deletion, keeping structures clean",
+                "Launched a Showcase Navbar Component for dynamic navigation experiences",
+                "Implemented an easy process for creating navigation bars",
+                "Enhanced navbar editing functionality for flexible customization"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.5",
+        "type": "patch",
         "date": "2023-08-31",
         "changes": {
-            "Feature": [
-                "Simplified navbar deletion process, promoting an organized and efficient navigation system.",
-                "Introduced Showcase Footers Component, elevating the website's footer design and functionality.",
-                "Advanced the footer editing capabilities, allowing for detailed customization.",
-                "Developed an efficient process for footer deletion, ensuring a clean and concise website layout.",
-                "Implemented a feature to display cards, enhancing the visual appeal and organization of content."
+            "Features": [
+                "Simplified navbar deletion process for a more organized navigation system",
+                "Introduced a Showcase Footers Component, improving footer design and functionality",
+                "Advanced footer editing capabilities for detailed customization",
+                "Developed an efficient process for footer deletion, ensuring a concise layout",
+                "Implemented a feature to display cards, enhancing visual appeal and organization"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.7",
+        "type": "patch",
         "date": "2023-09-05",
         "changes": {
-            "Feature": [
-                "Introduced a comprehensive profile showcasing feature, improving user engagement.",
-                "Enhanced profile editing functionality, allowing users to easily update their information.",
-                "Developed a streamlined process for card creation, facilitating the addition of new content.",
-                "Advanced card editing capabilities, ensuring a flexible and user-friendly content management experience.",
-                "Launched an Admin Profile feature, providing administrators with enhanced profile management capabilities."
+            "Features": [
+                "Introduced a comprehensive profile showcase feature, boosting user engagement",
+                "Enhanced profile editing functionality for easy updates",
+                "Developed a streamlined process for card creation",
+                "Improved card editing capabilities for flexible content management",
+                "Launched an Admin Profile feature, offering enhanced profile management"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.9",
+        "type": "patch",
         "date": "2023-09-10",
         "changes": {
-            "Feature": [
-                "Introduced a Forms Showcase feature, enhancing the visibility and accessibility of forms.",
-                "Launched a Home Page feature, providing a welcoming and informative first impression for visitors.",
-                "Implemented a Home Page Editor, enabling easy customization and updates to the home page content.",
-                "Introduced an About Page feature, offering a dedicated space for company or website information.",
-                "Launched an About Page Editor, facilitating easy updates and customization of about page content."
+            "Features": [
+                "Introduced a Forms Showcase feature, improving visibility of forms",
+                "Launched a Home Page feature for a welcoming initial user experience",
+                "Implemented a Home Page Editor for easy customization",
+                "Introduced an About Page feature for company/website information",
+                "Launched an About Page Editor for straightforward updates"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.11",
+        "type": "patch",
         "date": "2023-09-15",
         "changes": {
-            "Feature": [
-                "Implemented a Contact Us Page feature, ensuring visitors have easy access to contact information.",
-                "Launched a Contact Us Page Editor, allowing for straightforward updates to contact information and layout.",
-                "Introduced a Media Selection Reusable Modal, streamlining the process of selecting and managing media content.",
-                "Launched a dedicated Cylinder Page - Hero, Safe & Reliable, highlighting key features and safety information.",
-                "Enhanced image selection functionality for sliders, showing current images during updates and selected images after selection.",
-                "Implemented a Cylinder Page Editor for Hero, Safe & Reliable sections, enabling easy updates and customizations."
+            "Features": [
+                "Implemented a Contact Us Page feature for easy access to contact information",
+                "Launched a Contact Us Page Editor for quick updates",
+                "Introduced a Media Selection Reusable Modal for simpler media management",
+                "Added a Cylinder Page – Hero, Safe & Reliable section, highlighting key features",
+                "Improved image selection for sliders, showing current images and changes clearly",
+                "Provided a Cylinder Page Editor for Hero, Safe & Reliable sections"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.13",
+        "type": "patch",
         "date": "2023-09-20",
         "changes": {
-            "Feature": [
-                "Introduced an Order Placement feature on the Cylinder Page, facilitating straightforward order processes.",
-                "Launched a Reticulation System feature on the Cylinder Page, providing detailed information on gas reticulation systems.",
-                "Implemented a Dealership Opportunity section on the Cylinder Page, offering information on dealership opportunities.",
-                "Enhanced the Order Placement section editing capabilities on the Cylinder Page, allowing for easy updates.",
-                "Streamlined the Reticulation System section editing process on the Cylinder Page, ensuring ease of customization.",
-                "Introduced an Auto Gas Page - Cover, featuring a multi-card selector for diverse gas options."
+            "Features": [
+                "Introduced an Order Placement feature on the Cylinder Page for smoother ordering",
+                "Launched a Reticulation System feature on the Cylinder Page for gas system details",
+                "Implemented a Dealership Opportunity section on the Cylinder Page for potential partners",
+                "Enhanced the Order Placement section editing on the Cylinder Page",
+                "Streamlined the Reticulation System section editing on the Cylinder Page",
+                "Introduced an Auto Gas Page – Cover with a multi-card selector for gas options"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.15",
+        "type": "patch",
         "date": "2023-09-25",
         "changes": {
-            "Feature": [
-                "Launched an Autogas Page Editor for the Cover section, enabling customized presentation of gas options.",
-                "Implemented an Accordion feature on the Auto Gas Page, enhancing content organization and accessibility.",
-                "Enhanced the Auto Gas Page Editor with Accordion capabilities, allowing for detailed content management.",
-                "Launched a Bulk Gas Page - Cover, featuring a multi-card selector for bulk gas options.",
-                "Implemented a Bulk Gas Page Editor for the Cover section, enabling easy customization of bulk gas presentations."
+            "Features": [
+                "Launched an Autogas Page Editor for the Cover section, supporting custom gas presentations",
+                "Implemented an Accordion feature on the Auto Gas Page for better content organization",
+                "Enhanced the Auto Gas Page Editor with Accordion capabilities",
+                "Launched a Bulk Gas Page – Cover with a multi-card selector for bulk gas options",
+                "Provided a Bulk Gas Page Editor for easy customization of bulk gas presentations"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.17",
+        "type": "patch",
         "date": "2023-09-30",
         "changes": {
-            "Feature": [
-                "Introduced a Carousel Selector feature on the Bulk Gas Page, enhancing the visual appeal and user interaction.",
-                "Enhanced the Bulk Gas Page Editor with Carousel Selector capabilities, allowing for dynamic content displays.",
-                "Launched a Grid Card Selector feature on the Bulk Gas Page, improving content organization and accessibility.",
-                "Implemented a Bulk Gas Page Editor for the Grid Card Selector, facilitating easy content management and customization.",
-                "Introduced a Health & Safety Page - Cover, featuring a multi-card selector for health and safety information.",
-                "Launched a Health & Safety Page Editor for the Cover section, enabling customized presentation of safety guidelines."
+            "Features": [
+                "Introduced a Carousel Selector on the Bulk Gas Page for improved visual appeal",
+                "Enhanced the Bulk Gas Page Editor with Carousel Selector features",
+                "Launched a Grid Card Selector on the Bulk Gas Page for organized content",
+                "Implemented a Bulk Gas Page Editor for the Grid Card Selector",
+                "Introduced a Health & Safety Page – Cover with a multi-card selector",
+                "Launched a Health & Safety Page Editor for the Cover section"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
-        "version": "0.1.19",
-        "date": "2023-10-05",
-        "changes": {
-            "Feature": [
-                "Implemented a Grid Card Selector feature on the Health & Safety Page, enhancing content organization.",
-                "Enhanced the Health & Safety Page Editor with Grid Card Selector capabilities, allowing for detailed content management.",
-                "Introduced an Accordion feature on the Health & Safety Page, improving the organization and presentation of information.",
-                "Launched a Health & Safety Page Editor with Accordion capabilities, facilitating easy updates to safety content.",
-                "Implemented an Icon List feature on the Health & Safety Page, enhancing the visual presentation of key safety icons.",
-                "Enhanced the Health & Safety Page Editor with Icon List capabilities, allowing for easy customization of safety icons.",
-                "Launched a News Media Page - Cover, featuring a multi-card selector for media and news content.",
-                "Implemented a News Media Page Editor for the Cover section, enabling dynamic presentation of news items.",
-                "Introduced an Events Management feature on the News Media Page, streamlining the organization of events.",
-                "Launched a News Media Page Editor for Events Management, facilitating easy updates and management of event information.",
-                "Implemented a Press Release Management feature on the News Media Page, enhancing the distribution and organization of press releases.",
-                "Enhanced the News Media Page Editor with Press Release Management capabilities, allowing for streamlined press release updates."
-            ],
-            "BugFix": []
-        }
-    },
-    {
-        "version": "0.1.4",
+        "version": "0.1.18",
+        "type": "patch",
         "date": "2023-10-02",
         "changes": {
-            "Feature": [
-                "Introduced a Creator feature on the News Media Page, enabling the easy creation and management of news content.",
-                "Launched a News Media Page Editor for the Creator feature, facilitating customized news content creation.",
-                "Implemented an Events Component, offering a comprehensive solution for creating and managing events.",
-                "Launched an Events Component Editor, enabling detailed customization and management of event information.",
-                "Introduced an Events Component Gallery, enhancing the visual presentation and accessibility of event images.",
-                "Implemented a Press Release Component Creator, streamlining the process of creating and managing press releases."
+            "Features": [
+                "Introduced a Creator feature on the News Media Page, simplifying news management",
+                "Launched a News Media Page Editor for the Creator feature",
+                "Implemented an Events Component for comprehensive event creation/management",
+                "Launched an Events Component Editor for detailed event customization",
+                "Introduced an Events Component Gallery for event image handling",
+                "Implemented a Press Release Component Creator for streamlined press release management"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.19",
+        "type": "patch",
         "date": "2023-10-05",
         "changes": {
-            "Feature": [
-                "Launched a Press Release Component Editor, facilitating easy customization and updates to press release content.",
-                "Introduced a Press Release Component Gallery, enhancing the organization and presentation of press release images.",
-                "Launched an Order Management Dashboard, offering comprehensive tools for managing orders efficiently.",
-                "Implemented Order Management Manipulation features, providing enhanced control over order processing and tracking.",
-                "Introduced a Dealership Dashboard, enabling streamlined management of dealership information and applications.",
-                "Launched Dealership Manipulation features, offering detailed control over dealership data and processes."
+            "Features": [
+                "Implemented a Grid Card Selector on the Health & Safety Page for content organization",
+                "Enhanced the Health & Safety Page Editor with Grid Card Selector features",
+                "Introduced an Accordion feature on the Health & Safety Page for structured information",
+                "Launched a Health & Safety Page Editor with Accordion capabilities",
+                "Implemented an Icon List feature on the Health & Safety Page for visual safety icons",
+                "Enhanced the Health & Safety Page Editor with Icon List functionality",
+                "Launched a News Media Page – Cover with a multi-card selector for media content",
+                "Implemented a News Media Page Editor for Events Management",
+                "Introduced a Press Release Management feature on the News Media Page",
+                "Enhanced the News Media Page Editor with Press Release Management"
             ],
-            "BugFix": []
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "0.1.20",
+        "type": "patch",
+        "date": "2023-10-06",
+        "changes": {
+            "Features": [
+                "Launched a Press Release Component Editor for easy press release updates",
+                "Introduced a Press Release Component Gallery for better press release image organization",
+                "Deployed an Order Management Dashboard for comprehensive order tracking",
+                "Implemented Order Management Manipulation features for detailed order processing",
+                "Introduced a Dealership Dashboard, facilitating dealership data management",
+                "Launched Dealership Manipulation features for in-depth dealership control"
+            ],
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.21",
+        "type": "patch",
         "date": "2023-10-10",
         "changes": {
-            "Feature": [
-                "Implemented a Contact Us Dashboard, facilitating efficient management of contact inquiries and information.",
-                "Introduced Contact us Manipulation features, providing enhanced control over contact form responses and management.",
-                "Launched a Gas Variants Dashboard, offering comprehensive tools for managing different gas variants.",
-                "Implemented Gas Variants Manipulation features, enabling detailed control over gas variant information and updates.",
-                "Introduced a Dashboard Order Implement feature, streamlining the integration of orders into the dashboard for efficient management.",
-                "Launched Admin Authentication features, ensuring secure and efficient administration access and control."
+            "Features": [
+                "Implemented a Contact Us Dashboard for managing contact inquiries",
+                "Introduced Contact Us Manipulation features for controlling form responses",
+                "Launched a Gas Variants Dashboard for managing different gas types",
+                "Added Gas Variants Manipulation features for detailed gas data control",
+                "Introduced a Dashboard Order Implement feature for integrating orders in the dashboard",
+                "Deployed Admin Authentication features for secure administrative access"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.23",
+        "type": "patch",
         "date": "2023-10-15",
         "changes": {
-            "Feature": [
-                "Implemented detailed Admin Profile Details features, allowing for comprehensive management of admin profile information.",
-                "Introduced an Admin Logout Automation feature, enhancing security and convenience in admin session management.",
-                "Launched an Admin Dashboard, offering comprehensive tools and insights for effective website management.",
-                "Implemented Google Analytics Integration, providing detailed insights and analytics for informed decision-making.",
-                "Introduced Order Management on Dashboard features, enabling efficient tracking and management of orders."
+            "Features": [
+                "Added Admin Profile Details features for comprehensive admin info management",
+                "Introduced Admin Logout Automation for secure session handling",
+                "Launched an Admin Dashboard for effective website oversight",
+                "Implemented Google Analytics Integration for detailed usage insights",
+                "Introduced Order Management on Dashboard for efficient order tracking"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.25",
+        "type": "patch",
         "date": "2023-10-20",
         "changes": {
-            "Feature": [
-                "Launched Dealership Management on Dashboard features, offering comprehensive tools for managing dealership applications and information.",
-                "Implemented a Gases Dashboard, facilitating streamlined management of various gas types and information.",
-                "Introduced features for creating gas types, enhancing flexibility in managing and introducing new gas variants.",
-                "Launched capabilities for updating gas types, ensuring accurate and current information on gas offerings.",
-                "Implemented a straightforward process for gas type deletion, promoting efficient management of gas variant offerings.",
-                "Introduced a Form Responses Dashboard, enabling efficient tracking and management of form submissions."
+            "Features": [
+                "Deployed Dealership Management on Dashboard for managing dealership applications",
+                "Implemented a Gases Dashboard for streamlined gas management",
+                "Added features for creating gas types for new variants",
+                "Introduced gas type updating features for accurate data",
+                "Implemented gas type deletion functionality for efficient management",
+                "Launched a Form Responses Dashboard for tracking form submissions"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.27",
+        "type": "patch",
         "date": "2023-10-25",
         "changes": {
-            "Feature": [
-                "Launched a Contact Us Dashboard, providing comprehensive tools for managing contact inquiries and responses.",
-                "Implemented Contact Form Responses filtering by name, enhancing the organization and accessibility of form submissions.",
-                "Introduced Contact Form Responses filtering by date, facilitating efficient tracking of form submissions over time.",
-                "Launched a feature for searching anything in Contact Form Responses, providing enhanced flexibility in managing submissions.",
-                "Implemented a feature to show messages in a popup for Contact Form Responses, enhancing user interaction and response management.",
-                "Introduced a two-click status change feature for Contact Form Responses, streamlining the management and processing of submissions."
+            "Features": [
+                "Launched a Contact Us Dashboard for managing inquiries and responses",
+                "Added filtering by name in Contact Form Responses",
+                "Introduced date filtering in Contact Form Responses",
+                "Enabled searching across all Contact Form Responses",
+                "Implemented popup messages for Contact Form Responses",
+                "Added a two-click status change feature for Contact Form Responses"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.29",
+        "type": "patch",
         "date": "2023-10-30",
         "changes": {
-            "Feature": [
-                "Launched a System Demand Dashboard, offering comprehensive tools for managing and tracking system demand information.",
-                "Implemented features for filtering System Demand data by name, enhancing organization and accessibility.",
-                "Introduced features for filtering System Demand data by date, facilitating efficient tracking and analysis.",
-                "Launched a feature to show data descriptions in a popup for System Demand, enhancing user interaction and information presentation."
+            "Features": [
+                "Launched a System Demand Dashboard for managing system demand details",
+                "Added filtering by name in System Demand data",
+                "Introduced filtering by date in System Demand data",
+                "Implemented popup descriptions for System Demand data"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.31",
+        "type": "patch",
         "date": "2023-11-04",
         "changes": {
-            "Feature": [
-                "Implemented a feature for downloading System Demand data in excel, streamlining data management and reporting.",
-                "Introduced a feature for searching anything in System Demand data, providing enhanced flexibility in data analysis and management.",
-                "Launched a feature for exporting Contact Form Responses data in excel, facilitating efficient data management and reporting.",
-                "Implemented a two-click status change feature for System Demand, streamlining the management and processing of system demand information."
+            "Features": [
+                "Enabled downloading System Demand data in Excel for easy reporting",
+                "Added searching across all System Demand data for flexibility",
+                "Launched Excel export for Contact Form Responses data",
+                "Provided a two-click status change for System Demand management"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.33",
+        "type": "patch",
         "date": "2023-11-09",
         "changes": {
-            "Feature": [
-                "Introduced a Creator Mode - Pages Dashboard, offering comprehensive tools for managing and customizing web pages.",
-                "Launched a feature for creating new pages in Creator Mode, enhancing flexibility and creativity in web design.",
-                "Implemented a straightforward process for page deletion in Creator Mode, promoting efficient content management.",
-                "Introduced a Creator Canvas Develop feature in Creator Mode, enabling dynamic and customized web design.",
-                "Launched a Component Selector feature in Creator Mode, providing a wide range of components for flexible web design."
+            "Features": [
+                "Introduced a Creator Mode – Pages Dashboard for managing web pages",
+                "Launched a feature for creating new pages in Creator Mode",
+                "Enabled page deletion in Creator Mode for efficient content management",
+                "Introduced a Creator Canvas Develop feature for custom web design",
+                "Deployed a Component Selector in Creator Mode for flexible building"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.35",
+        "type": "patch",
         "date": "2023-11-14",
         "changes": {
-            "Feature": [
-                "Implemented Real-Time Render Selected Component features in Creator Mode, enhancing design efficiency and visualization.",
-                "Introduced a Component Parser for Cards in Creator Mode, streamlining the integration and customization of card components.",
-                "Launched a Component Parser for Titles in Creator Mode, facilitating easy customization and integration of title components.",
-                "Implemented a Component Parser for Descriptions in Creator Mode, enhancing content management and customization.",
-                "Introduced a Component Parser for Navbars in Creator Mode, enabling dynamic and flexible navigation design."
+            "Features": [
+                "Enabled Real-Time Render of selected components in Creator Mode",
+                "Introduced a Component Parser for Cards, streamlining card usage",
+                "Launched a Component Parser for Titles, simplifying title customization",
+                "Provided a Component Parser for Descriptions, improving content flow",
+                "Introduced a Component Parser for Navbars, supporting dynamic navigation"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.37",
+        "type": "patch",
         "date": "2023-11-19",
         "changes": {
-            "Feature": [
-                "Launched a Component Parser for Menus in Creator Mode, providing comprehensive tools for menu design and customization.",
-                "Implemented a Component Parser for Footers in Creator Mode, enhancing footer design and functionality.",
-                "Introduced a Component Parser for Events in Creator Mode, streamlining event management and presentation.",
-                "Launched a Component Parser for Forms in Creator Mode, facilitating efficient form design and integration.",
-                "Implemented a Component Parser for Gas in Creator Mode, providing tools for managing and presenting gas information."
+            "Features": [
+                "Released a Component Parser for Menus in Creator Mode",
+                "Added a Component Parser for Footers, enhancing footer design",
+                "Deployed a Component Parser for Events, aiding event management",
+                "Introduced a Component Parser for Forms, facilitating form customization",
+                "Added a Component Parser for Gas, improving gas information management"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
-        "version": "0.1.37",
-        "date": "2023-11-19",
+        "version": "0.1.38",
+        "type": "patch",
+        "date": "2023-11-20",
         "changes": {
-            "Feature": [
-                "Introduced a Component Parser for Inner Sections in Creator Mode, enhancing layout design and content organization.",
-                "Launched a Component Parser for Sections in Creator Mode, facilitating structured and organized web design.",
-                "Implemented a Component Parser for Media in Creator Mode, providing comprehensive tools for media management and presentation.",
-                "Introduced a Component Parser for Press Releases in Creator Mode, streamlining press release management and integration.",
-                "Launched a Component Parser for Sliders in Creator Mode, enhancing slider design and customization."
+            "Features": [
+                "Added a Component Parser for Inner Sections in Creator Mode",
+                "Launched a Component Parser for Sections, improving layout structure",
+                "Deployed a Component Parser for Media, enhancing media presentation",
+                "Introduced a Component Parser for Press Releases, streamlining PR management",
+                "Provided a Component Parser for Sliders, enabling flexible slider customization"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.39",
+        "type": "patch",
         "date": "2023-11-24",
         "changes": {
-            "Feature": [
-                "Implemented an Editor Mode for Titles, providing enhanced flexibility in title editing and customization.",
-                "Introduced an Editor Mode for Descriptions, facilitating detailed content editing and management.",
-                "Launched an Editor Mode for Menus, offering comprehensive tools for menu editing and customization.",
-                "Implemented an Editor Mode for Navbars, enabling dynamic navigation editing and design.",
-                "Introduced an Editor Mode for Cards, providing a user-friendly interface for card editing and management.",
-                "Launched an Editor Mode for Multiple Cards, enhancing the management and customization of card collections."
+            "Features": [
+                "Implemented an Editor Mode for Titles with flexible editing",
+                "Introduced an Editor Mode for Descriptions for detailed content control",
+                "Launched an Editor Mode for Menus with robust customization",
+                "Provided an Editor Mode for Navbars for dynamic navigation edits",
+                "Enabled an Editor Mode for Cards, improving card management",
+                "Added Editor Mode for Multiple Cards for better multi-card handling"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.41",
+        "type": "patch",
         "date": "2023-11-29",
         "changes": {
-            "Feature": [
-                "Implemented an Editor Mode for Inner Sections, facilitating structured and efficient section editing.",
-                "Introduced an Editor Mode for Sliders, offering comprehensive tools for slider customization and management.",
-                "Launched an Editor Mode for Media, providing enhanced flexibility in media management and presentation.",
-                "Implemented an Editor Mode for Footers, facilitating efficient footer editing and customization.",
-                "Introduced an Editor Mode for Events, streamlining event management and editing processes."
+            "Features": [
+                "Deployed an Editor Mode for Inner Sections for structured editing",
+                "Launched an Editor Mode for Sliders, providing comprehensive slider management",
+                "Introduced an Editor Mode for Media, improving media organization",
+                "Implemented an Editor Mode for Footers for flexible footer customization",
+                "Added an Editor Mode for Events, supporting event editing and updates"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.43",
+        "type": "patch",
         "date": "2023-12-04",
         "changes": {
-            "Feature": [
-                "Launched an Editor Mode for Press Releases, providing comprehensive tools for press release editing and management.",
-                "Implemented an Editor Mode for Forms, enhancing form design and customization capabilities.",
-                "Introduced a feature for deleting sections in Editor Mode, promoting efficient content management and organization.",
-                "Launched an Editor Mode set to only clicked Section, enhancing focused editing and customization of specific sections.",
-                "Implemented a comprehensive Users List with details, providing enhanced user management and insights."
+            "Features": [
+                "Launched an Editor Mode for Press Releases, supporting detailed PR editing",
+                "Introduced an Editor Mode for Forms, improving form design and customization",
+                "Added a feature for deleting sections in Editor Mode for efficient cleanup",
+                "Launched an Editor Mode limited to the clicked section, ensuring targeted edits",
+                "Implemented a comprehensive Users List with detailed user data"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.45",
+        "type": "patch",
         "date": "2023-12-09",
         "changes": {
-            "Feature": [
-                "Introduced a Super Admin Profile Information Update feature, ensuring accurate and up-to-date super admin profiles.",
-                "Launched a feature for Super Admin to change their own role, enhancing flexibility and control in administration.",
-                "Implemented a feature for Admin to modify their own information, ensuring accurate and current admin profiles.",
-                "Introduced a feature for Admins to show other users with info, enhancing user management and insights.",
-                "Launched capabilities for Admins to update other users' information, providing comprehensive user management tools."
+            "Features": [
+                "Introduced a Super Admin Profile Information Update feature",
+                "Launched a feature enabling Super Admin role changes for themselves",
+                "Implemented a feature for Admins to modify their own details",
+                "Introduced a feature for Admins to view other users' info",
+                "Deployed capabilities for Admins to update other users' data"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.47",
+        "type": "patch",
         "date": "2023-12-14",
         "changes": {
-            "Feature": [
-                "Implemented a feature for Admins to change other users' roles, facilitating efficient user role management.",
-                "Introduced a Bulk Media Selection feature, streamlining the process of selecting and managing large volumes of media.",
-                "Launched a Media upload feature, enabling easy and efficient media management.",
-                "Implemented a Media update feature, ensuring current and accurate media content.",
-                "Introduced a Media Delete feature, promoting efficient and organized media management."
+            "Features": [
+                "Implemented a feature for Admins to change other users' roles",
+                "Introduced Bulk Media Selection for easier handling of large media sets",
+                "Launched a Media upload feature for efficient media management",
+                "Added a Media update feature for keeping content current",
+                "Provided a Media Delete feature for organized media cleanup"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.49",
+        "type": "patch",
         "date": "2023-12-19",
         "changes": {
-            "Feature": [
-                "Launched a Page Builder for creating pages, enhancing web design flexibility and creativity.",
-                "Implemented a Page Builder for adding sections, facilitating structured and organized web design.",
-                "Introduced a Page Builder for adding components, providing a wide range of design options and customization.",
-                "Launched a Page Builder for syncing with the database, ensuring seamless integration and data management.",
-                "Implemented a Page Builder for updating components, enhancing design flexibility and customization."
+            "Features": [
+                "Launched a Page Builder for creating pages, enhancing design flexibility",
+                "Implemented a Page Builder for adding sections, improving structure",
+                "Introduced a Page Builder for adding components, enabling rich layouts",
+                "Added a Page Builder for syncing with the database, ensuring consistency",
+                "Deployed a Page Builder for updating components with ease"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.51",
+        "type": "patch",
         "date": "2023-12-24",
         "changes": {
-            "Feature": [
-                "Introduced an Authentication feature for context setup, ensuring secure and efficient user authentication processes.",
-                "Launched an Authentication feature for user validation, enhancing security and user management.",
-                "Implemented an Authentication feature for user data persistence, ensuring seamless user experiences and data management.",
-                "Introduced an Authentication feature for route secure, enhancing security and access control.",
-                "Launched features for optimizing media fetching, enhancing efficiency and performance in media management."
+            "Features": [
+                "Introduced Authentication for context setup, securing user sessions",
+                "Launched Authentication for user validation, enhancing security",
+                "Implemented Authentication for user data persistence, ensuring continuity",
+                "Added Authentication for route security, restricting unauthorized access",
+                "Optimized media fetching for improved performance"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.53",
+        "type": "patch",
         "date": "2023-12-29",
         "changes": {
-            "Feature": [
-                "Implemented features for optimizing cards fetching, streamlining the process of managing and displaying cards.",
-                "Introduced a Grid & List View in cards for better usability, providing flexible display options for content.",
-                "Launched features for redeveloping cards to Modular form, enhancing design flexibility and customization.",
-                "Implemented features for adding Sorting, Searching, and Filtering Optimization in cards, streamlining content management.",
-                "Introduced a feature for updating card show difference and changed image instantly, enhancing content accuracy and presentation.",
-                "Launched a Tools Added feature - Image to WebP converter, facilitating efficient image conversion and optimization."
+            "Features": [
+                "Optimized card fetching for faster content display",
+                "Introduced Grid & List View in cards for better usability",
+                "Redeveloped cards into a Modular form for flexible layouts",
+                "Added Sorting, Searching, and Filtering optimization in cards",
+                "Provided a real-time card image swap on updates",
+                "Launched a Tools feature: Image-to-WebP converter"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.55",
+        "type": "patch",
         "date": "2024-01-03",
         "changes": {
-            "Feature": [
-                "Implemented a comprehensive Changelog feature, providing detailed insights into updates and enhancements.",
-                "Introduced Media Library Real-Time Deletion, enhancing efficiency and organization in media management.",
-                "Launched Media Library Advanced Filtering Features, providing comprehensive tools for media search and organization.",
-                "Implemented Media Library Limit & Audit Media uploads, ensuring efficient and controlled media management.",
-                "Introduced Media Library elements pagination on Server End and Front end optimization, enhancing performance and user experience."
+            "Features": [
+                "Introduced a comprehensive Changelog feature for tracking updates",
+                "Enabled Media Library Real-Time Deletion for better organization",
+                "Launched Advanced Filtering in Media Library for easy searches",
+                "Added Media upload limits & auditing for controlled content",
+                "Deployed server-side pagination & front-end optimization in the Media Library"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.57",
+        "type": "patch",
         "date": "2024-01-08",
         "changes": {
-            "Feature": [
-                "Launched Menu Items Search filter add, facilitating efficient search and organization of menu items.",
-                "Implemented Menu Items Sorting Feature, streamlining the process of organizing and displaying menu items.",
-                "Introduced Add Bangla Title fields in Menu Items, enhancing localization and accessibility for Bangla-speaking users.",
-                "Launched Add Search Filters in Menus, providing comprehensive search capabilities for menu management.",
-                "Implemented Add Sorting Filters in Menus, facilitating efficient organization and display of menus.",
-                "Introduced Add Navbar names as titles for navbars, enhancing navigation clarity and user experience.",
-                "Launched Navbar menu items get hamburgered view if limit exceeds, providing a responsive and user-friendly navigation experience."
+            "Features": [
+                "Launched a Menu Items Search filter, improving menu management",
+                "Implemented a Menu Items Sorting Feature for easy organization",
+                "Added Bangla Title fields in Menu Items for localization",
+                "Introduced Search Filters in Menus for quick retrieval",
+                "Deployed Sorting Filters in Menus for efficient structuring",
+                "Added Navbar titles for better clarity",
+                "Enabled Navbar items to auto-collapse into a hamburger if item limit is exceeded"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.59",
+        "type": "patch",
         "date": "2024-01-15",
         "changes": {
-            "Feature": [
-                "Implemented Sliders have List view, offering flexible display options for sliders.",
-                "Introduced Sliders will show in grid, enhancing visual appeal and organization of slider content.",
-                "Launched Cards show in grid, providing a structured and visually appealing display for cards.",
-                "Implemented Cards show in list, offering an alternative and organized display option for cards.",
-                "Introduced Cards can be searched by title, enhancing searchability and accessibility of card content.",
-                "Launched Cards can be sorted by time and page name, facilitating efficient organization and retrieval of card content.",
-                "Implemented Cards description will be shown on Modal on view description click, enhancing user interaction and information accessibility."
+            "Features": [
+                "Added a List view for Sliders, enabling alternative displays",
+                "Introduced a Grid view for Sliders, improving layout variety",
+                "Enabled a Grid display for Cards, offering structured visuals",
+                "Launched a List display for Cards, enhancing organization",
+                "Allowed card searches by title for better findability",
+                "Enabled card sorting by time and page name",
+                "Displayed card descriptions in a modal upon viewing"
             ],
-            "BugFix": []
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "3.1.1",
+        "type": "patch",
+        "date": "2024-01-15",
+        "changes": {
+            "Features": [
+                "Added a new Gallery refresh feature to see updated media",
+                "Introduced a Cloudinary tab visible only if registered"
+            ],
+            "Bug Fixes": [
+                "Fixed gallery file format compatibility issues"
+            ]
         }
     },
     {
         "version": "0.1.61",
+        "type": "patch",
         "date": "2024-01-18",
         "changes": {
-            "Feature": [
-                "Introduced Order Management - Orders can be Sorted by Order ID, streamlining order tracking and management.",
-                "Launched Order Management - Orders can be Sorted by Customer Name, enhancing customer service and order management.",
-                "Implemented Order Management - Orders can be Sorted by Order Date, facilitating efficient order tracking and prioritization.",
-                "Introduced Order Management - Orders can be Sorted by Status, streamlining order processing and management.",
-                "Launched Order Management - Orders details can be shown in Popup, enhancing user interaction and order details accessibility.",
-                "Implemented Order Management - Orders status can be changed in 2 clicks, streamlining order processing and status updates."
+            "Features": [
+                "Introduced Order Management sorting by Order ID",
+                "Launched sorting by Customer Name for better service",
+                "Implemented sorting by Order Date for prioritization",
+                "Added sorting by Status for streamlined processing",
+                "Enabled order details in a popup for quick reference",
+                "Allowed 2-click status changes for faster updates"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.63",
+        "type": "patch",
         "date": "2024-01-23",
         "changes": {
-            "Feature": [
-                "Introduced Order Management - Orders can be Searched by any kind of data, enhancing searchability and order management efficiency.",
-                "Launched Order Management - Orders with details can be downloaded as excel sheets, facilitating efficient order reporting and analysis.",
-                "Implemented Order Management - Dealership Opportunity can be Sorted by Dealer Name, streamlining dealership management and tracking.",
-                "Introduced Order Management - D.O can be Sorted by District, enhancing localization and management of dealership opportunities.",
-                "Launched Order Management - D.O can be Sorted by Time of application, facilitating efficient tracking and processing of dealership applications.",
-                "Implemented Order Management - D.O details can be checked in popup, enhancing user interaction and information accessibility.",
-                "Introduced Order Management - D.O status can be changed in 2 clicks, streamlining dealership application processing and status updates."
+            "Features": [
+                "Enabled searching orders by any data for better management",
+                "Allowed Excel downloads of orders with details for reporting",
+                "Provided sorting of Dealership Opportunities by Dealer Name",
+                "Introduced sorting of DO by District for easy localization",
+                "Enabled sorting of DO by time of application",
+                "Added DO details in a popup for quick info",
+                "Allowed DO status changes in 2 clicks"
             ],
-            "BugFix": []
+            "Bug Fixes": []
         }
     },
     {
         "version": "0.1.65",
+        "type": "patch",
         "date": "2024-01-28",
         "changes": {
-            "Feature": [],
-            "BugFix": [
-                "Resolved the absence of gas weight in order details.",
-                "Fixed the issue where dealership opportunity information was not fully included.",
-                "Addressed the static display of footer menu titles.",
-                "Corrected a local storage error occurring on the profile page.",
-                "Updated menu items to accurately reflect Bangla titles.",
-                "Implemented a hamburger view for menu lists in the navigation bar.",
-                "Rectified grid issues in the card gallery layout."
+            "Features": [],
+            "Bug Fixes": [
+                "Included gas weight in order details",
+                "Displayed full dealership opportunity info",
+                "Resolved static footer menu titles",
+                "Fixed a local storage error on the profile page",
+                "Ensured Bangla titles update properly in menu items",
+                "Implemented a hamburger view for menu lists in the navbar",
+                "Corrected grid layout issues in the card gallery"
             ]
         }
     },
     {
         "version": "0.1.67",
+        "type": "patch",
         "date": "2024-02-02",
         "changes": {
-            "Feature": [],
-            "BugFix": [
-                "Users can now create additional menu items instead of being restricted to premade ones.",
-                "Users can now update the menu of the Navbar section as intended.",
-                "Resolved the issue where the Unselect Media Option was not working when creating a new card.",
-                "Users can now preview media and sliders as expected.",
-                "The \"Add Component\" feature in the Edit section is now functioning properly.",
-                "The \"Add section\" feature in Edit section is now working correctly.",
-                "\"Page Name\" is now displayed along with \"Page ID\" in the pages list.",
-                "Resolved the issue where updating one paragraph would change all other paragraphs in the same section."
+            "Features": [],
+            "Bug Fixes": [
+                "Users can now create additional menu items beyond premade ones",
+                "Navbar menu updates function as intended",
+                "Unselect Media Option in card creation now works",
+                "Users can preview media and sliders properly",
+                "The 'Add Component' feature in Edit section is functional",
+                "The 'Add Section' feature in Edit section is operational",
+                "\"Page Name\" displays alongside \"Page ID\" in the pages list",
+                "Updating one paragraph no longer changes all paragraphs in the section"
+            ]
+        }
+    },
+    {
+        "version": "0.1.93",
+        "type": "patch",
+        "date": "2024-02-05",
+        "changes": {
+            "Features": [
+                "Users must refresh the page after adding a component to see edit/delete options",
+                "When creating a new page, a manual refresh is needed to access the new page"
+            ],
+            "Bug Fixes": [
+                "Navbar nested menus no longer all open simultaneously",
+                "Navbar creation no longer auto-submits on menu selection",
+                "Pages can be deleted properly",
+                "Media library displays correctly when adding images to a section",
+                "Form and Events dropdowns now show data",
+                "Editing a section only creates one visual section (no duplicates)",
+                "Card editing no longer triggers application errors on changes"
             ]
         }
     },
     {
         "version": "0.1.94",
+        "type": "patch",
+        "date": "2024-02-10",
+        "changes": {
+            "Features": [
+                "Preview Media feature",
+                "Preview Sliders feature",
+                "Display 'Page Name' alongside 'Page ID' in the pages list"
+            ],
+            "Bug Fixes": [
+                "Menu items were previously premade; additional items can now be created",
+                "Navbar menu can be updated correctly",
+                "Unselect Media Option in card creation is fully functional",
+                "Edit Section -> Add Component works properly",
+                "Edit Section -> Add Section is functioning",
+                "Editing a paragraph no longer affects all paragraphs in the section"
+            ]
+        }
+    },
+    {
+        "version": "0.1.95",
+        "type": "patch",
         "date": "2024-03-10",
         "changes": {
-            "Feature": [],
-            "BugFix": [
-                "Canceling the Edit in Creator mode will no longer result in the removal of the section.",
-                "Resolved the issue where an error would occur if the user cancels their creation after adding the first component by pressing the close button.",
-                "Users no longer need to refresh the page to see the edit or delete section option after adding a component.",
-                "Fixed the problem where all nested menus in the Navbar section would open when viewing them in the CMS, and now they can be opened individually & vice versa.",
-                "Navbar creation will no longer automatically submit when the menu is selected or clicked.",
-                "Users no longer need to manually refresh the page to access or expand the newly created Page after creating a new page.",
-                "Users can now delete pages as intended.",
-                "Resolved the issue where users were not able to see the media library when adding Images in a section, now they see a drop-down menu with Image IDs as expected.",
-                "The drop-down menu now shows data when adding Forms or Events in a section.",
-                "After editing a section, only one section is created visually as intended.",
-                "Fixed the issue where editing a card in a section and then changing it from the drop-down menu would redirect the user to an Application error page."
+            "Features": [],
+            "Bug Fixes": [
+                "Canceling Edit in Creator mode no longer removes the entire section",
+                "No more error if creation is canceled after adding the first component",
+                "Users do not need to refresh to see edit/delete section options after adding a component",
+                "Nested menus in the Navbar section can be opened individually",
+                "Navbar creation does not auto-submit on menu clicks",
+                "No manual refresh needed to expand a newly created Page",
+                "Pages can be deleted as intended",
+                "The media library properly shows when adding images to a section",
+                "Forms and Events dropdowns now populate correctly",
+                "Editing a section only creates one new section visually",
+                "Changing a card via dropdown no longer leads to an Application error"
+            ]
+        }
+    },
+    {
+        "version": "1.2.3",
+        "type": "patch",
+        "date": "2024-03-04",
+        "changes": {
+            "Bug Fixes": [
+                "Creating a new page no longer changes other page names"
+            ]
+        }
+    },
+    {
+        "version": "2.2.5",
+        "type": "patch",
+        "date": "2024-03-06",
+        "changes": {
+            "Features": [
+                "Added 'Documents' in Components for user uploads",
+                "Documents can be viewed and deleted in the CMS",
+                "Improved document handling across the CMS"
+            ],
+            "Bug Fixes": [
+                "Changing single media in page editor no longer affects all media in the section",
+                "Fixed position of 'Go Top' & 'Go Bottom' buttons in page editor",
+                "Resolved content overflow in the editor"
+            ]
+        }
+    },
+    {
+        "version": "2.2.7",
+        "type": "patch",
+        "date": "2024-03-08",
+        "changes": {
+            "Features": [
+                "Page slug is now editable in the page editor",
+                "Changelog version auto-updates in CMS from changelog.json"
+            ],
+            "Bug Fixes": [
+                "Multilingual titles can be added/updated for menu items"
+            ]
+        }
+    },
+    {
+        "version": "2.2.9",
+        "type": "patch",
+        "date": "2024-03-13",
+        "changes": {
+            "Features": [
+                "User can update sliders more easily in the CMS page editor"
+            ],
+            "Bug Fixes": [
+                "Added/updated multilingual titles in sliders",
+                "Changing a page name no longer affects all pages"
+            ]
+        }
+    },
+    {
+        "version": "2.2.11",
+        "type": "patch",
+        "date": "2024-03-15",
+        "changes": {
+            "Features": [
+                "Admins can create users from MAVE Admin -> Profile",
+                "Users can change theme from the top-right corner",
+                "Authorized users see avatars in their profile",
+                "Media Library is 1.2x faster",
+                "Tabs for Photos and Videos in Media Library"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.26",
+        "type": "patch",
+        "date": "2024-03-19",
+        "changes": {
+            "Features": [
+                "Users can upload/view documents (PDF, DOCX, XLSX, etc.) in Components",
+                "Instant file deletion without waiting",
+                "Menu Items support nested parent menus",
+                "Parent menus are visible in the CMS",
+                "Menu links can be Independent, Page, or Mega Menu"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.34",
+        "type": "patch",
+        "date": "2024-03-23",
+        "changes": {
+            "Features": [
+                "Upgraded rich text editors for better user experience",
+                "Improved media selector usability",
+                "Creator Studio supports page search by name/title"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.35",
+        "type": "patch",
+        "date": "2024-03-27",
+        "changes": {
+            "Features": [
+                "Added FAQ Page in the CMS",
+                "Added Support Page"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.36",
+        "type": "patch",
+        "date": "2024-04-02",
+        "changes": {
+            "Features": [
+                "Added documentation & User Guide"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.38",
+        "type": "patch",
+        "date": "2024-04-22",
+        "changes": {
+            "Features": [
+                "Dual title and description fields added in page edit mode"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.40",
+        "type": "patch",
+        "date": "2024-04-24",
+        "changes": {
+            "Features": [
+                "User can add a section title in the page editor"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.42",
+        "type": "patch",
+        "date": "2024-04-25",
+        "changes": {
+            "Features": [
+                "Users can create, view, update, and delete blog posts",
+                "Blog list and details view in CMS",
+                "AI-assisted writing in blog post editor",
+                "Blogs can be read directly in the CMS"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.43",
+        "type": "patch",
+        "date": "2024-05-06",
+        "changes": {
+            "Bug Fixes": [
+                "Page editor mode now displays section title",
+                "Updating a section properly closes editor mode",
+                "Removed Edit Mode 2",
+                "Card multilingual title only shows if available"
+            ]
+        }
+    },
+    {
+        "version": "2.2.48",
+        "type": "patch",
+        "date": "2024-05-09",
+        "changes": {
+            "Features": [
+                "Introduced tab view in Sliders Component",
+                "Create/Edit/Update/Delete Slider of cards in CMS",
+                "New MAVE logo design"
+            ],
+            "Bug Fixes": [
+                "Conversion between image sliders and card sliders is smoother"
+            ]
+        }
+    },
+    {
+        "version": "2.2.52",
+        "type": "patch",
+        "date": "2024-05-15",
+        "changes": {
+            "Features": [
+                "Ability to add components in existing sections",
+                "Enhanced media library with all media types",
+                "Gallery received a new UI"
+            ],
+            "Bug Fixes": [
+                "Sliders can be created seamlessly",
+                "Removed extraneous success/error messages"
+            ]
+        }
+    },
+    {
+        "version": "2.2.56",
+        "type": "patch",
+        "date": "2024-05-20",
+        "changes": {
+            "Features": [
+                "Users can view pages and subpages in the CMS Pages Gallery"
+            ],
+            "Bug Fixes": [
+                "Fixed the card slider issue, enabling smoother modifications"
+            ]
+        }
+    },
+    {
+        "version": "2.3.1",
+        "type": "patch",
+        "date": "2024-05-21",
+        "changes": {
+            "Features": [
+                "A new UI appears if the user is a super admin"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.2.57",
+        "type": "patch",
+        "date": "2024-05-26",
+        "changes": {
+            "Features": [
+                "Users can create and update cards with page/link assignments"
+            ],
+            "Bug Fixes": [
+                "Resolved a linking issue so pages match up correctly"
+            ]
+        }
+    },
+    {
+        "version": "2.2.62",
+        "type": "patch",
+        "date": "2024-06-03",
+        "changes": {
+            "Features": [
+                "Updated the Gallery view",
+                "Users can copy, view, and download media"
+            ],
+            "Bug Fixes": []
+        }
+    },
+    {
+        "version": "2.3.19",
+        "type": "patch",
+        "date": "2024-08-11",
+        "changes": {
+            "Features": [
+                "Introduced a new dynamic form builder under Tools",
+                "Users can create, update, delete, and view forms",
+                "Users can add fields and validations to forms",
+                "Added Terms, Contributing, Issue Template, etc., in CMS docs",
+                "Accessible from User Manual > Documentation"
+            ],
+            "Bug Fixes": [
+                "Fixed slider element update issues"
+            ]
+        }
+    },
+    {
+        "version": "2.3.21",
+        "type": "patch",
+        "date": "2024-09-22",
+        "changes": {
+            "Features": [
+                "Added new icons in the sidebar",
+                "Updated Mave logo"
+            ],
+            "Bug Fixes": [
+                "Resolved slider element update bug"
+            ]
+        }
+    },
+    {
+        "version": "3.0",
+        "type": "major",
+        "date": "2024-10-30",
+        "changes": {
+            "Features": [
+                "Revamped CMS look",
+                "Overhauled Page Builder",
+                "Custom model, form, and footer builders",
+                "CRUD for models to build a custom CMS",
+                "New widgets like carousel, accordion, table, etc."
+            ],
+            "Bug Fixes": [
+                "Fixed linking issues for matching pages",
+                "Resolved card slider modifications",
+                "Removed extraneous success/error messages"
+            ]
+        }
+    },
+    {
+        "version": "3.0.12",
+        "type": "patch",
+        "date": "2024-12-23",
+        "changes": {
+            "Features": [
+                "Introduced a new CMS interface",
+                "Menu item links now support query parameters and parent references",
+                "Search for media and cards within the page builder",
+                "Added a new footer builder akin to the page builder",
+                "Mave AI enhanced for more conversational, intelligent page building"
+            ],
+            "Bug Fixes": [
+                "Fixed menu items parent issue",
+                "Resolved query parameter issues in media and card searches"
+            ]
+        }
+    },
+    {
+        "version": "3.0.14",
+        "type": "patch",
+        "date": "2024-12-24",
+        "changes": {
+            "Features": [
+                "Gallery and Cards now have advanced search and filtering",
+                "Cards/Images support \"tag\" for categorization"
+            ],
+            "Bug Fixes": [
+                "Fixed sorting issue in Gallery"
+            ]
+        }
+    },
+    {
+        "version": "3.0.17",
+        "type": "patch",
+        "date": "2024-12-31",
+        "changes": {
+            "Features": [
+                "Added tags to Gallery, Cards, and Sliders with advanced functionality",
+                "Search and filter sliders by tags"
+            ],
+            "Bug Fixes": [
+                "Fixed tag field in slider creation",
+                "Resolved critical issue in dynamic complex table in page builder"
+            ]
+        }
+    },
+    {
+        "version": "3.2.11",
+        "type": "patch",
+        "date": "2025-03-12",
+        "changes": {
+            "Features": [
+                "Added tagged career responses in form"
             ]
         }
     }
