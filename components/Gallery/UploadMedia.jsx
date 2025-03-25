@@ -22,25 +22,45 @@ const UploadMedia = ({
   const [uploading, setUploading] = useState(false);
 
   const handleBeforeUpload = (file) => {
-    const isValidSize = file.size / 1024 / 1024 < 10; // Less than 10MB
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    const isValidSize = file.size < maxSize;
     const isValidType = [
       "image/jpeg",
       "image/png",
       "image/jpg",
       "image/webp",
+      "image/gif",
+      "image/svg+xml",
       "video/mp4",
+      "video/mkv",
+      "video/mpeg",
+      "video/mov",
+      "video/m4u",
       "application/pdf",
-      "application/epub",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/vnd.ms-powerpoint.presentation.macroEnabled.12",
     ].includes(file.type);
+
     if (!isValidSize) {
-      message.error("File must be smaller than 10MB.");
+      message.error(
+        `File size must be less than 2MB. Current size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`
+      );
+      return false;
     }
+
     if (!isValidType) {
       message.error(
-        "Unsupported file type. Only JPG, PNG, MP4, PDF, and EPUB are allowed."
+        "Unsupported file type. Please check the allowed file types."
       );
+      return false;
     }
-    return isValidSize && isValidType;
+
+    return true;
   };
 
   const handleChange = ({ file, fileList: newFileList }) => {

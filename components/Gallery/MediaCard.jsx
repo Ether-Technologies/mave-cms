@@ -54,6 +54,8 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
       "image/jpg",
       "image/jpeg",
       "image/svg+xml",
+      "image/webp",
+      "image/gif",
     ];
     return supportedFormats.includes(media.file_type);
   };
@@ -167,13 +169,36 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
         </div>
       );
     } else {
+      // Document preview
+      const isOfficeDoc =
+        media.file_type.includes("word") ||
+        media.file_type.includes("excel") ||
+        media.file_type.includes("powerpoint");
+
       return (
         <div className="flex items-center justify-center h-48 sm:h-56 md:h-64 lg:h-64 bg-gray-100 rounded-t-md">
-          <iframe
-            src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
-            title={media.file_name}
-            className="w-full h-full rounded-md"
-          />
+          <div className="text-center">
+            <div className="text-4xl mb-2">
+              {isOfficeDoc ? (
+                <svg
+                  className="w-16 h-16 mx-auto text-blue-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-16 h-16 mx-auto text-red-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
+                </svg>
+              )}
+            </div>
+            <p className="text-sm text-gray-600">{media.file_name}</p>
+          </div>
         </div>
       );
     }

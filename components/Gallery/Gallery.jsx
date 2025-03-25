@@ -72,6 +72,8 @@ const Gallery = () => {
   const handleMediaUploadSuccess = (newMedia) => {
     addMedia(newMedia); // Add the new media to the state and IndexedDB
     handleUploadModalClose(); // Close the upload modal
+    // Refresh the media data
+    window.location.reload();
   };
 
   return (

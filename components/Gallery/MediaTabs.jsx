@@ -14,8 +14,23 @@ const MediaTabs = ({
   handleEdit,
   handleDelete,
   handlePreview,
-  availableTags, // New prop for available tags
+  availableTags,
 }) => {
+  // Filter documents by type
+  const officeDocs = docs.filter(
+    (doc) =>
+      doc.file_type.includes("word") ||
+      doc.file_type.includes("excel") ||
+      doc.file_type.includes("powerpoint")
+  );
+
+  const otherDocs = docs.filter(
+    (doc) =>
+      !doc.file_type.includes("word") &&
+      !doc.file_type.includes("excel") &&
+      !doc.file_type.includes("powerpoint")
+  );
+
   return (
     <Tabs defaultActiveKey="1" centered animated type="card">
       <TabPane tab={`Images (${images.length})`} key="1">
@@ -25,7 +40,7 @@ const MediaTabs = ({
           handleEdit={handleEdit}
           handleDelete={handleDelete}
           handlePreview={handlePreview}
-          availableTags={availableTags} // Pass availableTags
+          availableTags={availableTags}
         />
       </TabPane>
       <TabPane tab={`Videos (${videos.length})`} key="2">
@@ -35,23 +50,31 @@ const MediaTabs = ({
           handleEdit={handleEdit}
           handleDelete={handleDelete}
           handlePreview={handlePreview}
-          availableTags={availableTags} // Pass availableTags
+          availableTags={availableTags}
         />
       </TabPane>
-      <TabPane tab={`Docs (${docs.length})`} key="3">
+      <TabPane tab={`Office Docs (${officeDocs.length})`} key="3">
         <MediaGrid
-          mediaItems={docs}
+          mediaItems={officeDocs}
           mediaType="document"
           handleEdit={handleEdit}
           handleDelete={handleDelete}
           handlePreview={handlePreview}
-          availableTags={availableTags} // Pass availableTags
+          availableTags={availableTags}
         />
       </TabPane>
-
-      <TabPane tab="Cloudinary" key="4">
-        <Cloudinary availableTags={availableTags} />{" "}
-        {/* Pass availableTags if needed */}
+      <TabPane tab={`Other Docs (${otherDocs.length})`} key="4">
+        <MediaGrid
+          mediaItems={otherDocs}
+          mediaType="document"
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+          handlePreview={handlePreview}
+          availableTags={availableTags}
+        />
+      </TabPane>
+      <TabPane tab="Cloudinary" key="5">
+        <Cloudinary availableTags={availableTags} />
       </TabPane>
     </Tabs>
   );
