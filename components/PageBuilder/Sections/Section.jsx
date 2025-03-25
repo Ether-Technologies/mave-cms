@@ -2,42 +2,63 @@
 
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
-import SectionHeader from "./SectionHeader";
+import { Button } from "antd";
+import { CopyOutlined, DeleteOutlined } from "@ant-design/icons";
 import ComponentList from "../Components/ComponentList";
+import { useDispatch } from "react-redux";
+import { updateSection } from "../../../store/slices/pageSlice";
 
-const Section = ({ section, index, sections, setSections }) => {
-  const updateSection = (updatedSection) => {
-    const newSections = [...sections];
-    newSections[index] = updatedSection;
-    setSections(newSections);
-  };
+const Section = ({ section, index, onDuplicate, onDelete }) => {
+  const dispatch = useDispatch();
 
-  const deleteSection = () => {
-    const newSections = [...sections];
-    newSections.splice(index, 1);
-    setSections(newSections);
+  const handleComponentsUpdate = (updatedComponents) => {
+    const updatedSection = {
+      ...section,
+      data: updatedComponents,
+    };
+    dispatch(
+      updateSection({ sectionIndex: index, newSection: updatedSection })
+    );
   };
 
   return (
     <Draggable draggableId={section._id} index={index}>
       {(provided) => (
         <div
-          className="section bg-white shadow-md rounded-md p-4 mb-4"
           ref={provided.innerRef}
           {...provided.draggableProps}
+          className="section-container bg-white shadow-md rounded-lg p-4 mb-6"
         >
-          <SectionHeader
-            section={section}
-            updateSection={updateSection}
-            deleteSection={deleteSection}
-            dragHandleProps={provided.dragHandleProps}
-          />
+          <div
+            {...provided.dragHandleProps}
+            className="section-header flex items-center justify-between mb-4 pb-2 border-b"
+          >
+            <h3 className="text-lg font-semibold">
+              {section.title || `Section ${index + 1}`}
+            </h3>
+            <div className="flex gap-2">
+              <Button
+                icon={<CopyOutlined />}
+                onClick={() => onDuplicate(index)}
+                title="Duplicate section"
+              >
+                Duplicate
+              </Button>
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                onClick={() => onDelete(index)}
+                title="Delete section"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
           <ComponentList
-            components={section.data}
-            setComponents={(newComponents) => {
-              const updatedSection = { ...section, data: newComponents };
-              updateSection(updatedSection);
-            }}
+            sectionId={section._id}
+            components={section.data || []}
+            sectionIndex={index}
+            onUpdate={handleComponentsUpdate}
           />
         </div>
       )}

@@ -1,80 +1,196 @@
 // components/PageBuilder/PageBuilder.jsx
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import SectionList from "./Sections/SectionList";
 import { Button, message, Spin } from "antd"; // Removed Tooltip for simplicity
-import { SaveOutlined, EyeOutlined } from "@ant-design/icons"; // Changed to EyeOutlined for Preview
+import {
+  SaveOutlined,
+  EyeOutlined,
+  UndoOutlined,
+  RedoOutlined,
+} from "@ant-design/icons"; // Changed to EyeOutlined for Preview
 import instance from "../../axios";
 import PagePreview from "./PagePreview";
 import { useRouter } from "next/router";
+import debounce from "lodash/debounce";
+import {
+  setPageData,
+  setLoading,
+  setError,
+  setIsDirty,
+  setLastSaved,
+} from "../../store/slices/pageSlice";
+import {
+  pushToHistory,
+  undo,
+  redo,
+  clearHistory,
+  selectCanUndo,
+  selectCanRedo,
+} from "../../store/slices/historySlice";
+
+const AUTOSAVE_DELAY = 30000; // 30 seconds
 
 const PageBuilder = ({ pageId }) => {
-  const [pageData, setPageData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { pageData, loading, error, isDirty, lastSaved } = useSelector(
+    (state) => state.page
+  );
+
+  const { canUndo, canRedo } = useSelector((state) => state.history);
   const [preview, setPreview] = useState(false);
-  const [isDirty, setIsDirty] = useState(false); // Track unsaved changes
+
   const router = useRouter();
-  const initialLoadRef = useRef(true); // To prevent setting isDirty on initial load
+  const initialLoadRef = useRef(true);
 
-  // Fetch page data from the backend
-  useEffect(() => {
-    const fetchPageData = async () => {
-      setLoading(true);
-      try {
-        const response = await instance.get(`/pages/${pageId}`);
+  // Fetch page data from the backend with error handling
+  const fetchPageData = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      const response = await instance.get(`/pages/${pageId}`);
+      const data = response.data;
 
-        if (response.data) {
-          setPageData(response.data);
-        } else {
-          setPageData(null);
-        }
-      } catch (error) {
-        setPageData(null);
-        message.error("Failed to load page data.");
-      } finally {
-        setLoading(false);
-        initialLoadRef.current = false; // Mark initial load as done
+      // Normalize component types in the data
+      if (data.body) {
+        data.body = data.body.map((section) => ({
+          ...section,
+          data: section.data.map((component) => ({
+            ...component,
+            type: component.type?.type || component.type, // Handle both object and string type
+          })),
+        }));
       }
-    };
 
-    if (pageId) {
-      fetchPageData();
+      dispatch(setPageData(data));
+      dispatch(pushToHistory(data)); // Add initial state to history
+      dispatch(setError(null));
+    } catch (err) {
+      dispatch(setError(err.message || "Failed to fetch page data"));
+    } finally {
+      dispatch(setLoading(false));
+      initialLoadRef.current = false;
     }
-  }, [pageId]);
+  }, [pageId, dispatch]);
 
-  // Save the page data to the backend
-  const savePageData = async () => {
+  // Save the page data to the backend with error handling
+  const savePageData = async (showMessage = true) => {
     if (!pageData) {
       message.error("No page data to save.");
       return;
     }
 
     try {
-      await instance.put(`/pages/${pageData.id}`, pageData);
-      message.success("Page saved successfully");
-      setIsDirty(false); // Reset isDirty after saving
-    } catch (error) {
-      message.error("Failed to save page data");
+      dispatch(setLoading(true));
+      const response = await instance.put(`/pages/${pageData.id}`, pageData);
+
+      // Handle axios response directly
+      if (response.status === 200) {
+        dispatch(setIsDirty(false));
+        dispatch(setLastSaved(new Date().toISOString()));
+        if (showMessage) {
+          message.success("Page saved successfully");
+        }
+        return true;
+      } else {
+        throw new Error("Failed to save page");
+      }
+    } catch (err) {
+      dispatch(setError(err.message || "Failed to save page"));
+      if (showMessage) {
+        message.error(
+          "Failed to save page data: " + (err.message || "Unknown error")
+        );
+      }
+      return false;
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
-  // Update isDirty when pageData changes
+  // Handle undo/redo actions
+  const handleUndo = () => {
+    if (canUndo) {
+      dispatch(undo());
+    }
+  };
+
+  const handleRedo = () => {
+    if (canRedo) {
+      dispatch(redo());
+    }
+  };
+
+  // Handle keyboard shortcuts
   useEffect(() => {
-    if (initialLoadRef.current) return; // Do not set isDirty on initial load
-    setIsDirty(true);
-  }, [pageData]);
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handleRedo();
+        } else {
+          e.preventDefault();
+          handleUndo();
+        }
+      } else if ((e.metaKey || e.ctrlKey) && e.key === "y") {
+        e.preventDefault();
+        handleRedo();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        if (isDirty) {
+          savePageData(true);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [canUndo, canRedo, isDirty]);
+
+  // Debounced autosave function
+  const debouncedAutosave = useCallback(
+    debounce(async () => {
+      if (isDirty) {
+        await savePageData(false);
+      }
+    }, AUTOSAVE_DELAY),
+    [isDirty, pageData]
+  );
+
+  // Effect for autosave
+  useEffect(() => {
+    if (!initialLoadRef.current && isDirty) {
+      debouncedAutosave();
+    }
+    return () => {
+      debouncedAutosave.cancel();
+    };
+  }, [isDirty, debouncedAutosave]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (pageId) {
+      fetchPageData();
+    }
+  }, [pageId]);
+
+  // Update history when pageData changes
+  useEffect(() => {
+    if (!initialLoadRef.current && pageData) {
+      dispatch(pushToHistory(pageData));
+    }
+  }, [pageData, dispatch]);
 
   // Handle browser/tab close or refresh
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (isDirty) {
         e.preventDefault();
-        e.returnValue = ""; // Required for Chrome to show the prompt
+        e.returnValue = "";
       }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
@@ -94,7 +210,6 @@ const PageBuilder = ({ pageId }) => {
     };
 
     router.events.on("routeChangeStart", handleRouteChange);
-
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
     };
@@ -104,6 +219,17 @@ const PageBuilder = ({ pageId }) => {
     return (
       <div className="m-auto flex justify-center items-center h-screen">
         <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center">
+        <div className="text-red-500 mb-4">{error}</div>
+        <Button onClick={fetchPageData} type="primary">
+          Retry Loading
+        </Button>
       </div>
     );
   }
@@ -118,25 +244,50 @@ const PageBuilder = ({ pageId }) => {
     <div className="p-4 relative">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">{pageData.page_name_en} Page</h1>
+        <div>
+          <h1 className="text-2xl font-bold">{pageData.page_name_en} Page</h1>
+          {lastSaved && (
+            <p className="text-sm text-gray-500">
+              Last saved: {new Date(lastSaved).toLocaleString()}
+            </p>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button
+            icon={<UndoOutlined />}
+            onClick={handleUndo}
+            disabled={!canUndo}
+            title="Undo (Ctrl/⌘ + Z)"
+          />
+          <Button
+            icon={<RedoOutlined />}
+            onClick={handleRedo}
+            disabled={!canRedo}
+            title="Redo (Ctrl/⌘ + Y or Ctrl/⌘ + Shift + Z)"
+          />
+        </div>
       </div>
 
       {/* Section List */}
       <SectionList
         sections={pageData.body}
         setSections={(newSections) => {
-          setPageData({ ...pageData, body: newSections });
+          dispatch(setPageData({ ...pageData, body: newSections }));
         }}
-        setIsDirty={setIsDirty} // Pass setIsDirty to track changes
       />
 
       {/* Floating Save Button */}
       <Button
         icon={<SaveOutlined style={{ fontSize: "1.5rem" }} />}
-        onClick={savePageData}
-        className="text-lg font-bold fixed bottom-16 right-10 bg-theme hover:bg-theme text-black px-4 py-6 rounded-full shadow-lg z-50  border-2 border-themedark"
+        onClick={() => savePageData(true)}
+        className={`text-lg font-bold fixed bottom-16 right-10 px-4 py-6 rounded-full shadow-lg z-50 border-2 ${
+          isDirty
+            ? "bg-yellow-400 hover:bg-yellow-500"
+            : "bg-theme hover:bg-theme"
+        } text-black border-themedark`}
+        title="Save (Ctrl/⌘ + S)"
       >
-        Save
+        {isDirty ? "Save*" : "Save"}
       </Button>
 
       {/* Floating Preview Button */}

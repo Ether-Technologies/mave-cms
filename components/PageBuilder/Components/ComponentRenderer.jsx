@@ -1,6 +1,6 @@
 // components/PageBuilder/Components/ComponentRenderer.jsx
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import TextComponent from "./TextComponent";
 import ParagraphComponent from "./ParagraphComponent";
 import MediaComponent from "./MediaComponent";
@@ -18,62 +18,116 @@ import GoogleMapComponent from "./GoogleMapComponent";
 import IconListComponent from "./IconListComponent/IconListComponent";
 import TestimonialComponent from "./TestimonialComponent/TestimonialComponent";
 import TitleDescriptionComponent from "./TitleDescriptionComponent";
+import { useDispatch, useSelector } from "react-redux";
+import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
+import { Button } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
 
 const COMPONENT_MAP = {
-  title: TextComponent,
-  description: ParagraphComponent,
-  titledescription: TitleDescriptionComponent,
-  media: MediaComponent,
-  menu: MenuComponent,
-  navbar: NavbarComponent,
-  slider: SliderComponent,
-  card: CardComponent,
-  footer: FooterComponent,
-  video: VideoComponent,
-  table: TableComponent,
-  accordion: AccordionComponent,
-  button: ButtonComponent,
-  gallery: GalleryComponent,
-  "google-map": GoogleMapComponent,
-  iconlist: IconListComponent,
-  testimonial: TestimonialComponent,
+  title: React.memo(TextComponent),
+  description: React.memo(ParagraphComponent),
+  titledescription: React.memo(TitleDescriptionComponent),
+  media: React.memo(MediaComponent),
+  menu: React.memo(MenuComponent),
+  navbar: React.memo(NavbarComponent),
+  slider: React.memo(SliderComponent),
+  card: React.memo(CardComponent),
+  footer: React.memo(FooterComponent),
+  video: React.memo(VideoComponent),
+  table: React.memo(TableComponent),
+  accordion: React.memo(AccordionComponent),
+  button: React.memo(ButtonComponent),
+  gallery: React.memo(GalleryComponent),
+  "google-map": React.memo(GoogleMapComponent),
+  iconlist: React.memo(IconListComponent),
+  testimonial: React.memo(TestimonialComponent),
 };
 
-const ComponentRenderer = ({
-  component,
-  index,
-  components,
-  setComponents,
-  preview = false,
-}) => {
-  const updateComponent = (updatedComponent) => {
-    const newComponents = [...components];
-    newComponents[index] = updatedComponent;
-    setComponents(newComponents);
-  };
+const ComponentRenderer = React.memo(
+  ({ component, index, sectionIndex, preview = false }) => {
+    const dispatch = useDispatch();
+    const pageData = useSelector((state) => state.page.pageData);
 
-  const deleteComponent = () => {
-    const newComponents = [...components];
-    newComponents.splice(index, 1);
-    setComponents(newComponents);
-  };
+    // Memoize the update and delete handlers
+    const updateComponent = useCallback(
+      (updatedComponent) => {
+        const updatedPageData = {
+          ...pageData,
+          body: pageData.body.map((section, idx) => {
+            if (idx === sectionIndex) {
+              return {
+                ...section,
+                data: section.data.map((comp, compIdx) =>
+                  compIdx === index ? updatedComponent : comp
+                ),
+              };
+            }
+            return section;
+          }),
+        };
+        dispatch(setPageData(updatedPageData));
+        dispatch(setIsDirty(true));
+      },
+      [dispatch, pageData, sectionIndex, index]
+    );
 
-  const SpecificComponent = COMPONENT_MAP[component.type];
+    const deleteComponent = useCallback(() => {
+      const updatedPageData = {
+        ...pageData,
+        body: pageData.body.map((section, idx) => {
+          if (idx === sectionIndex) {
+            return {
+              ...section,
+              data: section.data.filter((_, compIdx) => compIdx !== index),
+            };
+          }
+          return section;
+        }),
+      };
+      dispatch(setPageData(updatedPageData));
+      dispatch(setIsDirty(true));
+    }, [dispatch, pageData, sectionIndex, index]);
 
-  if (!SpecificComponent) {
-    return <div>Unknown component type: {component.type}</div>;
+    // Get the actual component type, handling both object and string formats
+    const componentType = component.type?.type || component.type;
+
+    // Memoize the component type check
+    const SpecificComponent = useMemo(
+      () => COMPONENT_MAP[componentType],
+      [componentType]
+    );
+
+    if (!SpecificComponent) {
+      console.warn(`Unknown component type: ${componentType}`);
+      return null;
+    }
+
+    return (
+      <div className="relative border border-gray-300 p-4 mb-4">
+        <div className="absolute top-9 right-0 flex gap-2 z-10">
+          <Button
+            size="small"
+            icon={<CopyOutlined />}
+            onClick={() => {
+              const duplicateEvent = new CustomEvent("duplicateComponent", {
+                detail: { componentIndex: index },
+              });
+              window.dispatchEvent(duplicateEvent);
+            }}
+            className="mavebutton"
+          />
+        </div>
+        <SpecificComponent
+          component={component}
+          updateComponent={updateComponent}
+          deleteComponent={deleteComponent}
+          preview={preview}
+        />
+      </div>
+    );
   }
+);
 
-  return (
-    <div className="relative border border-gray-300 p-4 mb-4">
-      <SpecificComponent
-        component={component}
-        updateComponent={updateComponent}
-        deleteComponent={deleteComponent}
-        preview={preview}
-      />
-    </div>
-  );
-};
+ComponentRenderer.displayName = "ComponentRenderer";
 
 export default ComponentRenderer;

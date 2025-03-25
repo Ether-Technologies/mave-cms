@@ -1,76 +1,123 @@
 // components/PageBuilder/Components/ComponentList.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import ComponentRenderer from "./ComponentRenderer";
 import ComponentSelectorModal from "../Modals/ComponentSelectorModal";
-import { v4 as uuidv4 } from "uuid";
+import Component from "./Component";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsDirty, setPageData } from "../../../store/slices/pageSlice";
 
-const ComponentList = ({ components, setComponents }) => {
+const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
+  const dispatch = useDispatch();
+  const pageData = useSelector((state) => state.page.pageData);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  useEffect(() => {
+    const handleDuplicate = (event) => {
+      const { componentIndex } = event.detail;
+      const component = components[componentIndex];
+      const duplicatedComponent = {
+        ...JSON.parse(JSON.stringify(component)),
+        _id: Date.now().toString(),
+      };
+
+      const updatedPageData = {
+        ...pageData,
+        body: pageData.body.map((section, idx) => {
+          if (idx === sectionIndex) {
+            const newData = [...section.data];
+            newData.splice(componentIndex + 1, 0, duplicatedComponent);
+            return {
+              ...section,
+              data: newData,
+            };
+          }
+          return section;
+        }),
+      };
+
+      dispatch(setPageData(updatedPageData));
+      dispatch(setIsDirty(true));
+    };
+
+    window.addEventListener("duplicateComponent", handleDuplicate);
+    return () =>
+      window.removeEventListener("duplicateComponent", handleDuplicate);
+  }, [components, dispatch, pageData, sectionIndex]);
+
   const onDragEnd = (result) => {
-    if (!result.destination) {
-      return;
-    }
+    if (!result.destination) return;
 
     const reorderedComponents = Array.from(components);
     const [movedComponent] = reorderedComponents.splice(result.source.index, 1);
     reorderedComponents.splice(result.destination.index, 0, movedComponent);
 
-    setComponents(reorderedComponents);
+    dispatch(setIsDirty(true));
   };
 
-  const addComponent = (newComponent) => {
-    newComponent._id = uuidv4();
-    setComponents([...components, newComponent]);
+  const addComponent = (type) => {
+    const newComponent = {
+      _id: Date.now().toString(),
+      type,
+      content: type === "text" ? "Enter your text here..." : "",
+      settings: type === "image" ? { src: "", alt: "" } : {},
+    };
+
+    const updatedPageData = {
+      ...pageData,
+      body: pageData.body.map((section, idx) => {
+        if (idx === sectionIndex) {
+          return {
+            ...section,
+            data: [...(section.data || []), newComponent],
+          };
+        }
+        return section;
+      }),
+    };
+
+    dispatch(setPageData(updatedPageData));
+    dispatch(setIsDirty(true));
+    setIsModalVisible(false);
   };
 
   return (
-    <div>
+    <div className="component-list">
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable-components" type="COMPONENT">
+        <Droppable droppableId={sectionId}>
           {(provided) => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              {components?.map((component, index) => (
-                <Draggable
-                  key={component._id || component.id}
-                  draggableId={component?._id || component?.id?.toString()}
-                  index={index}
-                >
-                  {(provided) => (
-                    <div
-                      className="component bg-gray-50 p-3 mb-2 rounded-md"
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <ComponentRenderer
-                        component={component}
-                        index={index}
-                        components={components}
-                        setComponents={setComponents}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className="components-container min-h-[100px] p-4 bg-gray-50 rounded-md"
+            >
+              {Array.isArray(components) &&
+                components.map((component, index) => (
+                  <ComponentRenderer
+                    key={component._id}
+                    component={component}
+                    index={index}
+                    sectionIndex={sectionIndex}
+                  />
+                ))}
               {provided.placeholder}
             </div>
           )}
         </Droppable>
       </DragDropContext>
-      <Button
-        type="dashed"
-        icon={<PlusOutlined />}
-        onClick={() => setIsModalVisible(true)}
-        block
-        className="mt-4"
-      >
-        Add Component
-      </Button>
+      <div className="add-component-controls mt-4">
+        <Button
+          type="dashed"
+          icon={<PlusOutlined />}
+          onClick={() => setIsModalVisible(true)}
+          block
+        >
+          Add Component
+        </Button>
+      </div>
       <ComponentSelectorModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}

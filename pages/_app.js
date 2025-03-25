@@ -16,10 +16,12 @@ import { AuthProvider } from "../src/context/AuthContext";
 import { MenuRefreshProvider } from "../src/context/MenuRefreshContext";
 import { ThemeProvider } from "../src/context/ThemeContext";
 import PromoPopup from "../components/promotional/PromoPopup";
+import { Provider } from "react-redux";
+import store from "../store";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
+    <Provider store={store}>
       <Head>
         <title>Mave CMS</title>
       </Head>
@@ -55,7 +57,7 @@ function MyApp({ Component, pageProps }) {
           </a>
         </p>
       </footer>
-    </>
+    </Provider>
   );
 }
 
