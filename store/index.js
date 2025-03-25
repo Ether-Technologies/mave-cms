@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import pageReducer from "./slices/pageSlice";
-import historyReducer from "./slices/historySlice";
+import pageReducer, { pageMiddleware } from "./slices/pageSlice";
+import historyReducer, { historyMiddleware } from "./slices/historySlice";
 
 const store = configureStore({
   reducer: {
@@ -10,7 +10,7 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false, // Disable serializable check for Date objects
-    }),
+    }).concat(pageMiddleware, historyMiddleware),
 });
 
 export default store;

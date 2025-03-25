@@ -8,6 +8,8 @@ import {
   CheckOutlined,
   CloseOutlined,
   ExportOutlined,
+  CopyFilled,
+  DragOutlined,
 } from "@ant-design/icons";
 import VideoSelectionModal from "../Modals/VideoSelectionModal";
 
@@ -39,7 +41,8 @@ const VideoComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [videoData, setVideoData] = useState(component._mave);
@@ -147,10 +150,12 @@ const VideoComponent = ({
   }
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
-      {/* Header with Component Title and Action Buttons */}
+    <div className="border p-4 rounded-md bg-white">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Video Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Video Component</h3>
+        </div>
         <div>
           {!isEditing ? (
             <>
@@ -163,6 +168,11 @@ const VideoComponent = ({
                   Change
                 </Button>
               )}
+              <Button
+                icon={<CopyFilled />}
+                onClick={onDuplicateElement}
+                className="mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this component?"
                 onConfirm={handleDelete}
@@ -196,18 +206,14 @@ const VideoComponent = ({
         </div>
       </div>
 
-      {/* Video Display */}
       {renderVideo()}
 
-      {/* Video Selection Modal */}
-      {!preview && (
-        <VideoSelectionModal
-          isVisible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          onSelectVideo={handleSelectVideo}
-          initialVideo={videoData}
-        />
-      )}
+      <VideoSelectionModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onSelectVideo={handleSelectVideo}
+        initialVideo={videoData}
+      />
     </div>
   );
 };

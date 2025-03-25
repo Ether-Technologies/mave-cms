@@ -8,6 +8,8 @@ import {
   CheckOutlined,
   CloseOutlined,
   ExportOutlined,
+  CopyFilled,
+  DragOutlined,
 } from "@ant-design/icons";
 import SliderSelectionModal from "../Modals/SliderSelectionModal";
 import Image from "next/image";
@@ -39,7 +41,8 @@ const SliderComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sliderData, setSliderData] = useState(component._mave);
@@ -94,15 +97,6 @@ const SliderComponent = ({
   if (preview) {
     return (
       <div className="preview-slider-component p-4 bg-gray-100 rounded-md flex justify-center">
-        {/* {sliderData?.medias && sliderData.medias.length > 0 ? (
-          <div className="w-full">
-            <Carousel autoplay dots={false}>
-              {renderSliderImages(sliderData.medias)}
-            </Carousel>
-          </div>
-        ) : (
-          <p className="text-gray-500">No slider selected.</p>
-        )} */}
         {sliderData?.type === "image" && sliderData?.medias?.length > 0 ? (
           <div className="w-full">
             <Carousel autoplay dots={false}>
@@ -130,10 +124,12 @@ const SliderComponent = ({
   }
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
-      {/* Header with Component Title and Action Buttons */}
+    <div className="border p-4 rounded-md bg-white">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Slider Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Slider Component</h3>
+        </div>
         <div>
           {!isEditing ? (
             <>
@@ -146,6 +142,11 @@ const SliderComponent = ({
                   Change
                 </Button>
               )}
+              <Button
+                icon={<CopyFilled />}
+                onClick={onDuplicateElement}
+                className="mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this component?"
                 onConfirm={handleDelete}
@@ -179,33 +180,11 @@ const SliderComponent = ({
         </div>
       </div>
 
-      {/* Display Current and Selected Slider Side by Side */}
       <div className="flex flex-col md:flex-row items-start gap-4">
-        {/* Current Slider */}
         <div className="flex flex-col w-full md:w-1/2">
           {sliderData && (
             <h4 className="mb-2 text-md font-semibold">Current Slider</h4>
           )}
-          {/* {sliderData?.medias && sliderData.medias.length > 0 ? (
-            <div className="w-full">
-              <h2 className="text-xl font-bold text-theme pb-4">
-                {sliderData.title_en || "Slider Title"}
-              </h2>
-              <Carousel autoplay>
-                {renderSliderImages(sliderData.medias)}
-              </Carousel>
-            </div>
-          ) : (
-            <>
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => setIsModalVisible(true)}
-                className="mavebutton w-fit"
-              >
-                Select Slider
-              </Button>
-            </>
-          )} */}
           {sliderData?.type === "image" && sliderData?.medias?.length > 0 ? (
             <div className="w-full">
               <h2 className="text-xl font-bold text-theme pb-4">
@@ -244,23 +223,9 @@ const SliderComponent = ({
           )}
         </div>
 
-        {/* Selected Slider (Shown Only When Editing) */}
         {isEditing && selectedSliderData && (
           <div className="flex flex-col w-full md:w-1/2">
             <h4 className="mb-2 text-md font-medium">Selected Slider</h4>
-            {/* {selectedSliderData?.medias &&
-            selectedSliderData.medias.length > 0 ? (
-              <div className="w-full">
-                <h2 className="text-xl font-bold text-theme pb-4">
-                  {selectedSliderData.title_en || "Slider Title"}
-                </h2>
-                <Carousel autoplay>
-                  {renderSliderImages(selectedSliderData.medias)}
-                </Carousel>
-              </div>
-            ) : (
-              <Paragraph>No media in selected slider.</Paragraph>
-            )} */}
             {selectedSliderData?.type === "image" &&
             selectedSliderData?.medias?.length > 0 ? (
               <div className="w-full">
@@ -291,17 +256,17 @@ const SliderComponent = ({
                 </Carousel>
               </div>
             ) : (
-              <Paragraph>No media/cards in selected slider.</Paragraph>
+              <p className="text-gray-500">No slider selected.</p>
             )}
           </div>
         )}
       </div>
 
-      {/* Slider Selection Modal */}
       <SliderSelectionModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSelectSlider={handleSelectSlider}
+        initialSlider={sliderData}
       />
     </div>
   );

@@ -8,6 +8,7 @@ import {
   PlusOutlined,
   ExportOutlined,
   CopyFilled,
+  DragOutlined,
 } from "@ant-design/icons";
 
 const TextComponent = ({
@@ -52,9 +53,12 @@ const TextComponent = ({
   }
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="text-xl font-semibold">Text Component</h3>
+    <div className="border p-4 rounded-md bg-white">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Text Component</h3>
+        </div>
         <div>
           {isEditing ? (
             <>
@@ -84,20 +88,14 @@ const TextComponent = ({
                   Change
                 </Button>
               )}
-
-              {/* Duplicate Component Button */}
               <Button
                 icon={<CopyFilled />}
-                className="mavebutton"
                 onClick={onDuplicateElement}
-                hidden
-              >
-                Duplicate
-              </Button>
-
+                className="mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this component?"
-                onConfirm={deleteComponent}
+                onConfirm={handleDelete}
                 okText="Yes"
                 cancelText="No"
               >
@@ -115,10 +113,9 @@ const TextComponent = ({
           value={tempValue}
           onChange={(e) => setTempValue(e.target.value)}
           placeholder="Enter text..."
-          onPressEnter={handleSubmit} // <-- Added this line
+          onPressEnter={handleSubmit}
         />
       ) : component.value ? (
-        // <p>{component.value}</p>
         <Title level={3}>{component.value}</Title>
       ) : (
         <Button

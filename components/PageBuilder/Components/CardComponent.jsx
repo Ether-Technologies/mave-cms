@@ -8,6 +8,8 @@ import {
   CheckOutlined,
   CloseOutlined,
   ExportOutlined,
+  CopyFilled,
+  DragOutlined,
 } from "@ant-design/icons";
 import CardSelectionModal from "../Modals/CardSelectionModal";
 import Image from "next/image";
@@ -48,7 +50,8 @@ const CardComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [cardData, setCardData] = useState(component._mave);
@@ -133,10 +136,12 @@ const CardComponent = ({
   }
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
-      {/* Header with Component Title and Action Buttons */}
+    <div className="border p-4 rounded-md bg-white">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Card Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Card Component</h3>
+        </div>
         <div>
           {!isEditing ? (
             <>
@@ -149,6 +154,11 @@ const CardComponent = ({
                   Change
                 </Button>
               )}
+              <Button
+                icon={<CopyFilled />}
+                onClick={onDuplicateElement}
+                className="mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this component?"
                 onConfirm={handleDelete}
@@ -182,9 +192,7 @@ const CardComponent = ({
         </div>
       </div>
 
-      {/* Display Current and Selected Card Side by Side */}
       <div className="flex flex-col md:flex-row items-start gap-4">
-        {/* Current Card */}
         <div className="flex flex-col w-full md:w-1/2">
           {cardData && (
             <h4 className="mb-2 text-md font-semibold">Current Card</h4>
@@ -232,7 +240,6 @@ const CardComponent = ({
           )}
         </div>
 
-        {/* Selected Card (Shown Only When Editing) */}
         {isEditing && selectedCardData && (
           <div className="flex flex-col w-full md:w-1/2">
             <h4 className="mb-2 text-md font-medium">Selected Card</h4>
@@ -248,12 +255,21 @@ const CardComponent = ({
                 </h2>
                 <Paragraph>
                   {selectedCardData.description_en ? (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          selectedCardData.description_en.slice(0, 200) + "...",
-                      }}
-                    />
+                    selectedCardData.description_en.length > 200 ? (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            selectedCardData.description_en.slice(0, 200) +
+                            "...",
+                        }}
+                      />
+                    ) : (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: selectedCardData.description_en,
+                        }}
+                      />
+                    )
                   ) : (
                     "No description."
                   )}
@@ -264,11 +280,11 @@ const CardComponent = ({
         )}
       </div>
 
-      {/* Card Selection Modal */}
       <CardSelectionModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSelectCard={handleSelectCard}
+        initialCard={cardData}
       />
     </div>
   );

@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Typography, message, Popconfirm } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  CopyFilled,
+  DragOutlined,
+} from "@ant-design/icons";
 import ButtonSelectionModal from "../Modals/ButtonSelectionModal/ButtonSelectionModal";
 import { useRouter } from "next/router";
 
@@ -12,7 +17,8 @@ const ButtonComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [buttonData, setButtonData] = useState(component._mave || {});
@@ -88,15 +94,22 @@ const ButtonComponent = ({
   }
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
-      {/* Header with Component Title and Action Buttons */}
+    <div className="border p-4 rounded-md bg-white">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Button Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Button Component</h3>
+        </div>
         <div>
           <Button
             icon={<EditOutlined />}
             onClick={() => setIsModalVisible(true)}
-            className="mr-2"
+            className="mavebutton"
+          />
+          <Button
+            icon={<CopyFilled />}
+            onClick={onDuplicateElement}
+            className="mavebutton"
           />
           <Popconfirm
             title="Are you sure you want to delete this button?"
@@ -109,7 +122,6 @@ const ButtonComponent = ({
         </div>
       </div>
 
-      {/* Button Display */}
       {buttonData.text ? (
         <div style={{ textAlign: "left" }}>
           <Button
@@ -125,7 +137,6 @@ const ButtonComponent = ({
         <Paragraph>No button configured.</Paragraph>
       )}
 
-      {/* Button Selection Modal */}
       <ButtonSelectionModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}

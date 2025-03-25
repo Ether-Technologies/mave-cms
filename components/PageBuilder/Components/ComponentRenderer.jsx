@@ -1,6 +1,7 @@
 // components/PageBuilder/Components/ComponentRenderer.jsx
 
 import React, { useState, useMemo, useCallback } from "react";
+import { Draggable } from "react-beautiful-dnd";
 import TextComponent from "./TextComponent";
 import ParagraphComponent from "./ParagraphComponent";
 import MediaComponent from "./MediaComponent";
@@ -20,8 +21,8 @@ import TestimonialComponent from "./TestimonialComponent/TestimonialComponent";
 import TitleDescriptionComponent from "./TitleDescriptionComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
-import { Button } from "antd";
-import { CopyOutlined } from "@ant-design/icons";
+import { Button, Popconfirm } from "antd";
+import { CopyOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const COMPONENT_MAP = {
   title: React.memo(TextComponent),
@@ -88,6 +89,13 @@ const ComponentRenderer = React.memo(
       dispatch(setIsDirty(true));
     }, [dispatch, pageData, sectionIndex, index]);
 
+    const handleDuplicate = useCallback(() => {
+      const duplicateEvent = new CustomEvent("duplicateComponent", {
+        detail: { componentIndex: index },
+      });
+      window.dispatchEvent(duplicateEvent);
+    }, [index]);
+
     // Get the actual component type, handling both object and string formats
     const componentType = component.type?.type || component.type;
 
@@ -103,27 +111,26 @@ const ComponentRenderer = React.memo(
     }
 
     return (
-      <div className="relative border border-gray-300 p-4 mb-4">
-        <div className="absolute top-9 right-0 flex gap-2 z-10">
-          <Button
-            size="small"
-            icon={<CopyOutlined />}
-            onClick={() => {
-              const duplicateEvent = new CustomEvent("duplicateComponent", {
-                detail: { componentIndex: index },
-              });
-              window.dispatchEvent(duplicateEvent);
-            }}
-            className="mavebutton"
-          />
-        </div>
-        <SpecificComponent
-          component={component}
-          updateComponent={updateComponent}
-          deleteComponent={deleteComponent}
-          preview={preview}
-        />
-      </div>
+      <Draggable draggableId={component._id} index={index}>
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            className={`relative border border-gray-300 p-4 mb-4 ${
+              snapshot.isDragging ? "shadow-lg" : ""
+            }`}
+          >
+            <SpecificComponent
+              component={component}
+              updateComponent={updateComponent}
+              deleteComponent={deleteComponent}
+              preview={preview}
+              onDuplicateElement={handleDuplicate}
+            />
+          </div>
+        )}
+      </Draggable>
     );
   }
 );

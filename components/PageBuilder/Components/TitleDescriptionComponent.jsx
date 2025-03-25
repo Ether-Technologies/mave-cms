@@ -6,6 +6,8 @@ import {
   CheckOutlined,
   CloseOutlined,
   ExportOutlined,
+  CopyFilled,
+  DragOutlined,
 } from "@ant-design/icons";
 import RichTextEditor from "../../RichTextEditor";
 import instance from "../../../axios";
@@ -33,6 +35,7 @@ const TitleDescriptionComponent = ({
   updateComponent,
   deleteComponent,
   preview = false,
+  onDuplicateElement,
 }) => {
   // Local form data
   const [isEditing, setIsEditing] = useState(false);
@@ -175,7 +178,7 @@ const TitleDescriptionComponent = ({
       linkPageId,
     } = formData;
     return (
-      <div className="border p-4 rounded-md bg-gray-50">
+      <div className="border p-4 rounded-md bg-white">
         <h3 className="text-xl font-semibold mb-2">Title & Description</h3>
         {/* Title + Alt Title */}
         <div className="text-theme font-bold">
@@ -223,10 +226,14 @@ const TitleDescriptionComponent = ({
   } = formData;
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
-      {/* Header */}
+    <div className="border p-4 rounded-md bg-white">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Title & Description Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">
+            Title & Description Component
+          </h3>
+        </div>
         <div>
           {!isEditing ? (
             <>
@@ -239,6 +246,11 @@ const TitleDescriptionComponent = ({
                   Change
                 </Button>
               )}
+              <Button
+                icon={<CopyFilled />}
+                onClick={onDuplicateElement}
+                className="mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this component?"
                 onConfirm={handleDelete}
@@ -273,104 +285,106 @@ const TitleDescriptionComponent = ({
       </div>
 
       {isEditing ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Title */}
+        <div className="space-y-4">
+          {/* Title Fields */}
           <div>
-            <label className="font-semibold">Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Title
+            </label>
             <Input
               value={title}
               onChange={(e) => handleChange("title", e.target.value)}
-              placeholder="Enter title..."
-              className="mb-2"
+              placeholder="Enter title"
             />
           </div>
-          {/* Alt Title */}
           <div>
-            <label className="font-semibold">Alt Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Alternative Title (Optional)
+            </label>
             <Input
               value={altTitle}
               onChange={(e) => handleChange("altTitle", e.target.value)}
-              placeholder="Enter alt title..."
-              className="mb-2"
+              placeholder="Enter alternative title"
             />
           </div>
 
-          {/* Description (Rich Text) */}
-          <div className="md:col-span-2">
-            <label className="font-semibold">Description</label>
-            <RichTextEditor
-              placeholder="Enter description..."
-              onChange={(html) => handleChange("description", html)}
-              //   value={description}
-              defaultValue={description}
-              editMode={true}
-            />
-          </div>
-
-          {/* Alt Description (Rich Text) */}
-          <div className="md:col-span-2">
-            <label className="font-semibold">Alt Description</label>
-            <RichTextEditor
-              placeholder="Enter alt description..."
-              onChange={(html) => handleChange("altDescription", html)}
-              //   value={altDescription}
-              defaultValue={altDescription}
-              editMode={true}
-            />
-          </div>
-
-          {/* Link Type (Radio) */}
+          {/* Description Fields */}
           <div>
-            <label className="font-semibold">Link Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <RichTextEditor
+              defaultValue={description}
+              onChange={(html) => handleChange("description", html)}
+              editMode={true}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Alternative Description (Optional)
+            </label>
+            <RichTextEditor
+              defaultValue={altDescription}
+              onChange={(html) => handleChange("altDescription", html)}
+              editMode={true}
+            />
+          </div>
+
+          {/* Link Fields */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Link Type
+            </label>
             <Radio.Group
-              onChange={(e) => handleChange("linkType", e.target.value)}
               value={linkType}
-              className="mt-1 block"
+              onChange={(e) => handleChange("linkType", e.target.value)}
             >
-              <Radio value="page">Page Link</Radio>
               <Radio value="independent">Independent Link</Radio>
+              <Radio value="page">Page Link</Radio>
             </Radio.Group>
           </div>
 
-          {/* If linkType=page → show page dropdown, else input */}
-          {linkType === "page" ? (
+          {linkType === "independent" ? (
             <div>
-              <label className="font-semibold">Select Page</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Link URL
+              </label>
+              <Input
+                value={link}
+                onChange={(e) => handleChange("link", e.target.value)}
+                placeholder="Enter URL"
+              />
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select Page
+              </label>
               <Select
-                placeholder="Select a Page"
-                allowClear
-                showSearch
-                value={linkPageId || undefined}
+                value={linkPageId}
                 onChange={(value) => handleChange("linkPageId", value)}
-                className="w-full mt-1"
+                placeholder="Select a page"
+                className="w-full"
               >
-                {pages?.map((p) => (
-                  <Select.Option key={p.id} value={p.id}>
-                    {p.page_name_en}
+                {pages.map((page) => (
+                  <Select.Option key={page.id} value={page.id}>
+                    {page.page_name_en}
                   </Select.Option>
                 ))}
               </Select>
             </div>
-          ) : (
-            <div>
-              <label className="font-semibold">Link (URL)</label>
-              <Input
-                placeholder="e.g. https://example.com or /some-path"
-                value={link}
-                onChange={(e) => handleChange("link", e.target.value)}
-              />
-            </div>
           )}
         </div>
-      ) : component?._mave ? (
+      ) : (
         <div>
-          {/* Display Mode */}
-          <p className="mb-1 text-lg font-bold">
+          {/* Title + Alt Title */}
+          <div className="text-theme font-bold">
             {title || "No Title"}
             {altTitle ? ` / ${altTitle}` : ""}
-          </p>
+          </div>
           {/* Description */}
           <div
+            className="mt-2"
             dangerouslySetInnerHTML={{
               __html: description || "No Description",
             }}
@@ -378,7 +392,7 @@ const TitleDescriptionComponent = ({
           {/* Alt Description */}
           {altDescription && (
             <div
-              className="italic mt-2"
+              className="mt-2 italic"
               dangerouslySetInnerHTML={{ __html: altDescription }}
             />
           )}
@@ -386,19 +400,16 @@ const TitleDescriptionComponent = ({
           {link && (
             <p className="mt-2">
               <strong>Link: </strong>
-              {linkType === "page" && linkPageId ? `${link}` : link}
+              {linkType === "page" ? (
+                <>
+                  Page #{linkPageId} → <span>{link}</span>
+                </>
+              ) : (
+                <span>{link}</span>
+              )}
             </p>
           )}
         </div>
-      ) : (
-        // If no data yet, prompt user to create
-        <Button
-          icon={<EditOutlined />}
-          onClick={handleEditClick}
-          className="mavebutton w-fit"
-        >
-          Add Title & Description
-        </Button>
       )}
     </div>
   );

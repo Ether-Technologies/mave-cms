@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, Typography, message, Popconfirm } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  CopyFilled,
+  DragOutlined,
+} from "@ant-design/icons";
 import TableSelectionDrawer from "../Modals/TableSelectionModal/TableSelectionDrawer";
 
 const { Paragraph } = Typography;
@@ -11,7 +17,8 @@ const TableComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [tableData, setTableData] = useState(component._mave || {});
@@ -64,8 +71,8 @@ const TableComponent = ({
                   tableData?.styles?.borderStyle === "none"
                     ? "none"
                     : tableData?.styles?.borderStyle === "thin"
-                    ? "1px solid #ddd"
-                    : "2px solid #000",
+                      ? "1px solid #ddd"
+                      : "2px solid #000",
                 backgroundColor: tableData?.styles?.cellColor || "#fff",
                 textAlign: tableData?.styles?.textAlign || "left",
               }}
@@ -120,10 +127,12 @@ const TableComponent = ({
   }
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
-      {/* Header with Component Title and Action Buttons */}
+    <div className="border p-4 rounded-md bg-white">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Table Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Table Component</h3>
+        </div>
         <div>
           {tableData && (
             <>
@@ -134,6 +143,11 @@ const TableComponent = ({
               >
                 Update
               </Button>
+              <Button
+                icon={<CopyFilled />}
+                onClick={onDuplicateElement}
+                className="mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this component?"
                 onConfirm={handleDelete}
@@ -159,8 +173,8 @@ const TableComponent = ({
                 tableData?.styles?.borderStyle === "none"
                   ? "none"
                   : tableData?.styles?.borderStyle === "thin"
-                  ? "1px solid #ddd"
-                  : "2px solid #000",
+                    ? "1px solid #ddd"
+                    : "2px solid #000",
               backgroundColor: tableData?.styles?.cellColor || "#fff",
               textAlign: tableData?.styles?.textAlign || "left",
             }}

@@ -8,7 +8,11 @@ import ComponentRenderer from "./ComponentRenderer";
 import ComponentSelectorModal from "../Modals/ComponentSelectorModal";
 import Component from "./Component";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsDirty, setPageData } from "../../../store/slices/pageSlice";
+import {
+  setIsDirty,
+  setPageData,
+  moveComponent,
+} from "../../../store/slices/pageSlice";
 
 const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
   const dispatch = useDispatch();
@@ -51,11 +55,42 @@ const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
   const onDragEnd = (result) => {
     if (!result.destination) return;
 
-    const reorderedComponents = Array.from(components);
-    const [movedComponent] = reorderedComponents.splice(result.source.index, 1);
-    reorderedComponents.splice(result.destination.index, 0, movedComponent);
+    const { source, destination } = result;
+    const sourceSectionIndex = parseInt(source.droppableId);
+    const destinationSectionIndex = parseInt(destination.droppableId);
 
-    dispatch(setIsDirty(true));
+    // If moving within the same section
+    if (sourceSectionIndex === destinationSectionIndex) {
+      const reorderedComponents = Array.from(components);
+      const [movedComponent] = reorderedComponents.splice(source.index, 1);
+      reorderedComponents.splice(destination.index, 0, movedComponent);
+
+      const updatedPageData = {
+        ...pageData,
+        body: pageData.body.map((section, idx) => {
+          if (idx === sectionIndex) {
+            return {
+              ...section,
+              data: reorderedComponents,
+            };
+          }
+          return section;
+        }),
+      };
+
+      dispatch(setPageData(updatedPageData));
+      dispatch(setIsDirty(true));
+    } else {
+      // If moving between sections
+      dispatch(
+        moveComponent({
+          fromSectionIndex: sourceSectionIndex,
+          toSectionIndex: destinationSectionIndex,
+          fromIndex: source.index,
+          toIndex: destination.index,
+        })
+      );
+    }
   };
 
   const addComponent = (type) => {

@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { pushToHistory } from "./historySlice";
 
 const initialState = {
   pageData: null,
@@ -75,6 +76,23 @@ const pageSlice = createSlice({
     },
   },
 });
+
+// Middleware to update history when page data changes
+export const pageMiddleware = (store) => (next) => (action) => {
+  const result = next(action);
+
+  // Push to history after any action that modifies page data
+  if (
+    action.type === "page/updateSection" ||
+    action.type === "page/moveComponent" ||
+    action.type === "page/duplicateComponent"
+  ) {
+    const state = store.getState();
+    store.dispatch(pushToHistory(state.page.pageData));
+  }
+
+  return result;
+};
 
 export const {
   setPageData,
