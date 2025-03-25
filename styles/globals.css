@@ -645,3 +645,76 @@ a:hover {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* Preview Container Styles */
+.preview-container {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+.preview-container .ant-drawer-body {
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.preview-container .ant-drawer-content-wrapper {
+  z-index: 1000;
+}
+
+.preview-container .ant-drawer-content {
+  background-color: #fff;
+}
+
+.preview-container .ant-drawer-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+.preview-container .ant-drawer-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Preview Content Styles */
+.preview-content {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.preview-content .ant-typography {
+  margin-bottom: 16px;
+}
+
+.preview-content .ant-typography-title {
+  margin-bottom: 24px;
+}
+
+.preview-content .mb-8 {
+  margin-bottom: 32px;
+}
+
+.preview-content .ant-drawer-body {
+  padding: 0;
+}
+
+.preview-content .ant-drawer-content-wrapper {
+  z-index: 1000;
+}
+
+.preview-content .ant-drawer-content {
+  background-color: #fff;
+}
+
+.preview-content .ant-drawer-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+.preview-content .ant-drawer-title {
+  font-size: 18px;
+  font-weight: 500;
+}

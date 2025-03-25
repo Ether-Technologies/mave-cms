@@ -1,7 +1,7 @@
 // components/PageBuilder/Sections/SectionList.jsx
 
 import React from "react";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import Section from "./Section";
@@ -11,16 +11,6 @@ import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
 const SectionList = () => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
-
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const sections = Array.from(pageData.body);
-    const [reorderedSection] = sections.splice(result.source.index, 1);
-    sections.splice(result.destination.index, 0, reorderedSection);
-
-    dispatch(setPageData({ ...pageData, body: sections }));
-  };
 
   const addSection = () => {
     const newSection = {
@@ -53,28 +43,26 @@ const SectionList = () => {
 
   return (
     <div className="section-list">
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="sections" type="SECTION">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="sections-container"
-            >
-              {pageData?.body?.map((section, index) => (
-                <Section
-                  key={section._id}
-                  section={section}
-                  index={index}
-                  onDuplicate={duplicateSection}
-                  onDelete={deleteSection}
-                />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <Droppable droppableId="sections" type="SECTION">
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="sections-container"
+          >
+            {pageData?.body?.map((section, index) => (
+              <Section
+                key={section._id}
+                section={section}
+                index={index}
+                onDuplicate={duplicateSection}
+                onDelete={deleteSection}
+              />
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
       <Button
         type="dashed"
         icon={<PlusOutlined />}

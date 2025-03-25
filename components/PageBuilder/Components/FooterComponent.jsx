@@ -6,6 +6,8 @@ import {
   DeleteOutlined,
   PlusOutlined,
   ExportOutlined,
+  CopyFilled,
+  DragOutlined,
 } from "@ant-design/icons";
 import FooterSelectionModal from "../Modals/FooterSelectionModal";
 
@@ -15,7 +17,8 @@ const FooterComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [footerData, setFooterData] = useState(component._mave);
@@ -65,27 +68,33 @@ const FooterComponent = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-xl font-semibold">Footer Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Footer Component</h3>
+        </div>
         <div>
-          <>
-            {footerData && (
-              <Button
-                icon={<ExportOutlined />}
-                onClick={() => setIsModalVisible(true)}
-                className="mavebutton"
-              >
-                Change
-              </Button>
-            )}
-            <Popconfirm
-              title="Are you sure you want to delete this component?"
-              onConfirm={handleDelete}
-              okText="Yes"
-              cancelText="No"
+          {footerData && (
+            <Button
+              icon={<ExportOutlined />}
+              onClick={() => setIsModalVisible(true)}
+              className="mavebutton"
             >
-              <Button icon={<DeleteOutlined />} className="mavecancelbutton" />
-            </Popconfirm>
-          </>
+              Change
+            </Button>
+          )}
+          <Button
+            icon={<CopyFilled />}
+            onClick={onDuplicateElement}
+            className="mavebutton"
+          />
+          <Popconfirm
+            title="Are you sure you want to delete this component?"
+            onConfirm={handleDelete}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<DeleteOutlined />} className="mavecancelbutton" />
+          </Popconfirm>
         </div>
       </div>
       {footerData ? (

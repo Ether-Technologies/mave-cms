@@ -6,6 +6,8 @@ import {
   DeleteOutlined,
   PlusOutlined,
   ExportOutlined,
+  CopyFilled,
+  DragOutlined,
 } from "@ant-design/icons";
 import NavbarSelectionModal from "../Modals/NavbarSelectionModal";
 import Image from "next/image";
@@ -16,7 +18,8 @@ const NavbarComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [navbarData, setNavbarData] = useState(component._mave);
@@ -80,7 +83,10 @@ const NavbarComponent = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-xl font-semibold">Navbar Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Navbar Component</h3>
+        </div>
         <div>
           {navbarData && (
             <Button
@@ -91,6 +97,11 @@ const NavbarComponent = ({
               Change
             </Button>
           )}
+          <Button
+            icon={<CopyFilled />}
+            onClick={onDuplicateElement}
+            className="mavebutton"
+          />
           <Popconfirm
             title="Are you sure you want to delete this component?"
             onConfirm={handleDelete}

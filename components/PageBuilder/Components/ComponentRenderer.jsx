@@ -110,6 +110,22 @@ const ComponentRenderer = React.memo(
       return null;
     }
 
+    // If in preview mode, render without drag-and-drop wrapper
+    if (preview) {
+      return (
+        <div className="relative border border-gray-300 p-4 mb-4">
+          <SpecificComponent
+            component={component}
+            updateComponent={updateComponent}
+            deleteComponent={deleteComponent}
+            preview={preview}
+            onDuplicateElement={handleDuplicate}
+          />
+        </div>
+      );
+    }
+
+    // Normal mode with drag-and-drop
     return (
       <Draggable draggableId={component._id} index={index}>
         {(provided, snapshot) => (

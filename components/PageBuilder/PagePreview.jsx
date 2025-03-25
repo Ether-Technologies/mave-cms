@@ -1,8 +1,7 @@
 // components/PageBuilder/PagePreview.jsx
 
 import React from "react";
-import { Drawer, Modal, Typography } from "antd";
-import SectionList from "./Sections/SectionList";
+import { Drawer, Typography } from "antd";
 import ComponentRenderer from "./Components/ComponentRenderer";
 
 const { Title } = Typography;
@@ -22,15 +21,22 @@ const PagePreview = ({ pageData, open, setOpen }) => {
       footer={null}
       width="70%"
       style={{ top: 20 }}
+      className="preview-container"
+      destroyOnClose
     >
-      <div className="preview-container">
+      <div className="preview-content">
         {/* Render each section with preview mode */}
         {pageData.body && pageData.body.length > 0 ? (
           pageData.body.map((section, index) => (
             <div key={section._id || index} className="mb-8">
-              <Title level={4} style={{ fontFamily: section.font || "Arial" }}>
-                {section.sectionTitle}
-              </Title>
+              {section.sectionTitle && (
+                <Title
+                  level={4}
+                  style={{ fontFamily: section.font || "Arial" }}
+                >
+                  {section.sectionTitle}
+                </Title>
+              )}
               {/* Render components within the section */}
               {section.data && section.data.length > 0 ? (
                 section.data.map((component, compIndex) => (

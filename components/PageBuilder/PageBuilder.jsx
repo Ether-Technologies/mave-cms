@@ -29,6 +29,7 @@ import {
   selectCanUndo,
   selectCanRedo,
 } from "../../store/slices/historySlice";
+import { DragDropContext } from "react-beautiful-dnd";
 
 const AUTOSAVE_DELAY = 30000; // 30 seconds
 
@@ -215,6 +216,63 @@ const PageBuilder = ({ pageId }) => {
     };
   }, [isDirty, router.events]);
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const { source, destination, type } = result;
+
+    // Handle section reordering
+    if (type === "SECTION") {
+      const sections = Array.from(pageData.body);
+      const [reorderedSection] = sections.splice(source.index, 1);
+      sections.splice(destination.index, 0, reorderedSection);
+      dispatch(setPageData({ ...pageData, body: sections }));
+      return;
+    }
+
+    // Handle component reordering within or between sections
+    const sourceSectionIndex = parseInt(source.droppableId);
+    const destinationSectionIndex = parseInt(destination.droppableId);
+
+    // If moving within the same section
+    if (sourceSectionIndex === destinationSectionIndex) {
+      const sections = Array.from(pageData.body);
+      const section = sections[sourceSectionIndex];
+      const components = Array.from(section.data);
+      const [movedComponent] = components.splice(source.index, 1);
+      components.splice(destination.index, 0, movedComponent);
+
+      sections[sourceSectionIndex] = {
+        ...section,
+        data: components,
+      };
+
+      dispatch(setPageData({ ...pageData, body: sections }));
+    } else {
+      // If moving between sections
+      const sections = Array.from(pageData.body);
+      const sourceSection = sections[sourceSectionIndex];
+      const destinationSection = sections[destinationSectionIndex];
+      const sourceComponents = Array.from(sourceSection.data);
+      const destinationComponents = Array.from(destinationSection.data);
+
+      const [movedComponent] = sourceComponents.splice(source.index, 1);
+      destinationComponents.splice(destination.index, 0, movedComponent);
+
+      sections[sourceSectionIndex] = {
+        ...sourceSection,
+        data: sourceComponents,
+      };
+
+      sections[destinationSectionIndex] = {
+        ...destinationSection,
+        data: destinationComponents,
+      };
+
+      dispatch(setPageData({ ...pageData, body: sections }));
+    }
+  };
+
   if (loading) {
     return (
       <div className="m-auto flex justify-center items-center h-screen">
@@ -269,12 +327,14 @@ const PageBuilder = ({ pageId }) => {
       </div>
 
       {/* Section List */}
-      <SectionList
-        sections={pageData.body}
-        setSections={(newSections) => {
-          dispatch(setPageData({ ...pageData, body: newSections }));
-        }}
-      />
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <SectionList
+          sections={pageData.body}
+          setSections={(newSections) => {
+            dispatch(setPageData({ ...pageData, body: newSections }));
+          }}
+        />
+      </DragDropContext>
 
       {/* Floating Save Button */}
       <Button

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 import ComponentRenderer from "./ComponentRenderer";
 import ComponentSelectorModal from "../Modals/ComponentSelectorModal";
 import Component from "./Component";
@@ -52,47 +52,6 @@ const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
       window.removeEventListener("duplicateComponent", handleDuplicate);
   }, [components, dispatch, pageData, sectionIndex]);
 
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const { source, destination } = result;
-    const sourceSectionIndex = parseInt(source.droppableId);
-    const destinationSectionIndex = parseInt(destination.droppableId);
-
-    // If moving within the same section
-    if (sourceSectionIndex === destinationSectionIndex) {
-      const reorderedComponents = Array.from(components);
-      const [movedComponent] = reorderedComponents.splice(source.index, 1);
-      reorderedComponents.splice(destination.index, 0, movedComponent);
-
-      const updatedPageData = {
-        ...pageData,
-        body: pageData.body.map((section, idx) => {
-          if (idx === sectionIndex) {
-            return {
-              ...section,
-              data: reorderedComponents,
-            };
-          }
-          return section;
-        }),
-      };
-
-      dispatch(setPageData(updatedPageData));
-      dispatch(setIsDirty(true));
-    } else {
-      // If moving between sections
-      dispatch(
-        moveComponent({
-          fromSectionIndex: sourceSectionIndex,
-          toSectionIndex: destinationSectionIndex,
-          fromIndex: source.index,
-          toIndex: destination.index,
-        })
-      );
-    }
-  };
-
   const addComponent = (type) => {
     const newComponent = {
       _id: Date.now().toString(),
@@ -121,28 +80,26 @@ const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
 
   return (
     <div className="component-list">
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId={sectionId}>
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="components-container min-h-[100px] p-4 bg-gray-50 rounded-md"
-            >
-              {Array.isArray(components) &&
-                components.map((component, index) => (
-                  <ComponentRenderer
-                    key={component._id}
-                    component={component}
-                    index={index}
-                    sectionIndex={sectionIndex}
-                  />
-                ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <Droppable droppableId={sectionIndex.toString()}>
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="components-container min-h-[100px] p-4 bg-gray-50 rounded-md"
+          >
+            {Array.isArray(components) &&
+              components.map((component, index) => (
+                <ComponentRenderer
+                  key={component._id}
+                  component={component}
+                  index={index}
+                  sectionIndex={sectionIndex}
+                />
+              ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
       <div className="add-component-controls mt-4">
         <Button
           type="dashed"

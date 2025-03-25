@@ -260,9 +260,12 @@ const MediaComponent = ({
       <MediaSelectionModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        onSelect={handleSelectMedia}
-        selectionMode={component.selectionMode}
-        selectedMedia={mediaData}
+        onSelectMedia={handleSelectMedia}
+        selectionMode={component.selectionMode || "single"}
+        maxSelection={component.maxSelection}
+        initialSelectedMedia={
+          mediaData ? (Array.isArray(mediaData) ? mediaData : [mediaData]) : []
+        }
       />
     </div>
   );

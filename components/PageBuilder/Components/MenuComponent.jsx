@@ -10,6 +10,7 @@ import {
   DragOutlined,
   CheckCircleOutlined,
   ExportOutlined,
+  CopyFilled,
 } from "@ant-design/icons";
 import MenuSelectionModal from "../Modals/MenuSelectionModal";
 
@@ -17,7 +18,8 @@ const MenuComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
+  onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [menuData, setMenuData] = useState(component._mave);
@@ -63,7 +65,10 @@ const MenuComponent = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-xl font-semibold">Menu Component</h3>
+        <div className="flex items-center gap-2">
+          <DragOutlined className="text-2xl border rounded-md p-1" />
+          <h3 className="text-xl font-semibold">Menu Component</h3>
+        </div>
         <div>
           {menuData && (
             <Button
@@ -74,6 +79,11 @@ const MenuComponent = ({
               Change
             </Button>
           )}
+          <Button
+            icon={<CopyFilled />}
+            onClick={onDuplicateElement}
+            className="mavebutton"
+          />
           <Popconfirm
             title="Are you sure you want to delete this component?"
             onConfirm={handleDelete}
