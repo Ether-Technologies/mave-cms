@@ -107,6 +107,39 @@ const Pages = () => {
     }
   };
 
+  const handleDuplicatePage = async (pageId) => {
+    try {
+      // First, get the page data
+      const response = await instance.get(`/pages/${pageId}`);
+      const pageData = response.data;
+
+      // Create a new page with the same data but with a new name
+      const newPageData = {
+        ...pageData,
+        page_name_en: `${pageData.page_name_en} (Copy)`,
+        page_name_bn: `${pageData.page_name_bn} (Copy)`,
+        slug: `${pageData.slug}-copy`,
+      };
+
+      // Remove the id from the new page data
+      delete newPageData.id;
+
+      // Create the new page
+      const createResponse = await instance.post("/pages", newPageData);
+
+      if (createResponse.status === 201) {
+        message.success("Page duplicated successfully.");
+        // Add the new page to the state
+        setTypePages((prevPages) => [createResponse.data, ...prevPages]);
+      } else {
+        message.error("Failed to duplicate page.");
+      }
+    } catch (error) {
+      console.error("Error duplicating page:", error);
+      message.error("An error occurred while duplicating the page.");
+    }
+  };
+
   const handleEditPage = (id) => {
     router.push(`/page-builder/${id}`);
   };
@@ -252,11 +285,13 @@ const Pages = () => {
       <PagesTabs
         typePages={typePages.slice(0, itemsPerPage)}
         typeSubpages={typeSubpages.slice(0, itemsPerPage)}
+        typeFooters={typeFooters.slice(0, itemsPerPage)}
         handleExpand={handleExpand}
         expandedPageId={expandedPageId}
         handleDeletePage={handleDeletePage}
         handleEditPage={handleEditPage}
         handleEditPageInfo={handleEditPageInfo}
+        handleDuplicatePage={handleDuplicatePage}
       />
     </div>
   );

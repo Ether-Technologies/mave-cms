@@ -11,6 +11,7 @@ const RenderPages = ({
   expandedPageId,
   handleDeletePage,
   handleEditPageInfo,
+  handleDuplicatePage,
 }) => {
   return (
     <div>
@@ -25,6 +26,7 @@ const RenderPages = ({
                 expandedPageId={expandedPageId}
                 handleDeletePage={handleDeletePage}
                 handleEditPageInfo={handleEditPageInfo}
+                handleDuplicatePage={handleDuplicatePage}
               />
             </div>
           ))}

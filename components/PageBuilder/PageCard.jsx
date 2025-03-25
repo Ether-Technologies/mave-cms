@@ -5,6 +5,7 @@ import {
   DeleteFilled,
   EditOutlined,
   PlusCircleOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
 import { Button, Card, message, Popconfirm } from "antd";
 import React, { useState, useEffect } from "react";
@@ -18,6 +19,7 @@ const PageCard = ({
   expandedPageId,
   handleDeletePage,
   handleEditPageInfo,
+  handleDuplicatePage,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [type, setType] = useState("Page");
@@ -105,6 +107,13 @@ const PageCard = ({
                 className="mavebutton"
               >
                 Edit {type} Info
+              </Button>
+              <Button
+                icon={<CopyOutlined />}
+                onClick={() => handleDuplicatePage(page.id)}
+                className="mavebutton"
+              >
+                Duplicate {type}
               </Button>
               <Popconfirm
                 title="Are you sure you want to delete this page?"

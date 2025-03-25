@@ -9,11 +9,13 @@ const { TabPane } = Tabs;
 const PagesTabs = ({
   typePages,
   typeSubpages,
+  typeFooters,
   handleExpand,
   expandedPageId,
   handleDeletePage,
   handleEditPage,
   handleEditPageInfo,
+  handleDuplicatePage,
 }) => {
   return (
     <Tabs centered animated defaultActiveKey="1" className="mt-8">
@@ -26,6 +28,7 @@ const PagesTabs = ({
             expandedPageId={expandedPageId}
             handleDeletePage={handleDeletePage}
             handleEditPageInfo={handleEditPageInfo}
+            handleDuplicatePage={handleDuplicatePage}
           />
         ) : (
           <Spin size="large" />
@@ -40,6 +43,22 @@ const PagesTabs = ({
             expandedPageId={expandedPageId}
             handleDeletePage={handleDeletePage}
             handleEditPageInfo={handleEditPageInfo}
+            handleDuplicatePage={handleDuplicatePage}
+          />
+        ) : (
+          <Spin size="large" />
+        )}
+      </TabPane>
+      <TabPane tab="Footers" key="3">
+        {typeFooters ? (
+          <RenderPages
+            webpages={typeFooters}
+            handleEditPage={handleEditPage}
+            handleExpand={handleExpand}
+            expandedPageId={expandedPageId}
+            handleDeletePage={handleDeletePage}
+            handleEditPageInfo={handleEditPageInfo}
+            handleDuplicatePage={handleDuplicatePage}
           />
         ) : (
           <Spin size="large" />
