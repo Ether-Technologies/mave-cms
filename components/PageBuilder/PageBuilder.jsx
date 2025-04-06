@@ -160,13 +160,11 @@ const PageBuilder = ({ pageId }) => {
 
   // Effect for autosave
   useEffect(() => {
-    if (!initialLoadRef.current && isDirty) {
-      debouncedAutosave();
-    }
+    // Only save when explicitly triggered, not automatically
     return () => {
       debouncedAutosave.cancel();
     };
-  }, [isDirty, debouncedAutosave]);
+  }, [debouncedAutosave]);
 
   // Initial data fetch
   useEffect(() => {
