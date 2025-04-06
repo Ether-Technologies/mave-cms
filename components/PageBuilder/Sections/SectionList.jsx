@@ -15,11 +15,11 @@ const SectionList = () => {
   const addSection = () => {
     const newSection = {
       _id: Date.now().toString(),
-      title: `Section ${pageData.body.length + 1}`,
+      title: `Section ${(pageData.body?.length || 0) + 1}`,
       data: [],
     };
 
-    const updatedSections = [...pageData.body, newSection];
+    const updatedSections = [...(pageData.body || []), newSection];
     dispatch(setPageData({ ...pageData, body: updatedSections }));
   };
 
