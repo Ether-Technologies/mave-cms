@@ -85,40 +85,6 @@ const SideMenuItems = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, refreshMenu]); // Add refreshMenu as a dependency
 
-  // Compute final menu data with custom models appended to Creator Studio
-  // const finalMenuData = useMemo(() => {
-  //   // Deep clone to prevent state mutation
-  //   const menuData = JSON.parse(JSON.stringify(allMenuData));
-
-  //   if (token && user && customModels.length > 0) {
-  //     // Find the Creator Studio menu
-  //     const creatorStudioMenu = menuData.find(
-  //       (menu) => menu.title === "Creator Studio"
-  //     );
-
-  //     if (creatorStudioMenu) {
-  //       // Map custom models to submenu items
-  //       const customModelItems = customModels.map((model) => ({
-  //         id: `custom-${model.id}`, // Ensure unique id
-  //         icon: "/icons/mave/custom-models.svg",
-  //         link: `/custom-models/${model.id}`,
-  //         title: model.model_name
-  //           .split(" ")
-  //           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  //           .join(" "),
-  //       }));
-
-  //       // Append custom models to Creator Studio's submenu
-  //       creatorStudioMenu.submenu = [
-  //         ...creatorStudioMenu.submenu,
-  //         ...customModelItems,
-  //       ];
-  //     }
-  //   }
-
-  //   return menuData;
-  // }, [allMenuData, customModels, token, user]);
-
   const finalMenuData = useMemo(() => {
     const menuData = JSON.parse(JSON.stringify(allMenuData));
 
@@ -232,13 +198,15 @@ const SideMenuItems = ({
               key={item.id.toString()}
               title={
                 <div className="flex items-center gap-2 font-semibold">
-                  <Image
-                    src={item.icon}
-                    alt={`${item.title} icon`}
-                    width={collapsed ? 50 : 40}
-                    height={collapsed ? 50 : 40}
-                    className="main-menu-icon"
-                  />
+                  <div className="flex items-center justify-center w-6 h-6">
+                    <Image
+                      src={item.icon}
+                      alt={`${item.title} icon`}
+                      width={20}
+                      height={20}
+                      className="main-menu-icon"
+                    />
+                  </div>
                   {!collapsed && <span>{item.title}</span>}
                 </div>
               }
@@ -247,12 +215,14 @@ const SideMenuItems = ({
               {item.submenu.map((subItem) => (
                 <Item key={subItem.id.toString()} className="">
                   <div className="flex items-center gap-2">
-                    <Image
-                      src={subItem.icon}
-                      alt={`${subItem.title} icon`}
-                      width={30}
-                      height={30}
-                    />
+                    <div className="flex items-center justify-center w-5 h-5">
+                      <Image
+                        src={subItem.icon}
+                        alt={`${subItem.title} icon`}
+                        width={16}
+                        height={16}
+                      />
+                    </div>
                     <span className="text-md font-semibold text-gray-500">
                       {subItem.title}
                     </span>
@@ -268,12 +238,14 @@ const SideMenuItems = ({
               }`}
             >
               <div className="flex items-center gap-2">
-                <Image
-                  src={item.icon}
-                  alt={`${item.title} icon`}
-                  width={20}
-                  height={20}
-                />
+                <div className="flex items-center justify-center w-6 h-6">
+                  <Image
+                    src={item.icon}
+                    alt={`${item.title} icon`}
+                    width={20}
+                    height={20}
+                  />
+                </div>
                 {!collapsed && <span>{item.title}</span>}
               </div>
             </Item>
