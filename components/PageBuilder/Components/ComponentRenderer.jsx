@@ -20,7 +20,11 @@ import IconListComponent from "./IconListComponent/IconListComponent";
 import TestimonialComponent from "./TestimonialComponent/TestimonialComponent";
 import TitleDescriptionComponent from "./TitleDescriptionComponent";
 import { useDispatch, useSelector } from "react-redux";
-import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
+import {
+  setPageData,
+  setIsDirty,
+  duplicateComponent,
+} from "../../../store/slices/pageSlice";
 
 const COMPONENT_MAP = {
   title: React.memo(TextComponent),
@@ -88,11 +92,8 @@ const ComponentRenderer = React.memo(
     }, [dispatch, pageData, sectionIndex, index]);
 
     const handleDuplicate = useCallback(() => {
-      const duplicateEvent = new CustomEvent("duplicateComponent", {
-        detail: { componentIndex: index },
-      });
-      window.dispatchEvent(duplicateEvent);
-    }, [index]);
+      dispatch(duplicateComponent({ sectionIndex, componentIndex: index }));
+    }, [dispatch, sectionIndex, index]);
 
     // Get the actual component type, handling both object and string formats
     const componentType = component.type?.type || component.type;

@@ -11,6 +11,7 @@ import {
   setIsDirty,
   setPageData,
   moveComponent,
+  duplicateComponent,
 } from "../../../store/slices/pageSlice";
 import { message } from "antd";
 
@@ -23,42 +24,6 @@ const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
   useEffect(() => {
     setComponents(components);
   }, [components]);
-
-  const handleDuplicate = (componentIndex) => {
-    const component = componentsState[componentIndex];
-    if (!component) return;
-
-    try {
-      const duplicatedComponent = {
-        ...component,
-        _id: Date.now().toString(),
-      };
-      const newComponents = [...componentsState];
-      newComponents.splice(componentIndex + 1, 0, duplicatedComponent);
-      setComponents(newComponents);
-
-      // Update the page data
-      const updatedPageData = {
-        ...pageData,
-        body: pageData.body.map((section, idx) => {
-          if (idx === sectionIndex) {
-            return {
-              ...section,
-              data: newComponents,
-            };
-          }
-          return section;
-        }),
-      };
-
-      dispatch(setPageData(updatedPageData));
-      dispatch(setIsDirty(true));
-      message.success("Component duplicated successfully");
-    } catch (error) {
-      console.error("Error duplicating component:", error);
-      message.error("Failed to duplicate component");
-    }
-  };
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -161,7 +126,14 @@ const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
                             component={component}
                             index={index}
                             sectionIndex={sectionIndex}
-                            onDuplicateElement={() => handleDuplicate(index)}
+                            onDuplicateElement={() =>
+                              dispatch(
+                                duplicateComponent({
+                                  sectionIndex,
+                                  componentIndex: index,
+                                })
+                              )
+                            }
                           />
                         </div>
                       </div>
