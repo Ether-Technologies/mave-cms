@@ -21,8 +21,6 @@ import TestimonialComponent from "./TestimonialComponent/TestimonialComponent";
 import TitleDescriptionComponent from "./TitleDescriptionComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
-import { Button, Popconfirm } from "antd";
-import { CopyOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const COMPONENT_MAP = {
   title: React.memo(TextComponent),

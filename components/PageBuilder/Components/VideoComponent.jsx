@@ -17,6 +17,8 @@ const { Paragraph } = Typography;
 
 // Helper function to validate and get embed URL
 const getEmbedUrl = (url) => {
+  if (!url) return null;
+
   const youtubeMatch = url.match(
     /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^\s&]+)/
   );
@@ -45,11 +47,11 @@ const VideoComponent = ({
   onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [videoData, setVideoData] = useState(component._mave);
+  const [videoData, setVideoData] = useState(component._mave || {});
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    setVideoData(component._mave);
+    setVideoData(component._mave || {});
   }, [component._mave]);
 
   const handleSelectVideo = (selectedVideo) => {
@@ -59,7 +61,7 @@ const VideoComponent = ({
       id: selectedVideo.url,
     });
     setVideoData(selectedVideo);
-    setIsEditing(false);
+    setIsModalVisible(false);
     message.success("Video updated successfully.");
   };
 
@@ -87,53 +89,64 @@ const VideoComponent = ({
   const renderVideo = () => {
     if (!videoData || !videoData.url) {
       return (
-        <Button
-          icon={<EditOutlined />}
-          onClick={() => setIsModalVisible(true)}
-          className="mavebutton w-fit"
-        >
-          Select Video
-        </Button>
+        <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => setIsModalVisible(true)}
+            className="mavebutton w-fit"
+          >
+            Select Video
+          </Button>
+          <p className="mt-2 text-sm text-gray-500">No video selected</p>
+        </div>
       );
     }
 
     const embedUrl = getEmbedUrl(videoData.url);
     if (!embedUrl) {
-      return <Paragraph>Unsupported video URL.</Paragraph>;
+      return (
+        <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+          <Paragraph className="text-red-600">
+            Invalid video URL. Please select a valid YouTube, Vimeo, or direct
+            video link.
+          </Paragraph>
+        </div>
+      );
     }
 
     // Determine if it's an iframe embed or direct video
     const isIframe =
-      embedUrl.startsWith("https://www.youtube.com") ||
-      embedUrl.startsWith("https://player.vimeo.com");
+      embedUrl.includes("youtube.com") || embedUrl.includes("vimeo.com");
 
-    return isIframe ? (
-      <div className="video-responsive">
-        <iframe
-          src={embedUrl}
-          title="Embedded Video"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen={videoData.settings.controls}
-          style={{
-            width: "100%",
-            height: "100%",
-            aspectRatio: videoData.settings.aspectRatio || "16/9",
-          }}
-        ></iframe>
+    return (
+      <div className="video-container relative w-full overflow-hidden rounded-lg bg-gray-900">
+        {isIframe ? (
+          <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+            <iframe
+              src={embedUrl}
+              title="Embedded Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute top-0 left-0 w-full h-full"
+              onError={(e) => {
+                console.error("Video iframe error:", e);
+                // Handle iframe loading error
+              }}
+            />
+          </div>
+        ) : (
+          <video
+            src={embedUrl}
+            controls
+            className="w-full h-auto"
+            onError={(e) => {
+              console.error("Video loading error:", e);
+              // Handle video loading error
+            }}
+          />
+        )}
       </div>
-    ) : (
-      <video
-        src={embedUrl}
-        controls={videoData.settings.controls}
-        autoPlay={videoData.settings.autoplay}
-        loop={videoData.settings.loop}
-        style={{
-          width: "100%",
-          height: "auto",
-          aspectRatio: videoData.settings.aspectRatio || "16/9",
-        }}
-      />
     );
   };
 

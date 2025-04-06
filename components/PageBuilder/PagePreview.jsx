@@ -27,8 +27,8 @@ const PagePreview = ({ pageData, open, setOpen }) => {
       <div className="preview-content">
         {/* Render each section with preview mode */}
         {pageData.body && pageData.body.length > 0 ? (
-          pageData.body.map((section, index) => (
-            <div key={section._id || index} className="mb-8">
+          pageData.body.map((section, sectionIndex) => (
+            <div key={section._id || sectionIndex} className="section">
               {section.sectionTitle && (
                 <Title
                   level={4}
@@ -41,12 +41,12 @@ const PagePreview = ({ pageData, open, setOpen }) => {
               {section.data && section.data.length > 0 ? (
                 section.data.map((component, compIndex) => (
                   <ComponentRenderer
-                    key={component._id || compIndex}
+                    key={component?._id || compIndex}
                     component={component}
                     index={compIndex}
                     components={section.data}
-                    setComponents={() => {}} // No-op since it's read-only
-                    preview={true} // Set preview mode
+                    sectionIndex={sectionIndex}
+                    preview={true}
                   />
                 ))
               ) : (

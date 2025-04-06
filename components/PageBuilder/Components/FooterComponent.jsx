@@ -37,8 +37,6 @@ const FooterComponent = ({
     deleteComponent();
   };
 
-  console.log("Footer Component", footerData);
-
   if (preview) {
     return (
       <div className="preview-footer-component p-4 bg-gray-100 rounded-md">

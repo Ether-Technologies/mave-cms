@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import { Input, Button, Modal, Popconfirm, Typography } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  PlusOutlined,
-  ExportOutlined,
-  CopyFilled,
-  DragOutlined,
-} from "@ant-design/icons";
+import { Input, Modal, Typography, Button } from "antd";
+import { PlusOutlined, EditOutlined } from "@ant-design/icons";
+import BaseComponent from "./BaseComponent";
+
+const { Title } = Typography;
 
 const TextComponent = ({
   component,
@@ -20,7 +14,6 @@ const TextComponent = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(component.value || "");
-  const { Title } = Typography;
 
   const handleSubmit = () => {
     if (tempValue.trim() === "") {
@@ -39,95 +32,78 @@ const TextComponent = ({
     setIsEditing(false);
   };
 
-  const handleDelete = () => {
-    deleteComponent();
+  const renderContent = () => {
+    if (isEditing) {
+      return (
+        <div className="space-y-4">
+          <Input.TextArea
+            value={tempValue}
+            onChange={(e) => setTempValue(e.target.value)}
+            placeholder="Enter text..."
+            autoSize={{ minRows: 3, maxRows: 6 }}
+            className="w-full px-4 py-2 text-lg border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          />
+        </div>
+      );
+    }
+
+    if (component.value) {
+      return (
+        <div className="prose max-w-none relative group">
+          <Title level={3} className="text-2xl font-bold text-gray-800">
+            {component.value}
+          </Title>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => setIsEditing(true)}
+            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          >
+            Edit
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+        <Button
+          icon={<PlusOutlined />}
+          onClick={() => setIsEditing(true)}
+          className="bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 hover:text-blue-700 hover:border-blue-200 transition-colors duration-200"
+        >
+          Add Text
+        </Button>
+        <p className="mt-2 text-sm text-gray-500">No text content added</p>
+      </div>
+    );
   };
 
-  // If in preview mode, render the text content only
+  // Preview mode rendering
   if (preview) {
     return (
-      <div className="preview-text-component p-4 bg-gray-100 rounded-md text-center">
-        <h1 className="text-3xl font-bold">{component.value}</h1>
+      <div className="preview-text-component p-6 bg-gray-50 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md text-center">
+        <h1 className="text-3xl font-bold text-gray-800">{component.value}</h1>
       </div>
     );
   }
 
   return (
-    <div className="border p-4 rounded-md bg-white">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
-          <DragOutlined className="text-2xl border rounded-md p-1" />
-          <h3 className="text-xl font-semibold">Text Component</h3>
-        </div>
-        <div>
-          {isEditing ? (
-            <>
-              <Button
-                icon={<CheckOutlined />}
-                onClick={handleSubmit}
-                className="mavebutton"
-              >
-                Done
-              </Button>
-              <Button
-                icon={<CloseOutlined />}
-                onClick={handleCancel}
-                className="mavecancelbutton"
-              >
-                Discard
-              </Button>
-            </>
-          ) : (
-            <>
-              {component.value && (
-                <Button
-                  icon={<ExportOutlined />}
-                  onClick={() => setIsEditing(true)}
-                  className="mavebutton"
-                >
-                  Change
-                </Button>
-              )}
-              <Button
-                icon={<CopyFilled />}
-                onClick={onDuplicateElement}
-                className="mavebutton"
-              />
-              <Popconfirm
-                title="Are you sure you want to delete this component?"
-                onConfirm={handleDelete}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button
-                  icon={<DeleteOutlined />}
-                  className="mavecancelbutton"
-                />
-              </Popconfirm>
-            </>
-          )}
-        </div>
-      </div>
-      {isEditing ? (
-        <Input
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value)}
-          placeholder="Enter text..."
-          onPressEnter={handleSubmit}
-        />
-      ) : component.value ? (
-        <Title level={3}>{component.value}</Title>
-      ) : (
-        <Button
-          icon={<PlusOutlined />}
-          type="dashed"
-          onClick={() => setIsEditing(true)}
-          className="w-full border-theme font-bold"
-        >
-          Add Text
-        </Button>
-      )}
-    </div>
+    <BaseComponent
+      component={component}
+      updateComponent={updateComponent}
+      deleteComponent={deleteComponent}
+      preview={preview}
+      onDuplicateElement={onDuplicateElement}
+      title="Text Component"
+      isEditing={isEditing}
+      setIsEditing={setIsEditing}
+      onEdit={() => setIsEditing(true)}
+      onCancel={handleCancel}
+      onSave={handleSubmit}
+      showChangeButton={!!component.value}
+    >
+      {renderContent()}
+    </BaseComponent>
   );
 };
 

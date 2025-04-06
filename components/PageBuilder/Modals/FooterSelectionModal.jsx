@@ -31,8 +31,6 @@ const FooterSelectionModal = ({ isVisible, onClose, onSelectFooter }) => {
     }
   }, [isVisible]);
 
-  console.log("Footer List", footerList);
-
   return (
     <Modal
       title="Select Footer"
