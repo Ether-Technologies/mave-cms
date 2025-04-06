@@ -44,7 +44,7 @@ const renderSliderImages = (medias) => {
         }
         alt={media.title || "Slider Image"}
         width={900}
-        height={900}
+        height={400}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         objectFit="cover"
         className="rounded-lg"
@@ -157,8 +157,8 @@ const SliderComponent = ({
             <Image
               src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${card.media_files.file_path}`}
               alt={card.title_en || "Card Image"}
-              width={800}
-              height={700}
+              width={900}
+              height={600}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               objectFit="cover"
               className="rounded-lg"
@@ -272,8 +272,10 @@ const SliderComponent = ({
       </div>
 
       <div className="flex flex-col md:flex-row items-start gap-4">
-        <div className="flex flex-col w-full md:w-1/2">
-          {sliderData && (
+        <div
+          className={`flex flex-col ${isEditing && selectedSliderData ? "w-full md:w-1/2" : "w-full"}`}
+        >
+          {sliderData && isEditing && (
             <h4 className="mb-2 text-md font-semibold">Current Slider</h4>
           )}
           {sliderData?.type === "image" && sliderData?.medias?.length > 0 ? (

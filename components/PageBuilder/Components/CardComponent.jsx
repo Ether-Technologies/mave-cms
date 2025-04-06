@@ -34,7 +34,7 @@ const renderCardMedia = (media) => {
         <Image
           src="/images/Image_Placeholder.png"
           alt="No Image"
-          width={400}
+          width={900}
           height={400}
           objectFit="cover"
           className="rounded-lg"
@@ -47,7 +47,7 @@ const renderCardMedia = (media) => {
     <Image
       src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
       alt={media.title_en || "Card Image"}
-      width={400}
+      width={900}
       height={400}
       objectFit="cover"
       className="rounded-lg"
@@ -225,8 +225,10 @@ const CardComponent = ({
       </div>
 
       <div className="flex flex-col md:flex-row items-start gap-4">
-        <div className="flex flex-col w-full md:w-1/2">
-          {cardData && (
+        <div
+          className={`flex flex-col ${isEditing && selectedCardData ? "w-full md:w-1/2" : "w-full"}`}
+        >
+          {cardData && isEditing && (
             <h4 className="mb-2 text-md font-semibold">Current Card</h4>
           )}
           {cardData ? (

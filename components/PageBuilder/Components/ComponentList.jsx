@@ -86,7 +86,7 @@ const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
             <div
               ref={provided.innerRef}
               {...provided.droppableProps}
-              className="components-container min-h-[100px] p-4 bg-gray-50 rounded-md"
+              className="components-container min-h-[100px] p-1 bg-gray-50 rounded-md"
             >
               {Array.isArray(componentsState) &&
                 componentsState.map((component, index) => (

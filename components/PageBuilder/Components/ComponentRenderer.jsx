@@ -112,7 +112,7 @@ const ComponentRenderer = React.memo(
     // If in preview mode, render without drag-and-drop wrapper
     if (preview) {
       return (
-        <div className="relative border border-gray-300 p-4 mb-4">
+        <div className="relative mb-4">
           <SpecificComponent
             component={component}
             updateComponent={updateComponent}
@@ -132,7 +132,7 @@ const ComponentRenderer = React.memo(
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`relative border border-gray-300 p-4 mb-4 ${
+            className={`relative mb-4 ${
               snapshot.isDragging ? "shadow-lg" : ""
             }`}
           >
