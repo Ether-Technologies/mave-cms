@@ -63,7 +63,7 @@ const MenuComponent = ({
   }
 
   return (
-    <div>
+    <div className="bg-white p-4 rounded-md">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
           <DragOutlined className="text-2xl border rounded-md p-1" />
@@ -95,11 +95,8 @@ const MenuComponent = ({
         </div>
       </div>
       {menuData ? (
-        <div className="flex gap-6 items-center">
-          <h2 className="text-xl font-semibold text-theme">
-            Selected Menu: {menuData.name}
-          </h2>
-          <ArrowRightOutlined />
+        <div className="flex flex-col gap-6 p-4 rounded-md">
+          <h2 className="text-xl font-semibold text-theme">{menuData.name}</h2>
           <Menu mode="horizontal" className="flex-grow">
             {renderMenuItems(menuData?.menu_items)}
           </Menu>

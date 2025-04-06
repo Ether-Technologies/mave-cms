@@ -81,7 +81,7 @@ const NavbarComponent = ({
   }
 
   return (
-    <div>
+    <div className="bg-white p-4 rounded-md">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
           <DragOutlined className="text-2xl border rounded-md p-1" />
@@ -115,9 +115,9 @@ const NavbarComponent = ({
       {navbarData ? (
         <div className="p-4 border rounded-md">
           <Paragraph strong className="text-theme">
-            Name: {navbarData.menu?.name}
+            {navbarData.menu?.name}
           </Paragraph>
-          <div className="navbar-preview flex items-center">
+          <div className="navbar-preview flex items-center gap-10">
             <Image
               src={
                 navbarData?.logo?.file_path
@@ -128,7 +128,7 @@ const NavbarComponent = ({
               height={50}
               alt="Navbar Logo"
               objectFit="cover"
-              className="rounded-lg"
+              className="rounded-lg border-2 border-gray-200"
             />
             <Menu mode="horizontal" className="flex-grow">
               {renderMenuItems(navbarData?.menu?.menu_items)}
