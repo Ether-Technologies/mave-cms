@@ -105,61 +105,58 @@ const CreateFooterModal = ({
       onCancel={handleCancel}
       footer={null}
       centered
+      className="create-modal"
+      width={600}
     >
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
+      <div className="flex flex-col gap-6 p-4">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Footer Title
+          </label>
           <Input
-            placeholder="Footer Title"
+            placeholder="Enter footer title"
             value={newPageTitleEn}
             onChange={(e) => setNewPageTitleEn(e.target.value)}
-            className="text-lg"
+            className="text-lg h-12"
+            size="large"
           />
-        </Col>
-        <Col span={24}>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Footer Alt Title
+          </label>
           <Input
-            placeholder="Footer Alt Title"
+            placeholder="Enter footer alt title"
             value={newPageTitleBn}
             onChange={(e) => {
               setNewPageTitleBn(e.target.value);
               setIsAltTitleManuallyEdited(true);
             }}
-            className="text-lg"
+            className="text-lg h-12"
+            size="large"
           />
-        </Col>
-        {/* <Col span={24}>
-          <div className="flex gap-2 items-center">
-            <Input
-              placeholder="Footer Slug (e.g., about-us)"
-              className="text-lg"
-              value={newSlug}
-              onChange={(e) => setNewSlug(e.target.value)}
-            />
-            <Button onClick={generateSlug} className="mavebutton">
-              Generate
-            </Button>
-          </div>
-          <span className="text-xs text-gray-500">
-            *Use only lowercase letters, numbers, and hyphens.
-          </span>
-        </Col> */}
-        <Col span={24} className="flex justify-end gap-2">
+        </div>
+
+        <div className="flex justify-end gap-3 mt-4">
+          <Button
+            onClick={handleCancel}
+            icon={<CloseCircleOutlined />}
+            className="h-10 px-6 mavecancelbutton"
+          >
+            Cancel
+          </Button>
           <Button
             onClick={handleCreateFooter}
             icon={<PlusCircleOutlined />}
             loading={loading}
-            className="mavebutton"
+            className="h-10 px-6 mavebutton"
+            type="primary"
           >
             Create Footer
           </Button>
-          <Button
-            onClick={handleCancel}
-            icon={<CloseCircleOutlined />}
-            className="mavecancelbutton"
-          >
-            Cancel
-          </Button>
-        </Col>
-      </Row>
+        </div>
+      </div>
     </Modal>
   );
 };

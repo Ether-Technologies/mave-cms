@@ -297,28 +297,40 @@ const PageBuilder = ({ pageId }) => {
   }
 
   return (
-    <div className="p-4 relative">
+    <div className="p-6 relative min-h-screen bg-gray-50">
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className="text-2xl font-bold">{pageData.page_name_en} Page</h1>
+      <div className="flex justify-between items-center mb-8 p-4 bg-white rounded-lg shadow-sm">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold text-gray-800">
+            {pageData.page_name_en} Page
+          </h1>
           {lastSaved && (
-            <p className="text-sm text-gray-500">
-              Last saved: {new Date(lastSaved).toLocaleString()}
+            <p className="text-sm text-gray-500 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+              {/* date format 06:22 PM, 04 March 2025 */}
+              {new Date(lastSaved).toLocaleString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Button
             icon={<UndoOutlined />}
             onClick={handleUndo}
             disabled={!canUndo}
+            className="flex items-center justify-center w-10 h-10 rounded-lg border-2 border-gray-200 hover:border-theme transition-colors"
             title="Undo (Ctrl/⌘ + Z)"
           />
           <Button
             icon={<RedoOutlined />}
             onClick={handleRedo}
             disabled={!canRedo}
+            className="flex items-center justify-center w-10 h-10 rounded-lg border-2 border-gray-200 hover:border-theme transition-colors"
             title="Redo (Ctrl/⌘ + Y or Ctrl/⌘ + Shift + Z)"
           />
         </div>
@@ -326,34 +338,35 @@ const PageBuilder = ({ pageId }) => {
 
       {/* Section List */}
       <DragDropContext onDragEnd={handleDragEnd}>
-        <SectionList
-          sections={pageData.body}
-          setSections={(newSections) => {
-            dispatch(setPageData({ ...pageData, body: newSections }));
-          }}
-        />
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <SectionList
+            sections={pageData.body}
+            setSections={(newSections) => {
+              dispatch(setPageData({ ...pageData, body: newSections }));
+            }}
+          />
+        </div>
       </DragDropContext>
 
-      {/* Floating Save Button */}
-      <Button
-        icon={<SaveOutlined style={{ fontSize: "1.5rem" }} />}
-        onClick={() => savePageData(true)}
-        className={`text-lg font-bold fixed bottom-16 right-10 px-4 py-6 rounded-full shadow-lg z-50 border-2 ${
-          isDirty
-            ? "bg-yellow-400 hover:bg-yellow-500"
-            : "bg-theme hover:bg-theme"
-        } text-black border-themedark`}
-        title="Save (Ctrl/⌘ + S)"
-      >
-        {isDirty ? "Save*" : "Save"}
-      </Button>
-
-      {/* Floating Preview Button */}
-      <Button
-        icon={<EyeOutlined style={{ fontSize: "1.5rem" }} />}
-        onClick={() => setPreview(true)}
-        className="text-lg font-bold fixed bottom-16 right-40 bg-theme hover:bg-theme text-black p-4 rounded-full shadow-lg z-50 h-16 w-16 flex justify-center items-center border-2 border-themedark"
-      />
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-14 right-6 flex gap-4">
+        <Button
+          icon={<EyeOutlined style={{ fontSize: "1.5rem" }} />}
+          onClick={() => setPreview(true)}
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-lg border-2 border-gray-200 hover:border-theme transition-colors"
+        />
+        <Button
+          icon={<SaveOutlined style={{ fontSize: "1.5rem" }} />}
+          onClick={() => savePageData(true)}
+          disabled={!isDirty}
+          className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg border-2 ${
+            isDirty
+              ? "bg-yellow-400 hover:bg-yellow-500 border-yellow-500 cursor-pointer"
+              : "bg-gray-300 border-gray-400 cursor-not-allowed"
+          } text-white transition-colors`}
+          title={isDirty ? "Save (Ctrl/⌘ + S)" : "No changes to save"}
+        />
+      </div>
 
       {/* Page Preview Modal */}
       <PagePreview pageData={pageData} open={preview} setOpen={setPreview} />

@@ -6,6 +6,10 @@ import {
   EditOutlined,
   PlusCircleOutlined,
   CopyOutlined,
+  ArrowRightOutlined,
+  CaretDownFilled,
+  CaretRightOutlined,
+  CaretDownOutlined,
 } from "@ant-design/icons";
 import { Button, Card, message, Popconfirm } from "antd";
 import React, { useState, useEffect } from "react";
@@ -57,73 +61,78 @@ const PageCard = ({
 
   return (
     <Card
-      title={`${type} ID-${page.id} : ${page.page_name_en}`}
-      extra={
-        <div className="flex space-x-2 transition-all duration-300">
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => router.push(`/page-builder/${page.id}`)}
-            className="mavebutton"
-          >
-            Edit {type}
-          </Button>
-          <Button
-            type="default"
-            icon={
-              expandedPageId === page.id ? (
-                <CloseCircleOutlined />
-              ) : (
-                <PlusCircleOutlined />
-              )
-            }
-            onClick={() => handleExpand(page.id)}
-            className="rounded-md"
-          >
-            {expandedPageId === page.id ? "Collapse" : "Expand"}
-          </Button>
+      title={
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <span className="text-base md:text-lg font-semibold text-gray-800">
+              {type} ID-{page.id}
+            </span>
+            <span className="text-base md:text-lg font-medium text-theme">
+              {page.page_name_en}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => router.push(`/page-builder/${page.id}`)}
+              className="h-9 px-4 mavebutton"
+            />
+            <Button
+              type="default"
+              icon={
+                expandedPageId === page.id ? (
+                  <CaretDownOutlined />
+                ) : (
+                  <CaretRightOutlined />
+                )
+              }
+              onClick={() => handleExpand(page.id)}
+              className="h-9 px-4 rounded-md border-2 border-gray-200 hover:border-theme transition-colors"
+            />
+          </div>
         </div>
       }
-      bordered
-      className="shadow-md"
+      bordered={false}
+      className="w-full shadow-sm hover:shadow-md transition-shadow duration-200 rounded-lg bg-white"
     >
       {expandedPageId === page.id && (
-        <div className="mt-4">
-          {isEditing ? (
-            <PageEditForm
-              page={page}
-              onSubmit={confirmEdit}
-              onCancel={cancelEditing}
-            />
-          ) : (
-            <PageInfoDisplay page={page} />
-          )}
+        <div className="w-full mt-4">
+          <div className="w-full">
+            {isEditing ? (
+              <PageEditForm
+                page={page}
+                onSubmit={confirmEdit}
+                onCancel={cancelEditing}
+              />
+            ) : (
+              <PageInfoDisplay page={page} />
+            )}
+          </div>
 
-          {/* Action Buttons when not editing */}
           {!isEditing && (
-            <div className="flex space-x-4 mt-4 transition-all duration-300">
+            <div className="flex flex-wrap gap-3 mt-6">
               <Button
                 icon={<EditOutlined />}
                 onClick={startEditing}
-                className="mavebutton"
-              >
-                Edit {type} Info
-              </Button>
+                className="h-9 px-4 mavebutton"
+              />
               <Button
                 icon={<CopyOutlined />}
                 onClick={() => handleDuplicatePage(page.id)}
-                className="mavebutton"
-              >
-                Duplicate {type}
-              </Button>
+                className="h-9 px-4 mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this page?"
                 onConfirm={() => handleDeletePage(page.id)}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ className: "mavebutton" }}
+                cancelButtonProps={{ className: "mavecancelbutton" }}
               >
-                <Button icon={<DeleteFilled />} className="mavecancelbutton">
-                  Delete {type}
-                </Button>
+                <Button
+                  icon={<DeleteFilled />}
+                  className="h-9 px-4 mavecancelbutton"
+                />
               </Popconfirm>
             </div>
           )}

@@ -31,7 +31,7 @@ const PagesTabs = ({
             handleDuplicatePage={handleDuplicatePage}
           />
         ) : (
-          <Spin size="large" />
+          <div>No pages found</div>
         )}
       </TabPane>
       <TabPane tab="Subpages" key="2">
@@ -46,22 +46,7 @@ const PagesTabs = ({
             handleDuplicatePage={handleDuplicatePage}
           />
         ) : (
-          <Spin size="large" />
-        )}
-      </TabPane>
-      <TabPane tab="Footers" key="3">
-        {typeFooters ? (
-          <RenderPages
-            webpages={typeFooters}
-            handleEditPage={handleEditPage}
-            handleExpand={handleExpand}
-            expandedPageId={expandedPageId}
-            handleDeletePage={handleDeletePage}
-            handleEditPageInfo={handleEditPageInfo}
-            handleDuplicatePage={handleDuplicatePage}
-          />
-        ) : (
-          <Spin size="large" />
+          <div>No subpages found</div>
         )}
       </TabPane>
     </Tabs>

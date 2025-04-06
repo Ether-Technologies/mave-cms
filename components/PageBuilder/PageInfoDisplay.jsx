@@ -69,7 +69,7 @@ const PageInfoDisplay = ({ page }) => {
             <span className="font-semibold text-theme">Page Meta Image</span>
             <div className="relative w-32 h-32 mt-2">
               <Image
-                src={page.additional[0].metaImage}
+                src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${page.additional[0].metaImage}`}
                 alt={page.additional[0].metaImageAlt || "Meta Image"}
                 objectFit="cover"
                 className="rounded-md"

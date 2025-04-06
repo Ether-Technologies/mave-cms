@@ -93,8 +93,8 @@ const MediaComponent = ({
             key={media.id}
             src={fileUrl}
             alt={media.title || "Image"}
-            width={192}
-            height={144}
+            width={900}
+            height={400}
             objectFit="cover"
             className="rounded-lg transition-all duration-300 group-hover:shadow-lg w-48 h-36"
           />
@@ -217,7 +217,7 @@ const MediaComponent = ({
   }
 
   return (
-    <div className="border p-4 rounded-md bg-white">
+    <div className="border p-4 rounded-md bg-white w-full">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
           <DragOutlined className="text-2xl border rounded-md p-1" />
@@ -279,43 +279,60 @@ const MediaComponent = ({
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center gap-4">
-        <div className="flex flex-col items-center">
-          {mediaData && (
-            <h4 className="mb-2 text-md font-semibold">Current Media</h4>
-          )}
-          {mediaData ? (
-            component.selectionMode === "multiple" ? (
-              <div className="grid grid-cols-2 gap-4">
-                {mediaData.map((media) => renderMediaItem(media))}
-              </div>
-            ) : (
-              renderMediaItem(mediaData)
-            )
-          ) : (
-            <Button
-              icon={<ExportOutlined />}
-              onClick={() => setIsModalVisible(true)}
-              className="mavebutton"
-            >
-              Choose Media
-            </Button>
-          )}
-        </div>
-
-        {isEditing && selectedMediaData && (
-          <div className="flex justify-between items-center">
-            <ArrowRightOutlined className="text-2xl mx-20" />
-            <div className="flex flex-col items-center">
-              <h4 className="mb-2 text-md font-medium">Selected Media</h4>
-              {component.selectionMode === "multiple" ? (
-                <div className="grid grid-cols-2 gap-4">
-                  {selectedMediaData.map((media) => renderMediaItem(media))}
+      <div className="flex flex-col w-full">
+        {!isEditing ? (
+          <div className="w-full">
+            {mediaData ? (
+              component.selectionMode === "multiple" ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                  {mediaData.map((media) => renderMediaItem(media))}
                 </div>
               ) : (
-                renderMediaItem(selectedMediaData)
-              )}
+                <div className="w-full flex justify-center">
+                  {renderMediaItem(mediaData)}
+                </div>
+              )
+            ) : (
+              <Button
+                icon={<ExportOutlined />}
+                onClick={() => setIsModalVisible(true)}
+                className="mavebutton w-full md:w-auto"
+              >
+                Choose Media
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col md:flex-row w-full gap-6">
+            {/* Current Media */}
+            <div className="w-full md:w-1/2">
+              <h4 className="mb-2 text-md font-semibold">Current Media</h4>
+              {mediaData ? (
+                component.selectionMode === "multiple" ? (
+                  <div className="grid grid-cols-1 gap-4 w-full">
+                    {mediaData.map((media) => renderMediaItem(media))}
+                  </div>
+                ) : (
+                  <div className="w-full">{renderMediaItem(mediaData)}</div>
+                )
+              ) : null}
             </div>
+
+            {/* Selected Media */}
+            {selectedMediaData && (
+              <div className="w-full md:w-1/2">
+                <h4 className="mb-2 text-md font-medium">Selected Media</h4>
+                {component.selectionMode === "multiple" ? (
+                  <div className="grid grid-cols-1 gap-4 w-full">
+                    {selectedMediaData.map((media) => renderMediaItem(media))}
+                  </div>
+                ) : (
+                  <div className="w-full">
+                    {renderMediaItem(selectedMediaData)}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

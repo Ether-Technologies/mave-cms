@@ -217,6 +217,7 @@ const PageEditForm = ({ page, onSubmit, onCancel }) => {
         >
           Select Meta Image
         </Button>
+        {console.log(formData.metaImage)}
         {formData.metaImage && (
           <div className="relative w-32 h-32 mt-2">
             <Image
