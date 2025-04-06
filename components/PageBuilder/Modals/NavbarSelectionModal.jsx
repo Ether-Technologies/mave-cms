@@ -1,115 +1,92 @@
 // components/PageBuilder/Modals/NavbarSelectionModal.jsx
 
 import React, { useState, useEffect } from "react";
-import { Modal, List, message } from "antd";
+import { List, Button, Input, Space, Typography, message } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import instance from "../../../axios";
 import Image from "next/image";
-import { Menu } from "antd";
 
-const NavbarSelectionModal = ({ isVisible, onClose, onSelectNavbar }) => {
-  const [navbarList, setNavbarList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedNavbarId, setSelectedNavbarId] = useState(null);
+const { Text } = Typography;
+
+const NavbarSelectionModal = ({ onSelectNavbar, selectedNavbar }) => {
+  const [navbars, setNavbars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isVisible) {
-      const fetchNavbars = async () => {
-        setLoading(true);
-        try {
-          const response = await instance.get("/navbars"); // Replace with your actual API endpoint
-          setNavbarList(response.data);
-        } catch (error) {
-          message.error("Failed to fetch navbars");
-        }
-        setLoading(false);
-      };
-      fetchNavbars();
+    fetchNavbars();
+  }, []);
+
+  const fetchNavbars = async () => {
+    try {
+      setLoading(true);
+      const response = await instance.get("/navbars");
+      setNavbars(response.data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch navbars");
+      message.error("Failed to fetch navbars");
+    } finally {
+      setLoading(false);
     }
-  }, [isVisible]);
-
-  // Helper function to recursively render menu items
-  const renderMenuItems = (menuItems) => {
-    return menuItems?.map((item) => {
-      if (item.all_children && item.all_children.length > 0) {
-        return (
-          <Menu.SubMenu key={item.id} title={item.title}>
-            {renderMenuItems(item.all_children)}
-          </Menu.SubMenu>
-        );
-      } else {
-        return <Menu.Item key={item.id}>{item.title}</Menu.Item>;
-      }
-    });
   };
 
-  // Handle navbar selection
-  const handleNavbarSelect = (item) => {
-    setSelectedNavbarId(item.id);
-    onSelectNavbar(item); // Pass the selected navbar back to the parent component
-    onClose(); // Close the modal after selection
-  };
+  const filteredNavbars = navbars.filter((navbar) =>
+    navbar.title_en.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
-    <Modal
-      title="Select Navbar"
-      open={isVisible}
-      onCancel={onClose}
-      footer={null}
-      width={800}
-      bodyStyle={{ padding: "20px" }}
-    >
-      <List
-        loading={loading}
-        dataSource={navbarList}
-        renderItem={(item) => (
-          <List.Item>
-            <div
-              className="relative w-full cursor-pointer border rounded-md overflow-hidden"
-              onClick={() => handleNavbarSelect(item)}
+    <div className="flex flex-col gap-4">
+      <Input
+        placeholder="Search navbars..."
+        prefix={<SearchOutlined />}
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        allowClear
+      />
+      {error ? (
+        <Text type="danger">{error}</Text>
+      ) : (
+        <List
+          loading={loading}
+          dataSource={filteredNavbars}
+          renderItem={(navbar) => (
+            <List.Item
+              className={`p-4 border rounded-md cursor-pointer hover:bg-gray-50 ${
+                selectedNavbar?.id === navbar.id
+                  ? "bg-blue-50 border-blue-200"
+                  : ""
+              }`}
+              onClick={() => onSelectNavbar(navbar)}
             >
-              {/* Navbar Preview */}
-              <div className="flex items-center p-4 bg-white">
-                {/* Logo on the Left */}
-                {item.logo?.file_path ? (
+              <div className="flex items-center gap-4 w-full">
+                <div className="flex-shrink-0">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.logo.file_path}`}
-                    alt={`${item.menu.name} Logo`}
-                    width={80}
-                    height={80}
+                    src={
+                      navbar?.logo?.file_path
+                        ? `${process.env.NEXT_PUBLIC_MEDIA_URL}/${navbar.logo.file_path}`
+                        : "/images/Image_Placeholder.png"
+                    }
+                    width={60}
+                    height={50}
+                    alt="Navbar Logo"
                     objectFit="cover"
-                    className="rounded-full mr-4"
+                    className="rounded-md"
                   />
-                ) : (
-                  <div className="w-20 h-20 bg-gray-300 rounded-full mr-4 flex items-center justify-center">
-                    <span className="text-white text-lg">No Logo</span>
-                  </div>
-                )}
-
-                {/* Menu Items on the Right */}
-                <div className="flex-grow">
-                  {item.menu?.menu_items && item.menu.menu_items.length > 0 ? (
-                    <Menu mode="horizontal">
-                      {renderMenuItems(item.menu.menu_items)}
-                    </Menu>
-                  ) : (
-                    <span className="text-gray-500">No Menu Items</span>
-                  )}
+                </div>
+                <div className="flex flex-col flex-grow">
+                  <Text strong>{navbar.name}</Text>
+                  <Text type="secondary">
+                    {navbar.menu?.menu_items?.length || 0} menu items
+                  </Text>
                 </div>
               </div>
-
-              {/* Selected Overlay */}
-              {selectedNavbarId === item.id && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <span className="text-white text-xl font-bold">Selected</span>
-                </div>
-              )}
-            </div>
-          </List.Item>
-        )}
-        // Remove grid to have a vertical list
-        grid={false}
-      />
-    </Modal>
+            </List.Item>
+          )}
+        />
+      )}
+    </div>
   );
 };
 
