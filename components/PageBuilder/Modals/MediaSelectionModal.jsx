@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Modal,
+  Drawer,
   List,
   Button,
   message,
@@ -10,9 +10,27 @@ import {
   Pagination,
   Tabs,
   Input,
-  Switch,
+  Space,
+  Radio,
+  Tooltip,
+  Badge,
+  Tag,
+  Progress,
+  Divider,
 } from "antd";
-import { EyeOutlined, InboxOutlined, SyncOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  InboxOutlined,
+  SyncOutlined,
+  CloseOutlined,
+  CheckOutlined,
+  UploadOutlined,
+  CloudUploadOutlined,
+  FilterOutlined,
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import instance from "../../../axios";
 import Image from "next/image";
 import UploadMediaTabs from "../../Gallery/UploadMediaTabs";
@@ -32,7 +50,6 @@ const MediaSelectionModal = (props) => {
     initialSelectedMedia = [],
   } = props;
 
-  // Determine the maximum selection allowed
   const maxSelection =
     propMaxSelection !== undefined
       ? propMaxSelection
@@ -46,20 +63,24 @@ const MediaSelectionModal = (props) => {
   const [sortOrder, setSortOrder] = useState("desc");
   const [selectedMedia, setSelectedMedia] = useState(initialSelectedMedia);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
+  const [filterType, setFilterType] = useState("all");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
+  const [imageSize, setImageSize] = useState("medium");
 
-  // Pagination states
+  const pageSize = viewMode === "grid" ? 12 : 6;
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 12; // Number of items per page
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     if (isVisible) {
       fetchMedia();
-      // Set selectedMedia to initialSelectedMedia when the modal opens
       setSelectedMedia(initialSelectedMedia);
       setSearchQuery("");
       setCurrentPage(1);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]);
 
   const fetchMedia = async () => {
@@ -70,42 +91,85 @@ const MediaSelectionModal = (props) => {
       const filteredAndSorted = filterAndSortMedia(
         response.data,
         searchQuery,
-        sortOrder
+        sortOrder,
+        filterType
       );
       setSortedMedia(filteredAndSorted);
+      setTotalItems(filteredAndSorted.length);
     } catch (error) {
       message.error("Failed to fetch media items.");
     }
     setLoading(false);
   };
 
-  const filterAndSortMedia = (list, query, order) => {
-    const filtered = list.filter((media) =>
+  const filterAndSortMedia = (list, query, order, type) => {
+    let filtered = list;
+
+    if (type !== "all") {
+      filtered = filtered.filter((media) => {
+        if (type === "image") return media.file_type.startsWith("image/");
+        if (type === "video") return media.file_type.startsWith("video/");
+        if (type === "document")
+          return (
+            !media.file_type.startsWith("image/") &&
+            !media.file_type.startsWith("video/")
+          );
+        return true;
+      });
+    }
+
+    filtered = filtered.filter((media) =>
       media.title
         ? media.title.toLowerCase().includes(query.toLowerCase())
         : media.file_name.toLowerCase().includes(query.toLowerCase())
     );
+
     const sorted = filtered.sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
       return order === "asc" ? dateA - dateB : dateB - dateA;
     });
+
     return sorted;
   };
 
   const handleSortChange = (value) => {
     setSortOrder(value);
-    const filteredAndSorted = filterAndSortMedia(mediaList, searchQuery, value);
+    const filteredAndSorted = filterAndSortMedia(
+      mediaList,
+      searchQuery,
+      value,
+      filterType
+    );
     setSortedMedia(filteredAndSorted);
-    setCurrentPage(1); // Reset to first page on sort change
+    setCurrentPage(1);
   };
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    const filteredAndSorted = filterAndSortMedia(mediaList, value, sortOrder);
+    const filteredAndSorted = filterAndSortMedia(
+      mediaList,
+      value,
+      sortOrder,
+      filterType
+    );
     setSortedMedia(filteredAndSorted);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1);
+    setTotalItems(filteredAndSorted.length);
+  };
+
+  const handleFilterChange = (value) => {
+    setFilterType(value);
+    const filteredAndSorted = filterAndSortMedia(
+      mediaList,
+      searchQuery,
+      sortOrder,
+      value
+    );
+    setSortedMedia(filteredAndSorted);
+    setCurrentPage(1);
+    setTotalItems(filteredAndSorted.length);
   };
 
   const isItemSelected = (item) => {
@@ -141,31 +205,26 @@ const MediaSelectionModal = (props) => {
     onClose();
   };
 
-  // Handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-  // Calculate items for the current page
+
   const paginatedMedia = sortedMedia.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
   const handleUploadSuccess = (uploadedMedia) => {
-    // Check if uploadedMedia is valid
     if (!uploadedMedia) {
       console.error("Upload failed or no media returned.");
       return;
     }
-    // Refresh media list after upload
     fetchMedia();
 
-    // Automatically select the uploaded media
     if (selectionMode === "single") {
       const singleMedia = Array.isArray(uploadedMedia)
         ? uploadedMedia[0]
         : uploadedMedia;
-      // Ensure singleMedia is defined
       if (singleMedia) {
         setSelectedMedia([singleMedia]);
         onSelectMedia([singleMedia]);
@@ -178,7 +237,6 @@ const MediaSelectionModal = (props) => {
         ? [...selectedMedia, ...uploadedMedia]
         : [...selectedMedia, uploadedMedia];
 
-      // Filter out undefined elements
       const validSelected = newSelected.filter((media) => media);
       setSelectedMedia(validSelected);
       onSelectMedia(validSelected);
@@ -187,155 +245,277 @@ const MediaSelectionModal = (props) => {
     message.success("Media uploaded and selected successfully.");
   };
 
-  return (
-    <Modal
-      title="Select Media"
-      open={isVisible}
-      onCancel={onClose}
-      footer={null}
-      width={900}
-      centered
-    >
-      <Tabs defaultActiveKey="1" centered type="card">
-        <TabPane tab="Select Media" key="1">
-          <Tabs defaultActiveKey="1" centered>
-            <TabPane tab="Native Storage" key="1">
-              {/* Sorting and Search Controls */}
-              <div className="w-auto grid items-center grid-cols-5 gap-4 pb-6">
-                <div className="col-span-1 ml-4">
-                  <Switch
-                    checkedChildren="Added Last"
-                    unCheckedChildren="Added First"
-                    checked={sortOrder === "asc"}
-                    onChange={(checked) =>
-                      handleSortChange(checked ? "asc" : "desc")
-                    }
-                  />
-                </div>
-                <div className="col-span-3">
-                  <Search
-                    placeholder="Search media..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    allowClear
-                  />
-                </div>
-                <div className="col-span-1 flex justify-end">
-                  <Button
-                    className="mavebutton"
-                    onClick={fetchMedia}
-                    icon={<SyncOutlined />}
-                  >
-                    Refresh
-                  </Button>
-                </div>
-              </div>
+  const getImageSizeClass = () => {
+    switch (imageSize) {
+      case "small":
+        return "w-32 h-24";
+      case "medium":
+        return "w-48 h-36";
+      case "large":
+        return "w-64 h-48";
+      default:
+        return "w-48 h-36";
+    }
+  };
 
-              {/* Media List */}
+  const renderMediaItem = (item) => (
+    <div
+      className={`relative border-2 rounded-md cursor-pointer transition-all duration-200 hover:shadow-lg ${
+        isItemSelected(item)
+          ? "border-theme shadow-md"
+          : "border-transparent hover:border-gray-200"
+      }`}
+      onClick={() => handleSelection(item)}
+    >
+      {item.file_type.startsWith("image/") ? (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.file_path}`}
+          alt={item.title || "Media Unavailable"}
+          width={
+            imageSize === "small" ? 128 : imageSize === "large" ? 256 : 192
+          }
+          height={
+            imageSize === "small" ? 96 : imageSize === "large" ? 192 : 144
+          }
+          objectFit="cover"
+          layout="responsive"
+          className={`rounded-md ${getImageSizeClass()}`}
+        />
+      ) : item.file_type.startsWith("video/") ? (
+        <div className="relative">
+          <video
+            src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.file_path}`}
+            className={`rounded-md w-full ${
+              viewMode === "grid" ? "h-28" : "h-48"
+            } object-cover`}
+            muted
+            preload="metadata"
+          />
+          <div className="absolute inset-0 flex justify-center items-center">
+            <EyeOutlined className="text-white text-3xl opacity-75" />
+          </div>
+        </div>
+      ) : (
+        <div className="document-preview flex flex-col items-center justify-center h-48 bg-gray-100 rounded-md">
+          <InboxOutlined className="text-4xl text-gray-400" />
+          <p className="mt-2 text-center text-sm font-medium truncate w-40">
+            {item.title || item.file_name}
+          </p>
+        </div>
+      )}
+      <div className="absolute top-2 left-2">
+        <Tag
+          color={
+            item.file_type.startsWith("image/")
+              ? "blue"
+              : item.file_type.startsWith("video/")
+                ? "red"
+                : "green"
+          }
+        >
+          {item.file_type.startsWith("image/")
+            ? "Image"
+            : item.file_type.startsWith("video/")
+              ? "Video"
+              : "Document"}
+        </Tag>
+      </div>
+      <p className="mt-2 text-center text-sm font-medium truncate">
+        {item.title || "Untitled"}
+      </p>
+      {isItemSelected(item) && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center rounded-md">
+          <span className="text-white text-lg font-semibold">Selected</span>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderSettingsDrawer = () => (
+    <Drawer
+      title="Display Settings"
+      placement="right"
+      width={300}
+      onClose={() => setSettingsDrawerVisible(false)}
+      open={settingsDrawerVisible}
+    >
+      <div className="space-y-6">
+        <div>
+          <h4 className="font-medium mb-2">View Mode</h4>
+          <Radio.Group
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            buttonStyle="solid"
+            className="w-full"
+          >
+            <Radio.Button value="grid" className="w-1/2 text-center">
+              Grid
+            </Radio.Button>
+            <Radio.Button value="list" className="w-1/2 text-center">
+              List
+            </Radio.Button>
+          </Radio.Group>
+        </div>
+        <Divider />
+        <div>
+          <h4 className="font-medium mb-2">Image Size</h4>
+          <Select value={imageSize} onChange={setImageSize} className="w-full">
+            <Option value="small">Small</Option>
+            <Option value="medium">Medium</Option>
+            <Option value="large">Large</Option>
+          </Select>
+        </div>
+      </div>
+    </Drawer>
+  );
+
+  return (
+    <>
+      <Drawer
+        title={
+          <div className="flex justify-between items-center mr-10">
+            <span>Select Media</span>
+            <div className="flex items-center gap-4">
+              <Badge count={selectedMedia.length} showZero>
+                <span className="text-sm text-gray-500">Selected Items</span>
+              </Badge>
+              <Tooltip title="Display Settings">
+                <Button
+                  icon={<SettingOutlined />}
+                  onClick={() => setSettingsDrawerVisible(true)}
+                />
+              </Tooltip>
+            </div>
+          </div>
+        }
+        placement="right"
+        width={800}
+        onClose={onClose}
+        open={isVisible}
+        extra={
+          <Space>
+            <Button onClick={onClose} icon={<CloseOutlined />}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              icon={<CheckOutlined />}
+              disabled={selectedMedia.length === 0}
+            >
+              Select
+            </Button>
+          </Space>
+        }
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex justify-between items-center mb-4">
+            <Space>
+              <Select
+                value={filterType}
+                onChange={handleFilterChange}
+                style={{ width: 120 }}
+                suffixIcon={<FilterOutlined />}
+              >
+                <Option value="all">All Types</Option>
+                <Option value="image">Images</Option>
+                <Option value="video">Videos</Option>
+                <Option value="document">Documents</Option>
+              </Select>
+              <Tooltip
+                title={sortOrder === "desc" ? "Newest First" : "Oldest First"}
+              >
+                <Button
+                  icon={
+                    sortOrder === "desc" ? (
+                      <SortDescendingOutlined />
+                    ) : (
+                      <SortAscendingOutlined />
+                    )
+                  }
+                  onClick={() =>
+                    handleSortChange(sortOrder === "desc" ? "asc" : "desc")
+                  }
+                />
+              </Tooltip>
+            </Space>
+            <Space>
+              <Search
+                placeholder="Search media..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                allowClear
+                className="w-64"
+              />
+              <Tooltip title="Refresh">
+                <Button
+                  icon={<SyncOutlined />}
+                  onClick={fetchMedia}
+                  className="mavebutton"
+                />
+              </Tooltip>
+            </Space>
+          </div>
+
+          {isUploading && (
+            <div className="mb-4">
+              <Progress percent={uploadProgress} status="active" />
+            </div>
+          )}
+
+          <Tabs defaultActiveKey="1" className="flex-1">
+            <TabPane tab="Native Storage" key="1">
               <List
-                grid={{
-                  gutter: 16,
-                  xs: 1,
-                  sm: 2,
-                  md: 3,
-                  lg: 4,
-                  xl: 4,
-                  xxl: 6,
-                }}
+                grid={
+                  viewMode === "grid"
+                    ? {
+                        gutter: 16,
+                        xs: 1,
+                        sm: 2,
+                        md: 3,
+                        lg: 4,
+                        xl: 4,
+                        xxl: 6,
+                      }
+                    : null
+                }
                 dataSource={paginatedMedia}
                 loading={loading}
                 locale={{ emptyText: "No media items found." }}
                 renderItem={(item) => (
-                  <List.Item>
-                    <div
-                      className={`relative border-2 rounded-md cursor-pointer ${
-                        isItemSelected(item)
-                          ? "border-theme"
-                          : "border-transparent"
-                      }`}
-                      onClick={() => handleSelection(item)}
-                    >
-                      {item.file_type.startsWith("image/") ? (
-                        <Image
-                          src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.file_path}`}
-                          alt={item.title || "Media Unavailable"}
-                          width={250}
-                          height={200}
-                          objectFit="cover"
-                          layout="responsive"
-                          className="rounded-md"
-                        />
-                      ) : item.file_type.startsWith("video/") ? (
-                        <div className="relative">
-                          <video
-                            src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.file_path}`}
-                            className="rounded-md w-full h-28 object-cover"
-                            muted
-                            preload="metadata"
-                            height={200}
-                          />
-                          <div className="absolute inset-0 flex justify-center items-center">
-                            <EyeOutlined className="text-white text-3xl opacity-75" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="document-preview flex flex-col items-center justify-center h-48 bg-gray-100 rounded-md">
-                          <InboxOutlined className="text-4xl text-gray-400" />
-                          <p className="mt-2 text-center text-sm font-medium truncate w-40">
-                            {item.title || item.file_name}
-                          </p>
-                        </div>
-                      )}
-                      <p className="mt-2 text-center text-sm font-medium truncate">
-                        {item.title || "Untitled"}
-                      </p>
-                      {isItemSelected(item) && (
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center rounded-md">
-                          <span className="text-white text-lg font-semibold">
-                            Selected
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </List.Item>
+                  <List.Item>{renderMediaItem(item)}</List.Item>
                 )}
               />
-
-              {/* Pagination Controls */}
-              <div className="flex justify-between mt-4">
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={sortedMedia.length}
-                  onChange={handlePageChange}
-                  showSizeChanger={false}
-                  showQuickJumper
-                />
-                <Button
-                  className="mavebutton"
-                  onClick={handleSubmit}
-                  disabled={selectedMedia.length === 0}
-                >
-                  Submit
-                </Button>
-              </div>
             </TabPane>
             <TabPane tab="Cloudinary" key="2">
               <Cloudinary />
             </TabPane>
           </Tabs>
-        </TabPane>
-        {process.env.NEXT_PUBLIC_CLOUDINARY_STATUS === "activated" && (
-          <TabPane tab="Upload Media" key="2">
-            <UploadMediaTabs
-              onUploadSuccess={handleUploadSuccess}
-              onSelectMedia={handleUploadSuccess}
-              selectionMode={selectionMode}
+
+          <div className="flex justify-between items-center mt-4 pt-4 border-t">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalItems}
+              onChange={handlePageChange}
+              showSizeChanger={false}
+              showQuickJumper
+              showTotal={(total) => `Total ${total} items`}
             />
-          </TabPane>
-        )}
-      </Tabs>
-    </Modal>
+            {process.env.NEXT_PUBLIC_CLOUDINARY_STATUS === "activated" && (
+              <Button
+                type="primary"
+                icon={<UploadOutlined />}
+                onClick={() => setActiveTab("2")}
+              >
+                Upload Media
+              </Button>
+            )}
+          </div>
+        </div>
+      </Drawer>
+      {renderSettingsDrawer()}
+    </>
   );
 };
 

@@ -1,7 +1,15 @@
 // components/PageBuilder/Components/MediaComponent.jsx
 
 import React, { useState } from "react";
-import { Button, Popconfirm, message } from "antd";
+import {
+  Button,
+  Popconfirm,
+  message,
+  Space,
+  Tooltip,
+  Select,
+  Radio,
+} from "antd";
 import {
   DeleteOutlined,
   CheckOutlined,
@@ -10,6 +18,10 @@ import {
   ExportOutlined,
   CopyFilled,
   DragOutlined,
+  EyeOutlined,
+  DownloadOutlined,
+  LinkOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import MediaSelectionModal from "../Modals/MediaSelectionModal";
 import Image from "next/image";
@@ -26,14 +38,12 @@ const MediaComponent = ({
   const [selectedMediaData, setSelectedMediaData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Handle selection from MediaSelectionModal
   const handleSelectMedia = (selectedMedia) => {
     setSelectedMediaData(selectedMedia);
     setIsModalVisible(false);
     setIsEditing(true);
   };
 
-  // Handle Submit (Confirm) Changes
   const handleSubmit = () => {
     if (component.selectionMode === "multiple") {
       if (selectedMediaData.length === 0) {
@@ -62,78 +72,130 @@ const MediaComponent = ({
     message.success("Media updated successfully.");
   };
 
-  // Handle Cancel Changes
   const handleCancel = () => {
     setSelectedMediaData(null);
     setIsEditing(false);
     message.info("Media update canceled.");
   };
 
-  // Handle Delete Component
   const handleDelete = () => {
     deleteComponent();
   };
 
-  // Helper function to render media based on file type
   const renderMediaItem = (media) => {
     const fileUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`;
     const fileType = media.file_type || "";
 
     if (fileType.startsWith("image/")) {
       return (
-        <Image
-          key={media.id}
-          src={fileUrl}
-          alt={media.title || "Image"}
-          width={250}
-          height={200}
-          objectFit="cover"
-          className="rounded-lg"
-        />
+        <div className="relative group">
+          <Image
+            key={media.id}
+            src={fileUrl}
+            alt={media.title || "Image"}
+            width={192}
+            height={144}
+            objectFit="cover"
+            className="rounded-lg transition-all duration-300 group-hover:shadow-lg w-48 h-36"
+          />
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Space>
+              <Tooltip title="View">
+                <Button
+                  type="text"
+                  icon={<EyeOutlined className="text-white" />}
+                  onClick={() => window.open(fileUrl, "_blank")}
+                />
+              </Tooltip>
+              <Tooltip title="Download">
+                <Button
+                  type="text"
+                  icon={<DownloadOutlined className="text-white" />}
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = fileUrl;
+                    link.download = media.file_name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                />
+              </Tooltip>
+            </Space>
+          </div>
+        </div>
       );
     } else if (fileType.startsWith("video/")) {
       return (
-        <video
-          key={media.id}
-          src={fileUrl}
-          controls
-          width={250}
-          height={200}
-          className="rounded-lg"
-        />
+        <div className="relative group">
+          <video
+            key={media.id}
+            src={fileUrl}
+            controls
+            className="rounded-lg transition-all duration-300 group-hover:shadow-lg w-48 h-36"
+          />
+        </div>
       );
     } else if (fileType === "application/pdf") {
-      // For PDF files
       return (
-        <div key={media.id} className="flex flex-col items-center">
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 underline"
-          >
-            {media.title || "View Document"}
-          </a>
+        <div key={media.id} className="flex flex-col items-center group">
+          <div className="bg-gray-100 p-4 rounded-lg transition-all duration-300 group-hover:shadow-lg">
+            <LinkOutlined className="text-4xl text-gray-400" />
+          </div>
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Space>
+              <Tooltip title="View">
+                <Button
+                  type="text"
+                  icon={<EyeOutlined />}
+                  onClick={() => window.open(fileUrl, "_blank")}
+                />
+              </Tooltip>
+              <Tooltip title="Download">
+                <Button
+                  type="text"
+                  icon={<DownloadOutlined />}
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = fileUrl;
+                    link.download = media.file_name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                />
+              </Tooltip>
+            </Space>
+          </div>
         </div>
       );
     } else {
-      // For other file types
       return (
-        <div key={media.id} className="flex flex-col items-center">
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 underline"
-          >
-            {media.title || "Download File"}
-          </a>
+        <div key={media.id} className="flex flex-col items-center group">
+          <div className="bg-gray-100 p-4 rounded-lg transition-all duration-300 group-hover:shadow-lg">
+            <LinkOutlined className="text-4xl text-gray-400" />
+          </div>
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Tooltip title="Download">
+              <Button
+                type="text"
+                icon={<DownloadOutlined />}
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = fileUrl;
+                  link.download = media.file_name;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              />
+            </Tooltip>
+          </div>
         </div>
       );
     }
   };
 
-  // If in preview mode, render the media content only
   if (preview) {
     return (
       <div className="preview-media-component p-4 bg-gray-100 rounded-md">
@@ -156,65 +218,68 @@ const MediaComponent = ({
 
   return (
     <div className="border p-4 rounded-md bg-white">
-      {/* Header with Component Title and Action Buttons */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
           <DragOutlined className="text-2xl border rounded-md p-1" />
           <h3 className="text-xl font-semibold">Media Component</h3>
         </div>
-        <div>
+        <div className="flex items-center gap-2">
           {!isEditing ? (
             <>
-              {mediaData && (
-                <Button
-                  icon={<ExportOutlined />}
-                  onClick={() => setIsModalVisible(true)}
-                  className="mavebutton"
+              <Space>
+                {mediaData && (
+                  <Tooltip title="Change Media">
+                    <Button
+                      icon={<EditOutlined />}
+                      onClick={() => setIsModalVisible(true)}
+                      className="mavebutton"
+                    />
+                  </Tooltip>
+                )}
+                <Tooltip title="Duplicate">
+                  <Button
+                    icon={<CopyFilled />}
+                    onClick={onDuplicateElement}
+                    className="mavebutton"
+                  />
+                </Tooltip>
+                <Popconfirm
+                  title="Are you sure you want to delete this component?"
+                  onConfirm={handleDelete}
+                  okText="Yes"
+                  cancelText="No"
                 >
-                  Change
-                </Button>
-              )}
-              <Button
-                icon={<CopyFilled />}
-                onClick={onDuplicateElement}
-                className="mavebutton"
-              />
-              <Popconfirm
-                title="Are you sure you want to delete this component?"
-                onConfirm={handleDelete}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button
-                  icon={<DeleteOutlined />}
-                  className="mavecancelbutton"
-                />
-              </Popconfirm>
+                  <Tooltip title="Delete">
+                    <Button
+                      icon={<DeleteOutlined />}
+                      className="mavecancelbutton"
+                    />
+                  </Tooltip>
+                </Popconfirm>
+              </Space>
             </>
           ) : (
             <>
-              <Button
-                icon={<CheckOutlined />}
-                onClick={handleSubmit}
-                className="mavebutton"
-              >
-                Done
-              </Button>
-              <Button
-                icon={<CloseOutlined />}
-                onClick={handleCancel}
-                className="mavecancelbutton"
-              >
-                Discard
-              </Button>
+              <Tooltip title="Save Changes">
+                <Button
+                  icon={<CheckOutlined />}
+                  onClick={handleSubmit}
+                  className="mavebutton"
+                />
+              </Tooltip>
+              <Tooltip title="Cancel">
+                <Button
+                  icon={<CloseOutlined />}
+                  onClick={handleCancel}
+                  className="mavecancelbutton"
+                />
+              </Tooltip>
             </>
           )}
         </div>
       </div>
 
-      {/* Display Current and Selected Media Side by Side */}
       <div className="flex flex-col md:flex-row items-center gap-4">
-        {/* Current Media */}
         <div className="flex flex-col items-center">
           {mediaData && (
             <h4 className="mb-2 text-md font-semibold">Current Media</h4>
@@ -233,12 +298,11 @@ const MediaComponent = ({
               onClick={() => setIsModalVisible(true)}
               className="mavebutton"
             >
-              Choose
+              Choose Media
             </Button>
           )}
         </div>
 
-        {/* Selected Media (Shown Only When Editing) */}
         {isEditing && selectedMediaData && (
           <div className="flex justify-between items-center">
             <ArrowRightOutlined className="text-2xl mx-20" />
@@ -256,7 +320,6 @@ const MediaComponent = ({
         )}
       </div>
 
-      {/* Media Selection Modal */}
       <MediaSelectionModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
