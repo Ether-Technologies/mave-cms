@@ -91,14 +91,14 @@ const BaseComponent = ({
                 <Button
                   icon={<CheckOutlined />}
                   onClick={onSave}
-                  className="action-button bg-green-50 text-green-600 border-green-100 hover:bg-green-100 hover:text-green-700 hover:border-green-200 transition-colors duration-200"
+                  className="mavebutton"
                 >
                   Done
                 </Button>
                 <Button
                   icon={<CloseOutlined />}
                   onClick={onCancel}
-                  className="action-button bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-700 hover:border-gray-300 transition-colors duration-200"
+                  className="mavecancelbutton"
                 >
                   Discard
                 </Button>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Input,
   Modal,
@@ -29,7 +29,7 @@ const TextComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(!component?._mave?.text);
   const [tempSettings, setTempSettings] = useState({
     fontSize: component?._mave?.fontSize || "medium",
     primaryColor: component?._mave?.primaryColor || "#000000",
@@ -45,7 +45,16 @@ const TextComponent = ({
     altText: component?._mave?.altText || "",
   });
 
+  useEffect(() => {
+    if (!component?._mave?.text) {
+      setIsEditing(true);
+    }
+  }, [component]);
+
   const handleSubmit = () => {
+    if (!formData.text.trim()) {
+      return;
+    }
     const updatedComponent = {
       ...component,
       _mave: {
@@ -65,6 +74,10 @@ const TextComponent = ({
   };
 
   const handleDiscard = () => {
+    if (!component?._mave?.text) {
+      deleteComponent(component.id);
+      return;
+    }
     setTempSettings({
       fontSize: component?._mave?.fontSize || "medium",
       primaryColor: component?._mave?.primaryColor || "#000000",
@@ -79,6 +92,25 @@ const TextComponent = ({
       altText: component?._mave?.altText || "",
     });
     setIsEditing(false);
+  };
+
+  const getFontSizeClass = (size) => {
+    switch (size) {
+      case "small":
+        return "text-sm";
+      case "medium":
+        return "text-base";
+      case "large":
+        return "text-lg";
+      case "xlarge":
+        return "text-xl";
+      case "2xlarge":
+        return "text-2xl";
+      case "3xlarge":
+        return "text-3xl";
+      default:
+        return "text-base";
+    }
   };
 
   const renderContent = () => {
@@ -97,6 +129,7 @@ const TextComponent = ({
               rows={4}
               className="w-full rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               placeholder="Enter your text here..."
+              autoFocus
             />
           </div>
 
@@ -235,44 +268,9 @@ const TextComponent = ({
               </div>
             </div>
           )}
-
-          <div className="flex justify-end space-x-3 mt-6">
-            <Button
-              onClick={handleDiscard}
-              className="px-6 py-2 border-gray-300 hover:bg-gray-50"
-            >
-              Discard
-            </Button>
-            <Button
-              type="primary"
-              onClick={handleSubmit}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700"
-            >
-              Save Changes
-            </Button>
-          </div>
         </div>
       );
     }
-
-    const getFontSizeClass = (size) => {
-      switch (size) {
-        case "small":
-          return "text-sm";
-        case "medium":
-          return "text-base";
-        case "large":
-          return "text-lg";
-        case "xlarge":
-          return "text-xl";
-        case "2xlarge":
-          return "text-2xl";
-        case "3xlarge":
-          return "text-3xl";
-        default:
-          return "text-base";
-      }
-    };
 
     return (
       <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -339,18 +337,18 @@ const TextComponent = ({
           {tempSettings.isDualColor ? (
             <div className="flex items-center gap-2">
               <span
+                className={getFontSizeClass(tempSettings.fontSize)}
                 style={{
                   color: tempSettings.primaryColor,
-                  fontSize: tempSettings.fontSize,
                   fontWeight: tempSettings.fontWeight,
                 }}
               >
                 {formData.text}
               </span>
               <span
+                className={getFontSizeClass(tempSettings.fontSize)}
                 style={{
                   color: tempSettings.secondaryColor,
-                  fontSize: tempSettings.fontSize,
                   fontWeight: tempSettings.fontWeight,
                 }}
               >
@@ -359,8 +357,8 @@ const TextComponent = ({
             </div>
           ) : (
             <div
+              className={getFontSizeClass(tempSettings.fontSize)}
               style={{
-                fontSize: tempSettings.fontSize,
                 color: tempSettings.primaryColor,
                 fontWeight: tempSettings.fontWeight,
               }}
@@ -386,7 +384,7 @@ const TextComponent = ({
       onEdit={() => setIsEditing(true)}
       onCancel={handleDiscard}
       onSave={handleSubmit}
-      showChangeButton={!!component.value}
+      showChangeButton={!!component?._mave?.text}
     >
       {renderContent()}
     </BaseComponent>
