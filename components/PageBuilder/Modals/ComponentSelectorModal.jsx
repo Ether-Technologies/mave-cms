@@ -97,6 +97,12 @@ const componentOptions = [
     icon: "/icons/mave/testimonial.svg",
     premium: true,
   },
+  {
+    type: "form",
+    name: "Form",
+    icon: "/icons/mave/exam.svg",
+    premium: true,
+  },
 ];
 
 const ComponentSelectorModal = ({ isVisible, onClose, onSelectComponent }) => {

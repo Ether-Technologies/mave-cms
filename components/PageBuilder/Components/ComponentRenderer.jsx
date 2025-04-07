@@ -19,6 +19,7 @@ import GoogleMapComponent from "./GoogleMapComponent";
 import IconListComponent from "./IconListComponent/IconListComponent";
 import TestimonialComponent from "./TestimonialComponent/TestimonialComponent";
 import TitleDescriptionComponent from "./TitleDescriptionComponent";
+import FormComponent from "./FormComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setPageData,
@@ -44,6 +45,7 @@ const COMPONENT_MAP = {
   "google-map": React.memo(GoogleMapComponent),
   iconlist: React.memo(IconListComponent),
   testimonial: React.memo(TestimonialComponent),
+  form: React.memo(FormComponent),
 };
 
 const ComponentRenderer = React.memo(
