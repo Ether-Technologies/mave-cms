@@ -9,10 +9,19 @@ import {
   InputNumber,
   Button,
   message,
+  Card,
+  Typography,
+  Space,
+  Row,
+  Col,
+  Tooltip,
+  Divider,
 } from "antd";
 import instance from "../../axios";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
+const { Title, Text } = Typography;
 
 const SecuritySettings = ({ config, id }) => {
   const [form] = Form.useForm();
@@ -21,7 +30,13 @@ const SecuritySettings = ({ config, id }) => {
   const [permissions, setPermissions] = useState([]);
 
   useEffect(() => {
-    form.setFieldsValue(config);
+    console.log("SecuritySettings config:", config);
+    // Set initial form values from config
+    const initialValues = {
+      ...config,
+    };
+    console.log("Setting initial values:", initialValues);
+    form.setFieldsValue(initialValues);
   }, [config, form]);
 
   const onFinish = async (values) => {
@@ -35,6 +50,7 @@ const SecuritySettings = ({ config, id }) => {
           ...values,
         },
       });
+
       message.success("Security Settings updated successfully!");
     } catch (error) {
       console.error("Error updating Security Settings:", error);
@@ -67,217 +83,72 @@ const SecuritySettings = ({ config, id }) => {
   }, []);
 
   return (
-    <Form form={form} layout="vertical" onFinish={onFinish}>
-      {/* Enable Registration */}
-      <Form.Item
-        name={["registration", "enabled"]}
-        label="Enable Registration"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
+    <Card
+      title={
+        <Space>
+          <Title level={4} style={{ margin: 0 }}>
+            Security Settings
+          </Title>
+          <Tooltip title="Configure security settings and access controls">
+            <InfoCircleOutlined style={{ color: "#1890ff" }} />
+          </Tooltip>
+        </Space>
+      }
+      className="max-w-4xl mx-auto"
+    >
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="loginAttempts"
+              label="Max Login Attempts"
+              rules={[
+                { required: true, message: "Please enter max login attempts" },
+              ]}
+            >
+              <InputNumber min={1} max={10} className="w-full" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="passwordExpiry"
+              label="Password Expiry (days)"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter password expiry days",
+                },
+              ]}
+            >
+              <InputNumber min={1} max={365} className="w-full" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      <Form.Item
-        name={["registration", "defaultRole"]}
-        label="Default Role"
-        rules={[{ required: true, message: "Default Role is required." }]}
-      >
-        <Select placeholder="Select default role" showSearch>
-          {roles?.map((role) => (
-            <Option key={role.id} value={role.id}>
-              {role.title}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-      {/* Default Permissions */}
-      <Form.Item
-        name={["registration", "defaultPermissions"]}
-        label="Default Permissions"
-        rules={[
-          { required: true, message: "Please select at least one permission." },
-        ]}
-      >
-        <Select
-          mode="multiple"
-          placeholder="Select default permissions"
-          showSearch
-        >
-          {permissions?.map((permission) => (
-            <Option key={permission.id} value={permission.id}>
-              {permission.category} &gt; {permission.title}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="twoFactorAuth"
+              label="Two-Factor Authentication"
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Default User Status */}
-      <Form.Item
-        name={["registration", "defaultUserStatus"]}
-        label="Default User Status"
-        rules={[
-          { required: true, message: "Default User Status is required." },
-        ]}
-      >
-        <Select showSearch>
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
-          <Option value="pending">Pending</Option>
-        </Select>
-      </Form.Item>
-
-      {/* Enable IP Whitelisting */}
-      <Form.Item
-        name={["ipWhitelisting", "enabled"]}
-        label="Enable IP Whitelisting"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
-
-      {/* Allowed IPs */}
-      <Form.Item
-        name={["ipWhitelisting", "allowedIps"]}
-        label="Allowed IPs"
-        dependencies={[["ipWhitelisting", "enabled"]]}
-        rules={[
-          ({ getFieldValue }) => ({
-            validator(_, value) {
-              if (!getFieldValue(["ipWhitelisting", "enabled"]) || value) {
-                return Promise.resolve();
-              }
-              return Promise.reject(new Error("Please enter allowed IPs."));
-            },
-          }),
-        ]}
-      >
-        <Input.TextArea
-          rows={4}
-          placeholder="Enter allowed IPs, one per line"
-        />
-      </Form.Item>
-
-      {/* Enable IP Blacklisting */}
-      <Form.Item
-        name={["ipBlacklisting", "enabled"]}
-        label="Enable IP Blacklisting"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
-
-      {/* Blocked IPs */}
-      <Form.Item
-        name={["ipBlacklisting", "blockedIps"]}
-        label="Blocked IPs"
-        dependencies={[["ipBlacklisting", "enabled"]]}
-        rules={[
-          ({ getFieldValue }) => ({
-            validator(_, value) {
-              if (!getFieldValue(["ipBlacklisting", "enabled"]) || value) {
-                return Promise.resolve();
-              }
-              return Promise.reject(new Error("Please enter blocked IPs."));
-            },
-          }),
-        ]}
-      >
-        <Input.TextArea
-          rows={4}
-          placeholder="Enter blocked IPs, one per line"
-        />
-      </Form.Item>
-
-      {/* Enable Two-Factor Authentication */}
-      <Form.Item
-        name="twoFactorAuthentication"
-        label="Enable Two-Factor Authentication"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
-
-      {/* Enable Session Timeout */}
-      <Form.Item
-        name={["sessionManagement", "sessionTimeoutEnabled"]}
-        label="Enable Session Timeout"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
-
-      {/* Session Timeout Minutes */}
-      <Form.Item
-        name={["sessionManagement", "sessionTimeoutMinutes"]}
-        label="Session Timeout (Minutes)"
-        dependencies={[["sessionManagement", "sessionTimeoutEnabled"]]}
-        rules={[
-          ({ getFieldValue }) => ({
-            validator(_, value) {
-              if (
-                !getFieldValue([
-                  "sessionManagement",
-                  "sessionTimeoutEnabled",
-                ]) ||
-                (value >= 1 && value <= 1440)
-              ) {
-                return Promise.resolve();
-              }
-              return Promise.reject(
-                new Error("Please enter a valid number of minutes (1-1440).")
-              );
-            },
-          }),
-        ]}
-      >
-        <InputNumber min={1} max={1440} />
-      </Form.Item>
-
-      {/* Enable Single Sign-On */}
-      <Form.Item
-        name={["singleSignOn", "enabled"]}
-        label="Enable Single Sign-On"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
-
-      {/* SSO Providers */}
-      <Form.Item
-        name={["singleSignOn", "providers"]}
-        label="SSO Providers"
-        dependencies={[["singleSignOn", "enabled"]]}
-        rules={[
-          ({ getFieldValue }) => ({
-            validator(_, value) {
-              if (
-                !getFieldValue(["singleSignOn", "enabled"]) ||
-                (value && value.length > 0)
-              ) {
-                return Promise.resolve();
-              }
-              return Promise.reject(
-                new Error("Please select at least one SSO provider.")
-              );
-            },
-          }),
-        ]}
-      >
-        <Select mode="multiple" placeholder="Select SSO providers" showSearch>
-          <Option value="Google">Google</Option>
-          <Option value="Facebook">Facebook</Option>
-          <Option value="GitHub">GitHub</Option>
-          {/* Add more providers as needed */}
-        </Select>
-      </Form.Item>
-
-      {/* Save Button */}
-      <Form.Item>
-        <Button className="mavebutton" htmlType="submit" loading={saving}>
-          Save Changes
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={saving}
+            className="w-full sm:w-auto"
+          >
+            Save Changes
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

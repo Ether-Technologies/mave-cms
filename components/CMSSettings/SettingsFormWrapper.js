@@ -13,36 +13,73 @@ import PerformanceSettings from "./PerformanceSettings";
 import AnalyticsSettings from "./AnalyticsSettings";
 import PaymentSettings from "./PaymentSettings";
 import APISettings from "./APISettings";
+import IPWhitelistSettings from "./IPWhitelistSettings";
+import LicenseSettings from "./LicenseSettings";
+import settingsConfig from "./settingsConfig.json";
+
+// Component mapping for different setting types
+const settingComponents = {
+  allowed_ips: IPWhitelistSettings,
+  mave_license: LicenseSettings,
+  "general-settings": GeneralSettings,
+  "seo-settings": SEOSettings,
+  "content-settings": ContentSettings,
+  "security-settings": SecuritySettings,
+  "email-settings": EmailSettings,
+  "notification-settings": NotificationSettings,
+  "backup-settings": BackupSettings,
+  "cache-settings": CacheSettings,
+  "performance-settings": PerformanceSettings,
+  "analytics-settings": AnalyticsSettings,
+  "payment-settings": PaymentSettings,
+  "api-settings": APISettings,
+};
 
 const SettingsFormWrapper = ({ type, config, id }) => {
-  switch (type) {
-    case "general-settings":
-      return <GeneralSettings config={config} id={id} />;
-    case "seo-settings":
-      return <SEOSettings config={config} id={id} />;
-    case "content-settings":
-      return <ContentSettings config={config} id={id} />;
-    case "security-settings":
-      return <SecuritySettings config={config} id={id} />;
-    case "email-settings":
-      return <EmailSettings config={config} id={id} />;
-    case "notification-settings":
-      return <NotificationSettings config={config} id={id} />;
-    case "backup-settings":
-      return <BackupSettings config={config} id={id} />;
-    case "cache-settings":
-      return <CacheSettings config={config} id={id} />;
-    case "performance-settings":
-      return <PerformanceSettings config={config} id={id} />;
-    case "analytics-settings":
-      return <AnalyticsSettings config={config} id={id} />;
-    case "payment-settings":
-      return <PaymentSettings config={config} id={id} />;
-    case "api-settings":
-      return <APISettings config={config} id={id} />;
-    default:
-      return <div>Unknown Settings Type</div>;
+  // Get default configuration from JSON
+  const defaultConfig = settingsConfig[type] || {};
+
+  // Merge provided config with defaults
+  const mergedConfig = {
+    ...defaultConfig,
+    ...config,
+    fields: {
+      ...defaultConfig.fields,
+      ...(typeof config === "object" && !Array.isArray(config)
+        ? config.fields || {}
+        : {}),
+    },
+  };
+
+  // Handle array config (like allowed_ips)
+  if (Array.isArray(config)) {
+    mergedConfig.fields.ips = { value: config };
   }
+
+  // Get the appropriate component for the setting type
+  const SettingComponent = settingComponents[type];
+
+  if (!SettingComponent) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        Unknown Settings Type: {type}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2 className="text-xl font-semibold mb-4">
+        {defaultConfig.name ||
+          config.name ||
+          type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+      </h2>
+      {defaultConfig.description && (
+        <p className="text-gray-600 mb-4">{defaultConfig.description}</p>
+      )}
+      <SettingComponent config={mergedConfig} id={id} />
+    </div>
+  );
 };
 
 export default SettingsFormWrapper;

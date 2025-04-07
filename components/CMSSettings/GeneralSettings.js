@@ -1,11 +1,26 @@
 // components/CMSSettings/GeneralSettings.js
 
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Switch, Button, message, Tooltip } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Switch,
+  Button,
+  message,
+  Tooltip,
+  Card,
+  Typography,
+  Space,
+  Row,
+  Col,
+} from "antd";
 import instance from "../../axios";
 import { setThemeColors } from "../../utils/themeUtils";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
+const { Title, Text } = Typography;
 
 const GeneralSettings = ({ config, id }) => {
   const [form] = Form.useForm();
@@ -98,198 +113,116 @@ const GeneralSettings = ({ config, id }) => {
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={onFinish}>
-      {/* Site Title */}
-      <Form.Item
-        name="siteTitle"
-        label="Site Title"
-        rules={[{ required: true, message: "Site Title is required." }]}
-      >
-        <Input />
-      </Form.Item>
+    <Card
+      title={
+        <Space>
+          <Title level={4} style={{ margin: 0 }}>
+            General Settings
+          </Title>
+          <Tooltip title="Configure your site's general settings">
+            <InfoCircleOutlined style={{ color: "#1890ff" }} />
+          </Tooltip>
+        </Space>
+      }
+      className="max-w-4xl mx-auto"
+    >
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="siteTitle"
+              label="Site Title"
+              rules={[{ required: true, message: "Site Title is required." }]}
+            >
+              <Input placeholder="Enter your site title" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="siteDescription"
+              label="Site Description"
+              rules={[
+                { required: true, message: "Site Description is required." },
+              ]}
+            >
+              <Input.TextArea
+                rows={4}
+                placeholder="Enter your site description"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Site Description */}
-      <Form.Item
-        name="siteDescription"
-        label="Site Description"
-        rules={[{ required: true, message: "Site Description is required." }]}
-      >
-        <Input.TextArea rows={4} />
-      </Form.Item>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="timezone"
+              label="Timezone"
+              rules={[{ required: true, message: "Timezone is required." }]}
+            >
+              <Select showSearch placeholder="Select timezone">
+                <Option value="Asia/Dhaka">Asia/Dhaka</Option>
+                <Option value="America/New_York">America/New_York</Option>
+                <Option value="Europe/London">Europe/London</Option>
+                <Option value="Asia/Tokyo">Asia/Tokyo</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="dateFormat"
+              label="Date Format"
+              rules={[{ required: true, message: "Date Format is required." }]}
+            >
+              <Select showSearch placeholder="Select date format">
+                <Option value="DD-MM-YYYY">DD-MM-YYYY</Option>
+                <Option value="MM-DD-YYYY">MM-DD-YYYY</Option>
+                <Option value="YYYY-MM-DD">YYYY-MM-DD</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Site Logo URL */}
-      <Form.Item
-        name="siteLogo"
-        label="Site Logo URL"
-        rules={[
-          { required: true, message: "Site Logo URL is required." },
-          { type: "url", message: "Please enter a valid URL." },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-      {/* Site Favicon URL */}
-      <Form.Item
-        name="siteFavicon"
-        label="Site Favicon URL"
-        rules={[
-          { required: true, message: "Site Favicon URL is required." },
-          { type: "url", message: "Please enter a valid URL." },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-      {/* Open Graph Image URL */}
-      <Form.Item
-        name="ogImage"
-        label="Open Graph Image URL"
-        rules={[
-          { required: true, message: "OG Image URL is required." },
-          { type: "url", message: "Please enter a valid URL." },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-      {/* Site Social Links */}
-      <Form.Item name="siteSocialLinks" label="Site Social Links">
-        <Input.Group compact>
-          <Form.Item
-            name={["siteSocialLinks", "facebook"]}
-            noStyle
-            rules={[
-              { type: "url", message: "Please enter a valid Facebook URL." },
-            ]}
-          >
-            <Input style={{ width: "25%" }} placeholder="Facebook URL" />
-          </Form.Item>
-          <Form.Item
-            name={["siteSocialLinks", "twitter"]}
-            noStyle
-            rules={[
-              { type: "url", message: "Please enter a valid Twitter URL." },
-            ]}
-          >
-            <Input style={{ width: "25%" }} placeholder="Twitter URL" />
-          </Form.Item>
-          <Form.Item
-            name={["siteSocialLinks", "linkedin"]}
-            noStyle
-            rules={[
-              { type: "url", message: "Please enter a valid LinkedIn URL." },
-            ]}
-          >
-            <Input style={{ width: "25%" }} placeholder="LinkedIn URL" />
-          </Form.Item>
-          <Form.Item
-            name={["siteSocialLinks", "instagram"]}
-            noStyle
-            rules={[
-              { type: "url", message: "Please enter a valid Instagram URL." },
-            ]}
-          >
-            <Input style={{ width: "25%" }} placeholder="Instagram URL" />
-          </Form.Item>
-        </Input.Group>
-      </Form.Item>
-
-      {/* Timezone */}
-      <Form.Item
-        name="timezone"
-        label="Timezone"
-        rules={[{ required: true, message: "Timezone is required." }]}
-      >
-        <Select showSearch>
-          <Option value="Asia/Dhaka">Asia/Dhaka</Option>
-          <Option value="America/New_York">America/New_York</Option>
-          <Option value="Europe/London">Europe/London</Option>
-          <Option value="Asia/Tokyo">Asia/Tokyo</Option>
-          {/* Add more timezones as needed */}
-        </Select>
-      </Form.Item>
-
-      {/* Date Format */}
-      <Form.Item
-        name="dateFormat"
-        label="Date Format"
-        rules={[{ required: true, message: "Date Format is required." }]}
-      >
-        <Select showSearch>
-          <Option value="DD-MM-YYYY">DD-MM-YYYY</Option>
-          <Option value="MM-DD-YYYY">MM-DD-YYYY</Option>
-          <Option value="YYYY-MM-DD">YYYY-MM-DD</Option>
-          {/* Add more formats as needed */}
-        </Select>
-      </Form.Item>
-
-      {/* Time Format */}
-      <Form.Item
-        name="timeFormat"
-        label="Time Format"
-        rules={[{ required: true, message: "Time Format is required." }]}
-      >
-        <Select showSearch>
-          <Option value="hh:mm A">12-hour (hh:mm AM/PM)</Option>
-          <Option value="HH:mm">24-hour (HH:mm)</Option>
-        </Select>
-      </Form.Item>
-
-      {/* Enable Google Crawler */}
-      <Form.Item
-        name="googleCrawler"
-        label="Enable Google Crawler"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
-
-      {/* Single Theme Selection */}
-      <Form.Item
-        label="Theme"
-        name="theme"
-        rules={[{ required: true, message: "Theme selection is required." }]}
-      >
-        <Select
-          showSearch
-          placeholder="Select Theme"
-          onChange={(value) => {
-            const selectedTheme = theme_options.find(
-              (theme) => theme.name === value
-            );
-            if (selectedTheme) {
-              handleThemeSelection(selectedTheme.theme, selectedTheme.accent);
-            }
-          }}
+        <Form.Item
+          label="Theme"
+          name="theme"
+          rules={[{ required: true, message: "Theme selection is required." }]}
         >
-          {theme_options.map((theme) => (
-            <Option key={theme.name} value={theme.name}>
-              <div
-                style={{
-                  display: "inline-block",
-                  width: "16px",
-                  height: "16px",
-                  backgroundColor: theme.theme,
-                  marginRight: "8px",
-                  borderRadius: "50%",
-                }}
-              ></div>
-              {theme.name}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
+          <Select
+            showSearch
+            placeholder="Select Theme"
+            onChange={handleThemeSelection}
+          >
+            {theme_options.map((theme) => (
+              <Option key={theme.name} value={theme.name}>
+                <Space>
+                  <div
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      backgroundColor: theme.theme,
+                      borderRadius: "50%",
+                    }}
+                  />
+                  {theme.name}
+                </Space>
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
 
-      {/* Save Button */}
-      <Form.Item>
-        <Tooltip title="Click to save changes and apply the theme">
-          <Button className="mavebutton" htmlType="submit" loading={saving}>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={saving}
+            className="w-full sm:w-auto"
+          >
             Save Changes
           </Button>
-        </Tooltip>
-      </Form.Item>
-    </Form>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

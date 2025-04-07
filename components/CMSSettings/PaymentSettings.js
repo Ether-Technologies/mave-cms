@@ -1,8 +1,26 @@
 // components/CMSSettings/PaymentSettings.js
 
 import React, { useEffect, useState } from "react";
-import { Form, Switch, Input, Button, message } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  message,
+  Card,
+  Typography,
+  Space,
+  Row,
+  Col,
+  Tooltip,
+  Switch,
+  Select,
+  InputNumber,
+} from "antd";
 import instance from "../../axios";
+import { InfoCircleOutlined } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 const PaymentSettings = ({ config, id }) => {
   const [form] = Form.useForm();
@@ -33,95 +51,194 @@ const PaymentSettings = ({ config, id }) => {
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={onFinish}>
-      {/* Enable PayPal */}
-      <Form.Item
-        name={["paypal", "enabled"]}
-        label="Enable PayPal"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
+    <Card
+      title={
+        <Space>
+          <Title level={4} style={{ margin: 0 }}>
+            Payment Settings
+          </Title>
+          <Tooltip title="Configure your payment settings">
+            <InfoCircleOutlined style={{ color: "#1890ff" }} />
+          </Tooltip>
+        </Space>
+      }
+      className="max-w-4xl mx-auto"
+    >
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="paymentEnabled"
+              label="Payment Processing"
+              valuePropName="checked"
+              extra={<Text type="secondary">Enable payment processing</Text>}
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="paymentGateway"
+              label="Payment Gateway"
+              dependencies={["paymentEnabled"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!getFieldValue("paymentEnabled") || value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Please select payment gateway")
+                    );
+                  },
+                }),
+              ]}
+              extra={
+                <Text type="secondary">Select your payment processor</Text>
+              }
+            >
+              <Select placeholder="Select payment gateway">
+                <Option value="stripe">Stripe</Option>
+                <Option value="paypal">PayPal</Option>
+                <Option value="square">Square</Option>
+                <Option value="authorize">Authorize.net</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* PayPal Client ID */}
-      <Form.Item
-        name={["paypal", "clientId"]}
-        label="PayPal Client ID"
-        rules={[{ required: true, message: "Client ID is required." }]}
-      >
-        <Input />
-      </Form.Item>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="currency"
+              label="Currency"
+              rules={[{ required: true, message: "Currency is required." }]}
+              extra={
+                <Text type="secondary">Default currency for payments</Text>
+              }
+            >
+              <Select placeholder="Select currency">
+                <Option value="usd">USD ($)</Option>
+                <Option value="eur">EUR (€)</Option>
+                <Option value="gbp">GBP (£)</Option>
+                <Option value="jpy">JPY (¥)</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="taxEnabled"
+              label="Tax Calculation"
+              valuePropName="checked"
+              extra={<Text type="secondary">Enable tax calculation</Text>}
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* PayPal Client Secret */}
-      <Form.Item
-        name={["paypal", "clientSecret"]}
-        label="PayPal Client Secret"
-        rules={[{ required: true, message: "Client Secret is required." }]}
-      >
-        <Input.Password />
-      </Form.Item>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="taxRate"
+              label="Tax Rate"
+              dependencies={["taxEnabled"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!getFieldValue("taxEnabled") || value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error("Please enter tax rate"));
+                  },
+                }),
+              ]}
+              extra={<Text type="secondary">Tax rate in percentage</Text>}
+            >
+              <InputNumber
+                min={0}
+                max={100}
+                placeholder="Enter tax rate"
+                className="w-full"
+                formatter={(value) => `${value}%`}
+                parser={(value) => value.replace("%", "")}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="minimumAmount"
+              label="Minimum Amount"
+              rules={[
+                { required: true, message: "Minimum amount is required." },
+              ]}
+              extra={<Text type="secondary">Minimum payment amount</Text>}
+            >
+              <InputNumber
+                min={0}
+                placeholder="Enter minimum amount"
+                className="w-full"
+                formatter={(value) =>
+                  `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Enable Stripe */}
-      <Form.Item
-        name={["stripe", "enabled"]}
-        label="Enable Stripe"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="refundEnabled"
+              label="Refund Processing"
+              valuePropName="checked"
+              extra={<Text type="secondary">Enable refund processing</Text>}
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="refundPeriod"
+              label="Refund Period"
+              dependencies={["refundEnabled"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!getFieldValue("refundEnabled") || value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Please enter refund period")
+                    );
+                  },
+                }),
+              ]}
+              extra={<Text type="secondary">Days allowed for refunds</Text>}
+            >
+              <InputNumber
+                min={0}
+                max={90}
+                placeholder="Enter refund period"
+                className="w-full"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Stripe Publishable Key */}
-      <Form.Item
-        name={["stripe", "publishableKey"]}
-        label="Stripe Publishable Key"
-        rules={[{ required: true, message: "Publishable Key is required." }]}
-      >
-        <Input />
-      </Form.Item>
-
-      {/* Stripe Secret Key */}
-      <Form.Item
-        name={["stripe", "secretKey"]}
-        label="Stripe Secret Key"
-        rules={[{ required: true, message: "Secret Key is required." }]}
-      >
-        <Input.Password />
-      </Form.Item>
-
-      {/* Enable Razorpay */}
-      <Form.Item
-        name={["razorpay", "enabled"]}
-        label="Enable Razorpay"
-        valuePropName="checked"
-      >
-        <Switch />
-      </Form.Item>
-
-      {/* Razorpay Key */}
-      <Form.Item
-        name={["razorpay", "key"]}
-        label="Razorpay Key"
-        rules={[{ required: true, message: "Razorpay Key is required." }]}
-      >
-        <Input />
-      </Form.Item>
-
-      {/* Razorpay Secret */}
-      <Form.Item
-        name={["razorpay", "secret"]}
-        label="Razorpay Secret"
-        rules={[{ required: true, message: "Razorpay Secret is required." }]}
-      >
-        <Input.Password />
-      </Form.Item>
-
-      {/* Save Button */}
-      <Form.Item>
-        <Button className="mavebutton" htmlType="submit" loading={saving}>
-          Save Changes
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={saving}
+            className="w-full sm:w-auto"
+          >
+            Save Changes
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

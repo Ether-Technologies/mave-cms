@@ -3,15 +3,24 @@
 import React, { useEffect, useState } from "react";
 import {
   Form,
-  Select,
   Input,
-  InputNumber,
-  Switch,
   Button,
   message,
+  Card,
+  Typography,
+  Space,
+  Row,
+  Col,
+  Tooltip,
+  Switch,
+  Select,
+  InputNumber,
+  TimePicker,
 } from "antd";
 import instance from "../../axios";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const BackupSettings = ({ config, id }) => {
@@ -43,103 +52,165 @@ const BackupSettings = ({ config, id }) => {
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={onFinish}>
-      {/* Backup Frequency */}
-      <Form.Item
-        name="backupFrequency"
-        label="Backup Frequency"
-        rules={[{ required: true, message: "Backup Frequency is required." }]}
-      >
-        <Select showSearch>
-          <Option value="daily">Daily</Option>
-          <Option value="weekly">Weekly</Option>
-          <Option value="monthly">Monthly</Option>
-        </Select>
-      </Form.Item>
+    <Card
+      title={
+        <Space>
+          <Title level={4} style={{ margin: 0 }}>
+            Backup Settings
+          </Title>
+          <Tooltip title="Configure your backup settings">
+            <InfoCircleOutlined style={{ color: "#1890ff" }} />
+          </Tooltip>
+        </Space>
+      }
+      className="max-w-4xl mx-auto"
+    >
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="autoBackup"
+              label="Auto Backup"
+              valuePropName="checked"
+              extra={<Text type="secondary">Enable automatic backups</Text>}
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="backupFrequency"
+              label="Backup Frequency"
+              dependencies={["autoBackup"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!getFieldValue("autoBackup") || value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Please select backup frequency")
+                    );
+                  },
+                }),
+              ]}
+              extra={<Text type="secondary">How often to create backups</Text>}
+            >
+              <Select placeholder="Select backup frequency">
+                <Option value="daily">Daily</Option>
+                <Option value="weekly">Weekly</Option>
+                <Option value="monthly">Monthly</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Backup Time */}
-      <Form.Item
-        name="backupTime"
-        label="Backup Time"
-        rules={[{ required: true, message: "Backup Time is required." }]}
-      >
-        <Input type="time" />
-      </Form.Item>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="backupTime"
+              label="Backup Time"
+              dependencies={["autoBackup"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!getFieldValue("autoBackup") || value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Please select backup time")
+                    );
+                  },
+                }),
+              ]}
+              extra={<Text type="secondary">Time to perform backups</Text>}
+            >
+              <TimePicker format="HH:mm" className="w-full" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="retentionPeriod"
+              label="Retention Period"
+              dependencies={["autoBackup"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!getFieldValue("autoBackup") || value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Please enter retention period")
+                    );
+                  },
+                }),
+              ]}
+              extra={
+                <Text type="secondary">Number of days to keep backups</Text>
+              }
+            >
+              <InputNumber
+                min={1}
+                max={365}
+                placeholder="Enter retention period"
+                className="w-full"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Backup Location */}
-      <Form.Item
-        name="backupLocation"
-        label="Backup Location"
-        rules={[{ required: true, message: "Backup Location is required." }]}
-      >
-        <Select showSearch>
-          <Option value="local">Local</Option>
-          <Option value="remote">Remote</Option>
-        </Select>
-      </Form.Item>
+        <Row gutter={[24, 16]}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="backupLocation"
+              label="Backup Location"
+              dependencies={["autoBackup"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!getFieldValue("autoBackup") || value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Please select backup location")
+                    );
+                  },
+                }),
+              ]}
+              extra={<Text type="secondary">Where to store backups</Text>}
+            >
+              <Select placeholder="Select backup location">
+                <Option value="local">Local Server</Option>
+                <Option value="s3">Amazon S3</Option>
+                <Option value="google">Google Drive</Option>
+                <Option value="dropbox">Dropbox</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="compressionEnabled"
+              label="Compression"
+              valuePropName="checked"
+              extra={<Text type="secondary">Compress backup files</Text>}
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      {/* Backup Destination */}
-      <Form.Item
-        name="backupDestination"
-        label="Backup Destination"
-        rules={[{ required: true, message: "Backup Destination is required." }]}
-      >
-        <Input />
-      </Form.Item>
-
-      {/* Remote Backup Settings */}
-      <Form.Item label="Remote Backup Settings">
-        <Form.Item
-          name={["remoteBackupSettings", "provider"]}
-          label="Remote Backup Provider"
-          rules={[
-            { required: true, message: "Remote Backup Provider is required." },
-          ]}
-        >
-          {/* <Input /> */}
-          <Select
-            placeholder="Select a provider"
-            allowClear
-            showSearch
-            optionFilterProp="children"
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={saving}
+            className="w-full sm:w-auto"
           >
-            <Option value="aws">AWS S3</Option>
-            <Option value="gcp">Google Cloud Storage</Option>
-          </Select>
+            Save Changes
+          </Button>
         </Form.Item>
-
-        <Form.Item
-          name={["remoteBackupSettings", "bucketName"]}
-          label="Bucket Name"
-          rules={[{ required: true, message: "Bucket Name is required." }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          name={["remoteBackupSettings", "accessKey"]}
-          label="Access Key"
-          rules={[{ required: true, message: "Access Key is required." }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          name={["remoteBackupSettings", "secretKey"]}
-          label="Secret Key"
-          rules={[{ required: true, message: "Secret Key is required." }]}
-        >
-          <Input.Password />
-        </Form.Item>
-      </Form.Item>
-
-      {/* Save Button */}
-      <Form.Item>
-        <Button className="mavebutton" htmlType="submit" loading={saving}>
-          Save Changes
-        </Button>
-      </Form.Item>
-    </Form>
+      </Form>
+    </Card>
   );
 };
 
