@@ -1,12 +1,22 @@
 // components/PageBuilder/Components/GalleryComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Typography, message, Carousel, Popconfirm } from "antd";
+import {
+  Button,
+  Drawer,
+  Typography,
+  message,
+  Carousel,
+  Popconfirm,
+  Space,
+  Tooltip,
+} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   CopyFilled,
   DragOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import GallerySelectionModal from "../Modals/GallerySelectionModal/GallerySelectionModal";
 import Image from "next/image";
@@ -20,7 +30,7 @@ const GalleryComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [galleryData, setGalleryData] = useState(component._mave || {});
   const [lightboxVisible, setLightboxVisible] = useState(false);
   const [currentMedia, setCurrentMedia] = useState(null);
@@ -36,7 +46,7 @@ const GalleryComponent = ({
       id: component._id,
     });
     setGalleryData(newGalleryData);
-    setIsModalVisible(false);
+    setIsDrawerVisible(false);
     message.success("Gallery updated successfully.");
   };
 
@@ -57,7 +67,7 @@ const GalleryComponent = ({
       return (
         <div
           key={media.id}
-          className="media-item"
+          className="media-item group relative overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
           onClick={() => openLightbox(media)}
           style={{ cursor: "pointer" }}
         >
@@ -70,25 +80,38 @@ const GalleryComponent = ({
             layout="responsive"
             placeholder="blur"
             blurDataURL="/Image_Placeholder.png"
+            className="transform transition-transform duration-300 group-hover:scale-105"
           />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+            <SettingOutlined className="text-white opacity-0 group-hover:opacity-100 transform scale-0 group-hover:scale-100 transition-all duration-300" />
+          </div>
         </div>
       );
     } else if (fileType.startsWith("video/")) {
       return (
         <div
           key={media.id}
-          className="media-item"
+          className="media-item group relative overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
           onClick={() => openLightbox(media)}
           style={{ cursor: "pointer" }}
         >
-          <video src={fileUrl} width="100%" height="auto" controls />
+          <video
+            src={fileUrl}
+            width="100%"
+            height="auto"
+            controls
+            className="transform transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+            <SettingOutlined className="text-white opacity-0 group-hover:opacity-100 transform scale-0 group-hover:scale-100 transition-all duration-300" />
+          </div>
         </div>
       );
     } else if (fileType === "application/pdf") {
       return (
         <div
           key={media.id}
-          className="media-item"
+          className="media-item group relative overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
           onClick={() => openLightbox(media)}
           style={{
             cursor: "pointer",
@@ -101,7 +124,10 @@ const GalleryComponent = ({
             padding: 16,
           }}
         >
-          <Typography.Text strong>
+          <Typography.Text
+            strong
+            className="group-hover:text-blue-600 transition-colors duration-200"
+          >
             {media.title || "View Document"}
           </Typography.Text>
         </div>
@@ -110,7 +136,7 @@ const GalleryComponent = ({
       return (
         <div
           key={media.id}
-          className="media-item"
+          className="media-item group relative overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
           onClick={() => openLightbox(media)}
           style={{
             cursor: "pointer",
@@ -123,7 +149,10 @@ const GalleryComponent = ({
             padding: 16,
           }}
         >
-          <Typography.Text strong>
+          <Typography.Text
+            strong
+            className="group-hover:text-blue-600 transition-colors duration-200"
+          >
             {media.title || "Download File"}
           </Typography.Text>
         </div>
@@ -133,7 +162,11 @@ const GalleryComponent = ({
 
   const renderGallery = () => {
     if (!galleryData.images || galleryData.images.length === 0) {
-      return <Paragraph>No media selected.</Paragraph>;
+      return (
+        <Paragraph className="text-gray-500 italic">
+          No media selected.
+        </Paragraph>
+      );
     }
 
     switch (galleryData.layout) {
@@ -180,6 +213,7 @@ const GalleryComponent = ({
             autoplay
             dotPosition="bottom"
             style={{ maxWidth: "800px", margin: "0 auto" }}
+            className="rounded-lg overflow-hidden shadow-md"
           >
             {galleryData.images?.map((media) => (
               <div key={media.id} onClick={() => openLightbox(media)}>
@@ -193,6 +227,7 @@ const GalleryComponent = ({
                     layout="responsive"
                     placeholder="blur"
                     blurDataURL="/Image_Placeholder.png"
+                    className="rounded-lg"
                   />
                 ) : media.file_type.startsWith("video/") ? (
                   <video
@@ -200,6 +235,7 @@ const GalleryComponent = ({
                     width="100%"
                     height="auto"
                     controls
+                    className="rounded-lg"
                   />
                 ) : (
                   renderMediaItem(media)
@@ -209,21 +245,26 @@ const GalleryComponent = ({
           </Carousel>
         );
       default:
-        return <Paragraph>Unknown gallery layout.</Paragraph>;
+        return (
+          <Paragraph className="text-red-500">
+            Unknown gallery layout.
+          </Paragraph>
+        );
     }
   };
 
   if (preview) {
     return (
-      <div className="preview-gallery-component p-4 bg-gray-100 rounded-md">
+      <div className="preview-gallery-component p-4 bg-gray-50 rounded-lg shadow-sm">
         {renderGallery()}
         {currentMedia && (
-          <Modal
+          <Drawer
+            title="Media Preview"
+            placement="right"
+            onClose={() => setLightboxVisible(false)}
             open={lightboxVisible}
-            footer={null}
-            onCancel={() => setLightboxVisible(false)}
-            centered
             width="60%"
+            className="media-preview-drawer"
           >
             {currentMedia.file_type.startsWith("image/") ? (
               <Image
@@ -233,6 +274,7 @@ const GalleryComponent = ({
                 height={800}
                 objectFit="contain"
                 layout="responsive"
+                className="rounded-lg"
               />
             ) : currentMedia.file_type.startsWith("video/") ? (
               <video
@@ -240,62 +282,84 @@ const GalleryComponent = ({
                 width="100%"
                 height="auto"
                 controls
+                className="rounded-lg"
               />
             ) : currentMedia.file_type === "application/pdf" ? (
               <iframe
                 src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${currentMedia.file_path}`}
                 width="100%"
                 height="800px"
+                className="rounded-lg"
               />
             ) : (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <Typography.Text strong>
+              <div className="text-center p-8">
+                <Typography.Text strong className="text-lg">
                   {currentMedia.title || "Download File"}
                 </Typography.Text>
               </div>
             )}
-          </Modal>
+          </Drawer>
         )}
       </div>
     );
   }
 
   return (
-    <div className="border p-4 rounded-md bg-white">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
-          <DragOutlined className="text-2xl border rounded-md p-1" />
-          <h3 className="text-xl font-semibold">Gallery Component</h3>
+    <div className="border border-gray-200 p-6 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-3">
+          <DragOutlined className="text-2xl text-gray-400 border rounded-md p-1.5 hover:bg-gray-50 transition-colors duration-200" />
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Gallery Component
+            </h3>
+            <p className="text-sm text-gray-500">
+              {galleryData.images?.length || 0}{" "}
+              {galleryData.images?.length === 1 ? "item" : "items"}
+            </p>
+          </div>
         </div>
-        <div>
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => setIsModalVisible(true)}
-            className="mavebutton"
-          >
-            Change
-          </Button>
-          <Button
-            icon={<CopyFilled />}
-            onClick={onDuplicateElement}
-            className="mavebutton"
-          />
+        <Space>
+          <Tooltip title="Edit Gallery">
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => setIsDrawerVisible(true)}
+              className="flex items-center gap-2 hover:bg-blue-50"
+            >
+              Edit
+            </Button>
+          </Tooltip>
+          <Tooltip title="Duplicate Gallery">
+            <Button
+              icon={<CopyFilled />}
+              onClick={onDuplicateElement}
+              className="hover:bg-gray-50"
+            />
+          </Tooltip>
           <Popconfirm
-            title="Are you sure you want to delete this component?"
+            title="Are you sure you want to delete this gallery?"
+            description="This action cannot be undone."
             onConfirm={handleDelete}
             okText="Yes"
             cancelText="No"
+            okButtonProps={{ danger: true }}
           >
-            <Button icon={<DeleteOutlined />} className="mavecancelbutton" />
+            <Tooltip title="Delete Gallery">
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                className="hover:bg-red-50"
+              />
+            </Tooltip>
           </Popconfirm>
-        </div>
+        </Space>
       </div>
 
       {renderGallery()}
 
       <GallerySelectionModal
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        isVisible={isDrawerVisible}
+        onClose={() => setIsDrawerVisible(false)}
         onSelectGallery={handleSelectGallery}
         initialGallery={galleryData}
       />

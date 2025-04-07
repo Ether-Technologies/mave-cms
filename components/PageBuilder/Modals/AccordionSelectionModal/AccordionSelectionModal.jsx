@@ -1,19 +1,23 @@
 // components/PageBuilder/Modals/AccordionSelectionModal/AccordionSelectionModal.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Modal,
+  Drawer,
   Form,
   Input,
   Button,
-  Typography,
-  Select,
-  Collapse,
   Space,
+  Select,
+  ColorPicker,
+  Collapse,
 } from "antd";
-import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  MinusOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import RichTextEditor from "../../../RichTextEditor";
 
-const { Title } = Typography;
 const { Option } = Select;
 const { Panel } = Collapse;
 
@@ -21,256 +25,227 @@ const AccordionSelectionModal = ({
   isVisible,
   onClose,
   onSelectAccordion,
-  initialData,
+  initialData = [],
 }) => {
   const [form] = Form.useForm();
-  const [accordionItems, setAccordionItems] = useState(initialData || []);
+  const [accordionItems, setAccordionItems] = useState(initialData);
+  const [showStyleConfig, setShowStyleConfig] = useState({});
 
-  const addAccordionItem = () => {
-    setAccordionItems([
-      ...accordionItems,
-      {
-        title: `Accordion ${accordionItems.length + 1}`,
-        content: "",
-        contentType: "text",
+  useEffect(() => {
+    setAccordionItems(initialData);
+    // Initialize showStyleConfig for each item
+    const initialStyleConfig = {};
+    initialData.forEach((_, index) => {
+      initialStyleConfig[index] = false;
+    });
+    setShowStyleConfig(initialStyleConfig);
+  }, [initialData]);
+
+  const handleAddItem = () => {
+    const newItem = {
+      title: "",
+      content: "",
+      contentType: "text",
+      style: {
+        headerBg: "#ffffff",
+        headerTextColor: "#000000",
+        contentBg: "#ffffff",
+        contentTextColor: "#000000",
+        borderColor: "#e5e7eb",
+        borderRadius: "8px",
       },
-    ]);
+    };
+    setAccordionItems([...accordionItems, newItem]);
+    setShowStyleConfig({ ...showStyleConfig, [accordionItems.length]: false });
   };
 
-  const removeAccordionItem = (index) => {
+  const handleRemoveItem = (index) => {
     const newItems = [...accordionItems];
     newItems.splice(index, 1);
     setAccordionItems(newItems);
+    const newStyleConfig = { ...showStyleConfig };
+    delete newStyleConfig[index];
+    setShowStyleConfig(newStyleConfig);
   };
 
-  const handleTitleChange = (value, index) => {
-    const newItems = [...accordionItems];
-    newItems[index].title = value;
-    setAccordionItems(newItems);
+  const handleSubmit = () => {
+    form.validateFields().then((values) => {
+      const updatedItems = accordionItems.map((item, index) => ({
+        ...item,
+        title: values[`title_${index}`],
+        contentType: values[`contentType_${index}`],
+        style: {
+          headerBg: values[`headerBg_${index}`] || "#ffffff",
+          headerTextColor: values[`headerTextColor_${index}`] || "#000000",
+          contentBg: values[`contentBg_${index}`] || "#ffffff",
+          contentTextColor: values[`contentTextColor_${index}`] || "#000000",
+          borderColor: values[`borderColor_${index}`] || "#e5e7eb",
+          borderRadius: values[`borderRadius_${index}`] || "8px",
+        },
+      }));
+      onSelectAccordion(updatedItems);
+    });
   };
 
-  const handleContentChange = (value, index) => {
-    const newItems = [...accordionItems];
-    newItems[index].content = value;
-    setAccordionItems(newItems);
-  };
-
-  const handleContentTypeChange = (value, index) => {
-    const newItems = [...accordionItems];
-    newItems[index].contentType = value;
-    if (value === "accordion") {
-      newItems[index].nestedAccordion = [];
-    }
-    setAccordionItems(newItems);
-  };
-
-  const handleNestedAccordionChange = (nestedData, index) => {
-    const newItems = [...accordionItems];
-    newItems[index].nestedAccordion = nestedData;
-    setAccordionItems(newItems);
-  };
-
-  const handleSave = () => {
-    // Basic validation
-    for (let i = 0; i < accordionItems.length; i++) {
-      if (!accordionItems[i].title.trim()) {
-        return;
+  const handleContentChange = (content, index) => {
+    const newItems = accordionItems.map((item, i) => {
+      if (i === index) {
+        return { ...item, content };
       }
-      if (
-        accordionItems[i].contentType === "text" &&
-        !accordionItems[i].content.trim()
-      ) {
-        return;
-      }
-    }
+      return item;
+    });
+    setAccordionItems(newItems);
+  };
 
-    onSelectAccordion(accordionItems);
-    form.resetFields();
+  const toggleStyleConfig = (index) => {
+    setShowStyleConfig({
+      ...showStyleConfig,
+      [index]: !showStyleConfig[index],
+    });
   };
 
   return (
-    <Modal
+    <Drawer
       title="Configure Accordion"
-      open={isVisible}
-      onOk={handleSave}
-      onCancel={onClose}
+      placement="right"
       width={800}
-      footer={[
-        <Button key="back" onClick={onClose}>
-          Cancel
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleSave}>
-          Save Accordion
-        </Button>,
-      ]}
+      onClose={onClose}
+      open={isVisible}
+      extra={
+        <Space>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="primary" onClick={handleSubmit}>
+            Save
+          </Button>
+        </Space>
+      }
     >
       <Form form={form} layout="vertical">
-        <Title level={4}>Accordion Items</Title>
-        {accordionItems?.map((item, index) => (
-          <div key={index} className="mb-4 border p-3 rounded-md">
-            <Space align="baseline">
-              <Form.Item label="Title" required style={{ flex: 1 }}>
-                <Input
-                  value={item.title}
-                  onChange={(e) => handleTitleChange(e.target.value, index)}
-                  placeholder="Accordion Title"
+        {accordionItems.map((item, index) => (
+          <div
+            key={index}
+            className="mb-6 p-4 border border-gray-200 rounded-lg"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Item {index + 1}</h3>
+              <Space>
+                <Button
+                  type="text"
+                  icon={<SettingOutlined />}
+                  onClick={() => toggleStyleConfig(index)}
+                >
+                  Advanced
+                </Button>
+                <Button
+                  icon={<MinusOutlined />}
+                  onClick={() => handleRemoveItem(index)}
+                  danger
+                  type="text"
                 />
-              </Form.Item>
-              <Button
-                icon={<MinusOutlined />}
-                onClick={() => removeAccordionItem(index)}
-                danger
-              />
-            </Space>
-            <Form.Item label="Content Type">
-              <Select
-                value={item.contentType}
-                onChange={(value) => handleContentTypeChange(value, index)}
-                showSearch
-              >
+              </Space>
+            </div>
+
+            <Form.Item
+              label="Title"
+              name={`title_${index}`}
+              initialValue={item.title}
+              rules={[{ required: true, message: "Please enter a title" }]}
+            >
+              <Input placeholder="Enter title" />
+            </Form.Item>
+
+            <Form.Item
+              label="Content Type"
+              name={`contentType_${index}`}
+              initialValue={item.contentType}
+            >
+              <Select>
                 <Option value="text">Text</Option>
                 <Option value="accordion">Nested Accordion</Option>
               </Select>
             </Form.Item>
-            {item.contentType === "text" ? (
-              <Form.Item label="Content" required>
-                <Input.TextArea
-                  value={item.content}
-                  onChange={(e) => handleContentChange(e.target.value, index)}
-                  placeholder="Accordion Content"
-                  rows={4}
-                />
-              </Form.Item>
-            ) : (
-              <AccordionSelectionModalNested
-                data={item.nestedAccordion}
-                onChange={(nestedData) =>
-                  handleNestedAccordionChange(nestedData, index)
-                }
+
+            <Form.Item label="Content">
+              <RichTextEditor
+                defaultValue={item.content}
+                onChange={(content) => handleContentChange(content, index)}
+                editMode={true}
               />
+            </Form.Item>
+
+            {showStyleConfig[index] && (
+              <div className="mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Form.Item
+                    label="Header Background"
+                    name={`headerBg_${index}`}
+                    initialValue={item.style?.headerBg}
+                  >
+                    <ColorPicker />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Header Text Color"
+                    name={`headerTextColor_${index}`}
+                    initialValue={item.style?.headerTextColor}
+                  >
+                    <ColorPicker />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Content Background"
+                    name={`contentBg_${index}`}
+                    initialValue={item.style?.contentBg}
+                  >
+                    <ColorPicker />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Content Text Color"
+                    name={`contentTextColor_${index}`}
+                    initialValue={item.style?.contentTextColor}
+                  >
+                    <ColorPicker />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Border Color"
+                    name={`borderColor_${index}`}
+                    initialValue={item.style?.borderColor}
+                  >
+                    <ColorPicker />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Border Radius"
+                    name={`borderRadius_${index}`}
+                    initialValue={item.style?.borderRadius}
+                  >
+                    <Select>
+                      <Option value="0px">None</Option>
+                      <Option value="4px">Small</Option>
+                      <Option value="8px">Medium</Option>
+                      <Option value="12px">Large</Option>
+                      <Option value="16px">Extra Large</Option>
+                    </Select>
+                  </Form.Item>
+                </div>
+              </div>
             )}
           </div>
         ))}
+
         <Button
           type="dashed"
-          onClick={addAccordionItem}
-          icon={<PlusOutlined />}
+          onClick={handleAddItem}
           block
+          icon={<PlusOutlined />}
+          className="mt-4"
         >
-          Add Accordion Item
+          Add Item
         </Button>
       </Form>
-    </Modal>
-  );
-};
-
-const AccordionSelectionModalNested = ({ data, onChange }) => {
-  const [nestedData, setNestedData] = useState(data || []);
-
-  const addNestedItem = () => {
-    setNestedData([
-      ...nestedData,
-      {
-        title: `Nested Accordion ${nestedData.length + 1}`,
-        content: "",
-        contentType: "text",
-      },
-    ]);
-  };
-
-  const removeNestedItem = (index) => {
-    const newNested = [...nestedData];
-    newNested.splice(index, 1);
-    setNestedData(newNested);
-    onChange(newNested);
-  };
-
-  const handleTitleChange = (value, index) => {
-    const newNested = [...nestedData];
-    newNested[index].title = value;
-    setNestedData(newNested);
-    onChange(newNested);
-  };
-
-  const handleContentChange = (value, index) => {
-    const newNested = [...nestedData];
-    newNested[index].content = value;
-    setNestedData(newNested);
-    onChange(newNested);
-  };
-
-  const handleContentTypeChange = (value, index) => {
-    const newNested = [...nestedData];
-    newNested[index].contentType = value;
-    if (value === "accordion") {
-      newNested[index].nestedAccordion = [];
-    }
-    setNestedData(newNested);
-    onChange(newNested);
-  };
-
-  const handleNestedAccordionChange = (nested, index) => {
-    const newNested = [...nestedData];
-    newNested[index].nestedAccordion = nested;
-    setNestedData(newNested);
-    onChange(newNested);
-  };
-
-  return (
-    <div className="ml-4">
-      <Title level={5}>Nested Accordion Items</Title>
-      {nestedData?.map((item, index) => (
-        <div key={index} className="mb-3 border p-2 rounded-md">
-          <Space align="baseline">
-            <Input
-              value={item.title}
-              onChange={(e) => handleTitleChange(e.target.value, index)}
-              placeholder="Nested Accordion Title"
-              style={{ width: "70%" }}
-            />
-            <Button
-              icon={<MinusOutlined />}
-              onClick={() => removeNestedItem(index)}
-              danger
-              type="text"
-            />
-          </Space>
-          <Form.Item label="Content Type">
-            <Select
-              value={item.contentType}
-              onChange={(value) => handleContentTypeChange(value, index)}
-              showSearch
-            >
-              <Option value="text">Text</Option>
-              <Option value="accordion">Nested Accordion</Option>
-            </Select>
-          </Form.Item>
-          {item.contentType === "text" ? (
-            <Form.Item label="Content" required>
-              <Input.TextArea
-                value={item.content}
-                onChange={(e) => handleContentChange(e.target.value, index)}
-                placeholder="Nested Accordion Content"
-                rows={3}
-              />
-            </Form.Item>
-          ) : (
-            <AccordionSelectionModalNested
-              data={item.nestedAccordion}
-              onChange={(nested) => handleNestedAccordionChange(nested, index)}
-            />
-          )}
-        </div>
-      ))}
-      <Button
-        type="dashed"
-        onClick={addNestedItem}
-        icon={<PlusOutlined />}
-        block
-      >
-        Add Nested Accordion Item
-      </Button>
-    </div>
+    </Drawer>
   );
 };
 
