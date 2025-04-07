@@ -27,8 +27,6 @@ const useMediaData = () => {
   const checkIndexedDbQuota = async () => {
     try {
       const quota = await navigator.storage.estimate();
-      // console.log("Usage:", quota.usage);
-      // console.log("Quota:", quota.quota);
     } catch (error) {
       console.error("Error checking indexedDB quota:", error);
     }
@@ -103,18 +101,12 @@ const useMediaData = () => {
       let keepFetching = true;
       let sortType = "desc";
 
-      console.log("Starting to populate IndexedDB with all media...");
-
       while (keepFetching) {
         const url = `/media/pageview?page=${page}&count=${pageSize}&order_type=${sortType.toUpperCase()}`;
-        console.log(`Fetching page ${page} from API: ${url}`);
         const res = await instance.get(url);
         const data = res.data?.data || [];
         totalAvailable = res.data?.total || 0;
 
-        console.log(
-          `Fetched ${data.length} media items from API on page ${page}.`
-        );
         allMedia = allMedia.concat(data);
         totalFetched += data.length;
         page += 1;
@@ -124,18 +116,13 @@ const useMediaData = () => {
         }
       }
 
-      console.log(`Total media fetched for IndexedDB: ${allMedia.length}.`);
-
       if (allMedia.length > 0) {
         await addMediaToDB(allMedia);
         setIsIndexedDBLoaded(true);
-        // message.success("All media loaded into IndexedDB for offline access.");
-        console.log("All media successfully added to IndexedDB.");
       } else {
         console.warn("No media fetched to add to IndexedDB.");
       }
     } catch (error) {
-      console.error("Error populating IndexedDB:", error);
       message.error("Failed to load all media into IndexedDB.");
     }
   }, []);

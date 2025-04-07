@@ -77,11 +77,11 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
               placeholder="blur"
               blurDataURL="/images/Image_Placeholder.png"
               style={{
-                objectFit: "cover",
                 objectPosition: "center",
                 width: "100%",
                 height: "100%",
               }}
+              objectFit="cover"
               className="rounded-t-md"
             />
           </div>

@@ -35,7 +35,7 @@ function renderMedia(card) {
           src="/images/Image_Placeholder.png"
           width={500}
           height={300}
-          style={{ objectFit: "cover" }}
+          objectFit="cover"
         />
       </div>
     );
@@ -90,7 +90,7 @@ function renderMedia(card) {
               src="/images/Video_Placeholder.png"
               width={500}
               height={300}
-              style={{ objectFit: "cover" }}
+              objectFit="cover"
             />
           </video>
           {!isPlaying && (
@@ -123,7 +123,7 @@ function renderMedia(card) {
           src={mediaUrl || "/images/Image_Placeholder.png"}
           width={500}
           height={300}
-          style={{ objectFit: "cover" }}
+          objectFit="cover"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = "/images/Image_Placeholder.png";
@@ -210,7 +210,7 @@ const CardItem = ({ card, viewType, onDeleteCard, onPreviewCard }) => {
               }
               width={100}
               height={100}
-              style={{ objectFit: "cover" }}
+              objectFit="cover"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = "/images/Image_Placeholder.png";

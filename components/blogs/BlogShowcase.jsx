@@ -37,7 +37,6 @@ const BlogShowcase = ({ blogs, setBlogs, fetchBlogs }) => {
         {/* Right Column: Top Posts and Social Media */}
         <div className="md:w-1/3 space-y-6">
           <TopPosts blogs={blogs} />
-          <SocialMediaLinks />
         </div>
       </div>
     </div>
