@@ -487,7 +487,18 @@ const MediaSelectionModal = (props) => {
                 )}
               />
             </TabPane>
-            <TabPane tab="Cloudinary" key="2">
+            <TabPane tab="Upload" key="2">
+              <UploadMediaTabs
+                onUploadSuccess={handleUploadSuccess}
+                addMedia={(media) => {
+                  fetchMedia();
+                  if (media) {
+                    handleUploadSuccess(media);
+                  }
+                }}
+              />
+            </TabPane>
+            <TabPane tab="Cloudinary" key="3">
               <Cloudinary />
             </TabPane>
           </Tabs>
