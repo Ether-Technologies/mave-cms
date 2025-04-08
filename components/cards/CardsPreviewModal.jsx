@@ -37,6 +37,8 @@ const CardsPreviewModal = ({
   const [isMediaModalVisible, setIsMediaModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [linkType, setLinkType] = useState("independent");
+  const [hasMediaChanged, setHasMediaChanged] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const PLACEHOLDER_IMAGE = "/images/Image_Placeholder.png";
 
@@ -109,6 +111,7 @@ const CardsPreviewModal = ({
   // Media selection
   const handleMediaSelect = (mediaItem) => {
     setSelectedMedia(mediaItem);
+    setHasMediaChanged(true);
     form.setFieldsValue({ media_ids: mediaItem.id });
     setIsMediaModalVisible(false);
   };
@@ -120,16 +123,25 @@ const CardsPreviewModal = ({
       form.setFieldsValue({
         link_url: undefined,
         media_link_path: undefined,
+        internal_link_path: undefined,
       });
     } else if (e.target.value === "media") {
       form.setFieldsValue({
         link_url: undefined,
         link_page_id: undefined,
+        internal_link_path: undefined,
+      });
+    } else if (e.target.value === "internal") {
+      form.setFieldsValue({
+        link_url: undefined,
+        link_page_id: undefined,
+        media_link_path: undefined,
       });
     } else {
       form.setFieldsValue({
         link_page_id: undefined,
         media_link_path: undefined,
+        internal_link_path: undefined,
       });
     }
   };
@@ -293,15 +305,14 @@ const CardsPreviewModal = ({
       }
       return `/${selectedPage.slug}?page_id=${selectedPage.id}&pageName=${selectedPage.page_name_en}`;
     } else if (values.link_type === "media" && values.media_link_path) {
-      // Ensure the path starts with a forward slash
-      const mediaPath = values.media_link_path.startsWith("/")
-        ? values.media_link_path
-        : `/${values.media_link_path}`;
-      return `${process.env.NEXT_PUBLIC_MEDIA_URL}${mediaPath}`;
+      return `${process.env.NEXT_PUBLIC_WEBSITE_URL}${values.media_link_path}`;
+    } else if (values.link_type === "internal" && values.internal_link_path) {
+      return `${process.env.NEXT_PUBLIC_WEBSITE_URL}${values.internal_link_path}`;
     }
-    return values.link_url; // Return the independent link URL if not a page or media link
+    return values.link_url;
   };
 
+  // Reset media change state when form is submitted
   const onFinishEdit = async () => {
     try {
       const values = await form.validateFields();
@@ -309,24 +320,33 @@ const CardsPreviewModal = ({
       const additional = { tags: values.tags || [] };
 
       const payload = {
-        ...values,
+        title_en: values.title_en,
+        title_bn: values.title_bn || "",
+        description_en: values.description_en,
+        description_bn: values.description_bn || "",
+        media_ids: values.media_ids,
+        page_name: values.page_name || "",
         link_url: finalLink,
         status: values.status ? 1 : 0,
         additional,
       };
-      delete payload.link_page_id;
-      delete payload.link_type;
-      delete payload.media_link_path;
 
       await instance.put(`/cards/${selectedCard.id}`, payload);
       message.success("Card updated successfully.");
       setIsEditing(false);
+      setHasMediaChanged(false);
       onCancel();
       fetchCards();
     } catch (err) {
       console.error(err);
       message.error("Failed to save changes.");
     }
+  };
+
+  // Wrap the handleCancelEdit prop to include media change state reset
+  const handleCancelEditWrapper = () => {
+    setHasMediaChanged(false);
+    handleCancelEdit();
   };
 
   return (
@@ -345,107 +365,58 @@ const CardsPreviewModal = ({
                 <Input type="hidden" />
               </Form.Item>
 
-              {/* Title (English) */}
-              <Form.Item
-                label="Title (English)"
-                name="title_en"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the title in English",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
+              {/* Basic Settings */}
+              <div className="space-y-4">
+                {/* Title (English) */}
+                <Form.Item
+                  label="Title (English)"
+                  name="title_en"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter the title in English",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
 
-              {/* Title (Alternate) */}
-              <Form.Item
-                label="Title (Alternate)"
-                name="title_bn"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the title in Alternate",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
+                {/* Description (English) */}
+                <Form.Item
+                  label="Description (English)"
+                  name="description_en"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter the description in English",
+                    },
+                  ]}
+                >
+                  <RichTextEditor
+                    editMode={true}
+                    onChange={(val) =>
+                      form.setFieldsValue({ description_en: val })
+                    }
+                    defaultValue={selectedCard?.description_en}
+                  />
+                </Form.Item>
 
-              {/* Description (English) */}
-              <Form.Item
-                label="Description (English)"
-                name="description_en"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the description in English",
-                  },
-                ]}
-              >
-                <RichTextEditor
-                  editMode={true}
-                  onChange={(val) =>
-                    form.setFieldsValue({ description_en: val })
-                  }
-                  defaultValue={selectedCard?.description_en}
-                />
-              </Form.Item>
-
-              {/* Description (Alternate) */}
-              <Form.Item
-                label="Description (Alternate)"
-                name="description_bn"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the description in Alternate",
-                  },
-                ]}
-              >
-                <RichTextEditor
-                  editMode={true}
-                  onChange={(val) =>
-                    form.setFieldsValue({ description_bn: val })
-                  }
-                  defaultValue={selectedCard?.description_bn}
-                />
-              </Form.Item>
-
-              {/* Media */}
-              <Form.Item label="Media" required>
-                <div className="flex flex-col">
-                  <Button
-                    onClick={() => setIsMediaModalVisible(true)}
-                    className="mavebutton"
-                  >
-                    Change Media
-                  </Button>
-                  <div className="flex justify-between mt-4">
-                    {/* Current Media */}
-                    <div className="flex flex-col items-center">
-                      <h3 className="my-2 font-bold">Current Media</h3>
-                      {selectedCard.media_files?.file_type?.startsWith(
-                        "video/"
-                      ) ? (
-                        <video
-                          width="200"
-                          height="150"
-                          controls
-                          className="rounded-lg"
-                          style={{ objectFit: "cover" }}
-                        >
-                          <source
-                            src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${selectedCard.media_files.file_path}`}
-                            type={selectedCard.media_files.file_type}
-                          />
-                          Your browser does not support the video tag.
-                        </video>
-                      ) : (
+                {/* Media */}
+                <Form.Item label="Media" required>
+                  <div className="flex flex-col">
+                    <Button
+                      onClick={() => setIsMediaModalVisible(true)}
+                      className="mavebutton"
+                    >
+                      Change Media
+                    </Button>
+                    <div className="flex justify-between mt-4">
+                      {/* Current Media */}
+                      <div className="flex flex-col items-center">
+                        <h3 className="my-2 font-bold">Current Media</h3>
                         <Image
                           src={
-                            selectedCard.media_files
+                            selectedCard.media_files?.file_path
                               ? `${process.env.NEXT_PUBLIC_MEDIA_URL}/${selectedCard.media_files.file_path}`
                               : PLACEHOLDER_IMAGE
                           }
@@ -459,30 +430,15 @@ const CardsPreviewModal = ({
                             e.target.src = PLACEHOLDER_IMAGE;
                           }}
                         />
-                      )}
-                    </div>
-                    {/* Changed Media */}
-                    {selectedMedia && (
-                      <div className="flex flex-col items-center">
-                        <h3 className="my-2 font-bold">Changed Media</h3>
-                        {selectedMedia.file_type?.startsWith("video/") ? (
-                          <video
-                            width="200"
-                            height="150"
-                            controls
-                            className="rounded-lg"
-                            style={{ objectFit: "cover" }}
-                          >
-                            <source
-                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${selectedMedia.file_path}`}
-                              type={selectedMedia.file_type}
-                            />
-                            Your browser does not support the video tag.
-                          </video>
-                        ) : (
+                      </div>
+
+                      {/* Changed Media - Only show if media has been changed */}
+                      {hasMediaChanged && selectedMedia && (
+                        <div className="flex flex-col items-center">
+                          <h3 className="my-2 font-bold">Changed Media</h3>
                           <Image
                             src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${selectedMedia.file_path}`}
-                            alt="Selected Media"
+                            alt="Changed Media"
                             width={200}
                             height={150}
                             objectFit="cover"
@@ -492,144 +448,153 @@ const CardsPreviewModal = ({
                               e.target.src = PLACEHOLDER_IMAGE;
                             }}
                           />
-                        )}
-                      </div>
-                    )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Form.Item>
-
-              {/* Page Association */}
-              <Form.Item
-                label="Page"
-                name="page_name"
-                rules={[{ required: true, message: "Please select a page" }]}
-              >
-                <Select placeholder="Select Page" allowClear showSearch>
-                  {pages
-                    ?.filter((p) => p.page_name_en)
-                    ?.map((p) => (
-                      <Option key={p.id} value={p.page_name_en}>
-                        {p.page_name_en}
-                      </Option>
-                    ))}
-                </Select>
-              </Form.Item>
-
-              {/* Link Type */}
-              <Form.Item label="Link Type" name="link_type">
-                <Radio.Group onChange={handleLinkTypeChange}>
-                  <Radio value="page">Page Link</Radio>
-                  <Radio value="independent">Independent Link</Radio>
-                  <Radio value="media">Link to a Media</Radio>
-                </Radio.Group>
-              </Form.Item>
-
-              {/* Link Fields */}
-              {linkType === "page" && (
-                <Form.Item
-                  label="Select the page to link"
-                  name="link_page_id"
-                  rules={[{ required: true, message: "Please select a page" }]}
-                >
-                  <Select
-                    placeholder="Select a Page to link"
-                    allowClear
-                    showSearch
-                  >
-                    {pages?.map((p) => (
-                      <Option key={p.id} value={p.id}>
-                        {p.page_name_en}
-                      </Option>
-                    ))}
-                  </Select>
                 </Form.Item>
-              )}
-              {linkType === "independent" && (
-                <Form.Item
-                  label="Link URL"
-                  name="link_url"
-                  rules={[
-                    { required: true, message: "Please enter the link URL" },
-                    {
-                      validator: async (_, value) => {
-                        if (!value) return;
-                        if (
-                          value.startsWith("/") ||
-                          value.match(/^https?:\/\//)
-                        ) {
-                          return Promise.resolve();
+              </div>
+
+              {/* Advanced Settings */}
+              <div className="mt-4">
+                <Button
+                  type="link"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="p-0"
+                >
+                  {showAdvanced
+                    ? "Hide Advanced Settings"
+                    : "Show Advanced Settings"}
+                </Button>
+                {showAdvanced && (
+                  <div className="mt-4 space-y-4">
+                    {/* Title (Alternate) */}
+                    <Form.Item label="Title (Alternate)" name="title_bn">
+                      <Input />
+                    </Form.Item>
+
+                    {/* Description (Alternate) */}
+                    <Form.Item
+                      label="Description (Alternate)"
+                      name="description_bn"
+                    >
+                      <RichTextEditor
+                        editMode={true}
+                        onChange={(val) =>
+                          form.setFieldsValue({ description_bn: val })
                         }
-                        return Promise.reject(
-                          new Error("Please enter a valid URL or path")
-                        );
-                      },
-                    },
-                  ]}
-                >
-                  <Input placeholder="Enter URL or path (e.g., /about or https://example.com)" />
-                </Form.Item>
-              )}
-              {linkType === "media" && (
-                <Form.Item
-                  label="Media Path"
-                  name="media_link_path"
-                  rules={[
-                    { required: true, message: "Please enter the media path" },
-                    {
-                      validator: async (_, value) => {
-                        if (!value) return;
-                        // Basic validation for media path
-                        if (value.includes("..") || value.includes("//")) {
-                          return Promise.reject(
-                            new Error("Invalid media path")
-                          );
-                        }
-                        return Promise.resolve();
-                      },
-                    },
-                  ]}
-                  extra={`The full URL will be: ${process.env.NEXT_PUBLIC_MEDIA_URL}/<your-path>`}
-                >
-                  <Input
-                    addonBefore={process.env.NEXT_PUBLIC_MEDIA_URL}
-                    placeholder="Enter media path (e.g., media/example.pdf)"
-                  />
-                </Form.Item>
-              )}
+                        defaultValue={selectedCard?.description_bn}
+                      />
+                    </Form.Item>
 
-              {/* Tags */}
-              <Form.Item label="Tags" name="tags">
-                <Select
-                  mode="tags"
-                  placeholder="Add or select tags"
-                  style={{ width: "100%" }}
-                  showSearch
-                >
-                  {/* Tags will be populated here */}
-                  {uniqueTags?.map((tag) => (
-                    <Option key={tag} value={tag}>
-                      {tag}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                    {/* Page Association */}
+                    <Form.Item label="Page" name="page_name">
+                      <Select placeholder="Select Page" allowClear showSearch>
+                        {pages
+                          ?.filter((p) => p.page_name_en)
+                          ?.map((p) => (
+                            <Option key={p.id} value={p.page_name_en}>
+                              {p.page_name_en}
+                            </Option>
+                          ))}
+                      </Select>
+                    </Form.Item>
 
-              {/* Status */}
-              <Form.Item
-                label="Status"
-                name="status"
-                valuePropName="checked"
-                rules={[{ required: true, message: "Please select a status" }]}
-              >
-                <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
-              </Form.Item>
+                    {/* Link Type */}
+                    <Form.Item label="Link Type" name="link_type">
+                      <Radio.Group onChange={handleLinkTypeChange}>
+                        <Radio value="page">Page Link</Radio>
+                        <Radio value="independent">Independent Link</Radio>
+                        <Radio value="media">Link to a Media</Radio>
+                        <Radio value="internal">Internal Link</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+
+                    {/* Link Fields */}
+                    {linkType === "page" && (
+                      <Form.Item
+                        label="Select the page to link"
+                        name="link_page_id"
+                      >
+                        <Select
+                          placeholder="Select a Page to link"
+                          allowClear
+                          showSearch
+                        >
+                          {pages?.map((p) => (
+                            <Option key={p.id} value={p.id}>
+                              {p.page_name_en}
+                            </Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    )}
+                    {linkType === "independent" && (
+                      <Form.Item label="Link URL" name="link_url">
+                        <Input placeholder="Enter URL or path (e.g., /about or https://example.com)" />
+                      </Form.Item>
+                    )}
+                    {linkType === "media" && (
+                      <Form.Item
+                        label="Media Path"
+                        name="media_link_path"
+                        extra={`The full URL will be: ${process.env.NEXT_PUBLIC_MEDIA_URL}/<your-path>`}
+                      >
+                        <Input
+                          addonBefore={process.env.NEXT_PUBLIC_MEDIA_URL}
+                          placeholder="Enter media path (e.g., media/example.pdf)"
+                        />
+                      </Form.Item>
+                    )}
+                    {linkType === "internal" && (
+                      <Form.Item
+                        label="Internal Path"
+                        name="internal_link_path"
+                        extra={`The full URL will be: ${process.env.NEXT_PUBLIC_APP_URL}/<your-path>`}
+                      >
+                        <Input
+                          addonBefore={process.env.NEXT_PUBLIC_APP_URL}
+                          placeholder="Enter internal path (e.g., /about-us)"
+                        />
+                      </Form.Item>
+                    )}
+
+                    {/* Tags */}
+                    <Form.Item label="Tags" name="tags">
+                      <Select
+                        mode="tags"
+                        placeholder="Add or select tags"
+                        style={{ width: "100%" }}
+                        showSearch
+                      >
+                        {uniqueTags?.map((tag) => (
+                          <Option key={tag} value={tag}>
+                            {tag}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
+                    {/* Status */}
+                    <Form.Item
+                      label="Status"
+                      name="status"
+                      valuePropName="checked"
+                    >
+                      <Switch
+                        checkedChildren="Active"
+                        unCheckedChildren="Inactive"
+                      />
+                    </Form.Item>
+                  </div>
+                )}
+              </div>
 
               {/* Form Actions */}
               <Form.Item>
                 <div className="flex justify-end gap-2">
                   <Button
-                    onClick={handleCancelEdit}
+                    onClick={handleCancelEditWrapper}
                     className="mavecancelbutton"
                   >
                     Cancel
