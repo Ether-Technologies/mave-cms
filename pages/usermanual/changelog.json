@@ -1012,5 +1012,32 @@
                 "Added tagged career responses in form"
             ]
         }
+    },
+    {
+        "version": "3.3.23",
+        "type": "minor",
+        "date": "2025-04-09",
+        "changes": {
+            "Features": [
+                "Page Builder components got styling options",
+                "New component 'Form' is added to the page builder",
+                "You can duplicate components and sections in the page builder now",
+                "You can upload media from media selection modal directly now",
+                "Page builder got versioning support and you can undo/redo any changes",
+                "The CMS got backup and restore feature",
+                "IP whitelisting is now available in the CMS settings",
+                "User settings got a makeover and now it's more intuitive",
+                "Blogs got new ui and new features",
+                "Profile page is more robust and has more features",
+                "You can add 5 types of links in cards now",
+                "Media selection modal got whole new ui and features"
+            ],
+            "Bug Fixes": [
+                "User can now change password from the profile page",
+                "Fixed the issue of link types in cards",
+                "Fixed the issue of media upload in page builder",
+                "Whitelisted IPs can now fetch public allowed data from the CMS database"
+            ]
+        }
     }
 ]

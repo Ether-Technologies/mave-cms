@@ -290,7 +290,7 @@ const TitleDescriptionComponent = ({
             />
           )}
           {link && (
-            <div className="flex items-center gap-2 text-blue-600">
+            <div className="flex items-center gap-2 text-yellow-600">
               <LinkOutlined />
               <a
                 href={link}
@@ -659,7 +659,7 @@ const TitleDescriptionComponent = ({
               />
             )}
             {link && (
-              <div className="flex items-center gap-2 text-blue-600">
+              <div className="flex items-center gap-2 text-yellow-600">
                 <LinkOutlined />
                 <a
                   href={link}

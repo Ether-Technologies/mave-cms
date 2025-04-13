@@ -268,7 +268,7 @@ a:hover {
 
 .login-content p {
   font-size: 18px;
-  color: #7d88a1;
+  color: #fcb813;
 }
 
 .input-field {
@@ -336,7 +336,7 @@ a:hover {
 }
 
 .item {
-  background-color: #ceedff;
+  background-color: #fcb813;
   border-radius: 15px;
   display: flex;
   padding: 1rem 3rem 1rem 3rem;
@@ -593,7 +593,7 @@ a:hover {
 }
 
 .ant-btn:focus {
-  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(252, 184, 19, 0.3);
 }
 
 /* Settings Tabs */

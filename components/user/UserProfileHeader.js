@@ -107,10 +107,10 @@ const UserProfileHeader = ({
         title: "Old Password",
         description: (
           <Form.Item
-            name="oldPassword"
+            name="old_password"
             rules={[{ required: true, message: "Please enter old password" }]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Enter your current password" />
           </Form.Item>
         ),
       },
@@ -119,10 +119,13 @@ const UserProfileHeader = ({
         title: "New Password",
         description: (
           <Form.Item
-            name="newPassword"
-            rules={[{ required: true, message: "Please enter new password" }]}
+            name="new_password"
+            rules={[
+              { required: true, message: "Please enter new password" },
+              { min: 6, message: "Password must be at least 6 characters" },
+            ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Enter your new password" />
           </Form.Item>
         ),
       },
@@ -131,12 +134,13 @@ const UserProfileHeader = ({
         title: "Confirm New Password",
         description: (
           <Form.Item
-            name="confirmNewPassword"
+            name="new_password_confirmation"
+            dependencies={["new_password"]}
             rules={[
               { required: true, message: "Please confirm new password" },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue("newPassword") === value) {
+                  if (!value || getFieldValue("new_password") === value) {
                     return Promise.resolve();
                   }
                   return Promise.reject(new Error("Passwords do not match!"));
@@ -144,7 +148,7 @@ const UserProfileHeader = ({
               }),
             ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Confirm your new password" />
           </Form.Item>
         ),
       }
@@ -183,21 +187,40 @@ const UserProfileHeader = ({
     setLoading(true);
     try {
       const payload = {
-        old_password: values.oldPassword,
-        new_password: values.newPassword,
-        new_password_confirmation: values.confirmNewPassword,
+        old_password: values.old_password,
+        new_password: values.new_password,
+        new_password_confirmation: values.new_password_confirmation,
       };
 
-      const response = await instance.post("/admin/password/change", payload);
+      console.log("Sending payload:", payload); // Debug log
+
+      const response = await instance.put("/admin/password/change", payload);
       if (response.status === 200) {
-        message.success("Password changed successfully");
-        setPasswordChangeMode(false);
-        form.resetFields();
+        message.success(
+          "Password changed successfully. Please log in again with your new password."
+        );
+
+        // Get current path for callback
+        const currentPath = window.location.pathname;
+
+        // Logout and redirect to login with callback
+        instance.logout(`/login?callback=${encodeURIComponent(currentPath)}`);
       } else {
         message.error("Failed to change password.");
       }
     } catch (error) {
-      message.error("Failed to change password.");
+      console.error("Password change error:", error); // Debug log
+      if (error.response?.status === 401) {
+        message.error("Unauthorized. Please log in again.");
+      } else if (error.response?.status === 422) {
+        // Handle validation errors
+        const errors = error.response.data.errors;
+        Object.keys(errors).forEach((key) => {
+          message.error(errors[key][0]);
+        });
+      } else {
+        message.error("Failed to change password.");
+      }
     } finally {
       setLoading(false);
     }
@@ -231,7 +254,7 @@ const UserProfileHeader = ({
         <>
           <Button
             type="primary"
-            htmlType="submit"
+            onClick={() => form.submit()}
             loading={loading}
             style={buttonStyle}
           >
@@ -239,7 +262,10 @@ const UserProfileHeader = ({
           </Button>
           <Button
             type="primary"
-            onClick={() => setPasswordChangeMode(false)}
+            onClick={() => {
+              setPasswordChangeMode(false);
+              form.resetFields();
+            }}
             style={buttonStyle}
           >
             <CloseCircleOutlined /> Cancel
@@ -298,19 +324,19 @@ const UserProfileHeader = ({
           style={{ borderRadius: "50%" }}
         />
       </div>
-      <Table
-        columns={columns}
-        dataSource={data}
-        pagination={false}
-        bordered
-        style={{
-          marginBottom: "1rem",
-          borderRadius: "5px",
-          border: "2px solid var(--theme)",
-          width: "100%",
-        }}
-      />
-      <Form form={form} onFinish={handlePasswordChange}>
+      <Form form={form} onFinish={handlePasswordChange} layout="vertical">
+        <Table
+          columns={columns}
+          dataSource={data}
+          pagination={false}
+          bordered
+          style={{
+            marginBottom: "1rem",
+            borderRadius: "5px",
+            border: "2px solid var(--theme)",
+            width: "100%",
+          }}
+        />
         <div
           style={{
             display: "grid",

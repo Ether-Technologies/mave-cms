@@ -14,7 +14,7 @@ export const weekData = [
 export const monthsData = [
   ["Factor", "Number", { role: "style" }],
   ["Visitors", 1134, "#FF6633"],
-  ["Users", 1000, "#3361FF"],
+  ["Users", 1000, "#fcb813"],
   ["Page Views", 1234, "#8833FF"],
   ["Bounce Rate", 500, "#2EE6CA"],
 ];
@@ -54,8 +54,8 @@ export default function SiteStat() {
     dataTypes === "Week"
       ? weekData
       : dataTypes === "Months"
-      ? monthsData
-      : yearData;
+        ? monthsData
+        : yearData;
 
   return (
     <div

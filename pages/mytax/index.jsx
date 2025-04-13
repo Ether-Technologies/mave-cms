@@ -58,7 +58,7 @@ const MyTax = () => {
     {
       title: "Income from Employment (Annual)",
       value: results.incomeEmploymentAnnual,
-      color: "bg-blue-500",
+      color: "bg-yellow-500",
     },
     {
       title: "House Rent Allowance (HRA) (Annual)",

@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, callback) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
       const response = await instance.post("admin/login", { email, password });
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
       message.success("Login successful!");
 
       // Redirect after state updates
-      router.push("/");
+      router.push(callback || "/");
     } catch (error) {
       message.error("Invalid credentials. Please try again.");
       dispatch({ type: "SET_LOADING", payload: false });

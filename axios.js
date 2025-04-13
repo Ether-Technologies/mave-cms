@@ -54,4 +54,13 @@ instance.interceptors.response.use(
   }
 );
 
+// Add logout function
+instance.logout = (redirectUrl = "/login") => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  if (typeof window !== "undefined") {
+    window.location.href = redirectUrl;
+  }
+};
+
 export default instance;

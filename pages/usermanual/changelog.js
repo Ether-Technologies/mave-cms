@@ -2,7 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Layout, Timeline, Tag, Button, Breadcrumb, Radio } from "antd";
 import moment from "moment";
 import changelog from "./changelog.json";
-import { HomeOutlined, SwapOutlined } from "@ant-design/icons";
+import {
+  HomeOutlined,
+  SwapOutlined,
+  BugOutlined,
+  StarOutlined,
+  CheckCircleOutlined,
+  PlusCircleOutlined,
+  ToolOutlined,
+  ThunderboltOutlined,
+} from "@ant-design/icons";
 import NavItems from "../../components/ui/NavItems";
 import { useAuth } from "../../src/context/AuthContext";
 
@@ -14,7 +23,6 @@ const Changelog = () => {
   const { user, token } = useAuth();
 
   useEffect(() => {
-    // Sort the changelog by date in descending order
     const sortedLogs = changelog.sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
@@ -39,12 +47,52 @@ const Changelog = () => {
     }
   };
 
+  const getChangeTypeConfig = (type) => {
+    switch (type) {
+      case "Bug Fixes":
+      case "BugFix":
+        return {
+          color: "#ff4d4f",
+          bgColor: "bg-red-50/70",
+          borderColor: "border-red-200",
+          hoverBorder: "hover:border-red-400",
+          icon: <BugOutlined className="text-red-500" />,
+          title: "Bug Fix",
+          titleIcon: <ToolOutlined className="text-red-500" />,
+          className: "hover:shadow-red-100",
+        };
+      case "Features":
+      case "Feature":
+        return {
+          color: "#52c41a",
+          bgColor: "bg-green-50/70",
+          borderColor: "border-green-200",
+          hoverBorder: "hover:border-green-400",
+          icon: <StarOutlined className="text-green-500" />,
+          title: "New Feature",
+          titleIcon: <ThunderboltOutlined className="text-green-500" />,
+          className: "hover:shadow-green-100",
+        };
+      default:
+        return {
+          color: "#1890ff",
+          bgColor: "bg-blue-50/70",
+          borderColor: "border-blue-200",
+          hoverBorder: "hover:border-blue-400",
+          icon: <PlusCircleOutlined className="text-blue-500" />,
+          title: "Update",
+          titleIcon: <CheckCircleOutlined className="text-blue-500" />,
+          className: "hover:shadow-blue-100",
+        };
+    }
+  };
+
   return (
     <div className="mavecontainer">
       <NavItems user={user} token={token} />
       <Layout className="site-layout-background pt-20 pr-10 pb-10 bg-transparent">
-        <Content className="p-10 bg-white rounded-lg min-h-10">
-          <div className="flex justify-between items-center mb-6">
+        <Content className="p-10 bg-white/80 backdrop-blur-sm rounded-2xl min-h-10 shadow-lg">
+          <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-4">
               <Breadcrumb
                 items={[
@@ -66,6 +114,7 @@ const Changelog = () => {
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 buttonStyle="solid"
+                className="shadow-sm"
               >
                 <Radio.Button value="all">All</Radio.Button>
                 <Radio.Button value="major">Major</Radio.Button>
@@ -76,51 +125,78 @@ const Changelog = () => {
                 icon={<SwapOutlined />}
                 onClick={() => setReverse(!reverse)}
                 style={{ transform: "rotate(90deg)" }}
+                className="shadow-sm hover:shadow-md transition-all duration-300"
               />
             </div>
           </div>
 
-          <h1 className="text-4xl font-semibold text-theme text-center w-full mb-10">
-            Mave Changelogs
-          </h1>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-theme mb-2">
+              Mave Changelogs
+            </h1>
+            <p className="text-gray-500">Track all updates and improvements</p>
+          </div>
 
           <Timeline
             mode="alternate"
-            pending="More to come..."
+            pending={
+              <div className="text-gray-400 italic">
+                More updates coming soon...
+              </div>
+            }
             reverse={reverse}
+            className="px-4"
           >
             {filteredLogs?.map((log, index) => (
               <Timeline.Item
                 key={index}
-                label={moment(log.date).format("DD MMM YYYY")}
+                label={
+                  <div className="text-gray-500 font-medium">
+                    {moment(log.date).format("DD MMM YYYY")}
+                  </div>
+                }
                 style={{
-                  paddingBottom: "20px",
+                  paddingBottom: "32px",
                   fontSize: "1.1em",
                 }}
               >
-                <div className="flex items-center gap-2 mb-4">
-                  <h3 className="text-2xl font-semibold text-theme m-0">
+                <div className="flex items-center gap-3 mb-6">
+                  <h3 className="text-2xl font-bold text-theme m-0">
                     v{log.version}
                   </h3>
-                  <Tag color={getVersionColor(log.type)}>
+                  <Tag
+                    color={getVersionColor(log.type)}
+                    className="rounded-full px-3 uppercase text-xs font-semibold"
+                  >
                     {log.type || "unspecified"}
                   </Tag>
                 </div>
-                <>
-                  {Object.entries(log.changes)?.map(([type, changeList]) =>
-                    changeList?.map((change, i) => (
-                      <div
-                        key={i}
-                        className="mb-2 p-4 rounded-lg bg-white shadow-sm border-2 border-gray-200 hover:border-theme hover:shadow-md hover:scale-105 transition-all duration-300"
-                      >
-                        <Tag color={type === "BugFix" ? "red" : "green"}>
-                          {type}
-                        </Tag>
-                        {change}
+                <div className="space-y-4">
+                  {Object.entries(log.changes)?.map(([type, changeList]) => {
+                    const config = getChangeTypeConfig(type);
+                    return (
+                      <div key={type} className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          {config.titleIcon}
+                          <span className="font-semibold text-gray-700">
+                            {config.title}
+                          </span>
+                        </div>
+                        {changeList?.map((change, i) => (
+                          <div
+                            key={i}
+                            className={`p-4 rounded-xl border ${config.bgColor} ${config.borderColor} ${config.hoverBorder} transition-all duration-300 hover:shadow-lg ${config.className}`}
+                          >
+                            <div className="flex gap-3">
+                              <div className="mt-1">{config.icon}</div>
+                              <div className="text-gray-700">{change}</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  )}
-                </>
+                    );
+                  })}
+                </div>
               </Timeline.Item>
             ))}
           </Timeline>

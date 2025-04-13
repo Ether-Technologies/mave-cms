@@ -50,8 +50,8 @@ const GeneralSettings = ({ config, id }) => {
     },
     {
       name: "Blue",
-      theme: "#3a86ff",
-      accent: "#0096c7",
+      theme: "#fcb813",
+      accent: "#e3a611",
     },
     {
       name: "Green",

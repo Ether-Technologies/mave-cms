@@ -16,6 +16,7 @@ import Loader from "../../components/Loader";
 export default function Login() {
   const { login, loading } = useAuth();
   const router = useRouter();
+  const { callback } = router.query;
 
   const handleLogin = (values) => {
     const { email, password } = values;
@@ -23,7 +24,7 @@ export default function Login() {
       message.error("Please fill in all fields");
       return;
     }
-    login(email, password);
+    login(email, password, callback);
   };
 
   if (loading) return <Loader />;

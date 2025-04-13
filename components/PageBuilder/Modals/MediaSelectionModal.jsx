@@ -307,7 +307,7 @@ const MediaSelectionModal = (props) => {
         <Tag
           color={
             item.file_type.startsWith("image/")
-              ? "blue"
+              ? "yellow"
               : item.file_type.startsWith("video/")
                 ? "red"
                 : "green"

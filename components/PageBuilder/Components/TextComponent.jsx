@@ -127,7 +127,7 @@ const TextComponent = ({
                 setFormData({ ...formData, text: e.target.value })
               }
               rows={4}
-              className="w-full rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
               placeholder="Enter your text here..."
               autoFocus
             />
@@ -225,7 +225,7 @@ const TextComponent = ({
                     isDualColor: !tempSettings.isDualColor,
                   })
                 }
-                className="text-blue-600 hover:text-blue-700"
+                className="text-yellow-600 hover:text-yellow-700"
               >
                 {tempSettings.isDualColor
                   ? "Disable Dual Color"
@@ -246,7 +246,7 @@ const TextComponent = ({
                     setFormData({ ...formData, altText: e.target.value })
                   }
                   rows={4}
-                  className="w-full rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
                   placeholder="Enter your second part text here..."
                 />
               </div>
