@@ -20,6 +20,7 @@ import IconListComponent from "./IconListComponent/IconListComponent";
 import TestimonialComponent from "./TestimonialComponent/TestimonialComponent";
 import TitleDescriptionComponent from "./TitleDescriptionComponent";
 import FormComponent from "./FormComponent";
+import InfoBoxComponent from "./InfoBoxComponent/InfoBoxComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setPageData,
@@ -46,6 +47,7 @@ const COMPONENT_MAP = {
   iconlist: React.memo(IconListComponent),
   testimonial: React.memo(TestimonialComponent),
   form: React.memo(FormComponent),
+  infobox: React.memo(InfoBoxComponent),
 };
 
 const ComponentRenderer = React.memo(

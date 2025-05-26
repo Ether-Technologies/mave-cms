@@ -161,6 +161,15 @@ export const componentOptions = [
     description: "Add input form",
     tags: ["form", "input", "interactive"],
   },
+  {
+    type: "infobox",
+    name: "Info Box",
+    icon: "/icons/mave/cards.svg",
+    premium: true,
+    category: "Layout",
+    description: "Add information box with media and details",
+    tags: ["info", "media", "layout", "details"],
+  },
 ];
 
 export const categories = [
