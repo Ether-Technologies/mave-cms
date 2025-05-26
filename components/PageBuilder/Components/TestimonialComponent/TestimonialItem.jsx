@@ -1,7 +1,7 @@
 // components/PageBuilder/Components/TestimonialComponent/TestimonialItem.jsx
 
 import React from "react";
-import { Card, Rate, Button, Tooltip } from "antd";
+import { Card, Rate, Button, Tooltip, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import Image from "next/image";
 
@@ -12,6 +12,8 @@ const TestimonialItem = ({
   font,
   color,
   background,
+  preview = false,
+  isEditMode,
 }) => {
   const getImageUrl = () => {
     if (!testimonial.image) return null;
@@ -33,19 +35,26 @@ const TestimonialItem = ({
       }}
       bordered
       hoverable
-      actions={[
-        <Tooltip title="Edit">
-          <Button type="text" icon={<EditOutlined />} onClick={onEdit} />
-        </Tooltip>,
-        <Tooltip title="Delete">
-          <Button
-            type="text"
-            icon={<DeleteOutlined />}
-            onClick={onDelete}
-            danger
-          />
-        </Tooltip>,
-      ]}
+      actions={
+        isEditMode
+          ? [
+              <Tooltip title="Edit">
+                <Button type="text" icon={<EditOutlined />} onClick={onEdit} />
+              </Tooltip>,
+              <Tooltip title="Delete">
+                <Popconfirm
+                  title="Delete Testimonial"
+                  description="Are you sure you want to delete this testimonial?"
+                  onConfirm={onDelete}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button type="text" icon={<DeleteOutlined />} danger />
+                </Popconfirm>
+              </Tooltip>,
+            ]
+          : null
+      }
     >
       {testimonial.image && (
         <Image

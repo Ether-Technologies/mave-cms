@@ -1,8 +1,13 @@
 // components/PageBuilder/Components/TestimonialComponent/TestimonialComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import { Button, Form, message, Typography } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button, Form, message, Typography, Space, Popconfirm } from "antd";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CopyFilled,
+} from "@ant-design/icons";
 import MediaSelectionModal from "../../Modals/MediaSelectionModal";
 import ConfigSection from "./ConfigSection";
 import TestimonialDisplay from "./TestimonialDisplay";
@@ -15,14 +20,16 @@ const TestimonialComponent = ({
   updateComponent,
   deleteComponent,
   preview = false,
+  onDuplicateElement,
 }) => {
   const [testimonials, setTestimonials] = useState(
     component._mave?.testimonials || []
   );
+  const [isEditMode, setIsEditMode] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEdit, setCurrentEdit] = useState(null);
-  const [layout, setLayout] = useState(component._mave?.layout || "carousel");
+  const [layout, setLayout] = useState(component._mave?.layout || "grid");
   const [font, setFont] = useState(component._mave?.font || "Arial");
   const [color, setColor] = useState(component._mave?.color || "#000000");
   const [background, setBackground] = useState(
@@ -35,17 +42,20 @@ const TestimonialComponent = ({
   const [editForm] = Form.useForm();
 
   useEffect(() => {
-    updateComponent({
-      ...component,
-      _mave: {
-        testimonials,
-        layout,
-        font,
-        color,
-        background,
-      },
-    });
+    if (isEditMode) {
+      updateComponent({
+        ...component,
+        _mave: {
+          testimonials,
+          layout,
+          font,
+          color,
+          background,
+        },
+      });
+    }
   }, [
+    isEditMode,
     testimonials,
     layout,
     font,
@@ -56,7 +66,7 @@ const TestimonialComponent = ({
   ]);
 
   const handleAddTestimonial = () => {
-    if (!preview) {
+    if (!preview && isEditMode) {
       setIsAdding(true);
       form.resetFields();
       setSelectedImage(null);
@@ -64,8 +74,6 @@ const TestimonialComponent = ({
   };
 
   const handleAddSubmit = (values) => {
-    console.log("Add form - Submitting values:", values);
-    console.log("Add form - Current selectedImage:", selectedImage);
     const newTestimonial = {
       id: Date.now(),
       quote: values.quote,
@@ -73,7 +81,6 @@ const TestimonialComponent = ({
       rating: values.rating,
       image: selectedImage,
     };
-    console.log("Add form - Creating new testimonial:", newTestimonial);
     setTestimonials([...testimonials, newTestimonial]);
     setIsAdding(false);
     setSelectedImage(null);
@@ -82,8 +89,7 @@ const TestimonialComponent = ({
   };
 
   const handleEditTestimonial = (testimonial) => {
-    if (!preview) {
-      console.log("Edit form - Setting up edit for testimonial:", testimonial);
+    if (!preview && isEditMode) {
       setCurrentEdit(testimonial);
       setIsEditing(true);
       setSelectedImage(testimonial.image);
@@ -97,8 +103,6 @@ const TestimonialComponent = ({
   };
 
   const handleEditSubmit = (values) => {
-    console.log("Edit form - Submitting values:", values);
-    console.log("Edit form - Current selectedImage:", selectedImage);
     const updatedTestimonial = {
       ...currentEdit,
       quote: values.quote,
@@ -106,7 +110,6 @@ const TestimonialComponent = ({
       rating: values.rating,
       image: selectedImage,
     };
-    console.log("Edit form - Updating testimonial:", updatedTestimonial);
     setTestimonials(
       testimonials.map((t) =>
         t.id === updatedTestimonial.id ? updatedTestimonial : t
@@ -120,51 +123,33 @@ const TestimonialComponent = ({
   };
 
   const handleDeleteTestimonial = (id) => {
-    if (!preview) {
-      Modal.confirm({
-        title: "Are you sure you want to delete this testimonial?",
-        onOk: () => {
-          setTestimonials(testimonials.filter((t) => t.id !== id));
-          message.success("Testimonial deleted successfully.");
+    if (!preview && isEditMode) {
+      setTestimonials(testimonials.filter((t) => t.id !== id));
+      message.success("Testimonial deleted successfully.");
+    }
+  };
+
+  const handleDeleteComponent = () => {
+    if (deleteComponent) {
+      deleteComponent(component._id || component.id);
+    }
+  };
+
+  const handleEditModeToggle = () => {
+    if (isEditMode) {
+      // Save changes when exiting edit mode
+      updateComponent({
+        ...component,
+        _mave: {
+          testimonials,
+          layout,
+          font,
+          color,
+          background,
         },
       });
     }
-  };
-
-  const handleLayoutChange = (value) => {
-    if (!preview) setLayout(value);
-  };
-
-  const handleFontChange = (value) => {
-    if (!preview) setFont(value);
-  };
-
-  const handleColorChange = (e) => {
-    if (!preview) setColor(e.target.value);
-  };
-
-  const handleBackgroundChange = (e) => {
-    if (!preview) setBackground(e.target.value);
-  };
-
-  const handleSelectImage = (media) => {
-    console.log("Add form - Selected media:", media);
-    if (media) {
-      console.log("Add form - Setting selected media:", media);
-      setSelectedImage(media);
-      setIsImageModalVisible(false);
-      message.success("Image selected successfully.");
-    }
-  };
-
-  const handleEditSelectImage = (media) => {
-    console.log("Edit form - Selected media:", media);
-    if (media) {
-      console.log("Edit form - Setting selected media:", media);
-      setSelectedImage(media);
-      setIsImageModalVisible(false);
-      message.success("Image selected successfully.");
-    }
+    setIsEditMode(!isEditMode);
   };
 
   const containerStyle = {
@@ -176,55 +161,105 @@ const TestimonialComponent = ({
   };
 
   return (
-    <div className="border p-4 rounded-md bg-white">
+    <div className="border p-4 rounded-md bg-gray-50">
       {!preview && (
-        <ConfigSection
-          layout={layout}
-          font={font}
-          color={color}
-          background={background}
-          handleLayoutChange={handleLayoutChange}
-          handleFontChange={handleFontChange}
-          handleColorChange={handleColorChange}
-          handleBackgroundChange={handleBackgroundChange}
-          preview={preview}
-        />
-      )}
-
-      {isAdding && !preview && (
-        <div className="mb-6 p-4 border rounded-md bg-gray-50">
-          <h4 className="text-lg font-medium mb-4">Add New Testimonial</h4>
-          <TestimonialForm
-            form={form}
-            onFinish={handleAddSubmit}
-            selectedImage={selectedImage}
-            onImageSelect={() => setIsImageModalVisible(true)}
-            onCancel={() => {
-              setIsAdding(false);
-              setSelectedImage(null);
-              form.resetFields();
-            }}
-          />
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Testimonial Component</h3>
+          <Space>
+            {isEditMode ? (
+              <>
+                <Button
+                  className="mavebutton"
+                  type="primary"
+                  onClick={handleEditModeToggle}
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  className="mavecancelbutton"
+                  onClick={() => setIsEditMode(false)}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  className="mavebutton"
+                  onClick={() => setIsEditMode(true)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  icon={<CopyFilled />}
+                  onClick={onDuplicateElement}
+                  className="mavebutton"
+                />
+              </>
+            )}
+            <Popconfirm
+              title="Delete Component"
+              description="Are you sure you want to delete this component?"
+              onConfirm={handleDeleteComponent}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button danger>Delete</Button>
+            </Popconfirm>
+          </Space>
         </div>
       )}
 
-      {isEditing && !preview && currentEdit && (
-        <div className="mb-6 p-4 border rounded-md bg-gray-50">
-          <h4 className="text-lg font-medium mb-4">Edit Testimonial</h4>
-          <TestimonialForm
-            form={editForm}
-            onFinish={handleEditSubmit}
-            selectedImage={selectedImage}
-            onImageSelect={() => setIsImageModalVisible(true)}
-            onCancel={() => {
-              setIsEditing(false);
-              setCurrentEdit(null);
-              setSelectedImage(null);
-              editForm.resetFields();
-            }}
-            isEdit={true}
+      {!preview && isEditMode && (
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <ConfigSection
+            layout={layout}
+            font={font}
+            color={color}
+            background={background}
+            handleLayoutChange={setLayout}
+            handleFontChange={setFont}
+            handleColorChange={(e) => setColor(e.target.value)}
+            handleBackgroundChange={(e) => setBackground(e.target.value)}
+            preview={preview}
           />
-        </div>
+
+          {isAdding && (
+            <div className="mb-6 p-4 border rounded-md bg-gray-50">
+              <h4 className="text-lg font-medium mb-4">Add New Testimonial</h4>
+              <TestimonialForm
+                form={form}
+                onFinish={handleAddSubmit}
+                selectedImage={selectedImage}
+                onImageSelect={() => setIsImageModalVisible(true)}
+                onCancel={() => {
+                  setIsAdding(false);
+                  setSelectedImage(null);
+                  form.resetFields();
+                }}
+              />
+            </div>
+          )}
+
+          {isEditing && currentEdit && (
+            <div className="mb-6 p-4 border rounded-md bg-gray-50">
+              <h4 className="text-lg font-medium mb-4">Edit Testimonial</h4>
+              <TestimonialForm
+                form={editForm}
+                onFinish={handleEditSubmit}
+                selectedImage={selectedImage}
+                onImageSelect={() => setIsImageModalVisible(true)}
+                onCancel={() => {
+                  setIsEditing(false);
+                  setCurrentEdit(null);
+                  setSelectedImage(null);
+                  editForm.resetFields();
+                }}
+                isEdit={true}
+              />
+            </div>
+          )}
+        </Space>
       )}
 
       <TestimonialDisplay
@@ -237,36 +272,31 @@ const TestimonialComponent = ({
         handleDeleteTestimonial={handleDeleteTestimonial}
         preview={preview}
         containerStyle={containerStyle}
+        isEditMode={isEditMode}
       />
 
-      {!isAdding && !preview && (
+      {!isAdding && !isEditing && (
         <div className="flex justify-center">
           <Button
             type="dashed"
             icon={<PlusOutlined />}
             onClick={handleAddTestimonial}
             className="flex items-center mavebutton mt-4"
-            disabled={preview}
           >
             Add Testimonial
           </Button>
         </div>
       )}
 
-      {!preview && (
+      {!preview && isEditMode && (
         <MediaSelectionModal
-          isVisible={isImageModalVisible && !isEditing}
+          isVisible={isImageModalVisible}
           onClose={() => setIsImageModalVisible(false)}
-          onSelectMedia={handleSelectImage}
-          selectionMode="single"
-        />
-      )}
-
-      {!preview && isEditing && (
-        <MediaSelectionModal
-          isVisible={isImageModalVisible && isEditing}
-          onClose={() => setIsImageModalVisible(false)}
-          onSelectMedia={handleEditSelectImage}
+          onSelectMedia={(media) => {
+            setSelectedImage(media);
+            setIsImageModalVisible(false);
+            message.success("Image selected successfully.");
+          }}
           selectionMode="single"
         />
       )}

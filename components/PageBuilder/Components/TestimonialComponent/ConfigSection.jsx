@@ -23,8 +23,6 @@ function ConfigSection({
 
   return (
     <Space direction="vertical" style={{ width: "100%" }}>
-      <h3 className="text-xl font-semibold">Testimonial Component</h3>
-
       <div className="flex flex-wrap justify-between mb-4">
         <Select
           value={layout}

@@ -1,7 +1,6 @@
 import React from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { Row, Col, Button, Space } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import TestimonialItem from "./TestimonialItem";
 import { Typography } from "antd";
 
@@ -17,28 +16,52 @@ const TestimonialDisplay = ({
   handleDeleteTestimonial,
   preview,
   containerStyle,
+  isEditMode,
 }) => {
-  const sliderSettings = {
-    dots: true,
-    infinite: testimonials.length > 3,
-    speed: 500,
-    slidesToShow: testimonials.length >= 3 ? 3 : testimonials.length,
-    slidesToScroll: 1,
-    autoplay: !preview,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-        },
-      },
-    ],
+  const renderTestimonialGrid = () => {
+    return (
+      <Row gutter={[16, 16]}>
+        {testimonials.map((testimonial, index) => (
+          <Col
+            key={index}
+            xs={24}
+            sm={layout === "grid" ? 12 : 24}
+            md={layout === "grid" ? 12 : 24}
+            lg={layout === "grid" ? 12 : 24}
+          >
+            <TestimonialItem
+              testimonial={testimonial}
+              onEdit={() => handleEditTestimonial(testimonial, index)}
+              onDelete={() => handleDeleteTestimonial(testimonial.id)}
+              font={font}
+              color={color}
+              background={background}
+              preview={preview}
+              isEditMode={isEditMode}
+            />
+          </Col>
+        ))}
+      </Row>
+    );
+  };
+
+  const renderTestimonialList = () => {
+    return (
+      <div className="space-y-4">
+        {testimonials.map((testimonial, index) => (
+          <TestimonialItem
+            key={index}
+            testimonial={testimonial}
+            onEdit={() => handleEditTestimonial(testimonial, index)}
+            onDelete={() => handleDeleteTestimonial(testimonial.id)}
+            font={font}
+            color={color}
+            background={background}
+            preview={preview}
+          />
+        ))}
+      </div>
+    );
   };
 
   if (testimonials.length === 0) {
@@ -49,40 +72,9 @@ const TestimonialDisplay = ({
     ) : null;
   }
 
-  return layout === "carousel" ? (
-    <div style={preview ? {} : containerStyle}>
-      <Slider {...sliderSettings}>
-        {testimonials.map((testimonial) => (
-          <TestimonialItem
-            key={testimonial.id}
-            testimonial={testimonial}
-            onEdit={() => handleEditTestimonial(testimonial)}
-            onDelete={() => handleDeleteTestimonial(testimonial.id)}
-            font={font}
-            color={color}
-            background={background}
-            preview={preview}
-          />
-        ))}
-      </Slider>
-    </div>
-  ) : (
-    <div
-      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-      style={preview ? {} : containerStyle}
-    >
-      {testimonials.map((testimonial) => (
-        <TestimonialItem
-          key={testimonial.id}
-          testimonial={testimonial}
-          onEdit={() => handleEditTestimonial(testimonial)}
-          onDelete={() => handleDeleteTestimonial(testimonial.id)}
-          font={font}
-          color={color}
-          background={background}
-          preview={preview}
-        />
-      ))}
+  return (
+    <div style={containerStyle}>
+      {layout === "grid" ? renderTestimonialGrid() : renderTestimonialList()}
     </div>
   );
 };
