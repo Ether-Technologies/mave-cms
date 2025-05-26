@@ -77,7 +77,6 @@ const InfoBoxComponent = ({
     const mediaArray = Array.isArray(media) ? media : [media];
     setSelectedMedia(mediaArray);
     setIsMediaModalVisible(false);
-    message.success("Media selected successfully.");
   };
 
   // Handle main media selection

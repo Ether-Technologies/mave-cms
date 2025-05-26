@@ -147,8 +147,18 @@ const Section = ({ section, index, onDuplicate, onDelete }) => {
       <Modal
         title="Delete Section"
         open={isDeleteModalVisible}
-        onOk={handleDeleteConfirm}
-        onCancel={handleDeleteCancel}
+        footer={[
+          <Button
+            className="mavecancelbutton"
+            key="cancel"
+            onClick={handleDeleteCancel}
+          >
+            Cancel
+          </Button>,
+          <Button danger key="delete" onClick={handleDeleteConfirm}>
+            Delete
+          </Button>,
+        ]}
       >
         <p>
           Are you sure you want to delete this section? This action cannot be

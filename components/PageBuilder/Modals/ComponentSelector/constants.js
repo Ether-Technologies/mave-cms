@@ -164,7 +164,7 @@ export const componentOptions = [
   {
     type: "infobox",
     name: "Info Box",
-    icon: "/icons/mave/cards.svg",
+    icon: "/icons/mave/infobox.svg",
     premium: true,
     category: "Layout",
     description: "Add information box with media and details",

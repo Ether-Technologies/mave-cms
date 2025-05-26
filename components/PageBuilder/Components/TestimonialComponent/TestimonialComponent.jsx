@@ -1,42 +1,28 @@
 // components/PageBuilder/Components/TestimonialComponent/TestimonialComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Select,
-  Space,
-  Modal,
-  Form,
-  Input,
-  Rate,
-  message,
-  Typography,
-  Popconfirm,
-} from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import TestimonialItem from "./TestimonialItem";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { Button, Form, message, Typography } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import MediaSelectionModal from "../../Modals/MediaSelectionModal";
-import Image from "next/image";
+import ConfigSection from "./ConfigSection";
+import TestimonialDisplay from "./TestimonialDisplay";
+import TestimonialForm from "./TestimonialForm";
 
-const { Option } = Select;
-const { Title } = Typography;
+const { Paragraph } = Typography;
 
 const TestimonialComponent = ({
   component,
   updateComponent,
   deleteComponent,
-  preview = false, // New prop with default value
+  preview = false,
 }) => {
   const [testimonials, setTestimonials] = useState(
     component._mave?.testimonials || []
   );
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [currentEdit, setCurrentEdit] = useState(null);
-  const [layout, setLayout] = useState(component._mave?.layout || "carousel"); // 'carousel' or 'grid'
+  const [layout, setLayout] = useState(component._mave?.layout || "carousel");
   const [font, setFont] = useState(component._mave?.font || "Arial");
   const [color, setColor] = useState(component._mave?.color || "#000000");
   const [background, setBackground] = useState(
@@ -59,7 +45,6 @@ const TestimonialComponent = ({
         background,
       },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     testimonials,
     layout,
@@ -70,68 +55,50 @@ const TestimonialComponent = ({
     component,
   ]);
 
-  // Slider settings for carousel layout
-  const sliderSettings = {
-    dots: true,
-    infinite: testimonials.length > 3,
-    speed: 500,
-    slidesToShow: testimonials.length >= 3 ? 3 : testimonials.length,
-    slidesToScroll: 1,
-    autoplay: !preview, // Disable autoplay in preview
-    responsive: [
-      {
-        breakpoint: 1024, // Tablet
-        settings: {
-          slidesToShow: 2,
-        },
-      },
-      {
-        breakpoint: 600, // Mobile
-        settings: {
-          slidesToShow: 1,
-        },
-      },
-    ],
-  };
-
-  // Handle adding a new testimonial
   const handleAddTestimonial = () => {
     if (!preview) {
-      setIsAddModalVisible(true);
+      setIsAdding(true);
       form.resetFields();
       setSelectedImage(null);
     }
   };
 
   const handleAddSubmit = (values) => {
+    console.log("Add form - Submitting values:", values);
+    console.log("Add form - Current selectedImage:", selectedImage);
     const newTestimonial = {
       id: Date.now(),
       quote: values.quote,
       author: values.author,
       rating: values.rating,
-      image: selectedImage, // URL of the selected image
+      image: selectedImage,
     };
+    console.log("Add form - Creating new testimonial:", newTestimonial);
     setTestimonials([...testimonials, newTestimonial]);
-    setIsAddModalVisible(false);
+    setIsAdding(false);
+    setSelectedImage(null);
+    form.resetFields();
     message.success("Testimonial added successfully.");
   };
 
-  // Handle editing an existing testimonial
   const handleEditTestimonial = (testimonial) => {
     if (!preview) {
+      console.log("Edit form - Setting up edit for testimonial:", testimonial);
       setCurrentEdit(testimonial);
-      setIsEditModalVisible(true);
+      setIsEditing(true);
+      setSelectedImage(testimonial.image);
       editForm.setFieldsValue({
         quote: testimonial.quote,
         author: testimonial.author,
         rating: testimonial.rating,
         image: testimonial.image,
       });
-      setSelectedImage(testimonial.image);
     }
   };
 
   const handleEditSubmit = (values) => {
+    console.log("Edit form - Submitting values:", values);
+    console.log("Edit form - Current selectedImage:", selectedImage);
     const updatedTestimonial = {
       ...currentEdit,
       quote: values.quote,
@@ -139,17 +106,19 @@ const TestimonialComponent = ({
       rating: values.rating,
       image: selectedImage,
     };
+    console.log("Edit form - Updating testimonial:", updatedTestimonial);
     setTestimonials(
       testimonials.map((t) =>
         t.id === updatedTestimonial.id ? updatedTestimonial : t
       )
     );
-    setIsEditModalVisible(false);
+    setIsEditing(false);
     setCurrentEdit(null);
+    setSelectedImage(null);
+    editForm.resetFields();
     message.success("Testimonial updated successfully.");
   };
 
-  // Handle deleting a testimonial
   const handleDeleteTestimonial = (id) => {
     if (!preview) {
       Modal.confirm({
@@ -162,54 +131,42 @@ const TestimonialComponent = ({
     }
   };
 
-  // Handle layout change
   const handleLayoutChange = (value) => {
-    if (!preview) {
-      setLayout(value);
-    }
+    if (!preview) setLayout(value);
   };
 
-  // Handle font change
   const handleFontChange = (value) => {
-    if (!preview) {
-      setFont(value);
-    }
+    if (!preview) setFont(value);
   };
 
-  // Handle text color change
   const handleColorChange = (e) => {
-    if (!preview) {
-      setColor(e.target.value);
-    }
+    if (!preview) setColor(e.target.value);
   };
 
-  // Handle background color change
   const handleBackgroundChange = (e) => {
-    if (!preview) {
-      setBackground(e.target.value);
-    }
+    if (!preview) setBackground(e.target.value);
   };
 
-  // Handle image selection for add
   const handleSelectImage = (media) => {
-    if (media.length > 0) {
-      setSelectedImage(media[0].file_path); // Adjust based on your media object structure
-      message.success("Image selected successfully.");
+    console.log("Add form - Selected media:", media);
+    if (media) {
+      console.log("Add form - Setting selected media:", media);
+      setSelectedImage(media);
       setIsImageModalVisible(false);
+      message.success("Image selected successfully.");
     }
   };
 
-  // Handle image selection for edit
   const handleEditSelectImage = (media) => {
-    if (media.length > 0) {
-      setSelectedImage(media[0].file_path); // Adjust based on your media object structure
-      message.success("Image selected successfully.");
+    console.log("Edit form - Selected media:", media);
+    if (media) {
+      console.log("Edit form - Setting selected media:", media);
+      setSelectedImage(media);
       setIsImageModalVisible(false);
-      editForm.setFieldsValue({ image: media[0].file_path });
+      message.success("Image selected successfully.");
     }
   };
 
-  // Styles based on configuration
   const containerStyle = {
     fontFamily: font,
     color: color,
@@ -219,258 +176,95 @@ const TestimonialComponent = ({
   };
 
   return (
-    <div className="border p-4 rounded-md bg-gray-50">
+    <div className="border p-4 rounded-md bg-white">
       {!preview && (
-        <Space direction="vertical" style={{ width: "100%" }}>
-          {/* Header */}
-          <div className="flex justify-between items-center">
-            <h3 className="text-xl font-semibold">Testimonial Component</h3>
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={handleAddTestimonial}
-              className="flex items-center"
-              disabled={preview}
-            >
-              Add Testimonial
-            </Button>
-          </div>
-
-          {/* Configuration Options */}
-          <div className="flex flex-wrap gap-4 mb-4">
-            <Select
-              value={layout}
-              onChange={handleLayoutChange}
-              style={{ width: 150 }}
-              disabled={preview}
-              showSearch
-            >
-              <Option value="carousel">Carousel</Option>
-              <Option value="grid">Grid</Option>
-            </Select>
-            <Select
-              value={font}
-              onChange={handleFontChange}
-              style={{ width: 150 }}
-              disabled={preview}
-              showSearch
-            >
-              <Option value="Arial">Arial</Option>
-              <Option value="Helvetica">Helvetica</Option>
-              <Option value="Times New Roman">Times New Roman</Option>
-              <Option value="Georgia">Georgia</Option>
-              <Option value="Verdana">Verdana</Option>
-              {/* Add more fonts as needed */}
-            </Select>
-            <div className="flex items-center">
-              <label htmlFor="color" className="mr-2">
-                Text Color:
-              </label>
-              <input
-                id="color"
-                type="color"
-                value={color}
-                onChange={handleColorChange}
-                className="w-10 h-10 border rounded-md"
-                disabled={preview}
-              />
-            </div>
-            <div className="flex items-center">
-              <label htmlFor="background" className="mr-2">
-                Background:
-              </label>
-              <input
-                id="background"
-                type="color"
-                value={background}
-                onChange={handleBackgroundChange}
-                className="w-10 h-10 border rounded-md"
-                disabled={preview}
-              />
-            </div>
-          </div>
-        </Space>
+        <ConfigSection
+          layout={layout}
+          font={font}
+          color={color}
+          background={background}
+          handleLayoutChange={handleLayoutChange}
+          handleFontChange={handleFontChange}
+          handleColorChange={handleColorChange}
+          handleBackgroundChange={handleBackgroundChange}
+          preview={preview}
+        />
       )}
 
-      {/* Testimonials Display */}
-      {testimonials.length > 0 ? (
-        layout === "carousel" ? (
-          <div style={preview ? {} : containerStyle}>
-            <Slider {...sliderSettings}>
-              {testimonials.map((testimonial) => (
-                <TestimonialItem
-                  key={testimonial.id}
-                  testimonial={testimonial}
-                  onEdit={() => handleEditTestimonial(testimonial)}
-                  onDelete={() => handleDeleteTestimonial(testimonial.id)}
-                  font={font}
-                  color={color}
-                  background={background}
-                  preview={preview}
-                />
-              ))}
-            </Slider>
-          </div>
-        ) : (
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-            style={preview ? {} : containerStyle}
+      {isAdding && !preview && (
+        <div className="mb-6 p-4 border rounded-md bg-gray-50">
+          <h4 className="text-lg font-medium mb-4">Add New Testimonial</h4>
+          <TestimonialForm
+            form={form}
+            onFinish={handleAddSubmit}
+            selectedImage={selectedImage}
+            onImageSelect={() => setIsImageModalVisible(true)}
+            onCancel={() => {
+              setIsAdding(false);
+              setSelectedImage(null);
+              form.resetFields();
+            }}
+          />
+        </div>
+      )}
+
+      {isEditing && !preview && currentEdit && (
+        <div className="mb-6 p-4 border rounded-md bg-gray-50">
+          <h4 className="text-lg font-medium mb-4">Edit Testimonial</h4>
+          <TestimonialForm
+            form={editForm}
+            onFinish={handleEditSubmit}
+            selectedImage={selectedImage}
+            onImageSelect={() => setIsImageModalVisible(true)}
+            onCancel={() => {
+              setIsEditing(false);
+              setCurrentEdit(null);
+              setSelectedImage(null);
+              editForm.resetFields();
+            }}
+            isEdit={true}
+          />
+        </div>
+      )}
+
+      <TestimonialDisplay
+        testimonials={testimonials}
+        layout={layout}
+        font={font}
+        color={color}
+        background={background}
+        handleEditTestimonial={handleEditTestimonial}
+        handleDeleteTestimonial={handleDeleteTestimonial}
+        preview={preview}
+        containerStyle={containerStyle}
+      />
+
+      {!isAdding && !preview && (
+        <div className="flex justify-center">
+          <Button
+            type="dashed"
+            icon={<PlusOutlined />}
+            onClick={handleAddTestimonial}
+            className="flex items-center mavebutton mt-4"
+            disabled={preview}
           >
-            {testimonials.map((testimonial) => (
-              <TestimonialItem
-                key={testimonial.id}
-                testimonial={testimonial}
-                onEdit={() => handleEditTestimonial(testimonial)}
-                onDelete={() => handleDeleteTestimonial(testimonial.id)}
-                font={font}
-                color={color}
-                background={background}
-                preview={preview}
-              />
-            ))}
-          </div>
-        )
-      ) : (
-        !preview && (
-          <Paragraph>
-            No testimonials added. Click "Add Testimonial" to get started.
-          </Paragraph>
-        )
+            Add Testimonial
+          </Button>
+        </div>
       )}
 
-      {/* Add Testimonial Modal */}
-      {!preview && (
-        <Modal
-          title="Add Testimonial"
-          open={isAddModalVisible}
-          onCancel={() => setIsAddModalVisible(false)}
-          footer={null}
-          destroyOnClose
-        >
-          <Form layout="vertical" form={form} onFinish={handleAddSubmit}>
-            <Form.Item
-              label="Quote"
-              name="quote"
-              rules={[{ required: true, message: "Please enter the quote." }]}
-            >
-              <Input.TextArea rows={4} placeholder="Enter customer quote" />
-            </Form.Item>
-            <Form.Item
-              label="Author"
-              name="author"
-              rules={[
-                { required: true, message: "Please enter the author's name." },
-              ]}
-            >
-              <Input placeholder="Enter author's name" />
-            </Form.Item>
-            <Form.Item label="Rating" name="rating" initialValue={5}>
-              <Rate />
-            </Form.Item>
-            <Form.Item label="Image" name="image">
-              {selectedImage ? (
-                <div className="mb-4">
-                  <Image
-                    src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${selectedImage}`}
-                    alt="Selected"
-                    className="w-full h-32 object-cover rounded-md"
-                    width={250}
-                    height={200}
-                    objectFit="cover"
-                  />
-                </div>
-              ) : null}
-              <Button onClick={() => setIsImageModalVisible(true)}>
-                Select Image
-              </Button>
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                Add Testimonial
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      )}
-
-      {/* Edit Testimonial Modal */}
-      {!preview && (
-        <Modal
-          title="Edit Testimonial"
-          open={isEditModalVisible}
-          onCancel={() => {
-            setIsEditModalVisible(false);
-            setCurrentEdit(null);
-            setSelectedImage(null);
-          }}
-          footer={null}
-          destroyOnClose
-        >
-          {currentEdit && (
-            <Form layout="vertical" form={editForm} onFinish={handleEditSubmit}>
-              <Form.Item
-                label="Quote"
-                name="quote"
-                rules={[{ required: true, message: "Please enter the quote." }]}
-              >
-                <Input.TextArea rows={4} placeholder="Enter customer quote" />
-              </Form.Item>
-              <Form.Item
-                label="Author"
-                name="author"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the author's name.",
-                  },
-                ]}
-              >
-                <Input placeholder="Enter author's name" />
-              </Form.Item>
-              <Form.Item label="Rating" name="rating">
-                <Rate />
-              </Form.Item>
-              <Form.Item label="Image" name="image">
-                {selectedImage ? (
-                  <div className="mb-4">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${selectedImage}`}
-                      alt="Selected"
-                      className="w-full h-32 object-cover rounded-md"
-                      width={250}
-                      height={200}
-                      objectFit="cover"
-                    />
-                  </div>
-                ) : null}
-                <Button onClick={() => setIsImageModalVisible(true)}>
-                  Change Image
-                </Button>
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Update Testimonial
-                </Button>
-              </Form.Item>
-            </Form>
-          )}
-        </Modal>
-      )}
-
-      {/* Media Selection Modal for Add */}
       {!preview && (
         <MediaSelectionModal
-          isVisible={isImageModalVisible && !isEditModalVisible}
+          isVisible={isImageModalVisible && !isEditing}
           onClose={() => setIsImageModalVisible(false)}
           onSelectMedia={handleSelectImage}
           selectionMode="single"
         />
       )}
 
-      {/* Media Selection Modal for Edit */}
-      {!preview && isEditModalVisible && (
+      {!preview && isEditing && (
         <MediaSelectionModal
-          isVisible={isImageModalVisible && isEditModalVisible}
+          isVisible={isImageModalVisible && isEditing}
           onClose={() => setIsImageModalVisible(false)}
           onSelectMedia={handleEditSelectImage}
           selectionMode="single"

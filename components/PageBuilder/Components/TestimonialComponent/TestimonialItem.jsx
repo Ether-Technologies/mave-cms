@@ -13,12 +13,23 @@ const TestimonialItem = ({
   color,
   background,
 }) => {
+  const getImageUrl = () => {
+    if (!testimonial.image) return null;
+    const imagePath =
+      typeof testimonial.image === "string"
+        ? testimonial.image
+        : testimonial.image.file_path;
+    const baseUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "";
+    return `${baseUrl}/${imagePath}`;
+  };
+
   return (
     <Card
       style={{
         fontFamily: font,
         color: color,
         backgroundColor: background,
+        margin: "10px",
       }}
       bordered
       hoverable
@@ -37,19 +48,15 @@ const TestimonialItem = ({
       ]}
     >
       {testimonial.image && (
-        <>
-          <Image
-            //   src={testimonial.image}
-            src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${testimonial.image}`}
-            alt={testimonial.author}
-            className="w-full h-32 object-cover rounded-md mb-4"
-            layout="responsive"
-            width={250}
-            height={200}
-            objectFit="cover"
-          />
-          {console.log("Image URL: ", testimonial.image)}
-        </>
+        <Image
+          src={getImageUrl()}
+          alt={testimonial.author}
+          className="w-full h-32 object-cover rounded-md mb-4"
+          layout="responsive"
+          width={250}
+          height={200}
+          objectFit="cover"
+        />
       )}
       <p className="italic">"{testimonial.quote}"</p>
       <div className="flex justify-between items-center mt-4">

@@ -194,6 +194,7 @@ const FormComponent = ({
     return (
       <div className="flex justify-center items-center p-8">
         <Button
+          className="mavebutton"
           type="primary"
           onClick={() => setIsDrawerVisible(true)}
           size="large"
