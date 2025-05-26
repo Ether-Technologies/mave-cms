@@ -181,7 +181,7 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
             <div className="text-4xl mb-2">
               {isOfficeDoc ? (
                 <svg
-                  className="w-16 h-16 mx-auto text-blue-500"
+                  className="w-16 h-16 mx-auto text-yellow-500"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >

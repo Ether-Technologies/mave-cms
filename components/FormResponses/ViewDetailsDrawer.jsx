@@ -87,7 +87,7 @@ const ViewDetailsDrawer = ({
           <Space>
             Form Response Details
             {formType && (
-              <Tag color={formType === "career" ? "blue" : "default"}>
+              <Tag color={formType === "career" ? "yellow" : "default"}>
                 {formType.toUpperCase()}
               </Tag>
             )}

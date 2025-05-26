@@ -1,111 +1,49 @@
 // components/PageBuilder/Modals/ComponentSelectorModal.jsx
 
-import React from "react";
-import { Drawer } from "antd";
-import Image from "next/image";
+import React, { useState, useMemo } from "react";
+import { Drawer, Segmented } from "antd";
+import { AppstoreOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import { motion, AnimatePresence } from "framer-motion";
 
-const componentOptions = [
-  {
-    type: "title",
-    name: "Title",
-    icon: "/icons/mave/font.svg",
-    premium: false,
-  },
-  {
-    type: "description",
-    name: "Paragraph",
-    icon: "/icons/mave/paragraph.svg",
-    premium: false,
-  },
-  {
-    type: "titledescription",
-    name: "Title & Desc.",
-    icon: "/icons/mave/textdescription.svg",
-    premium: false,
-  },
-  {
-    type: "media",
-    name: "Media",
-    icon: "/icons/mave/media.svg",
-    premium: false,
-  },
-  { type: "menu", name: "Menu", icon: "/icons/mave/menus.svg", premium: false },
-  {
-    type: "navbar",
-    name: "Navbar",
-    icon: "/icons/mave/navbar.svg",
-    premium: false,
-  },
-  {
-    type: "slider",
-    name: "Slider",
-    icon: "/icons/mave/slider.svg",
-    premium: false,
-  },
-  { type: "card", name: "Card", icon: "/icons/mave/cards.svg", premium: false },
-  {
-    type: "footer",
-    name: "Footer",
-    icon: "/icons/mave/footer.svg",
-    premium: false,
-  },
-  {
-    type: "video",
-    name: "Video",
-    icon: "/icons/mave/video.svg",
-    premium: true,
-  },
-  {
-    type: "table",
-    name: "Table",
-    icon: "/icons/mave/table.svg",
-    premium: true,
-  },
-  {
-    type: "accordion",
-    name: "Accordion",
-    icon: "/icons/mave/accordion.svg",
-    premium: true,
-  },
-  {
-    type: "button",
-    name: "Button",
-    icon: "/icons/mave/button.svg",
-    premium: true,
-  },
-  {
-    type: "gallery",
-    name: "Gallery",
-    icon: "/icons/mave/gallery.svg",
-    premium: true,
-  },
-  {
-    type: "google-map",
-    name: "Google Map",
-    icon: "/icons/mave/map.svg",
-    premium: true,
-  },
-  {
-    type: "iconlist",
-    name: "Icon List",
-    icon: "/icons/mave/iconlist.svg",
-    premium: true,
-  },
-  {
-    type: "testimonial",
-    name: "Testimonial",
-    icon: "/icons/mave/testimonial.svg",
-    premium: true,
-  },
-  {
-    type: "form",
-    name: "Form",
-    icon: "/icons/mave/exam.svg",
-    premium: true,
-  },
-];
+// Import components
+import ComponentCard from "./ComponentSelector/ComponentCard";
+import CategoryButton from "./ComponentSelector/CategoryButton";
+import SearchBar from "./ComponentSelector/SearchBar";
+
+// Import constants and animations
+import { componentOptions, categories } from "./ComponentSelector/constants";
+import {
+  containerVariants,
+  itemVariants,
+} from "./ComponentSelector/animations";
 
 const ComponentSelectorModal = ({ isVisible, onClose, onSelectComponent }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [viewMode, setViewMode] = useState("grid");
+
+  const filteredComponents = useMemo(() => {
+    return componentOptions.filter((component) => {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch =
+        component.name.toLowerCase().includes(searchLower) ||
+        component.description.toLowerCase().includes(searchLower) ||
+        (component.tags &&
+          component.tags.some((tag) =>
+            tag.toLowerCase().includes(searchLower)
+          ));
+
+      const matchesCategory =
+        selectedCategory === "all"
+          ? true
+          : selectedCategory === "premium"
+            ? component.premium
+            : component.category.toLowerCase() === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchTerm, selectedCategory]);
+
   const handleSelect = (componentType) => {
     const newComponent = { type: componentType };
     onSelectComponent(newComponent);
@@ -114,46 +52,79 @@ const ComponentSelectorModal = ({ isVisible, onClose, onSelectComponent }) => {
 
   return (
     <Drawer
-      title="Select Component Type"
+      title={
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-800">
+              Select Component Type
+            </h2>
+            <Segmented
+              options={[
+                { value: "grid", icon: <AppstoreOutlined /> },
+                { value: "list", icon: <UnorderedListOutlined /> },
+              ]}
+              value={viewMode}
+              onChange={setViewMode}
+              className="bg-gray-100 p-1 rounded-lg"
+            />
+          </div>
+          <SearchBar
+            value={searchTerm}
+            onChange={setSearchTerm}
+            resultCount={filteredComponents.length}
+          />
+          <div className="w-full overflow-hidden">
+            <div
+              className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide"
+              style={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+                WebkitOverflowScrolling: "touch",
+                maxWidth: "100%",
+              }}
+            >
+              {categories.map((category) => (
+                <CategoryButton
+                  key={category.id}
+                  category={category}
+                  isSelected={selectedCategory === category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      }
       open={isVisible}
       onClose={onClose}
       placement="right"
+      width="min(500px, 90vw)"
+      className="component-selector-drawer"
+      styles={{ body: { padding: "12px" } }}
     >
-      <div className="grid grid-cols-2 gap-6">
-        {componentOptions?.map((component) => (
-          <div
-            key={component.type}
-            className="relative flex flex-col items-center justify-center cursor-pointer border border-gray-200 rounded-lg p-4 shadow-md hover:shadow-xl transition-shadow duration-300 bg-white transform hover:-translate-y-1 hover:scale-105"
-            onClick={() => handleSelect(component.type)}
-          >
-            {/* Pro Badge */}
-            {component.premium && (
-              <div className="absolute top-2 right-2 flex items-center bg-gradient-to-r from-theme to-themedark text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
-                <svg
-                  className="w-4 h-4 mr-1 z-50"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927C9.323 2.207 10.677 2.207 10.951 2.927L12.82 7.566a1 1 0 00.95.69h5.34c.969 0 1.371 1.24.588 1.81l-4.3 3.13a1 1 0 00-.364 1.118l1.65 5.067c.3.918-.755 1.688-1.54 1.118l-4.3-3.13a1 1 0 00-1.176 0l-4.3 3.13c-.785.57-1.84-.2-1.54-1.118l1.65-5.067a1 1 0 00-.364-1.118L2.294 9.156c-.783-.57-.38-1.81.588-1.81h5.34a1 1 0 00.95-.69l1.77-4.64z" />
-                </svg>
-                Pro
-              </div>
-            )}
-            {/* Icon */}
-            <Image
-              src={component.icon}
-              width={50}
-              height={50}
-              alt={component.name}
-              className="object-contain"
-            />
-            {/* Name */}
-            <h3 className="mt-4 text-lg font-semibold text-gray-600">
-              {component.name}
-            </h3>
-          </div>
-        ))}
-      </div>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className={`${viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2" : "flex flex-col"} gap-4`}
+      >
+        <AnimatePresence>
+          {filteredComponents.map((component) => (
+            <motion.div
+              key={component.type}
+              variants={itemVariants}
+              layout
+              className="w-full"
+            >
+              <ComponentCard
+                component={component}
+                viewMode={viewMode}
+                onSelect={handleSelect}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.div>
     </Drawer>
   );
 };

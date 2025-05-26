@@ -59,7 +59,7 @@ const BaseComponent = ({
                   <Button
                     icon={<ExportOutlined />}
                     onClick={onEdit}
-                    className="action-button bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 hover:text-blue-700 hover:border-blue-200 transition-colors duration-200"
+                    className="action-button bg-yellow-50 text-yellow-600 border-yellow-100 hover:bg-yellow-100 hover:text-yellow-700 hover:border-yellow-200 transition-colors duration-200"
                   >
                     Change
                   </Button>

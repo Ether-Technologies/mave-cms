@@ -41,6 +41,7 @@
     "event-source-polyfill": "^1.0.31",
     "form-data": "^4.0.0",
     "formidable": "^3.5.2",
+    "framer-motion": "^12.12.2",
     "froala-editor": "^4.2.0",
     "http-proxy-middleware": "^3.0.0",
     "idb": "^8.0.0",

@@ -106,7 +106,7 @@ const TopPosts = ({ blogs }) => {
                 </span>
               </Space>
               {blog.additional?.category && (
-                <Tag color="blue" className="mt-2">
+                <Tag color="yellow" className="mt-2">
                   {blog.additional.category}
                 </Tag>
               )}

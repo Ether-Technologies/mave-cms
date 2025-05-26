@@ -101,7 +101,7 @@ const ImageSlider = ({
           slider.additional.tags.length > 0 && (
             <div className="mt-3">
               {slider.additional.tags.slice(0, 6).map((tagItem) => (
-                <Tag key={tagItem} color="blue" className="mb-1">
+                <Tag key={tagItem} color="yellow" className="mb-1">
                   {tagItem}
                 </Tag>
               ))}

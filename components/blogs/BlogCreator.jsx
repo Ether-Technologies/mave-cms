@@ -28,7 +28,7 @@ const BlogCreator = ({ creatorMode, setCreatorMode, fetchBlogs }) => {
       name: "Tech",
       value: "tech",
       related: [1, 2, 3, 4, 5, 6],
-      color: "blue",
+      color: "yellow",
     },
     {
       id: 3,

@@ -45,7 +45,7 @@ const FormResponsesGrid = ({ responses, refreshData, currentUser }) => {
   // Function to render form type tag
   const renderFormTypeTag = (formType) => {
     const tagColors = {
-      career: "blue",
+      career: "yellow",
       contact: "green",
       default: "default",
     };

@@ -38,7 +38,7 @@ const BlogCard = ({ blog, onDelete }) => {
         <div className="flex flex-col justify-between flex-grow">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Tag color="blue">{blog.additional?.category}</Tag>
+              <Tag color="yellow">{blog.additional?.category}</Tag>
               {blog.additional?.tags?.map((tag, index) => (
                 <Tag key={index} color="geekblue">
                   {tag}

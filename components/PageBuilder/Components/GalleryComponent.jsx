@@ -126,7 +126,7 @@ const GalleryComponent = ({
         >
           <Typography.Text
             strong
-            className="group-hover:text-blue-600 transition-colors duration-200"
+            className="group-hover:text-yellow-600 transition-colors duration-200"
           >
             {media.title || "View Document"}
           </Typography.Text>
@@ -151,7 +151,7 @@ const GalleryComponent = ({
         >
           <Typography.Text
             strong
-            className="group-hover:text-blue-600 transition-colors duration-200"
+            className="group-hover:text-yellow-600 transition-colors duration-200"
           >
             {media.title || "Download File"}
           </Typography.Text>
@@ -324,7 +324,7 @@ const GalleryComponent = ({
             <Button
               icon={<EditOutlined />}
               onClick={() => setIsDrawerVisible(true)}
-              className="flex items-center gap-2 hover:bg-blue-50"
+              className="flex items-center gap-2 hover:bg-yellow-50"
             >
               Edit
             </Button>

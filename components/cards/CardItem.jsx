@@ -14,7 +14,7 @@ const tagColors = [
   "gold",
   "green",
   "cyan",
-  "blue",
+  "yellow",
   "geekblue",
   "pink",
 ];

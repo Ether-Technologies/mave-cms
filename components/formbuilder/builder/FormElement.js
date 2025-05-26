@@ -137,7 +137,7 @@ const FormElement = ({
       // New: "guideline" => just render a paragraph
       case "guideline":
         return (
-          <div className="p-2 bg-gray-50 border-l-4 border-blue-400">
+          <div className="p-2 bg-gray-50 border-l-4 border-yellow-400">
             <p className="text-gray-600 whitespace-pre-line">
               {element.content}
             </p>

@@ -151,7 +151,7 @@ const ParagraphComponent = ({
               setIsEditing(true);
               setTempValue("");
             }}
-            className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors"
+            className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-yellow-500 transition-colors"
           >
             <span className="text-lg font-medium text-gray-600">
               Add Paragraph
