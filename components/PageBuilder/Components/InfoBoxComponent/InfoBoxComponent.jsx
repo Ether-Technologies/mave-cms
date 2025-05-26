@@ -1,24 +1,19 @@
 // components/PageBuilder/Components/InfoBoxComponent/InfoBoxComponent.jsx
 
 import React, { useState, useEffect } from "react";
+import { Button, Space, Form, message, Popconfirm, Input } from "antd";
 import {
-  Button,
-  Select,
-  Space,
-  Modal,
-  Form,
-  Input,
-  message,
-  Typography,
-  Popconfirm,
-} from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+  PlusOutlined,
+  MinusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import Image from "next/image";
 import InfoBoxItem from "./InfoBoxItem";
 import MediaSelectionModal from "../../Modals/MediaSelectionModal";
-import Image from "next/image";
-
-const { Option } = Select;
-const { Paragraph } = Typography;
+import ConfigSection from "./ConfigSection";
+import MainContentSection from "./MainContentSection";
+import AddInfoItemForm from "./AddInfoItemForm";
 
 const InfoBoxComponent = ({
   component,
@@ -32,9 +27,9 @@ const InfoBoxComponent = ({
     media: component._mave?.media || [],
     infoItems: component._mave?.infoItems || [],
   });
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [currentEdit, setCurrentEdit] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingItemId, setEditingItemId] = useState(null);
   const [layout, setLayout] = useState(component._mave?.layout || "vertical");
   const [font, setFont] = useState(component._mave?.font || "Arial");
   const [color, setColor] = useState(component._mave?.color || "#000000");
@@ -61,15 +56,26 @@ const InfoBoxComponent = ({
     });
   }, [infoBox, layout, font, color, background, updateComponent, component]);
 
-  // Handle adding a new info item
-  const handleAddInfoItem = () => {
-    if (!preview) {
-      setIsAddModalVisible(true);
-      form.resetFields();
-      setSelectedMedia([]);
-    }
+  // Handle media selection
+  const handleSelectMedia = (media) => {
+    const mediaArray = Array.isArray(media) ? media : [media];
+    setSelectedMedia(mediaArray);
+    setIsMediaModalVisible(false);
+    message.success("Media selected successfully.");
   };
 
+  // Handle main media selection
+  const handleMainMediaSelect = (media) => {
+    const mediaArray = Array.isArray(media) ? media : [media];
+    setInfoBox((prevInfoBox) => ({
+      ...prevInfoBox,
+      media: mediaArray,
+    }));
+    setIsMediaModalVisible(false);
+    message.success("Main media updated successfully.");
+  };
+
+  // Handle add info item submit
   const handleAddSubmit = (values) => {
     const newInfoItem = {
       id: Date.now(),
@@ -81,26 +87,26 @@ const InfoBoxComponent = ({
       ...infoBox,
       infoItems: [...infoBox.infoItems, newInfoItem],
     });
-    setIsAddModalVisible(false);
+    form.resetFields();
+    setSelectedMedia([]);
+    setShowAddForm(false);
     message.success("Info item added successfully.");
   };
 
-  // Handle editing an existing info item
+  // Handle edit info item
   const handleEditInfoItem = (item) => {
-    if (!preview) {
-      setCurrentEdit(item);
-      setIsEditModalVisible(true);
-      editForm.setFieldsValue({
-        title: item.title,
-        description: item.description,
-      });
-      setSelectedMedia(item.media);
-    }
+    setEditingItemId(item.id);
+    editForm.setFieldsValue({
+      title: item.title,
+      description: item.description,
+    });
+    setSelectedMedia(item.media);
   };
 
+  // Handle edit submit
   const handleEditSubmit = (values) => {
     const updatedItem = {
-      ...currentEdit,
+      id: editingItemId,
       title: values.title,
       description: values.description,
       media: selectedMedia,
@@ -111,75 +117,56 @@ const InfoBoxComponent = ({
         item.id === updatedItem.id ? updatedItem : item
       ),
     });
-    setIsEditModalVisible(false);
-    setCurrentEdit(null);
+    setEditingItemId(null);
+    setSelectedMedia([]);
     message.success("Info item updated successfully.");
   };
 
-  // Handle deleting an info item
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setSelectedMedia([]);
+    editForm.resetFields();
+  };
+
+  // Handle delete info item
   const handleDeleteInfoItem = (id) => {
-    if (!preview) {
-      setInfoBox({
-        ...infoBox,
-        infoItems: infoBox.infoItems.filter((item) => item.id !== id),
-      });
-      message.success("Info item deleted successfully.");
-    }
-  };
-
-  // Handle main media selection
-  const handleMainMediaSelect = (media) => {
-    console.log("Main media selected:", media);
-    // Ensure media is an array
-    const mediaArray = Array.isArray(media) ? media : [media];
-    setInfoBox((prevInfoBox) => {
-      const updatedInfoBox = {
-        ...prevInfoBox,
-        media: mediaArray,
-      };
-      console.log("Updated infoBox:", updatedInfoBox);
-      return updatedInfoBox;
+    setInfoBox({
+      ...infoBox,
+      infoItems: infoBox.infoItems.filter((item) => item.id !== id),
     });
-    setIsMediaModalVisible(false);
-    message.success("Main media updated successfully.");
+    message.success("Info item deleted successfully.");
   };
 
-  // Handle media selection
-  const handleSelectMedia = (media) => {
-    console.log("Selected media:", media);
-    // Ensure media is an array
-    const mediaArray = Array.isArray(media) ? media : [media];
-    setSelectedMedia(mediaArray);
-    setIsMediaModalVisible(false);
-    message.success("Media selected successfully.");
-  };
-
-  // Handle layout change
-  const handleLayoutChange = (value) => {
-    if (!preview) {
-      setLayout(value);
+  // Handle delete component
+  const handleDeleteComponent = () => {
+    if (deleteComponent) {
+      deleteComponent(component._id || component.id);
     }
   };
 
-  // Handle font change
-  const handleFontChange = (value) => {
-    if (!preview) {
-      setFont(value);
-    }
+  // Handle media modal open
+  const handleMediaModalOpen = (mode) => {
+    setMediaSelectionMode(mode);
+    setIsMediaModalVisible(true);
   };
 
-  // Handle text color change
-  const handleColorChange = (e) => {
-    if (!preview) {
-      setColor(e.target.value);
+  // Handle edit mode toggle
+  const handleEditModeToggle = () => {
+    if (isEditMode) {
+      // Save changes when exiting edit mode
+      updateComponent({
+        ...component,
+        _mave: {
+          ...infoBox,
+          layout,
+          font,
+          color,
+          background,
+        },
+      });
     }
-  };
-
-  // Handle background color change
-  const handleBackgroundChange = (e) => {
-    if (!preview) {
-      setBackground(e.target.value);
-    }
+    setIsEditMode(!isEditMode);
   };
 
   // Styles based on configuration
@@ -194,283 +181,243 @@ const InfoBoxComponent = ({
   return (
     <div className="border p-4 rounded-md bg-gray-50">
       {!preview && (
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Info Box Component</h3>
+          <Space>
+            {isEditMode ? (
+              <>
+                <Button
+                  className="mavebutton"
+                  type="primary"
+                  onClick={handleEditModeToggle}
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  className="mavecancelbutton"
+                  onClick={() => setIsEditMode(false)}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <Button
+                className="mavebutton"
+                onClick={() => setIsEditMode(true)}
+              >
+                Edit
+              </Button>
+            )}
+            <Popconfirm
+              title="Delete Component"
+              description="Are you sure you want to delete this component?"
+              onConfirm={handleDeleteComponent}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button danger>Delete</Button>
+            </Popconfirm>
+          </Space>
+        </div>
+      )}
+
+      {!preview && isEditMode && (
         <Space direction="vertical" style={{ width: "100%" }}>
-          {/* Header */}
-          <div className="flex justify-between items-center">
-            <h3 className="text-xl font-semibold">Info Box Component</h3>
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={handleAddInfoItem}
-              className="flex items-center"
-              disabled={preview}
-            >
-              Add Info Item
-            </Button>
-          </div>
+          <ConfigSection
+            layout={layout}
+            font={font}
+            color={color}
+            background={background}
+            onLayoutChange={setLayout}
+            onFontChange={setFont}
+            onColorChange={(e) => setColor(e.target.value)}
+            onBackgroundChange={(e) => setBackground(e.target.value)}
+          />
 
-          {/* Configuration Options */}
-          <div className="flex flex-wrap gap-4 mb-4">
-            <Select
-              value={layout}
-              onChange={handleLayoutChange}
-              style={{ width: 150 }}
-              disabled={preview}
-              showSearch
-            >
-              <Option value="vertical">Vertical</Option>
-              <Option value="horizontal">Horizontal</Option>
-            </Select>
-            <Select
-              value={font}
-              onChange={handleFontChange}
-              style={{ width: 150 }}
-              disabled={preview}
-              showSearch
-            >
-              <Option value="Arial">Arial</Option>
-              <Option value="Helvetica">Helvetica</Option>
-              <Option value="Times New Roman">Times New Roman</Option>
-              <Option value="Georgia">Georgia</Option>
-              <Option value="Verdana">Verdana</Option>
-            </Select>
-            <div className="flex items-center">
-              <label htmlFor="color" className="mr-2">
-                Text Color:
-              </label>
-              <input
-                id="color"
-                type="color"
-                value={color}
-                onChange={handleColorChange}
-                className="w-10 h-10 border rounded-md"
-                disabled={preview}
-              />
-            </div>
-            <div className="flex items-center">
-              <label htmlFor="background" className="mr-2">
-                Background:
-              </label>
-              <input
-                id="background"
-                type="color"
-                value={background}
-                onChange={handleBackgroundChange}
-                className="w-10 h-10 border rounded-md"
-                disabled={preview}
-              />
-            </div>
-          </div>
+          <MainContentSection
+            infoBox={infoBox}
+            onInfoBoxChange={setInfoBox}
+            onMediaSelect={handleMediaModalOpen}
+            media={infoBox.media}
+          />
 
-          {/* Main Content */}
-          <div className="mb-4">
-            <Form layout="vertical">
-              <Form.Item label="Title">
-                <Input
-                  value={infoBox.title}
-                  onChange={(e) =>
-                    setInfoBox({ ...infoBox, title: e.target.value })
-                  }
-                  placeholder="Enter title"
-                />
-              </Form.Item>
-              <Form.Item label="Description">
-                <Input.TextArea
-                  value={infoBox.description}
-                  onChange={(e) =>
-                    setInfoBox({ ...infoBox, description: e.target.value })
-                  }
-                  placeholder="Enter description"
-                  rows={4}
-                />
-              </Form.Item>
-              <Form.Item label="Main Media">
-                <div className="flex flex-col">
-                  <Button
-                    onClick={() => {
-                      console.log("Opening media modal for main media");
-                      setMediaSelectionMode("single");
-                      setIsMediaModalVisible(true);
-                    }}
-                  >
-                    Select Media
-                  </Button>
-                  {infoBox.media && infoBox.media.length > 0 ? (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {infoBox.media.map((media, index) => (
-                        <div key={index} className="relative">
-                          <Image
-                            src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
-                            alt={media.title || media.title_en || "Media"}
-                            width={100}
-                            height={100}
-                            objectFit="cover"
-                            className="rounded-md"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="mt-4 text-gray-500">No media selected</div>
-                  )}
-                </div>
-              </Form.Item>
-            </Form>
+          <div className="border-t pt-4 mt-4">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-lg font-semibold">Info Items</h4>
+              <Button
+                className="mavebutton"
+                onClick={() => setShowAddForm(!showAddForm)}
+                icon={showAddForm ? <MinusOutlined /> : <PlusOutlined />}
+              >
+                {showAddForm ? "Cancel" : "Add Info Item"}
+              </Button>
+            </div>
+
+            {showAddForm && (
+              <AddInfoItemForm
+                form={form}
+                onFinish={handleAddSubmit}
+                onMediaSelect={handleMediaModalOpen}
+                selectedMedia={selectedMedia}
+              />
+            )}
           </div>
         </Space>
       )}
 
-      {/* Info Items Display */}
-      <div
-        className={`grid ${
-          layout === "vertical"
-            ? "grid-cols-1"
-            : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-        } gap-4`}
-        style={preview ? {} : containerStyle}
-      >
-        {infoBox.infoItems.map((item) => (
-          <InfoBoxItem
-            key={item.id}
-            item={item}
-            onEdit={() => handleEditInfoItem(item)}
-            onDelete={() => handleDeleteInfoItem(item.id)}
-            font={font}
-            color={color}
-            background={background}
-            preview={preview}
-          />
-        ))}
-      </div>
+      {/* Preview/Display Mode */}
+      <div style={preview || !isEditMode ? containerStyle : {}}>
+        {/* Title and Description - Full Width */}
+        {(preview || !isEditMode) && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-2">{infoBox.title}</h2>
+            <p className="mb-4">{infoBox.description}</p>
+          </div>
+        )}
 
-      {/* Add Info Item Modal */}
-      {!preview && (
-        <Modal
-          title="Add Info Item"
-          open={isAddModalVisible}
-          onCancel={() => setIsAddModalVisible(false)}
-          footer={null}
-          destroyOnClose
+        {/* Main Content and Info Items - Two Columns in Horizontal Mode */}
+        <div
+          className={`${layout === "vertical" ? "flex flex-col" : "grid grid-cols-2 gap-8"}`}
         >
-          <Form layout="vertical" form={form} onFinish={handleAddSubmit}>
-            <Form.Item
-              label="Title"
-              name="title"
-              rules={[{ required: true, message: "Please enter the title." }]}
-            >
-              <Input placeholder="Enter title" />
-            </Form.Item>
-            <Form.Item
-              label="Description"
-              name="description"
-              rules={[
-                { required: true, message: "Please enter the description." },
-              ]}
-            >
-              <Input.TextArea rows={4} placeholder="Enter description" />
-            </Form.Item>
-            <Form.Item label="Media">
-              <Button
-                onClick={() => {
-                  setMediaSelectionMode("multiple");
-                  setIsMediaModalVisible(true);
-                }}
-              >
-                Select Media
-              </Button>
-              {selectedMedia && selectedMedia.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {selectedMedia.map((media, index) => (
-                    <Image
-                      key={index}
-                      src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
-                      alt={media.title || media.title_en || "Media"}
-                      width={100}
-                      height={100}
-                      objectFit="cover"
-                      className="rounded-md"
-                    />
-                  ))}
-                </div>
-              )}
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                Add Info Item
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      )}
-
-      {/* Edit Info Item Modal */}
-      {!preview && (
-        <Modal
-          title="Edit Info Item"
-          open={isEditModalVisible}
-          onCancel={() => {
-            setIsEditModalVisible(false);
-            setCurrentEdit(null);
-            setSelectedMedia([]);
-          }}
-          footer={null}
-          destroyOnClose
-        >
-          {currentEdit && (
-            <Form layout="vertical" form={editForm} onFinish={handleEditSubmit}>
-              <Form.Item
-                label="Title"
-                name="title"
-                rules={[{ required: true, message: "Please enter the title." }]}
-              >
-                <Input placeholder="Enter title" />
-              </Form.Item>
-              <Form.Item
-                label="Description"
-                name="description"
-                rules={[
-                  { required: true, message: "Please enter the description." },
-                ]}
-              >
-                <Input.TextArea rows={4} placeholder="Enter description" />
-              </Form.Item>
-              <Form.Item label="Media">
-                <Button
-                  onClick={() => {
-                    setMediaSelectionMode("multiple");
-                    setIsMediaModalVisible(true);
-                  }}
-                >
-                  Select Media
-                </Button>
-                {selectedMedia && selectedMedia.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {selectedMedia.map((media, index) => (
+          {/* Main Media Display */}
+          {(preview || !isEditMode) && (
+            <div className={`${layout === "vertical" ? "mb-6" : ""}`}>
+              {infoBox.media && infoBox.media.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {infoBox.media.map((mediaItem, index) => (
+                    <div key={index} className="relative">
                       <Image
-                        key={index}
-                        src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
-                        alt={media.title || media.title_en || "Media"}
-                        width={100}
-                        height={100}
+                        src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${mediaItem.file_path}`}
+                        alt={mediaItem.title || mediaItem.title_en || "Media"}
+                        width={200}
+                        height={200}
                         objectFit="cover"
                         className="rounded-md"
                       />
-                    ))}
-                  </div>
-                )}
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Update Info Item
-                </Button>
-              </Form.Item>
-            </Form>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
-        </Modal>
-      )}
+
+          {/* Info Items Grid */}
+          <div className={`${layout === "vertical" ? "w-full" : ""}`}>
+            <div className="grid grid-cols-1 gap-6">
+              {infoBox.infoItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white p-4 rounded-md shadow-sm"
+                >
+                  {editingItemId === item.id ? (
+                    <div className="flex gap-4">
+                      <div className="w-1/3">
+                        {item.media && item.media.length > 0 && (
+                          <div className="relative">
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.media[0].file_path}`}
+                              alt={item.media[0].title || "Media"}
+                              width={50}
+                              height={50}
+                              objectFit="cover"
+                              className="rounded-md"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-2/3">
+                        <Form
+                          form={editForm}
+                          onFinish={handleEditSubmit}
+                          layout="vertical"
+                        >
+                          <Form.Item
+                            name="title"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please enter the title",
+                              },
+                            ]}
+                          >
+                            <Input placeholder="Title" />
+                          </Form.Item>
+                          <Form.Item
+                            name="description"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please enter the description",
+                              },
+                            ]}
+                          >
+                            <Input.TextArea
+                              rows={4}
+                              placeholder="Description"
+                            />
+                          </Form.Item>
+                          <Form.Item>
+                            <Space>
+                              <Button type="primary" htmlType="submit">
+                                Save
+                              </Button>
+                              <Button onClick={handleCancelEdit}>Cancel</Button>
+                            </Space>
+                          </Form.Item>
+                        </Form>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-5 items-center">
+                      <div className="col-span-1">
+                        {item.media && item.media.length > 0 && (
+                          <div className="relative">
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.media[0].file_path}`}
+                              alt={item.media[0].title || "Media"}
+                              width={50}
+                              height={50}
+                              objectFit="cover"
+                              className="rounded-md"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="col-span-4">
+                        <h3 className="text-lg font-semibold mb-2">
+                          {item.title}
+                        </h3>
+                        <p className="mb-4">{item.description}</p>
+                        {!preview && isEditMode && (
+                          <Space>
+                            <Button
+                              className="mavebutton"
+                              icon={<EditOutlined />}
+                              onClick={() => handleEditInfoItem(item)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              danger
+                              icon={<DeleteOutlined />}
+                              onClick={() => handleDeleteInfoItem(item.id)}
+                            >
+                              Delete
+                            </Button>
+                          </Space>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Media Selection Modal */}
-      {!preview && (
+      {!preview && isEditMode && (
         <MediaSelectionModal
           isVisible={isMediaModalVisible}
           onClose={() => {

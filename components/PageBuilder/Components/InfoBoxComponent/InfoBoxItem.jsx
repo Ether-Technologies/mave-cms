@@ -2,6 +2,7 @@ import React from "react";
 import { Card, Button, Tooltip } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import Image from "next/image";
+import styles from "./InfoBoxItem.module.css";
 
 const InfoBoxItem = ({
   item,
@@ -19,6 +20,7 @@ const InfoBoxItem = ({
         color: color,
         backgroundColor: background,
       }}
+      className={styles.infoItemCard}
       bordered
       hoverable
       actions={
@@ -40,22 +42,22 @@ const InfoBoxItem = ({
       }
     >
       {item.media && item.media.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className={styles.mediaContainer}>
           {item.media.map((media, index) => (
             <Image
               key={index}
               src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
-              alt={media.title_en || "Media"}
-              width={100}
-              height={100}
+              alt={media.title || media.title_en || "Media"}
+              width={120}
+              height={120}
               objectFit="cover"
-              className="rounded-md"
+              className={styles.mediaImage}
             />
           ))}
         </div>
       )}
-      <h4 className="text-lg font-semibold mb-2">{item.title}</h4>
-      <p className="text-gray-600">{item.description}</p>
+      <h4 className={styles.title}>{item.title}</h4>
+      <p className={styles.description}>{item.description}</p>
     </Card>
   );
 };
