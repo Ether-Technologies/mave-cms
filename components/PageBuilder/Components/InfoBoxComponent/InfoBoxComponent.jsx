@@ -1,12 +1,14 @@
 // components/PageBuilder/Components/InfoBoxComponent/InfoBoxComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import { Button, Space, Form, message, Popconfirm, Input } from "antd";
+import { Button, Space, Form, message, Popconfirm, Input, Switch } from "antd";
 import {
   PlusOutlined,
   MinusOutlined,
   EditOutlined,
   DeleteOutlined,
+  SettingOutlined,
+  CopyFilled,
 } from "@ant-design/icons";
 import Image from "next/image";
 import InfoBoxItem from "./InfoBoxItem";
@@ -20,6 +22,7 @@ const InfoBoxComponent = ({
   updateComponent,
   deleteComponent,
   preview = false,
+  onDuplicateElement,
 }) => {
   const [infoBox, setInfoBox] = useState({
     title: component._mave?.title || "",
@@ -30,7 +33,7 @@ const InfoBoxComponent = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItemId, setEditingItemId] = useState(null);
-  const [layout, setLayout] = useState(component._mave?.layout || "vertical");
+  const [layout, setLayout] = useState(component._mave?.layout || "horizontal");
   const [font, setFont] = useState(component._mave?.font || "Arial");
   const [color, setColor] = useState(component._mave?.color || "#000000");
   const [background, setBackground] = useState(
@@ -39,22 +42,35 @@ const InfoBoxComponent = ({
   const [isMediaModalVisible, setIsMediaModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [mediaSelectionMode, setMediaSelectionMode] = useState("multiple");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
   useEffect(() => {
-    updateComponent({
-      ...component,
-      _mave: {
-        ...infoBox,
-        layout,
-        font,
-        color,
-        background,
-      },
-    });
-  }, [infoBox, layout, font, color, background, updateComponent, component]);
+    // Only update if we're in edit mode
+    if (isEditMode) {
+      updateComponent({
+        ...component,
+        _mave: {
+          ...infoBox,
+          layout,
+          font,
+          color,
+          background,
+        },
+      });
+    }
+  }, [
+    isEditMode,
+    infoBox,
+    layout,
+    font,
+    color,
+    background,
+    updateComponent,
+    component,
+  ]);
 
   // Handle media selection
   const handleSelectMedia = (media) => {
@@ -81,6 +97,7 @@ const InfoBoxComponent = ({
       id: Date.now(),
       title: values.title,
       description: values.description,
+      link: values.link,
       media: selectedMedia,
     };
     setInfoBox({
@@ -99,6 +116,7 @@ const InfoBoxComponent = ({
     editForm.setFieldsValue({
       title: item.title,
       description: item.description,
+      link: item.link,
     });
     setSelectedMedia(item.media);
   };
@@ -109,6 +127,7 @@ const InfoBoxComponent = ({
       id: editingItemId,
       title: values.title,
       description: values.description,
+      link: values.link,
       media: selectedMedia,
     };
     setInfoBox({
@@ -201,12 +220,19 @@ const InfoBoxComponent = ({
                 </Button>
               </>
             ) : (
-              <Button
-                className="mavebutton"
-                onClick={() => setIsEditMode(true)}
-              >
-                Edit
-              </Button>
+              <>
+                <Button
+                  className="mavebutton"
+                  onClick={() => setIsEditMode(true)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  icon={<CopyFilled />}
+                  onClick={onDuplicateElement}
+                  className="mavebutton"
+                />
+              </>
             )}
             <Popconfirm
               title="Delete Component"
@@ -223,16 +249,27 @@ const InfoBoxComponent = ({
 
       {!preview && isEditMode && (
         <Space direction="vertical" style={{ width: "100%" }}>
-          <ConfigSection
-            layout={layout}
-            font={font}
-            color={color}
-            background={background}
-            onLayoutChange={setLayout}
-            onFontChange={setFont}
-            onColorChange={(e) => setColor(e.target.value)}
-            onBackgroundChange={(e) => setBackground(e.target.value)}
-          />
+          <div className="flex justify-end mb-4">
+            <Button
+              icon={<SettingOutlined />}
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              {showAdvanced ? "Hide Advanced" : "Show Advanced"}
+            </Button>
+          </div>
+
+          {showAdvanced && (
+            <ConfigSection
+              layout={layout}
+              font={font}
+              color={color}
+              background={background}
+              onLayoutChange={setLayout}
+              onFontChange={setFont}
+              onColorChange={(e) => setColor(e.target.value)}
+              onBackgroundChange={(e) => setBackground(e.target.value)}
+            />
+          )}
 
           <MainContentSection
             infoBox={infoBox}
@@ -275,9 +312,15 @@ const InfoBoxComponent = ({
           </div>
         )}
 
-        {/* Main Content and Info Items - Two Columns in Horizontal Mode */}
+        {/* Main Content and Info Items */}
         <div
-          className={`${layout === "vertical" ? "flex flex-col" : "grid grid-cols-2 gap-8"}`}
+          className={`${
+            preview || !isEditMode
+              ? layout === "vertical"
+                ? "flex flex-col"
+                : "grid grid-cols-2 gap-8"
+              : "flex flex-col"
+          }`}
         >
           {/* Main Media Display */}
           {(preview || !isEditMode) && (
@@ -289,8 +332,8 @@ const InfoBoxComponent = ({
                       <Image
                         src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${mediaItem.file_path}`}
                         alt={mediaItem.title || mediaItem.title_en || "Media"}
-                        width={200}
-                        height={200}
+                        width={300}
+                        height={300}
                         objectFit="cover"
                         className="rounded-md"
                       />
@@ -311,19 +354,28 @@ const InfoBoxComponent = ({
                 >
                   {editingItemId === item.id ? (
                     <div className="flex gap-4">
-                      <div className="w-1/3">
+                      <div className="flex flex-col justify-center w-1/3">
                         {item.media && item.media.length > 0 && (
-                          <div className="relative">
+                          <div
+                            className="relative cursor-pointer"
+                            onClick={() => handleMediaModalOpen("multiple")}
+                          >
                             <Image
                               src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.media[0].file_path}`}
                               alt={item.media[0].title || "Media"}
-                              width={50}
-                              height={50}
+                              width={200}
+                              height={200}
                               objectFit="cover"
                               className="rounded-md"
                             />
                           </div>
                         )}
+                        <Button
+                          className="mavebutton mt-2"
+                          onClick={() => handleMediaModalOpen("multiple")}
+                        >
+                          Change Media
+                        </Button>
                       </div>
                       <div className="w-2/3">
                         <Form
@@ -356,57 +408,76 @@ const InfoBoxComponent = ({
                               placeholder="Description"
                             />
                           </Form.Item>
+                          <Form.Item name="link">
+                            <Input placeholder="Link URL (optional)" />
+                          </Form.Item>
                           <Form.Item>
                             <Space>
-                              <Button type="primary" htmlType="submit">
+                              <Button
+                                className="mavebutton"
+                                type="primary"
+                                htmlType="submit"
+                              >
                                 Save
                               </Button>
-                              <Button onClick={handleCancelEdit}>Cancel</Button>
+                              <Button
+                                className="mavecancelbutton"
+                                onClick={handleCancelEdit}
+                              >
+                                Cancel
+                              </Button>
                             </Space>
                           </Form.Item>
                         </Form>
                       </div>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-5 items-center">
-                      <div className="col-span-1">
+                    <div className="grid grid-cols-12 items-center gap-4">
+                      <div className="col-span-3">
                         {item.media && item.media.length > 0 && (
                           <div className="relative">
                             <Image
                               src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.media[0].file_path}`}
                               alt={item.media[0].title || "Media"}
-                              width={50}
-                              height={50}
+                              width={100}
+                              height={100}
                               objectFit="cover"
                               className="rounded-md"
                             />
                           </div>
                         )}
                       </div>
-                      <div className="col-span-4">
+                      <div className="col-span-8">
                         <h3 className="text-lg font-semibold mb-2">
                           {item.title}
                         </h3>
-                        <p className="mb-4">{item.description}</p>
-                        {!preview && isEditMode && (
-                          <Space>
-                            <Button
-                              className="mavebutton"
-                              icon={<EditOutlined />}
-                              onClick={() => handleEditInfoItem(item)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              danger
-                              icon={<DeleteOutlined />}
-                              onClick={() => handleDeleteInfoItem(item.id)}
-                            >
-                              Delete
-                            </Button>
-                          </Space>
+                        <p className="mb-2">{item.description}</p>
+                        {item.link && (
+                          <a
+                            href={item.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {item.link}
+                          </a>
                         )}
                       </div>
+                      {!preview && isEditMode && (
+                        <Space className="col-span-1 flex flex-col">
+                          <Button
+                            className="mavebutton"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditInfoItem(item)}
+                          />
+                          <Button
+                            className="-ml-3"
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={() => handleDeleteInfoItem(item.id)}
+                          />
+                        </Space>
+                      )}
                     </div>
                   )}
                 </div>

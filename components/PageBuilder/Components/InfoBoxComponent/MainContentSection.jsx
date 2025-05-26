@@ -31,7 +31,7 @@ const MainContentSection = ({
           />
         </Form.Item>
         <Form.Item label="Main Media">
-          <div className="flex flex-col">
+          <div className="flex gap-2 items-center">
             <Button
               className="mavebutton"
               onClick={() => onMediaSelect("single")}
@@ -39,14 +39,18 @@ const MainContentSection = ({
               Select Media
             </Button>
             {media && media.length > 0 ? (
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2 cursor-pointer">
                 {media.map((mediaItem, index) => (
-                  <div key={index} className="relative">
+                  <div
+                    key={index}
+                    className="relative cursor-pointer"
+                    onClick={() => onMediaSelect("single")}
+                  >
                     <Image
                       src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${mediaItem.file_path}`}
                       alt={mediaItem.title || mediaItem.title_en || "Media"}
-                      width={100}
-                      height={100}
+                      width={200}
+                      height={200}
                       objectFit="cover"
                       className="rounded-md"
                     />

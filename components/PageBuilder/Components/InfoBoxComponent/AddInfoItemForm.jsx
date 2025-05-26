@@ -20,6 +20,13 @@ const AddInfoItemForm = ({ form, onFinish, onMediaSelect, selectedMedia }) => {
         >
           <Input.TextArea rows={4} placeholder="Enter description" />
         </Form.Item>
+        <Form.Item
+          label="Link"
+          name="link"
+          rules={[{ type: "url", message: "Please enter a valid URL" }]}
+        >
+          <Input placeholder="Enter link URL (optional)" />
+        </Form.Item>
         <Form.Item label="Media">
           <Button
             className="mavebutton"
@@ -34,8 +41,8 @@ const AddInfoItemForm = ({ form, onFinish, onMediaSelect, selectedMedia }) => {
                   key={index}
                   src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
                   alt={media.title || media.title_en || "Media"}
-                  width={100}
-                  height={100}
+                  width={50}
+                  height={50}
                   objectFit="cover"
                   className="rounded-md"
                 />
