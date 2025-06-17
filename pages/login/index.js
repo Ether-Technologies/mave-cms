@@ -184,6 +184,11 @@ export default function Login() {
             className="fixed bottom-0 right-0 m-4 bg-white text-theme z-20"
             onClick={() => router.push("/usermanual/changelog")}
           />
+          <Button
+            icon={<RadarChartOutlined />}
+            className="fixed bottom-0 right-10 m-4 bg-white text-theme z-20"
+            onClick={() => router.push("/portfolio")}
+          />
         </div>
       </div>
     </div>

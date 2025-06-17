@@ -66,7 +66,8 @@ const SiteContent = ({ children }) => {
     } else if (
       isPublicPage &&
       token &&
-      currentRoute !== "/usermanual/changelog"
+      currentRoute !== "/usermanual/changelog" &&
+      currentRoute !== "/portfolio"
     ) {
       // Redirect to home if the user is authenticated and tries to access a public page
       // EXCEPT for the changelog page
@@ -147,22 +148,20 @@ const SiteContent = ({ children }) => {
 
         {/* Main Content Area */}
         <Layout
-          className={`transition-all duration-300 ${
-            shouldShowSidebar
+          className={`transition-all duration-300 ${shouldShowSidebar
               ? collapsed
                 ? "lg:ml-[80px]" // Adjusted to match collapsedWidth
                 : "lg:ml-[260px]" // Match the width of Sider
               : ""
-          }`}
+            }`}
         >
           {/* Conditionally render the Collapse Button only for protected pages and public with layout pages when authenticated */}
           {shouldShowSidebar && (
             <div
               className={`hidden lg:flex fixed lg:top-20 z-40
-                ${
-                  collapsed
-                    ? "left-[50px] lg:left-[52px]"
-                    : "left-[260px] lg:left-[235px]"
+                ${collapsed
+                  ? "left-[50px] lg:left-[52px]"
+                  : "left-[260px] lg:left-[235px]"
                 } transition-all duration-300
                 `}
             >

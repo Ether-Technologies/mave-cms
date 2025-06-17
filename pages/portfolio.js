@@ -1,59 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Head from 'next/head';
 import Image from 'next/image';
+import FeatureCard from '../components/features/FeatureCard';
+import FeatureDetail from '../components/features/FeatureDetail';
+import TechnicalCapabilities from '../components/features/TechnicalCapabilities';
+import SystemRequirements from '../components/features/SystemRequirements';
+import BusinessBenefits from '../components/features/BusinessBenefits';
+import { features } from '../data/features';
 
 const Portfolio = () => {
-    const features = [
-        {
-            icon: "/icons/mave/component.svg",
-            title: "Advanced Page Builder",
-            description: "16+ pre-built components with drag-and-drop interface and real-time preview capabilities.",
-            gradient: "from-blue-500/20 to-purple-500/20"
-        },
-        {
-            icon: "/icons/mave/creatorstudio.svg",
-            title: "Custom Model Generator",
-            description: "Create custom models for e-commerce, blogs, or news portals with flexible field types.",
-            gradient: "from-green-500/20 to-teal-500/20"
-        },
-        {
-            icon: "/icons/mave/media.svg",
-            title: "Media Management",
-            description: "Advanced media library with cloud storage integration and image optimization.",
-            gradient: "from-yellow-500/20 to-orange-500/20"
-        },
-        {
-            icon: "/icons/mave/tools.svg",
-            title: "AI Integration",
-            description: "Smart content generation and optimization with AI-powered assistance.",
-            gradient: "from-purple-500/20 to-pink-500/20"
-        },
-        {
-            icon: "/icons/mave/settings.svg",
-            title: "Enterprise Security",
-            description: "SSL encryption, role-based access control, and GDPR compliance.",
-            gradient: "from-red-500/20 to-orange-500/20"
-        },
-        {
-            icon: "/icons/mave/browser.svg",
-            title: "Cloud-Native",
-            description: "Built for modern cloud infrastructures with high availability and resilience.",
-            gradient: "from-indigo-500/20 to-blue-500/20"
-        },
-        {
-            icon: "/icons/mave/headphones2.svg",
-            title: "Responsive Design",
-            description: "Fully responsive components that work seamlessly across all devices.",
-            gradient: "from-pink-500/20 to-red-500/20"
-        },
-        {
-            icon: "/icons/mave/documentation.svg",
-            title: "Customizable UI",
-            description: "Flexible theming and styling options with modern design patterns.",
-            gradient: "from-teal-500/20 to-green-500/20"
-        }
-    ];
+    const [selectedFeature, setSelectedFeature] = useState(null);
 
     return (
         <>
@@ -62,107 +19,123 @@ const Portfolio = () => {
                 <meta name="description" content="Explore the powerful features of Mave CMS - A modern headless content management system" />
             </Head>
 
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-yellow-50">
                 {/* Hero Section */}
-                <div className="relative h-screen flex items-center justify-center overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+                <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+                    {/* Background Elements */}
+                    <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-100/30 via-transparent to-purple-100/30"></div>
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-200/20 via-transparent to-transparent"></div>
 
+                    {/* Content */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-center z-10 px-4"
+                        className="relative z-10 text-center px-4 max-w-4xl"
                     >
-                        <Image
-                            src="/images/ui/mave_new_logo.png"
-                            alt="Mave Logo"
-                            width={300}
-                            height={100}
-                            className="mx-auto mb-8"
-                        />
-                        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-                            Mave CMS
-                        </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-8">
-                            A Modern Headless Content Management System
-                        </p>
-                        <div className="flex justify-center gap-4">
-                            <a
-                                href="https://github.com/atiqisrak/mave-cms"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-6 py-3 bg-white/10 backdrop-blur-lg rounded-lg text-white hover:bg-white/20 transition-all duration-300"
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                            className="mb-12"
+                        >
+                            <Image
+                                src="/images/ui/mave_new_logo.png"
+                                alt="Mave Logo"
+                                width={300}
+                                height={100}
+                                className="mx-auto"
+                            />
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.5 }}
+                            className="space-y-6"
+                        >
+                            <p className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+                                AI Powered Modern Headless Content Management System
+                            </p>
+                            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                                Built on MACH (Microservices, API-first, Cloud-native, Headless) architecture principles.
+                                Designed to provide developers and content creators with a powerful platform for managing content across various applications.
+                            </p>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6, duration: 0.5 }}
+                            className="flex justify-center gap-6 mt-12"
+                        >
+                            <motion.div
+
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="flex items-center gap-2 px-8 py-4 bg-white/80 backdrop-blur-lg rounded-xl text-gray-700 hover:bg-white/90 transition-all duration-300 border border-gray-200/50 shadow-lg hover:shadow-xl"
                             >
-                                View on GitHub
-                            </a>
-                            <a
+                                <img src="/images/ui/github.png" alt="GitHub" className="w-6 h-6" />
+                                <a href="https://github.com/atiqisrak/mave-cms" target="_blank" rel="noopener noreferrer">
+                                    View on GitHub
+                                </a>
+                            </motion.div>
+                            <motion.a
                                 href="https://mavecms.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-6 py-3 bg-theme rounded-lg text-white hover:bg-theme-dark transition-all duration-300"
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-xl text-white hover:shadow-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                             >
                                 Visit Website
-                            </a>
-                        </div>
+                            </motion.a>
+                        </motion.div>
                     </motion.div>
+
+                    {/* Decorative Elements */}
+                    <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent"></div>
                 </div>
 
                 {/* Features Grid */}
-                <div className="max-w-7xl mx-auto px-4 py-20">
-                    <h2 className="text-4xl font-bold text-white text-center mb-16">
-                        Powerful Features
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {features.map((feature, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                viewport={{ once: true }}
-                                className={`p-6 rounded-2xl bg-gradient-to-br ${feature.gradient} backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all duration-300`}
-                            >
-                                <div className="mb-4 flex justify-center">
-                                    <Image
-                                        src={feature.icon}
-                                        alt={feature.title}
-                                        width={48}
-                                        height={48}
-                                        className="filter brightness-0 invert"
-                                    />
-                                </div>
-                                <h3 className="text-xl font-semibold text-white mb-2 text-center">{feature.title}</h3>
-                                <p className="text-gray-300 text-center">{feature.description}</p>
-                            </motion.div>
-                        ))}
+                <div className="relative py-20">
+                    <div className="absolute inset-0 bg-gradient-to-b from-white via-yellow-50/50 to-white"></div>
+                    <div className="max-w-7xl mx-auto px-4 relative">
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-400 bg-clip-text text-transparent text-center mb-16"
+                        >
+                            Powerful Features
+                        </motion.h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {features.map((feature, index) => (
+                                <FeatureCard
+                                    key={index}
+                                    feature={feature}
+                                    onClick={setSelectedFeature}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Tech Stack Section */}
-                <div className="max-w-7xl mx-auto px-4 py-20">
-                    <h2 className="text-4xl font-bold text-white text-center mb-16">
-                        Built with Modern Technologies
-                    </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        {['React', 'Next.js', 'Laravel', 'MySQL', 'Docker', 'GraphQL', 'Tailwind CSS', 'Ant Design'].map((tech, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                viewport={{ once: true }}
-                                className="p-6 rounded-xl bg-white/5 backdrop-blur-lg border border-white/10 text-center"
-                            >
-                                <span className="text-white text-lg font-medium">{tech}</span>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
+                {/* Technical Capabilities */}
+                <TechnicalCapabilities />
 
-                {/* Footer */}
-                <footer className="py-8 text-center text-gray-400">
-                    <p>© 2024 Mave CMS. All rights reserved.</p>
-                </footer>
+                {/* System Requirements & Deployment */}
+                <SystemRequirements />
+
+                {/* Business Benefits & Use Cases */}
+                <BusinessBenefits />
+
+                {/* Feature Detail Modal */}
+                <FeatureDetail
+                    feature={selectedFeature}
+                    onClose={() => setSelectedFeature(null)}
+                />
             </div>
         </>
     );
