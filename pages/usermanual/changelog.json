@@ -1039,5 +1039,22 @@
                 "Whitelisted IPs can now fetch public allowed data from the CMS database"
             ]
         }
+    },
+    {
+        "version": "3.3.47",
+        "type": "minor",
+        "date": "2025-04-10",
+        "changes": {
+            "Features": [
+                "Page Builder Select Component got new ui and features",
+                "New widgets: Info Box and Testimonial added to the page builder",
+                "Settings page got new ui and features"
+            ],
+            "Bug Fixes": [
+                "Testimonial widget bug fixed",
+                "Info Box widget bug fixed",
+                "Custom design of widgets bug fixed"
+            ]
+        }
     }
 ]
