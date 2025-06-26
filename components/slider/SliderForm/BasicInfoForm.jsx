@@ -61,7 +61,7 @@ const BasicInfoForm = ({ allTags, form }) => (
     </Form.Item>
 
     {/* Tags */}
-    <Form.Item label="Tags" name="tags">
+    {/* <Form.Item label="Tags" name="tags">
       <Select
         mode="tags"
         placeholder="Select or add tags"
@@ -73,7 +73,7 @@ const BasicInfoForm = ({ allTags, form }) => (
           </Select.Option>
         ))}
       </Select>
-    </Form.Item>
+    </Form.Item> */}
   </>
 );
 

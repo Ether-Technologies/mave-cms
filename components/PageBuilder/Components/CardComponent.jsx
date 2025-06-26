@@ -28,6 +28,9 @@ import instance from "../../../axios";
 
 const { Text } = Typography;
 
+// Configuration
+const POLLING_INTERVAL = 30000; // 30 seconds
+
 // Helper function to render card media
 const renderCardMedia = (media) => {
   if (!media || !media.file_path) {
@@ -70,27 +73,31 @@ const CardComponent = ({
   const [selectedCardData, setSelectedCardData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [autoPolling, setAutoPolling] = useState(true);
 
   // Synchronize cardData with component._mave when it changes
   useEffect(() => {
     setCardData(component._mave);
   }, [component._mave]);
 
-  // Auto-refresh card data every 30 seconds when in preview mode
+  // Auto-refresh card data every 30 seconds when card data exists
   useEffect(() => {
-    if (!preview || !cardData?.id) return;
+    if (!cardData?.id || !autoPolling) return;
 
     const interval = setInterval(() => {
-      refreshCardData();
-    }, 30000); // 30 seconds
+      refreshCardData(true); // Silent refresh for polling
+    }, POLLING_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [preview, cardData?.id]);
+  }, [cardData?.id, autoPolling]);
 
   // Function to refresh card data from the server
-  const refreshCardData = async () => {
+  const refreshCardData = async (silent = false) => {
     if (!cardData?.id) {
-      message.warning("No card ID available to refresh");
+      if (!silent) {
+        message.warning("No card ID available to refresh");
+      }
       return;
     }
 
@@ -99,34 +106,41 @@ const CardComponent = ({
       const response = await instance.get(`/cards/${cardData.id}`);
       if (response.status === 200) {
         const updatedCard = response.data;
-        const updatedComponent = {
-          ...component,
-          _mave: {
-            ...updatedCard,
-            config: cardData.config || {
-              showDescription: true,
-              showImage: true,
-              layout: "horizontal",
-            },
-          },
-          id: updatedCard.id,
-        };
-
-        updateComponent(updatedComponent);
-        setCardData(updatedCard);
 
         // Check if there were actual changes
         const hasChanges =
           JSON.stringify(updatedCard) !== JSON.stringify(component._mave);
+
         if (hasChanges) {
-          message.success("Card data updated successfully");
-        } else {
+          const updatedComponent = {
+            ...component,
+            _mave: {
+              ...updatedCard,
+              config: cardData.config || {
+                showDescription: true,
+                showImage: true,
+                layout: "horizontal",
+              },
+            },
+            id: updatedCard.id,
+          };
+
+          updateComponent(updatedComponent);
+          setCardData(updatedCard);
+          setLastUpdated(new Date());
+
+          if (!silent) {
+            message.success("Card data updated successfully");
+          }
+        } else if (!silent) {
           message.info("Card data is up to date");
         }
       }
     } catch (error) {
       console.error("Error refreshing card data:", error);
-      message.error("Failed to refresh card data");
+      if (!silent) {
+        message.error("Failed to refresh card data");
+      }
     } finally {
       setIsRefreshing(false);
     }
@@ -183,15 +197,32 @@ const CardComponent = ({
     return (
       <div className="preview-card-component p-4 bg-gray-100 rounded-md">
         {cardData && (
-          <div className="flex justify-end mb-2">
-            <Button
-              icon={<ReloadOutlined spin={isRefreshing} />}
-              onClick={refreshCardData}
-              loading={isRefreshing}
-              size="small"
-              className="mavebutton"
-              title="Refresh card data"
-            />
+          <div className="flex justify-between items-center mb-2">
+            <div className="flex items-center gap-2">
+              <Button
+                icon={<ReloadOutlined spin={isRefreshing} />}
+                onClick={refreshCardData}
+                loading={isRefreshing}
+                size="small"
+                className="mavebutton"
+                title="Refresh card data"
+              />
+              {/* <span
+                className={`text-xs px-2 py-1 rounded ${autoPolling ? "text-green-600 bg-green-100" : "text-gray-500 bg-gray-100"}`}
+              >
+                Auto-refresh: {autoPolling ? "ON" : "OFF"}
+              </span> */}
+            </div>
+            {/* {lastUpdated && (
+              <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                Updated {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+            {autoPolling && cardData?.id && (
+              <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                Auto-refresh active
+              </span>
+            )} */}
           </div>
         )}
         {cardData ? (
@@ -248,6 +279,16 @@ const CardComponent = ({
         <div className="flex items-center gap-2">
           <DragOutlined className="text-2xl border rounded-md p-1" />
           <h3 className="text-xl font-semibold">Card Component</h3>
+          {/* {lastUpdated && (
+            <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+          {autoPolling && cardData?.id && (
+            <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+              Auto-refresh active
+            </span>
+          )} */}
         </div>
         <div className="flex items-center gap-2">
           {!isEditing ? (
@@ -262,6 +303,17 @@ const CardComponent = ({
                       className="mavebutton"
                     />
                   </Tooltip>
+                  {/* <Tooltip
+                    title={`${autoPolling ? "Disable" : "Enable"} Auto Refresh`}
+                  >
+                    <Button
+                      icon={<SettingOutlined />}
+                      onClick={() => setAutoPolling(!autoPolling)}
+                      className={
+                        autoPolling ? "mavebutton" : "mavecancelbutton"
+                      }
+                    />
+                  </Tooltip> */}
                   <Tooltip title="Change Card">
                     <Button
                       icon={<EditOutlined />}

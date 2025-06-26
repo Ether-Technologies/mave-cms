@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, message, Button } from "antd";
-import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
-import SliderRenderer from "./SliderComponent/SliderRenderer";
-import { useSliderRefresh } from "./SliderComponent/SliderRefresh";
-import SliderConfig from "./SliderComponent/SliderConfig";
-import SliderActions from "./SliderComponent/SliderActions";
-import SliderSelectionModal from "../Modals/SliderSelectionModal";
+import { EditOutlined } from "@ant-design/icons";
+import SliderRenderer from "./SliderRenderer";
+import { useSliderRefresh } from "./SliderRefresh";
+import SliderConfig from "./SliderConfig";
+import SliderActions from "./SliderActions";
+import SliderSelectionModal from "../../Modals/SliderSelectionModal";
 
 const SliderComponent = ({
   component,
@@ -14,23 +14,17 @@ const SliderComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
-  console.log("SliderComponent - Initial render - component:", component);
-  console.log(
-    "SliderComponent - Initial render - component._mave:",
-    component._mave
-  );
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sliderData, setSliderData] = useState(component._mave);
   const [selectedSliderData, setSelectedSliderData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [sliderConfig, setSliderConfig] = useState({
-    autoplay: true,
-    dots: false,
-    effect: "scroll",
-    speed: 500,
-    height: 400,
+    autoplay: component._mave?.config?.autoplay ?? true,
+    dots: component._mave?.config?.dots ?? false,
+    effect: component._mave?.config?.effect ?? "scroll",
+    speed: component._mave?.config?.speed ?? 500,
+    height: component._mave?.config?.height ?? 400,
   });
 
   // Use the refresh hook
@@ -45,23 +39,26 @@ const SliderComponent = ({
 
   // Synchronize sliderData with component._mave when it changes
   useEffect(() => {
-    console.log(
-      "SliderComponent - useEffect - component._mave changed:",
-      component._mave
-    );
-    console.log("SliderComponent - useEffect - component:", component);
     setSliderData(component._mave);
+
+    // Also sync the config if it exists
+    if (component._mave?.config) {
+      setSliderConfig((prevConfig) => ({
+        ...prevConfig,
+        ...component._mave.config,
+      }));
+    }
   }, [component._mave]);
 
   // Handle selection from SliderSelectionModal
-  const handleSelectSlider = (selectedSlider) => {
+  const handleSelectSlider = useCallback((selectedSlider) => {
     setSelectedSliderData(selectedSlider);
     setIsModalVisible(false);
     setIsEditing(true);
-  };
+  }, []);
 
   // Handle Submit (Confirm) Changes
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!selectedSliderData) {
       Modal.error({
         title: "Validation Error",
@@ -103,52 +100,29 @@ const SliderComponent = ({
       id: selectedSliderData.id,
     };
 
-    console.log(
-      "SliderComponent - handleSubmit - selectedSliderData:",
-      selectedSliderData
-    );
-    console.log(
-      "SliderComponent - handleSubmit - updatedComponent:",
-      updatedComponent
-    );
-
     updateComponent(updatedComponent);
     setSliderData(selectedSliderData);
     setSelectedSliderData(null);
     setIsEditing(false);
     message.success("Slider updated successfully.");
-  };
+  }, [selectedSliderData, sliderConfig, component, updateComponent]);
 
   // Handle Cancel Changes
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setSelectedSliderData(null);
     setIsEditing(false);
     message.info("Slider update canceled.");
-  };
+  }, []);
 
   // Handle Delete Component
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     deleteComponent();
-  };
+  }, [deleteComponent]);
 
   // If in preview mode, render the slider content only
   if (preview) {
     return (
       <div className="preview-slider-component p-4 bg-gray-100 rounded-md">
-        {sliderData && (
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-              <Button
-                icon={<ReloadOutlined spin={isRefreshing} />}
-                onClick={handleManualRefresh}
-                loading={isRefreshing}
-                size="small"
-                className="mavebutton"
-                title="Refresh slider data"
-              />
-            </div>
-          </div>
-        )}
         <SliderRenderer sliderData={sliderData} config={sliderData?.config} />
       </div>
     );
@@ -182,14 +156,6 @@ const SliderComponent = ({
           )}
           {sliderData ? (
             <div className="w-full relative">
-              {isRefreshing && (
-                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <ReloadOutlined spin />
-                    <span>Refreshing...</span>
-                  </div>
-                </div>
-              )}
               <SliderRenderer
                 sliderData={sliderData}
                 config={sliderData.config}

@@ -66,7 +66,7 @@ const SliderForm = ({
               description_en: slider.description_en,
               description_bn: slider.description_bn,
               type: slider.type,
-              tags: slider.additional?.tags || [],
+              // tags: slider.additional?.tags || [],
             });
             setSelectedMedia(slider.medias || []);
             setSelectedCards(slider.card_ids || []);
@@ -106,12 +106,12 @@ const SliderForm = ({
       type: values.type,
     };
 
-    if (values.tags) {
-      payload.additional = {
-        ...(payload.additional || {}),
-        tags: values.tags,
-      };
-    }
+    // if (values.tags) {
+    //   payload.additional = {
+    //     ...(payload.additional || {}),
+    //     tags: values.tags,
+    //   };
+    // }
 
     if (values.type === "image") {
       payload.media_ids = selectedMedia?.map((media) => media.id);
