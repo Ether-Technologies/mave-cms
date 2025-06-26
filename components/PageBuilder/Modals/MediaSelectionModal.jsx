@@ -1,6 +1,6 @@
 // components/PageBuilder/Modals/MediaSelectionModal.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Drawer,
   Button,
@@ -53,6 +53,18 @@ const MediaSelectionModal = (props) => {
   const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
   const [imageSize, setImageSize] = useState("medium");
 
+  // Use ref to maintain stable selection state
+  const selectedMediaRef = useRef(initialSelectedMedia);
+
+  // Use callback to update ref when state changes
+  const updateSelectionRef = (newSelection) => {
+    selectedMediaRef.current = newSelection;
+  };
+
+  // Use a more stable selection state
+  const [stableSelectedMedia, setStableSelectedMedia] =
+    useState(initialSelectedMedia);
+
   // Use the custom hook for media data management
   const {
     loading,
@@ -74,38 +86,74 @@ const MediaSelectionModal = (props) => {
     if (isVisible) {
       setSelectedMedia(initialSelectedMedia);
     }
-  }, [isVisible, initialSelectedMedia]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]);
+
+  // Debug: Track selectedMedia changes
+  useEffect(() => {
+    console.log("🔴 selectedMedia state changed to:", selectedMedia);
+  }, [selectedMedia]);
 
   const isItemSelected = (item) => {
-    return selectedMedia.some(
+    const selected = selectedMediaRef.current.some(
       (media) => media?.id === item.id || media?.file_path === item.file_path
     );
+    console.log("Checking if item is selected:", item.id, selected);
+    return selected;
   };
 
   const handleSelection = (item) => {
+    console.log("🔵 Selection triggered for item:", item.id);
+    console.log("🔵 Current selectedMedia before:", selectedMediaRef.current);
+
     if (selectionMode === "single") {
-      setSelectedMedia([item]);
+      const newSelection = [item];
+      setSelectedMedia(newSelection);
+      updateSelectionRef(newSelection);
+      console.log("🔵 Single selection - setting to:", newSelection);
     } else {
       if (isItemSelected(item)) {
-        setSelectedMedia(selectedMedia.filter((media) => media.id !== item.id));
-      } else if (selectedMedia.length >= maxSelection) {
+        const newSelected = selectedMediaRef.current.filter(
+          (media) => media.id !== item.id
+        );
+        setSelectedMedia(newSelected);
+        updateSelectionRef(newSelected);
+        console.log(
+          "🔵 Multiple selection - removing item, new selection:",
+          newSelected
+        );
+      } else if (selectedMediaRef.current.length >= maxSelection) {
         if (maxSelection !== Infinity) {
           message.warning(`You can select up to ${maxSelection} images.`);
         }
       } else {
-        setSelectedMedia([...selectedMedia, item]);
+        const newSelected = [...selectedMediaRef.current, item];
+        setSelectedMedia(newSelected);
+        updateSelectionRef(newSelected);
+        console.log(
+          "🔵 Multiple selection - adding item, new selection:",
+          newSelected
+        );
       }
     }
   };
 
   const handleSubmit = () => {
-    if (selectedMedia.length === 0) {
+    console.log(
+      "Submit triggered with selectedMedia:",
+      selectedMediaRef.current
+    );
+    if (selectedMediaRef.current.length === 0) {
       message.warning("Please select at least one media item.");
       return;
     }
     const selected =
-      selectionMode === "single" ? selectedMedia[0] : selectedMedia;
+      selectionMode === "single"
+        ? selectedMediaRef.current[0]
+        : selectedMediaRef.current;
+    console.log("Calling onSelectMedia with:", selected);
     onSelectMedia(selected);
+    console.log("Calling onClose");
     onClose();
   };
 
@@ -116,28 +164,10 @@ const MediaSelectionModal = (props) => {
     }
     fetchMedia();
 
-    if (selectionMode === "single") {
-      const singleMedia = Array.isArray(uploadedMedia)
-        ? uploadedMedia[0]
-        : uploadedMedia;
-      if (singleMedia) {
-        setSelectedMedia([singleMedia]);
-        onSelectMedia([singleMedia]);
-        onClose();
-      } else {
-        message.error("No media selected after upload.");
-      }
-    } else {
-      const newSelected = Array.isArray(uploadedMedia)
-        ? [...selectedMedia, ...uploadedMedia]
-        : [...selectedMedia, uploadedMedia];
-
-      const validSelected = newSelected.filter((media) => media);
-      setSelectedMedia(validSelected);
-      onSelectMedia(validSelected);
-    }
-
-    message.success("Media uploaded and selected successfully.");
+    // Don't automatically select uploaded media - let user choose
+    message.success(
+      "Media uploaded successfully. You can now select it from the list."
+    );
   };
 
   return (
@@ -147,7 +177,7 @@ const MediaSelectionModal = (props) => {
           <div className="flex justify-between items-center mr-10">
             <span>Select Media</span>
             <div className="flex items-center gap-4">
-              <Badge count={selectedMedia.length} showZero>
+              <Badge count={selectedMediaRef.current.length} showZero>
                 <span className="text-sm text-gray-500">Selected Items</span>
               </Badge>
               <Tooltip title="Display Settings">
@@ -172,7 +202,7 @@ const MediaSelectionModal = (props) => {
               type="primary"
               onClick={handleSubmit}
               icon={<CheckOutlined />}
-              disabled={selectedMedia.length === 0}
+              disabled={selectedMediaRef.current.length === 0}
             >
               Select
             </Button>
@@ -212,9 +242,7 @@ const MediaSelectionModal = (props) => {
                 onUploadSuccess={handleUploadSuccess}
                 addMedia={(media) => {
                   fetchMedia();
-                  if (media) {
-                    handleUploadSuccess(media);
-                  }
+                  // Don't automatically select uploaded media
                 }}
               />
             </TabPane>

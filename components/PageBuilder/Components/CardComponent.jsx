@@ -20,9 +20,11 @@ import {
   CopyFilled,
   DragOutlined,
   SettingOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import CardSelectionModal from "../Modals/CardSelectionModal";
 import Image from "next/image";
+import instance from "../../../axios";
 
 const { Text } = Typography;
 
@@ -67,11 +69,68 @@ const CardComponent = ({
   const [cardData, setCardData] = useState(component._mave);
   const [selectedCardData, setSelectedCardData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Synchronize cardData with component._mave when it changes
   useEffect(() => {
     setCardData(component._mave);
   }, [component._mave]);
+
+  // Auto-refresh card data every 30 seconds when in preview mode
+  useEffect(() => {
+    if (!preview || !cardData?.id) return;
+
+    const interval = setInterval(() => {
+      refreshCardData();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [preview, cardData?.id]);
+
+  // Function to refresh card data from the server
+  const refreshCardData = async () => {
+    if (!cardData?.id) {
+      message.warning("No card ID available to refresh");
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      const response = await instance.get(`/cards/${cardData.id}`);
+      if (response.status === 200) {
+        const updatedCard = response.data;
+        const updatedComponent = {
+          ...component,
+          _mave: {
+            ...updatedCard,
+            config: cardData.config || {
+              showDescription: true,
+              showImage: true,
+              layout: "horizontal",
+            },
+          },
+          id: updatedCard.id,
+        };
+
+        updateComponent(updatedComponent);
+        setCardData(updatedCard);
+
+        // Check if there were actual changes
+        const hasChanges =
+          JSON.stringify(updatedCard) !== JSON.stringify(component._mave);
+        if (hasChanges) {
+          message.success("Card data updated successfully");
+        } else {
+          message.info("Card data is up to date");
+        }
+      }
+    } catch (error) {
+      console.error("Error refreshing card data:", error);
+      message.error("Failed to refresh card data");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Handle selection from CardSelectionModal
   const handleSelectCard = (selectedCard) => {
@@ -123,10 +182,30 @@ const CardComponent = ({
   if (preview) {
     return (
       <div className="preview-card-component p-4 bg-gray-100 rounded-md">
+        {cardData && (
+          <div className="flex justify-end mb-2">
+            <Button
+              icon={<ReloadOutlined spin={isRefreshing} />}
+              onClick={refreshCardData}
+              loading={isRefreshing}
+              size="small"
+              className="mavebutton"
+              title="Refresh card data"
+            />
+          </div>
+        )}
         {cardData ? (
           <div
-            className={`flex ${cardData.config?.layout === "horizontal" ? "flex-row" : "flex-col"} gap-4 border p-4 rounded-md bg-white`}
+            className={`flex ${cardData.config?.layout === "horizontal" ? "flex-row" : "flex-col"} gap-4 border p-4 rounded-md bg-white relative`}
           >
+            {isRefreshing && (
+              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-md">
+                <div className="flex items-center gap-2">
+                  <ReloadOutlined spin />
+                  <span>Refreshing...</span>
+                </div>
+              </div>
+            )}
             {cardData.config?.showImage && (
               <div
                 className={
@@ -174,13 +253,23 @@ const CardComponent = ({
           {!isEditing ? (
             <Space>
               {cardData && (
-                <Tooltip title="Change Card">
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={() => setIsModalVisible(true)}
-                    className="mavebutton"
-                  />
-                </Tooltip>
+                <>
+                  <Tooltip title="Refresh Card Data">
+                    <Button
+                      icon={<ReloadOutlined spin={isRefreshing} />}
+                      onClick={refreshCardData}
+                      loading={isRefreshing}
+                      className="mavebutton"
+                    />
+                  </Tooltip>
+                  <Tooltip title="Change Card">
+                    <Button
+                      icon={<EditOutlined />}
+                      onClick={() => setIsModalVisible(true)}
+                      className="mavebutton"
+                    />
+                  </Tooltip>
+                </>
               )}
               <Tooltip title="Duplicate">
                 <Button
@@ -233,8 +322,16 @@ const CardComponent = ({
           )}
           {cardData ? (
             <div
-              className={`flex ${cardData.config?.layout === "horizontal" ? "flex-row" : "flex-col"} gap-4 border p-4 rounded-md bg-white`}
+              className={`flex ${cardData.config?.layout === "horizontal" ? "flex-row" : "flex-col"} gap-4 border p-4 rounded-md bg-white relative`}
             >
+              {isRefreshing && (
+                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <ReloadOutlined spin />
+                    <span>Refreshing...</span>
+                  </div>
+                </div>
+              )}
               {cardData.config?.showImage && (
                 <div
                   className={

@@ -11,10 +11,14 @@ const MediaList = ({
   onSelectMedia,
 }) => {
   const isItemSelected = (item) => {
-    return selectedMedia.some(
+    const selected = selectedMedia.some(
       (media) => media?.id === item.id || media?.file_path === item.file_path
     );
+    console.log("MediaList - Checking if item is selected:", item.id, selected);
+    return selected;
   };
+
+  console.log("MediaList - selectedMedia prop:", selectedMedia);
 
   return (
     <List

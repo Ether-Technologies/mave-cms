@@ -16,6 +16,7 @@ export const useMediaData = (isVisible) => {
 
     useEffect(() => {
         if (isVisible) {
+            console.log("🟡 useMediaData useEffect triggered - isVisible:", isVisible);
             fetchMedia();
             setSearchQuery("");
             setCurrentPage(1);
@@ -23,6 +24,7 @@ export const useMediaData = (isVisible) => {
     }, [isVisible]);
 
     const fetchMedia = async () => {
+        console.log("🟡 fetchMedia called");
         setLoading(true);
         try {
             const response = await instance.get("/media");
@@ -35,6 +37,7 @@ export const useMediaData = (isVisible) => {
             );
             setSortedMedia(filteredAndSorted);
             setTotalItems(filteredAndSorted.length);
+            console.log("🟡 fetchMedia completed");
         } catch (error) {
             message.error("Failed to fetch media items.");
         }
