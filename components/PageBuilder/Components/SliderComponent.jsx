@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, message, Button } from "antd";
 import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import SliderRenderer from "./SliderComponent/SliderRenderer";
@@ -14,12 +14,6 @@ const SliderComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
-  console.log("SliderComponent - Initial render - component:", component);
-  console.log(
-    "SliderComponent - Initial render - component._mave:",
-    component._mave
-  );
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sliderData, setSliderData] = useState(component._mave);
   const [selectedSliderData, setSelectedSliderData] = useState(null);
@@ -41,27 +35,22 @@ const SliderComponent = ({
     setAutoPolling,
     pollingError,
     handleManualRefresh,
-  } = useSliderRefresh(sliderData, component, updateComponent, preview);
+  } = useSliderRefresh(component._mave, component, updateComponent, preview);
 
   // Synchronize sliderData with component._mave when it changes
   useEffect(() => {
-    console.log(
-      "SliderComponent - useEffect - component._mave changed:",
-      component._mave
-    );
-    console.log("SliderComponent - useEffect - component:", component);
     setSliderData(component._mave);
   }, [component._mave]);
 
   // Handle selection from SliderSelectionModal
-  const handleSelectSlider = (selectedSlider) => {
+  const handleSelectSlider = useCallback((selectedSlider) => {
     setSelectedSliderData(selectedSlider);
     setIsModalVisible(false);
     setIsEditing(true);
-  };
+  }, []);
 
   // Handle Submit (Confirm) Changes
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!selectedSliderData) {
       Modal.error({
         title: "Validation Error",
@@ -103,33 +92,24 @@ const SliderComponent = ({
       id: selectedSliderData.id,
     };
 
-    console.log(
-      "SliderComponent - handleSubmit - selectedSliderData:",
-      selectedSliderData
-    );
-    console.log(
-      "SliderComponent - handleSubmit - updatedComponent:",
-      updatedComponent
-    );
-
     updateComponent(updatedComponent);
     setSliderData(selectedSliderData);
     setSelectedSliderData(null);
     setIsEditing(false);
     message.success("Slider updated successfully.");
-  };
+  }, [selectedSliderData, component, sliderConfig, updateComponent]);
 
   // Handle Cancel Changes
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setSelectedSliderData(null);
     setIsEditing(false);
     message.info("Slider update canceled.");
-  };
+  }, []);
 
   // Handle Delete Component
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     deleteComponent();
-  };
+  }, [deleteComponent]);
 
   // If in preview mode, render the slider content only
   if (preview) {

@@ -3,7 +3,7 @@ import { message } from "antd";
 import instance from "../../../../axios";
 
 // Configuration
-const POLLING_INTERVAL = 30000; // 30 seconds
+const POLLING_INTERVAL = 10000; // 10 seconds
 
 export const useSliderRefresh = (
   sliderData,
@@ -16,7 +16,6 @@ export const useSliderRefresh = (
   const [autoPolling, setAutoPolling] = useState(true);
   const [pollingError, setPollingError] = useState(null);
   const pollingIntervalRef = useRef(null);
-  const lastDataRef = useRef(null);
 
   // Memoize the fetch function to avoid dependency issues
   const fetchSliderData = useCallback(
@@ -34,44 +33,65 @@ export const useSliderRefresh = (
         }
         setPollingError(null);
 
-        const response = await instance.get(`/sliders/${sliderData.id}`);
+        // Fetch all sliders and find the specific one by ID
+        const response = await instance.get("/sliders");
 
-        if (response.status === 200) {
-          const updatedSlider = response.data;
+        if (response.status === 200 && Array.isArray(response.data)) {
+          const allSliders = response.data;
+          const updatedSlider = allSliders.find((s) => s.id === sliderData.id);
 
-          // Check if there were actual changes using ref to avoid infinite loops
-          const currentDataString = JSON.stringify(component._mave);
-          const hasChanges = currentDataString !== lastDataRef.current;
+          if (updatedSlider) {
+            // Check if there are actual changes
+            const currentMediaIds = component._mave?.media_ids || [];
+            const newMediaIds = updatedSlider.media_ids || [];
+            const hasChanges =
+              JSON.stringify(currentMediaIds) !== JSON.stringify(newMediaIds);
 
-          if (hasChanges) {
-            const updatedComponent = {
-              ...component,
-              _mave: {
-                ...updatedSlider,
-                config: sliderData.config || {
-                  autoplay: true,
-                  dots: false,
-                  effect: "scroll",
-                  speed: 500,
-                  height: 400,
+            if (hasChanges) {
+              // Always update the component with fresh data
+              const updatedComponent = {
+                ...component,
+                _mave: {
+                  ...updatedSlider,
+                  config: sliderData.config || {
+                    autoplay: true,
+                    dots: false,
+                    effect: "scroll",
+                    speed: 500,
+                    height: 400,
+                  },
                 },
-              },
-              id: updatedSlider.id,
-            };
+                id: updatedSlider.id,
+              };
 
-            updateComponent(updatedComponent);
-            setLastUpdated(new Date());
-            lastDataRef.current = JSON.stringify(updatedSlider);
+              // Test if updateComponent is working
+              try {
+                updateComponent(updatedComponent);
+              } catch (error) {
+                console.error("❌ Error calling updateComponent:", error);
+              }
 
-            if (!silent) {
-              message.success("Slider data updated successfully");
+              setLastUpdated(new Date());
+
+              if (!silent) {
+                message.success("Slider data updated successfully");
+              }
+            } else {
+              if (!silent) {
+                message.info("Slider data is up to date");
+              }
             }
-          } else if (!silent) {
-            message.info("Slider data is up to date");
+          } else {
+            if (!silent) {
+              message.error("Slider not found");
+            }
+          }
+        } else {
+          if (!silent) {
+            message.error("Invalid response format");
           }
         }
       } catch (error) {
-        console.error("Error refreshing slider data:", error);
         setPollingError("Failed to refresh slider data");
         if (!silent) {
           message.error("Failed to refresh slider data");
@@ -82,15 +102,8 @@ export const useSliderRefresh = (
         }
       }
     },
-    [sliderData?.id, sliderData?.config, component.id, updateComponent]
+    [sliderData?.id, sliderData?.config, component, updateComponent]
   );
-
-  // Initialize lastDataRef when component data changes
-  useEffect(() => {
-    if (component._mave) {
-      lastDataRef.current = JSON.stringify(component._mave);
-    }
-  }, [component._mave]);
 
   // Auto-polling effect
   useEffect(() => {
@@ -105,7 +118,7 @@ export const useSliderRefresh = (
     // Clear any existing errors when starting polling
     setPollingError(null);
 
-    // Set up polling interval (30 seconds)
+    // Set up polling interval (10 seconds)
     pollingIntervalRef.current = setInterval(() => {
       fetchSliderData(true);
     }, POLLING_INTERVAL);

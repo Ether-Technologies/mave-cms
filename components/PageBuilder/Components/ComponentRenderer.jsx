@@ -58,10 +58,6 @@ const ComponentRenderer = React.memo(
     // Memoize the update and delete handlers
     const updateComponent = useCallback(
       (updatedComponent) => {
-        console.log("ComponentRenderer - updateComponent called");
-        console.log("ComponentRenderer - updatedComponent:", updatedComponent);
-        console.log("ComponentRenderer - current pageData:", pageData);
-
         const updatedPageData = {
           ...pageData,
           body: pageData.body.map((section, idx) => {
@@ -77,11 +73,8 @@ const ComponentRenderer = React.memo(
           }),
         };
 
-        console.log("ComponentRenderer - updatedPageData:", updatedPageData);
         dispatch(setPageData(updatedPageData));
         dispatch(setIsDirty(true));
-
-        console.log("ComponentRenderer - Redux actions dispatched");
       },
       [dispatch, pageData, sectionIndex, index]
     );

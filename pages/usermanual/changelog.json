@@ -1056,5 +1056,16 @@
                 "Custom design of widgets bug fixed"
             ]
         }
+    },
+    {
+        "version": "3.3.48",
+        "type": "minor",
+        "date": "2025-04-10",
+        "changes": {
+            "Bug Fixes": [
+                "Text component in Page Builder auto edit mode bug fixed",
+                "Changing media in Slider and Card component related to page builder bug fixed"
+            ]
+        }
     }
 ]

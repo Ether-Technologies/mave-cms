@@ -48,7 +48,7 @@ const SliderActions = React.memo(
                   className="mavebutton"
                 />
               </Tooltip>
-              <Tooltip
+              {/* <Tooltip
                 title={`${autoPolling ? "Disable" : "Enable"} Auto Refresh`}
               >
                 <Button
@@ -58,8 +58,8 @@ const SliderActions = React.memo(
                   size="small"
                   className={autoPolling ? "mavebutton" : "mavecancelbutton"}
                 />
-              </Tooltip>
-              {lastUpdated && (
+              </Tooltip> */}
+              {/* {lastUpdated && (
                 <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
                   Updated {lastUpdated.toLocaleTimeString()}
                 </span>
@@ -68,7 +68,7 @@ const SliderActions = React.memo(
                 <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
                   Auto-refresh active
                 </span>
-              )}
+              )} */}
               {pollingError && (
                 <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
                   {pollingError}
