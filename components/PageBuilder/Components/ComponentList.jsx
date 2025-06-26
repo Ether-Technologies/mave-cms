@@ -55,9 +55,18 @@ const ComponentList = ({ sectionId, components = [], sectionIndex }) => {
   const addComponent = (type) => {
     const newComponent = {
       _id: Date.now().toString(),
-      type,
-      value: type === "text" ? "Enter your text here..." : "",
-      settings: {},
+      type: type,
+      value: "",
+      settings: [],
+      _mave: {
+        fontSize: "medium",
+        primaryColor: "#000000",
+        secondaryColor: "#000000",
+        textAlign: "left",
+        fontWeight: "normal",
+        isDualColor: false,
+        altText: null,
+      },
     };
 
     const updatedPageData = {

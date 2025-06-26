@@ -101,7 +101,8 @@ const ComponentRenderer = React.memo(
     }, [dispatch, sectionIndex, index]);
 
     // Get the actual component type, handling both object and string formats
-    const componentType = component.type?.type || component.type;
+    const componentType =
+      typeof component.type === "object" ? component.type.type : component.type;
 
     // Memoize the component type check
     const SpecificComponent = useMemo(

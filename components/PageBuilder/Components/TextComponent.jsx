@@ -61,39 +61,19 @@ const TextComponent = ({
       return;
     }
 
-    // Determine if this component uses the old _mave format or new value format
-    const usesOldFormat = component?._mave?.text !== undefined;
-
     const updatedComponent = {
       ...component,
+      value: formData.text,
+      _mave: {
+        fontSize: tempSettings.fontSize,
+        primaryColor: tempSettings.primaryColor,
+        secondaryColor: tempSettings.secondaryColor,
+        textAlign: tempSettings.textAlign,
+        fontWeight: tempSettings.fontWeight,
+        isDualColor: tempSettings.isDualColor,
+        altText: formData.altText,
+      },
     };
-
-    if (usesOldFormat) {
-      // Use old _mave format
-      updatedComponent._mave = {
-        ...component._mave,
-        text: formData.text,
-        altText: formData.altText,
-        fontSize: tempSettings.fontSize,
-        primaryColor: tempSettings.primaryColor,
-        secondaryColor: tempSettings.secondaryColor,
-        textAlign: tempSettings.textAlign,
-        fontWeight: tempSettings.fontWeight,
-        isDualColor: tempSettings.isDualColor,
-      };
-    } else {
-      // Use new value format
-      updatedComponent.value = formData.text;
-      updatedComponent._mave = {
-        fontSize: tempSettings.fontSize,
-        primaryColor: tempSettings.primaryColor,
-        secondaryColor: tempSettings.secondaryColor,
-        textAlign: tempSettings.textAlign,
-        fontWeight: tempSettings.fontWeight,
-        isDualColor: tempSettings.isDualColor,
-        altText: formData.altText,
-      };
-    }
 
     updateComponent(updatedComponent);
     setIsEditing(false);

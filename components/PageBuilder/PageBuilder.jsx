@@ -58,7 +58,10 @@ const PageBuilder = ({ pageId }) => {
           ...section,
           data: section.data.map((component) => ({
             ...component,
-            type: component.type?.type || component.type, // Handle both object and string type
+            type:
+              typeof component.type === "object"
+                ? component.type.type
+                : component.type,
           })),
         }));
       }

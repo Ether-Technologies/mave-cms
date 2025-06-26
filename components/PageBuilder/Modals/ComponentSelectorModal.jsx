@@ -45,8 +45,7 @@ const ComponentSelectorModal = ({ isVisible, onClose, onSelectComponent }) => {
   }, [searchTerm, selectedCategory]);
 
   const handleSelect = (componentType) => {
-    const newComponent = { type: componentType };
-    onSelectComponent(newComponent);
+    onSelectComponent(componentType);
     onClose();
   };
 

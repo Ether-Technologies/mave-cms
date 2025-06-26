@@ -1058,13 +1058,14 @@
         }
     },
     {
-        "version": "3.3.48",
+        "version": "3.3.49",
         "type": "minor",
-        "date": "2025-04-10",
+        "date": "2025-06-26",
         "changes": {
             "Bug Fixes": [
                 "Text component in Page Builder auto edit mode bug fixed",
-                "Changing media in Slider and Card component related to page builder bug fixed"
+                "Changing media in Slider and Card component related to page builder bug fixed",
+                "Text component in Page Builder structure type issue fixed"
             ]
         }
     }
