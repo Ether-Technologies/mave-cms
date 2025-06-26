@@ -56,7 +56,7 @@ const TitleDescriptionComponent = ({
   onDuplicateElement,
 }) => {
   // Local form data
-  const [isEditing, setIsEditing] = useState(!component?._mave);
+  const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [pages, setPages] = useState([]);
   const [formData, setFormData] = useState({
@@ -129,9 +129,6 @@ const TitleDescriptionComponent = ({
         titleFontWeight,
         titleAlign,
       });
-    } else {
-      // If no _mave data exists, start in editing mode
-      setIsEditing(true);
     }
   }, [component]);
 

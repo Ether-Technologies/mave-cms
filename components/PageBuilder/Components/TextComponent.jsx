@@ -29,7 +29,7 @@ const TextComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
-  const [isEditing, setIsEditing] = useState(!component?._mave?.text);
+  const [isEditing, setIsEditing] = useState(false);
   const [tempSettings, setTempSettings] = useState({
     fontSize: component?._mave?.fontSize || "medium",
     primaryColor: component?._mave?.primaryColor || "#000000",
@@ -40,24 +40,37 @@ const TextComponent = ({
     secondPartText: component?._mave?.secondPartText || "",
   });
 
+  // Handle both old _mave.text format and new value format
+  const getTextContent = () => {
+    if (component?.value) {
+      return component.value;
+    }
+    if (component?._mave?.text) {
+      return component._mave.text;
+    }
+    return "";
+  };
+
   const [formData, setFormData] = useState({
-    text: component?._mave?.text || "",
+    text: getTextContent(),
     altText: component?._mave?.altText || "",
   });
-
-  useEffect(() => {
-    if (!component?._mave?.text) {
-      setIsEditing(true);
-    }
-  }, [component]);
 
   const handleSubmit = () => {
     if (!formData.text.trim()) {
       return;
     }
+
+    // Determine if this component uses the old _mave format or new value format
+    const usesOldFormat = component?._mave?.text !== undefined;
+
     const updatedComponent = {
       ...component,
-      _mave: {
+    };
+
+    if (usesOldFormat) {
+      // Use old _mave format
+      updatedComponent._mave = {
         ...component._mave,
         text: formData.text,
         altText: formData.altText,
@@ -67,14 +80,28 @@ const TextComponent = ({
         textAlign: tempSettings.textAlign,
         fontWeight: tempSettings.fontWeight,
         isDualColor: tempSettings.isDualColor,
-      },
-    };
+      };
+    } else {
+      // Use new value format
+      updatedComponent.value = formData.text;
+      updatedComponent._mave = {
+        fontSize: tempSettings.fontSize,
+        primaryColor: tempSettings.primaryColor,
+        secondaryColor: tempSettings.secondaryColor,
+        textAlign: tempSettings.textAlign,
+        fontWeight: tempSettings.fontWeight,
+        isDualColor: tempSettings.isDualColor,
+        altText: formData.altText,
+      };
+    }
+
     updateComponent(updatedComponent);
     setIsEditing(false);
   };
 
   const handleDiscard = () => {
-    if (!component?._mave?.text) {
+    const hasContent = getTextContent().trim();
+    if (!hasContent) {
       deleteComponent(component.id);
       return;
     }
@@ -88,7 +115,7 @@ const TextComponent = ({
       secondPartText: component?._mave?.secondPartText || "",
     });
     setFormData({
-      text: component?._mave?.text || "",
+      text: getTextContent(),
       altText: component?._mave?.altText || "",
     });
     setIsEditing(false);
@@ -274,10 +301,31 @@ const TextComponent = ({
 
     return (
       <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-        <div style={{ textAlign: tempSettings.textAlign }}>
-          {tempSettings.isDualColor ? (
-            <div className="flex items-center gap-2">
-              <span
+        {formData.text ? (
+          <div style={{ textAlign: tempSettings.textAlign }}>
+            {tempSettings.isDualColor ? (
+              <div className="flex items-center gap-2">
+                <span
+                  className={getFontSizeClass(tempSettings.fontSize)}
+                  style={{
+                    color: tempSettings.primaryColor,
+                    fontWeight: tempSettings.fontWeight,
+                  }}
+                >
+                  {formData.text}
+                </span>
+                <span
+                  className={getFontSizeClass(tempSettings.fontSize)}
+                  style={{
+                    color: tempSettings.secondaryColor,
+                    fontWeight: tempSettings.fontWeight,
+                  }}
+                >
+                  {formData.altText}
+                </span>
+              </div>
+            ) : (
+              <div
                 className={getFontSizeClass(tempSettings.fontSize)}
                 style={{
                   color: tempSettings.primaryColor,
@@ -285,29 +333,22 @@ const TextComponent = ({
                 }}
               >
                 {formData.text}
-              </span>
-              <span
-                className={getFontSizeClass(tempSettings.fontSize)}
-                style={{
-                  color: tempSettings.secondaryColor,
-                  fontWeight: tempSettings.fontWeight,
-                }}
-              >
-                {formData.altText}
-              </span>
-            </div>
-          ) : (
-            <div
-              className={getFontSizeClass(tempSettings.fontSize)}
-              style={{
-                color: tempSettings.primaryColor,
-                fontWeight: tempSettings.fontWeight,
-              }}
-            >
-              {formData.text}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Button
+            icon={<PlusOutlined />}
+            type="dashed"
+            onClick={() => {
+              setIsEditing(true);
+              setFormData({ ...formData, text: "" });
+            }}
+            className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-yellow-500 transition-colors"
+          >
+            <span className="text-lg font-medium text-gray-600">Add Text</span>
+          </Button>
+        )}
       </div>
     );
   };
@@ -384,7 +425,7 @@ const TextComponent = ({
       onEdit={() => setIsEditing(true)}
       onCancel={handleDiscard}
       onSave={handleSubmit}
-      showChangeButton={!!component?._mave?.text}
+      showChangeButton={!!getTextContent().trim()}
     >
       {renderContent()}
     </BaseComponent>

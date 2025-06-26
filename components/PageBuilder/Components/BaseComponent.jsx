@@ -55,7 +55,7 @@ const BaseComponent = ({
           <div className="flex items-center gap-2">
             {!isEditing ? (
               <>
-                {showChangeButton && component?._mave && (
+                {showChangeButton && (
                   <Button
                     icon={<ExportOutlined />}
                     onClick={onEdit}
