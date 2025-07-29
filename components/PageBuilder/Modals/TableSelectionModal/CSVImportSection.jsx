@@ -1,93 +1,228 @@
-import React from "react";
-import { Collapse, Typography, message, Upload } from "antd";
+import React, { useState, useCallback, useMemo } from "react";
+import { Collapse, Typography, message, Upload, Progress, Alert } from "antd";
 import Papa from "papaparse";
 import { v4 as uuidv4 } from "uuid";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, FileTextOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 const { Dragger } = Upload;
 
-const CSVImportSection = ({ setHeaders, setRows }) => {
-  const handleCSVUpload = (file) => {
-    Papa.parse(file, {
-      skipEmptyLines: true,
-      complete: (result) => {
-        const { data } = result;
-        if (data && data.length > 0) {
-          // First row = CSV column names
-          const csvHeaderStrings = data[0].map((h) => h.trim());
-          // Convert each to { id, name }
-          const csvHeaders = csvHeaderStrings.map((colName) => ({
-            id: uuidv4(),
-            name: colName,
-          }));
+const CSVImportSection = React.memo(({ setHeaders, setRows }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [fileInfo, setFileInfo] = useState(null);
 
-          // Next rows = actual data
-          const csvRows = data.slice(1);
+  // Optimized CSV processing with progress
+  const processCSV = useCallback(
+    (file) => {
+      return new Promise((resolve, reject) => {
+        setIsProcessing(true);
+        setProgress(0);
 
-          // Update state
-          setHeaders(csvHeaders);
-          setRows(csvRows);
+        // Validate file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+          message.error(
+            "File size too large. Please upload a file smaller than 10MB."
+          );
+          setIsProcessing(false);
+          reject(new Error("File too large"));
+          return;
+        }
 
-          message.success("CSV imported successfully.");
-        } else {
-          message.error("CSV file is empty or invalid.");
+        // Validate file type
+        if (!file.name.toLowerCase().endsWith(".csv")) {
+          message.error("Please upload a valid CSV file.");
+          setIsProcessing(false);
+          reject(new Error("Invalid file type"));
+          return;
+        }
+
+        setFileInfo({
+          name: file.name,
+          size: (file.size / 1024).toFixed(2) + " KB",
+        });
+
+        Papa.parse(file, {
+          skipEmptyLines: true,
+          header: false, // We'll handle headers manually
+          complete: (result) => {
+            setProgress(100);
+
+            setTimeout(() => {
+              const { data, errors } = result;
+
+              if (errors && errors.length > 0) {
+                message.warning(
+                  `Found ${errors.length} parsing errors. Some data may be incomplete.`
+                );
+              }
+
+              if (data && data.length > 0) {
+                // First row = CSV column names
+                const csvHeaderStrings = data[0].map((h) => (h || "").trim());
+
+                // Validate headers
+                if (
+                  csvHeaderStrings.length === 0 ||
+                  csvHeaderStrings.every((h) => !h)
+                ) {
+                  message.error("No valid headers found in CSV file.");
+                  setIsProcessing(false);
+                  reject(new Error("No valid headers"));
+                  return;
+                }
+
+                // Convert each to { id, name }
+                const csvHeaders = csvHeaderStrings.map((colName) => ({
+                  id: uuidv4(),
+                  name: colName || `Column ${csvHeaders.length + 1}`,
+                }));
+
+                // Next rows = actual data
+                const csvRows = data.slice(1).map((row) =>
+                  // Ensure each row has the same number of columns as headers
+                  csvHeaders.map((_, index) => row[index] || "")
+                );
+
+                // Update state
+                setHeaders(csvHeaders);
+                setRows(csvRows);
+
+                message.success(
+                  `CSV imported successfully. ${csvRows.length} rows, ${csvHeaders.length} columns.`
+                );
+                setIsProcessing(false);
+                resolve({ headers: csvHeaders, rows: csvRows });
+              } else {
+                message.error("CSV file is empty or invalid.");
+                setIsProcessing(false);
+                reject(new Error("Empty CSV"));
+              }
+            }, 500); // Small delay to show progress
+          },
+          error: (error) => {
+            message.error(`Failed to parse CSV file: ${error.message}`);
+            setIsProcessing(false);
+            reject(error);
+          },
+          step: (row, parser) => {
+            // Update progress based on file size
+            const progressPercent = Math.min(
+              (parser.streamer.input.length / file.size) * 100,
+              95
+            );
+            setProgress(progressPercent);
+          },
+        });
+      });
+    },
+    [setHeaders, setRows]
+  );
+
+  // Optimized file upload handler
+  const handleCSVUpload = useCallback(
+    (file) => {
+      processCSV(file).catch(() => {
+        // Error already handled in processCSV
+      });
+      return false; // Prevent auto-upload
+    },
+    [processCSV]
+  );
+
+  // Memoized dragger props
+  const draggerProps = useMemo(
+    () => ({
+      name: "file",
+      multiple: false,
+      accept: ".csv",
+      showUploadList: false,
+      beforeUpload: handleCSVUpload,
+      disabled: isProcessing,
+      onChange(info) {
+        // This callback fires when file status changes
+        if (info.file.status === "uploading") {
+          // Handle upload progress if needed
         }
       },
-      error: () => {
-        message.error("Failed to parse CSV file.");
+      onDrop(e) {
+        console.log("Dropped files", e.dataTransfer.files);
       },
-    });
-    // Return false to prevent Upload from auto-uploading files
-    return false;
-  };
+    }),
+    [handleCSVUpload, isProcessing]
+  );
 
-  // These are the props you can spread into the Dragger
-  const draggerProps = {
-    name: "file",
-    multiple: false,
-    accept: ".csv",
-    showUploadList: false,
-    beforeUpload: handleCSVUpload, // or pass an inline arrow function if you prefer
-    onChange(info) {
-      // This callback fires when file status changes (e.g., file added, progress, done, error)
-      // If you only need to parse the CSV in `beforeUpload`, you can leave this empty
-      // but it's handy for hooking into the Upload lifecycle if needed.
-    },
-    onDrop(e) {
-      // Fires when a file is dropped onto the drop area
-      console.log("Dropped files", e.dataTransfer.files);
-    },
-  };
+  // Memoized upload content
+  const uploadContent = useMemo(
+    () => (
+      <div className="text-center">
+        <p className="ant-upload-drag-icon">
+          {isProcessing ? <FileTextOutlined /> : <UploadOutlined />}
+        </p>
+        <p className="ant-upload-text">
+          {isProcessing
+            ? "Processing CSV..."
+            : "Click or drag CSV file to this area to upload"}
+        </p>
+        <p className="ant-upload-hint">
+          {isProcessing
+            ? "Please wait while we process your file..."
+            : "Support for CSV files only. Max size: 10MB"}
+        </p>
+        {isProcessing && (
+          <div className="mt-4">
+            <Progress percent={progress} size="small" />
+          </div>
+        )}
+      </div>
+    ),
+    [isProcessing, progress]
+  );
+
+  // Memoized file info display
+  const fileInfoDisplay = useMemo(() => {
+    if (!fileInfo) return null;
+
+    return (
+      <Alert
+        message={`File: ${fileInfo.name}`}
+        description={`Size: ${fileInfo.size}`}
+        type="info"
+        showIcon
+        className="mt-2"
+      />
+    );
+  }, [fileInfo]);
 
   return (
     <div className="csv-import-section flex flex-col items-center justify-center mb-10">
       <Collapse
         bordered={false}
-        // defaultActiveKey={["1"]}
         expandIconPosition="right"
-        className="mt-4 border-2 bg-theme font-bold text-gray-700"
+        className="mt-4 border-2 bg-theme font-bold text-gray-700 w-full"
       >
         <Collapse.Panel
-          header="Import CSV"
+          header={
+            <div className="flex items-center gap-2">
+              <UploadOutlined />
+              <span>Import CSV</span>
+              {isProcessing && (
+                <span className="text-blue-500">(Processing...)</span>
+              )}
+            </div>
+          }
           key="1"
           className="text-center text-xl"
         >
-          <Dragger {...draggerProps}>
-            <p className="ant-upload-drag-icon">
-              <UploadOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-            <p className="ant-upload-hint">
-              Support for a single or bulk upload.
-            </p>
-          </Dragger>
+          <Dragger {...draggerProps}>{uploadContent}</Dragger>
+          {fileInfoDisplay}
         </Collapse.Panel>
       </Collapse>
     </div>
   );
-};
+});
+
+CSVImportSection.displayName = "CSVImportSection";
 
 export default CSVImportSection;
