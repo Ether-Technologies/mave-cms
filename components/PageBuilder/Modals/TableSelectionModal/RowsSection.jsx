@@ -42,8 +42,11 @@ const RowsSection = ({ headers, rows, setRows }) => {
   };
 
   const updateCell = (value, rowIndex, colIndex) => {
-    const updated = [...rows];
-    updated[rowIndex][colIndex] = value;
+    const updated = rows.map((row, index) =>
+      index === rowIndex
+        ? [...row.slice(0, colIndex), value, ...row.slice(colIndex + 1)]
+        : [...row]
+    );
     setRows(updated);
   };
 
