@@ -71,7 +71,6 @@ const PageBuilder = ({ pageId, editMode = false }) => {
         }));
       }
 
-      console.log("📄 Loading fresh server data:", data);
       dispatch(setPageData(data));
       dispatch(pushToHistory(data)); // Add initial state to history
       dispatch(setError(null));
@@ -181,8 +180,16 @@ const PageBuilder = ({ pageId, editMode = false }) => {
   useEffect(() => {
     if (pageId) {
       fetchPageData();
+    } else {
     }
   }, [pageId]);
+
+  // Force loading to false on mount if pageData exists
+  useEffect(() => {
+    if (pageData && loading) {
+      dispatch(setLoading(false));
+    }
+  }, []);
 
   // Update history when pageData changes
   useEffect(() => {
@@ -233,19 +240,12 @@ const PageBuilder = ({ pageId, editMode = false }) => {
   // Handle section updates (when components are added/modified)
   const handleSectionUpdate = useCallback(
     (sectionIndex, updatedSection) => {
-      console.log("🔧 handleSectionUpdate called:", {
-        sectionIndex,
-        updatedSection,
-      });
-
       // Validate inputs
       if (sectionIndex === undefined || sectionIndex === null) {
-        console.error("❌ Invalid sectionIndex:", sectionIndex);
         return;
       }
 
       if (!updatedSection) {
-        console.error("❌ Invalid updatedSection:", updatedSection);
         return;
       }
 
@@ -262,22 +262,7 @@ const PageBuilder = ({ pageId, editMode = false }) => {
           ];
           dispatch(setPageData(updatedPageData));
           dispatch(setIsDirty(true));
-          console.log("✅ Section updated successfully");
-        } else {
-          console.error(
-            "❌ Section index out of bounds:",
-            sectionIndex,
-            "body length:",
-            updatedPageData.body.length
-          );
         }
-      } else {
-        console.error("❌ Invalid parameters for handleSectionUpdate:", {
-          hasPageData: !!pageData,
-          hasBody: !!(pageData && pageData.body),
-          sectionIndex,
-          bodyLength: pageData?.body?.length,
-        });
       }
     },
     [pageData, dispatch]
@@ -297,17 +282,11 @@ const PageBuilder = ({ pageId, editMode = false }) => {
   );
 
   // Handle component deletion
-  const handleComponentDelete = useCallback(
-    (componentIndex) => {
-      if (pageData && pageData.body) {
-        const updatedPageData = { ...pageData };
-        // This will be handled by the Section component internally
-        dispatch(setPageData(updatedPageData));
-        dispatch(setIsDirty(true));
-      }
-    },
-    [pageData, dispatch]
-  );
+  const handleComponentDelete = useCallback((componentIndex) => {
+    // This is handled by the ComponentList components internally
+    // The componentIndex is passed from ComponentList to SectionWrapper
+    // and the actual deletion happens in the ComponentList components
+  }, []);
 
   // Handle component duplication
   const handleComponentDuplicate = useCallback(
@@ -343,29 +322,32 @@ const PageBuilder = ({ pageId, editMode = false }) => {
     }
   }, [pageData, dispatch]);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("🔍 PageBuilder state:", {
-      loading,
-      error,
-      pageData: pageData
-        ? { id: pageData.id, bodyLength: pageData.body?.length }
-        : null,
-      isDirty,
-      isEditing,
-    });
-  }, [loading, error, pageData, isDirty, isEditing]);
-
   // Force loading to false if it gets stuck
   useEffect(() => {
     if (loading && pageData) {
-      console.log("🔧 Force setting loading to false");
       dispatch(setLoading(false));
     }
   }, [loading, pageData, dispatch]);
 
+  // Force loading to false if pageData exists
+  useEffect(() => {
+    if (pageData && loading) {
+      dispatch(setLoading(false));
+    }
+  }, [pageData, loading, dispatch]);
+
+  // Add timeout to prevent infinite loading
+  useEffect(() => {
+    if (loading) {
+      const timeoutId = setTimeout(() => {
+        dispatch(setLoading(false));
+      }, 10000); // 10 second timeout
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [loading, dispatch]);
+
   if (loading) {
-    console.log("🔄 Showing loading spinner");
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -518,28 +500,6 @@ const PageBuilder = ({ pageId, editMode = false }) => {
           )}
         </div>
       </div>
-
-      {/* Floating Action Buttons - Only show in edit mode */}
-      {isEditing && (
-        <div className="fixed bottom-14 right-6 flex gap-4">
-          <Button
-            icon={<EyeOutlined style={{ fontSize: "1.5rem" }} />}
-            onClick={() => setPreview(true)}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-lg border-2 border-gray-200 hover:border-theme transition-colors"
-          />
-          <Button
-            icon={<SaveOutlined style={{ fontSize: "1.5rem" }} />}
-            onClick={() => savePageData(true)}
-            disabled={!isDirty}
-            className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg border-2 ${
-              isDirty
-                ? "bg-yellow-400 hover:bg-yellow-500 border-yellow-500 cursor-pointer"
-                : "bg-gray-300 border-gray-400 cursor-not-allowed"
-            } text-white transition-colors`}
-            title={isDirty ? "Save (Ctrl/⌘ + S)" : "No changes to save"}
-          />
-        </div>
-      )}
 
       {/* Page Preview Modal */}
       <PagePreview pageData={pageData} open={preview} setOpen={setPreview} />

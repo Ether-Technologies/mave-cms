@@ -28,6 +28,7 @@ const BaseComponent = ({
   showDeleteButton = true,
 }) => {
   const handleDelete = () => {
+    console.log("🔧 Delete button clicked in BaseComponent");
     deleteComponent();
   };
 

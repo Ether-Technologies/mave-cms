@@ -26,7 +26,6 @@ const SiteContent = ({ children }) => {
   const isProtected = isProtectedPage(currentRoute);
 
   useEffect(() => {
-    console.log("Allow Signup:", allowSignup); // Debugging
   }, [allowSignup]);
 
   useEffect(() => {
@@ -91,7 +90,8 @@ const SiteContent = ({ children }) => {
     setCollapsed(!collapsed);
   };
 
-  if (loading) return <Loader />;
+  // Don't show loader for page-builder pages
+  if (loading && !currentRoute.includes('/page-builder')) return <Loader />;
 
   if (isPublicPage) {
     // Render public pages without layout
@@ -149,10 +149,10 @@ const SiteContent = ({ children }) => {
         {/* Main Content Area */}
         <Layout
           className={`transition-all duration-300 ${shouldShowSidebar
-              ? collapsed
-                ? "lg:ml-[80px]" // Adjusted to match collapsedWidth
-                : "lg:ml-[260px]" // Match the width of Sider
-              : ""
+            ? collapsed
+              ? "lg:ml-[80px]" // Adjusted to match collapsedWidth
+              : "lg:ml-[260px]" // Match the width of Sider
+            : ""
             }`}
         >
           {/* Conditionally render the Collapse Button only for protected pages and public with layout pages when authenticated */}

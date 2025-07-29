@@ -28,7 +28,8 @@ const SectionWrapper = ({
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(
-    section.title || `Section ${(sectionIndex || index) + 1}`
+    section.title ||
+      `Section ${sectionIndex !== undefined ? sectionIndex + 1 : 1}`
   );
 
   // Handle editing state changes from components
@@ -43,13 +44,6 @@ const SectionWrapper = ({
 
   const handleComponentsUpdate = useCallback(
     (updatedComponents) => {
-      console.log("🔧 handleComponentsUpdate called:", {
-        sectionIndex,
-        index,
-        componentsCount: updatedComponents.length,
-        sectionId: section._id,
-      });
-
       const updatedSection = {
         ...section,
         data: updatedComponents,
@@ -57,21 +51,18 @@ const SectionWrapper = ({
 
       if (onSectionUpdate) {
         // Use the new section update callback
-        const finalSectionIndex =
-          sectionIndex !== undefined ? sectionIndex : index;
-        console.log("🔧 Calling onSectionUpdate with:", finalSectionIndex);
-        onSectionUpdate(finalSectionIndex, updatedSection);
+        onSectionUpdate(sectionIndex, updatedSection);
       } else {
         // Fallback to old system
         dispatch(
           updateSection({
-            sectionIndex: sectionIndex || index,
+            sectionIndex: sectionIndex,
             newSection: updatedSection,
           })
         );
       }
     },
-    [section, sectionIndex, index, onSectionUpdate, dispatch]
+    [section, sectionIndex, onSectionUpdate, dispatch]
   );
 
   const handleDeleteClick = () => {
@@ -81,7 +72,7 @@ const SectionWrapper = ({
   const handleDeleteConfirm = () => {
     setIsDeleteModalVisible(false);
     if (onDelete) {
-      onDelete(sectionIndex || index);
+      onDelete(sectionIndex);
     }
   };
 
@@ -108,13 +99,11 @@ const SectionWrapper = ({
 
     if (onSectionUpdate) {
       // Update the section title through the callback
-      const finalSectionIndex =
-        sectionIndex !== undefined ? sectionIndex : index;
-      onSectionUpdate(finalSectionIndex, updatedSection);
+      onSectionUpdate(sectionIndex, updatedSection);
     } else {
       dispatch(
         updateSection({
-          sectionIndex: sectionIndex || index,
+          sectionIndex: sectionIndex,
           newSection: updatedSection,
         })
       );
@@ -123,7 +112,10 @@ const SectionWrapper = ({
   };
 
   const handleTitleCancel = () => {
-    setTempTitle(section.title || `Section ${(sectionIndex || index) + 1}`);
+    setTempTitle(
+      section.title ||
+        `Section ${sectionIndex !== undefined ? sectionIndex + 1 : 1}`
+    );
     setIsEditingTitle(false);
   };
 
@@ -153,7 +145,8 @@ const SectionWrapper = ({
           ) : (
             <div className="flex items-center gap-2 flex-1">
               <h3 className="text-lg font-semibold text-gray-800">
-                {section.title || `Section ${(sectionIndex || index) + 1}`}
+                {section.title ||
+                  `Section ${sectionIndex !== undefined ? sectionIndex + 1 : 1}`}
               </h3>
               <Button
                 icon={<EditOutlined />}
@@ -167,7 +160,7 @@ const SectionWrapper = ({
             {onDuplicate && (
               <Button
                 icon={<CopyOutlined />}
-                onClick={() => onDuplicate(sectionIndex || index)}
+                onClick={() => onDuplicate(sectionIndex)}
                 size="small"
                 className="mavebutton"
               />
@@ -189,7 +182,7 @@ const SectionWrapper = ({
           onComponentDelete={onComponentDelete}
           onComponentDuplicate={onComponentDuplicate}
           onEditingStateChange={handleComponentEditingStateChange}
-          sectionIndex={sectionIndex || index}
+          sectionIndex={sectionIndex}
         />
       </div>
 

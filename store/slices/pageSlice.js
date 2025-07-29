@@ -34,13 +34,11 @@ const pageSlice = createSlice({
 
       // Validate that pageData and body exist
       if (!state.pageData || !state.pageData.body) {
-        console.error("❌ Cannot update section: pageData or body is null");
         return;
       }
 
       // Validate that sectionIndex is within bounds
       if (sectionIndex < 0 || sectionIndex >= state.pageData.body.length) {
-        console.error("❌ Section index out of bounds:", sectionIndex, "body length:", state.pageData.body.length);
         return;
       }
 

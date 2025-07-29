@@ -197,10 +197,10 @@ const ComponentList = ({
         (_, index) => index !== componentIndex
       );
 
-      if (onComponentDelete) {
-        onComponentDelete(componentIndex);
-      } else if (onComponentsUpdate) {
+      if (onComponentsUpdate) {
         onComponentsUpdate(updatedComponents);
+      } else if (onComponentDelete) {
+        onComponentDelete(componentIndex);
       } else {
         // Fallback to old system
         const updatedPageData = {
@@ -304,7 +304,11 @@ const ComponentList = ({
                         className="component-wrapper mb-2"
                       >
                         <ComponentRenderer
-                          component={component}
+                          component={{
+                            ...component,
+                            sectionIndex: sectionIndex,
+                            index: index,
+                          }}
                           onUpdate={(updatedComponent) =>
                             handleComponentUpdate(updatedComponent, index)
                           }

@@ -158,14 +158,22 @@ const ComponentListSimple = ({
   // Handle component deletion
   const handleComponentDelete = useCallback(
     (componentIndex) => {
+      console.log("🔧 handleComponentDelete called with:", {
+        componentIndex,
+        sectionIndex,
+        componentsCount: componentsState.length,
+      });
+
       const updatedComponents = componentsState.filter(
         (_, index) => index !== componentIndex
       );
 
-      if (onComponentDelete) {
-        onComponentDelete(componentIndex);
-      } else if (onComponentsUpdate) {
+      console.log("🔧 Updated components count:", updatedComponents.length);
+
+      if (onComponentsUpdate) {
         onComponentsUpdate(updatedComponents);
+      } else if (onComponentDelete) {
+        onComponentDelete(componentIndex);
       } else {
         // Fallback to old system
         const updatedPageData = {
@@ -251,7 +259,11 @@ const ComponentListSimple = ({
           componentsState.map((component, index) => (
             <div key={component._id} className="component-wrapper mb-2">
               <ComponentRenderer
-                component={component}
+                component={{
+                  ...component,
+                  sectionIndex: sectionIndex,
+                  index: index,
+                }}
                 onUpdate={(updatedComponent) =>
                   handleComponentUpdate(updatedComponent, index)
                 }

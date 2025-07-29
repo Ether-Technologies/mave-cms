@@ -50,21 +50,57 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // Initialize authentication state from localStorage
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (state.loading) {
+        console.warn("Auth loading timeout - forcing loading to false");
+        dispatch({ type: "SET_LOADING", payload: false });
+      }
+    }, 3000); // Reduced to 3 second timeout
 
-    if (storedToken && storedUser) {
-      dispatch({
-        type: "INITIALIZE",
-        payload: {
-          token: storedToken,
-          user: JSON.parse(storedUser),
-        },
-      });
-    } else {
+    // Initialize authentication state from localStorage
+    try {
+      const storedToken = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+
+      if (storedToken && storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          dispatch({
+            type: "INITIALIZE",
+            payload: {
+              token: storedToken,
+              user: parsedUser,
+            },
+          });
+        } catch (parseError) {
+          console.error("Error parsing stored user:", parseError);
+          // Clear invalid data
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          dispatch({ type: "SET_LOADING", payload: false });
+        }
+      } else {
+        dispatch({ type: "SET_LOADING", payload: false });
+      }
+    } catch (error) {
+      console.error("Error accessing localStorage:", error);
       dispatch({ type: "SET_LOADING", payload: false });
     }
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  // Force loading to false after a short delay to prevent stuck loading
+  useEffect(() => {
+    const forceLoadingFalse = setTimeout(() => {
+      if (state.loading) {
+        console.warn("Force setting auth loading to false");
+        dispatch({ type: "SET_LOADING", payload: false });
+      }
+    }, 1000); // 1 second delay
+
+    return () => clearTimeout(forceLoadingFalse);
   }, []);
 
   const login = async (email, password, callback) => {

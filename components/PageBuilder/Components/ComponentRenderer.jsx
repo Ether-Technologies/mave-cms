@@ -102,6 +102,12 @@ const ComponentRenderer = React.memo(
     );
 
     const deleteComponent = useCallback(() => {
+      console.log("🔧 deleteComponent called in ComponentRenderer:", {
+        hasOnDelete: !!onDelete,
+        componentIndex: component.index,
+        sectionIndex: component.sectionIndex,
+      });
+
       if (onDelete) {
         onDelete();
       } else {
