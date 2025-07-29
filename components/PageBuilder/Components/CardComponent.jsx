@@ -1,6 +1,6 @@
 // components/PageBuilder/Components/CardComponent.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Button,
   Modal,
@@ -74,87 +74,128 @@ const CardComponent = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [autoPolling, setAutoPolling] = useState(true);
+  const [autoPolling, setAutoPolling] = useState(false); // Default to false - only enable in preview mode
+  const lastUpdateRef = useRef(null);
 
   // Synchronize cardData with component._mave when it changes
   useEffect(() => {
     setCardData(component._mave);
   }, [component._mave]);
 
-  // Auto-refresh card data every 30 seconds when card data exists
+  // Auto-enable polling when in preview mode (not editing)
   useEffect(() => {
-    if (!cardData?.id || !autoPolling) return;
+    if (preview && !isEditing) {
+      setAutoPolling(true);
+    } else {
+      setAutoPolling(false);
+    }
+  }, [preview, isEditing]);
+
+  // Auto-refresh card data every 30 seconds when card data exists
+  // Only when in preview mode and not editing
+  useEffect(() => {
+    if (!cardData?.id || !autoPolling || isEditing || !preview) return;
 
     const interval = setInterval(() => {
       refreshCardData(true); // Silent refresh for polling
     }, POLLING_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [cardData?.id, autoPolling]);
+  }, [cardData?.id, autoPolling, isEditing, preview]);
 
   // Function to refresh card data from the server
-  const refreshCardData = async (silent = false) => {
-    if (!cardData?.id) {
-      if (!silent) {
-        message.warning("No card ID available to refresh");
+  const refreshCardData = useCallback(
+    async (silent = false) => {
+      // Prevent updates during editing to avoid losing draft state
+      if (isEditing) {
+        console.log("🔄 Skipping card refresh - component is being edited");
+        return;
       }
-      return;
-    }
 
-    setIsRefreshing(true);
-    try {
-      const response = await instance.get(`/cards/${cardData.id}`);
-      if (response.status === 200) {
-        const updatedCard = response.data;
+      // Only allow refresh in preview mode
+      if (!preview) {
+        console.log("🔄 Skipping card refresh - not in preview mode");
+        return;
+      }
 
-        // Check if there were actual changes
-        const hasChanges =
-          JSON.stringify(updatedCard) !== JSON.stringify(component._mave);
-
-        if (hasChanges) {
-          const updatedComponent = {
-            ...component,
-            _mave: {
-              ...updatedCard,
-              config: cardData.config || {
-                showDescription: true,
-                showImage: true,
-                layout: "horizontal",
-              },
-            },
-            id: updatedCard.id,
-          };
-
-          updateComponent(updatedComponent);
-          setCardData(updatedCard);
-          setLastUpdated(new Date());
-
-          if (!silent) {
-            message.success("Card data updated successfully");
-          }
-        } else if (!silent) {
-          message.info("Card data is up to date");
+      if (!cardData?.id) {
+        if (!silent) {
+          message.warning("No card ID available to refresh");
         }
+        return;
       }
-    } catch (error) {
-      console.error("Error refreshing card data:", error);
-      if (!silent) {
-        message.error("Failed to refresh card data");
+
+      setIsRefreshing(true);
+      try {
+        const response = await instance.get(`/cards/${cardData.id}`);
+        if (response.status === 200) {
+          const updatedCard = response.data;
+
+          // Check if there were actual changes
+          const hasChanges =
+            JSON.stringify(updatedCard) !== JSON.stringify(component._mave);
+
+          if (hasChanges) {
+            // Check if we've already updated recently to prevent rapid updates
+            const now = Date.now();
+            if (lastUpdateRef.current && now - lastUpdateRef.current < 5000) {
+              console.log("🔄 Skipping card update - too recent");
+              return;
+            }
+
+            const updatedComponent = {
+              ...component,
+              _mave: {
+                ...updatedCard,
+                config: cardData.config || {
+                  showDescription: true,
+                  showImage: true,
+                  layout: "horizontal",
+                },
+              },
+              id: updatedCard.id,
+            };
+
+            updateComponent(updatedComponent);
+            setCardData(updatedCard);
+            setLastUpdated(new Date());
+            lastUpdateRef.current = now;
+
+            if (!silent) {
+              message.success("Card data updated successfully");
+            }
+          } else if (!silent) {
+            message.info("Card data is up to date");
+          }
+        }
+      } catch (error) {
+        console.error("Error refreshing card data:", error);
+        if (!silent) {
+          message.error("Failed to refresh card data");
+        }
+      } finally {
+        setIsRefreshing(false);
       }
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+    },
+    [
+      cardData?.id,
+      cardData?.config,
+      component,
+      updateComponent,
+      isEditing,
+      preview,
+    ]
+  );
 
   // Handle selection from CardSelectionModal
-  const handleSelectCard = (selectedCard) => {
+  const handleSelectCard = useCallback((selectedCard) => {
     setSelectedCardData(selectedCard);
     setIsModalVisible(false);
     setIsEditing(true);
-  };
+  }, []);
 
   // Handle Submit (Confirm) Changes
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!selectedCardData) {
       Modal.error({
         title: "Validation Error",
@@ -162,7 +203,8 @@ const CardComponent = ({
       });
       return;
     }
-    updateComponent({
+
+    const updatedComponent = {
       ...component,
       _mave: {
         ...selectedCardData,
@@ -173,24 +215,26 @@ const CardComponent = ({
         },
       },
       id: selectedCardData.id,
-    });
+    };
+
+    updateComponent(updatedComponent);
     setCardData(selectedCardData);
     setSelectedCardData(null);
     setIsEditing(false);
     message.success("Card updated successfully.");
-  };
+  }, [selectedCardData, component, updateComponent]);
 
   // Handle Cancel Changes
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setSelectedCardData(null);
     setIsEditing(false);
     message.info("Card update canceled.");
-  };
+  }, []);
 
   // Handle Delete Component
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     deleteComponent();
-  };
+  }, [deleteComponent]);
 
   // If in preview mode, render the card content only
   if (preview) {
@@ -201,73 +245,34 @@ const CardComponent = ({
             <div className="flex items-center gap-2">
               <Button
                 icon={<ReloadOutlined spin={isRefreshing} />}
-                onClick={refreshCardData}
+                onClick={() => refreshCardData(false)}
                 loading={isRefreshing}
                 size="small"
                 className="mavebutton"
                 title="Refresh card data"
               />
-              {/* <span
-                className={`text-xs px-2 py-1 rounded ${autoPolling ? "text-green-600 bg-green-100" : "text-gray-500 bg-gray-100"}`}
-              >
-                Auto-refresh: {autoPolling ? "ON" : "OFF"}
-              </span> */}
-            </div>
-            {/* {lastUpdated && (
-              <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-                Updated {lastUpdated.toLocaleTimeString()}
-              </span>
-            )}
-            {autoPolling && cardData?.id && (
-              <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                Auto-refresh active
-              </span>
-            )} */}
-          </div>
-        )}
-        {cardData ? (
-          <div
-            className={`flex ${cardData.config?.layout === "horizontal" ? "flex-row" : "flex-col"} gap-4 border p-4 rounded-md bg-white relative`}
-          >
-            {isRefreshing && (
-              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-md">
-                <div className="flex items-center gap-2">
-                  <ReloadOutlined spin />
-                  <span>Refreshing...</span>
-                </div>
-              </div>
-            )}
-            {cardData.config?.showImage && (
-              <div
-                className={
-                  cardData.config?.layout === "horizontal" ? "w-1/3" : "w-full"
-                }
-              >
-                {renderCardMedia(cardData.media_files)}
-              </div>
-            )}
-            <div
-              className={
-                cardData.config?.layout === "horizontal" ? "w-2/3" : "w-full"
-              }
-            >
-              <Text strong className="text-xl">
-                {cardData.title_en || "Card Title"}
-              </Text>
-              {cardData.config?.showDescription && (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      cardData.description_en?.length <= 200
-                        ? cardData.description_en
-                        : cardData.description_en?.slice(0, 200) + "...",
-                  }}
-                />
+              {autoPolling && (
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                  Auto-refresh active
+                </span>
               )}
             </div>
           </div>
+        )}
+        {cardData ? (
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            {renderCardMedia(cardData.media_files)}
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-2">
+                {cardData.title_en || "Untitled Card"}
+              </h3>
+              <p className="text-gray-600">
+                {cardData.description_en || "No description available"}
+              </p>
+            </div>
+          </div>
         ) : (
-          <p className="text-gray-500">No card selected.</p>
+          <Text className="text-gray-500">No card data available.</Text>
         )}
       </div>
     );
@@ -279,88 +284,34 @@ const CardComponent = ({
         <div className="flex items-center gap-2">
           <DragOutlined className="text-2xl border rounded-md p-1" />
           <h3 className="text-xl font-semibold">Card Component</h3>
-          {/* {lastUpdated && (
-            <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-              Updated {lastUpdated.toLocaleTimeString()}
-            </span>
-          )}
-          {autoPolling && cardData?.id && (
-            <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-              Auto-refresh active
-            </span>
-          )} */}
         </div>
-        <div className="flex items-center gap-2">
-          {!isEditing ? (
-            <Space>
-              {cardData && (
-                <>
-                  <Tooltip title="Refresh Card Data">
-                    <Button
-                      icon={<ReloadOutlined spin={isRefreshing} />}
-                      onClick={refreshCardData}
-                      loading={isRefreshing}
-                      className="mavebutton"
-                    />
-                  </Tooltip>
-                  {/* <Tooltip
-                    title={`${autoPolling ? "Disable" : "Enable"} Auto Refresh`}
-                  >
-                    <Button
-                      icon={<SettingOutlined />}
-                      onClick={() => setAutoPolling(!autoPolling)}
-                      className={
-                        autoPolling ? "mavebutton" : "mavecancelbutton"
-                      }
-                    />
-                  </Tooltip> */}
-                  <Tooltip title="Change Card">
-                    <Button
-                      icon={<EditOutlined />}
-                      onClick={() => setIsModalVisible(true)}
-                      className="mavebutton"
-                    />
-                  </Tooltip>
-                </>
-              )}
-              <Tooltip title="Duplicate">
-                <Button
-                  icon={<CopyFilled />}
-                  onClick={onDuplicateElement}
-                  className="mavebutton"
-                />
-              </Tooltip>
+        <div className="flex gap-2">
+          {cardData && (
+            <>
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => setIsModalVisible(true)}
+                className="mavebutton"
+              >
+                Update
+              </Button>
+              <Button
+                icon={<CopyFilled />}
+                onClick={onDuplicateElement}
+                className="mavebutton"
+              />
               <Popconfirm
                 title="Are you sure you want to delete this component?"
                 onConfirm={handleDelete}
                 okText="Yes"
                 cancelText="No"
               >
-                <Tooltip title="Delete">
-                  <Button
-                    icon={<DeleteOutlined />}
-                    className="mavecancelbutton"
-                  />
-                </Tooltip>
-              </Popconfirm>
-            </Space>
-          ) : (
-            <Space>
-              <Tooltip title="Save Changes">
                 <Button
-                  icon={<CheckOutlined />}
-                  onClick={handleSubmit}
-                  className="mavebutton"
-                />
-              </Tooltip>
-              <Tooltip title="Cancel">
-                <Button
-                  icon={<CloseOutlined />}
-                  onClick={handleCancel}
+                  icon={<DeleteOutlined />}
                   className="mavecancelbutton"
                 />
-              </Tooltip>
-            </Space>
+              </Popconfirm>
+            </>
           )}
         </div>
       </div>
@@ -373,46 +324,17 @@ const CardComponent = ({
             <h4 className="mb-2 text-md font-semibold">Current Card</h4>
           )}
           {cardData ? (
-            <div
-              className={`flex ${cardData.config?.layout === "horizontal" ? "flex-row" : "flex-col"} gap-4 border p-4 rounded-md bg-white relative`}
-            >
-              {isRefreshing && (
-                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <ReloadOutlined spin />
-                    <span>Refreshing...</span>
-                  </div>
+            <div className="w-full relative">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                {renderCardMedia(cardData.media_files)}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    {cardData.title_en || "Untitled Card"}
+                  </h3>
+                  <p className="text-gray-600">
+                    {cardData.description_en || "No description available"}
+                  </p>
                 </div>
-              )}
-              {cardData.config?.showImage && (
-                <div
-                  className={
-                    cardData.config?.layout === "horizontal"
-                      ? "w-1/3"
-                      : "w-full"
-                  }
-                >
-                  {renderCardMedia(cardData.media_files)}
-                </div>
-              )}
-              <div
-                className={
-                  cardData.config?.layout === "horizontal" ? "w-2/3" : "w-full"
-                }
-              >
-                <Text strong className="text-xl">
-                  {cardData.title_en || "Card Title"}
-                </Text>
-                {cardData.config?.showDescription && (
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        cardData.description_en?.length <= 200
-                          ? cardData.description_en
-                          : cardData.description_en?.slice(0, 200) + "...",
-                    }}
-                  />
-                )}
               </div>
             </div>
           ) : (
@@ -429,52 +351,48 @@ const CardComponent = ({
         {isEditing && selectedCardData && (
           <div className="flex flex-col w-full md:w-1/2">
             <h4 className="mb-2 text-md font-semibold">Selected Card</h4>
-            <div
-              className={`flex ${selectedCardData.config?.layout === "horizontal" ? "flex-row" : "flex-col"} gap-4 border p-4 rounded-md bg-white`}
-            >
-              {selectedCardData.config?.showImage && (
-                <div
-                  className={
-                    selectedCardData.config?.layout === "horizontal"
-                      ? "w-1/3"
-                      : "w-full"
-                  }
-                >
-                  {renderCardMedia(selectedCardData.media_files)}
+            <div className="w-full relative">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                {renderCardMedia(selectedCardData.media_files)}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    {selectedCardData.title_en || "Untitled Card"}
+                  </h3>
+                  <p className="text-gray-600">
+                    {selectedCardData.description_en ||
+                      "No description available"}
+                  </p>
                 </div>
-              )}
-              <div
-                className={
-                  selectedCardData.config?.layout === "horizontal"
-                    ? "w-2/3"
-                    : "w-full"
-                }
-              >
-                <Text strong className="text-xl">
-                  {selectedCardData.title_en || "Card Title"}
-                </Text>
-                {selectedCardData.config?.showDescription && (
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        selectedCardData.description_en?.length <= 200
-                          ? selectedCardData.description_en
-                          : selectedCardData.description_en?.slice(0, 200) +
-                            "...",
-                    }}
-                  />
-                )}
               </div>
             </div>
           </div>
         )}
       </div>
 
+      {isEditing && selectedCardData && (
+        <div className="mt-4 flex gap-2">
+          <Button
+            type="primary"
+            icon={<CheckOutlined />}
+            onClick={handleSubmit}
+            className="mavebutton"
+          >
+            Confirm Changes
+          </Button>
+          <Button
+            icon={<CloseOutlined />}
+            onClick={handleCancel}
+            className="mavecancelbutton"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
+
       <CardSelectionModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSelectCard={handleSelectCard}
-        initialCard={cardData}
       />
     </div>
   );

@@ -9,17 +9,40 @@ export const useSliderRefresh = (
   sliderData,
   component,
   updateComponent,
-  preview = false
+  preview = false,
+  isEditing = false // Add isEditing parameter to prevent updates during editing
 ) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [autoPolling, setAutoPolling] = useState(true);
+  const [autoPolling, setAutoPolling] = useState(false); // Default to false - only enable in preview mode
   const [pollingError, setPollingError] = useState(null);
   const pollingIntervalRef = useRef(null);
+  const lastUpdateRef = useRef(null);
+
+  // Auto-enable polling when in preview mode (not editing)
+  useEffect(() => {
+    if (preview && !isEditing) {
+      setAutoPolling(true);
+    } else {
+      setAutoPolling(false);
+    }
+  }, [preview, isEditing]);
 
   // Memoize the fetch function to avoid dependency issues
   const fetchSliderData = useCallback(
     async (silent = false) => {
+      // Prevent updates during editing to avoid losing draft state
+      if (isEditing) {
+        console.log("🔄 Skipping slider refresh - component is being edited");
+        return;
+      }
+
+      // Only allow refresh in preview mode
+      if (!preview) {
+        console.log("🔄 Skipping slider refresh - not in preview mode");
+        return;
+      }
+
       if (!sliderData?.id) {
         if (!silent) {
           message.warning("No slider ID available to refresh");
@@ -48,6 +71,13 @@ export const useSliderRefresh = (
               JSON.stringify(currentMediaIds) !== JSON.stringify(newMediaIds);
 
             if (hasChanges) {
+              // Check if we've already updated recently to prevent rapid updates
+              const now = Date.now();
+              if (lastUpdateRef.current && now - lastUpdateRef.current < 5000) {
+                console.log("🔄 Skipping update - too recent");
+                return;
+              }
+
               // Always update the component with fresh data
               const updatedComponent = {
                 ...component,
@@ -67,6 +97,7 @@ export const useSliderRefresh = (
               // Test if updateComponent is working
               try {
                 updateComponent(updatedComponent);
+                lastUpdateRef.current = now;
               } catch (error) {
                 console.error("❌ Error calling updateComponent:", error);
               }
@@ -102,12 +133,19 @@ export const useSliderRefresh = (
         }
       }
     },
-    [sliderData?.id, sliderData?.config, component, updateComponent]
+    [
+      sliderData?.id,
+      sliderData?.config,
+      component,
+      updateComponent,
+      isEditing,
+      preview,
+    ]
   );
 
-  // Auto-polling effect
+  // Auto-polling effect - only when in preview mode and not editing
   useEffect(() => {
-    if (!autoPolling || !sliderData?.id || preview) {
+    if (!autoPolling || !sliderData?.id || !preview || isEditing) {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
@@ -129,7 +167,7 @@ export const useSliderRefresh = (
         pollingIntervalRef.current = null;
       }
     };
-  }, [autoPolling, sliderData?.id, preview, fetchSliderData]);
+  }, [autoPolling, sliderData?.id, preview, isEditing, fetchSliderData]);
 
   // Manual refresh function
   const handleManualRefresh = useCallback(async () => {

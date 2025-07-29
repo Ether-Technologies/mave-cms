@@ -10,6 +10,7 @@ import {
   CaretDownFilled,
   CaretRightOutlined,
   CaretDownOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { Button, Card, message, Popconfirm } from "antd";
 import React, { useState, useEffect } from "react";
@@ -24,6 +25,7 @@ const PageCard = ({
   handleDeletePage,
   handleEditPageInfo,
   handleDuplicatePage,
+  handlePreviewPage,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [type, setType] = useState("Page");
@@ -59,6 +61,13 @@ const PageCard = ({
     setIsEditing(false);
   };
 
+  // Function to truncate text
+  const truncateText = (text, maxLength = 30) => {
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
   return (
     <Card
       title={
@@ -67,15 +76,19 @@ const PageCard = ({
             <span className="text-base md:text-lg font-semibold text-gray-800">
               {type} ID-{page.id}
             </span>
-            <span className="text-base md:text-lg font-medium text-theme">
-              {page.page_name_en}
+            <span
+              className="text-base md:text-lg font-medium text-theme"
+              title={page.page_name_en}
+            >
+              {truncateText(page.page_name_en)}
             </span>
           </div>
           <div className="flex gap-2">
             <Button
-              icon={<EditOutlined />}
-              onClick={() => router.push(`/page-builder/${page.id}`)}
+              icon={<EyeOutlined />}
+              onClick={() => handlePreviewPage(page.id)}
               className="h-9 px-4 mavebutton"
+              title="Preview Page"
             />
             <Button
               type="default"
@@ -112,14 +125,22 @@ const PageCard = ({
           {!isEditing && (
             <div className="flex flex-wrap gap-3 mt-6">
               <Button
+                icon={<EyeOutlined />}
+                onClick={() => handlePreviewPage(page.id)}
+                className="h-9 px-4 mavebutton"
+                title="Preview Page"
+              />
+              <Button
                 icon={<EditOutlined />}
                 onClick={startEditing}
                 className="h-9 px-4 mavebutton"
+                title="Edit Page Info"
               />
               <Button
                 icon={<CopyOutlined />}
                 onClick={() => handleDuplicatePage(page.id)}
                 className="h-9 px-4 mavebutton"
+                title="Duplicate Page"
               />
               <Popconfirm
                 title="Are you sure you want to delete this page?"
@@ -132,6 +153,7 @@ const PageCard = ({
                 <Button
                   icon={<DeleteFilled />}
                   className="h-9 px-4 mavecancelbutton"
+                  title="Delete Page"
                 />
               </Popconfirm>
             </div>

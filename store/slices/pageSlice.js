@@ -31,7 +31,25 @@ const pageSlice = createSlice({
     },
     updateSection: (state, action) => {
       const { sectionIndex, newSection } = action.payload;
-      state.pageData.body[sectionIndex] = newSection;
+
+      // Validate that pageData and body exist
+      if (!state.pageData || !state.pageData.body) {
+        console.error("❌ Cannot update section: pageData or body is null");
+        return;
+      }
+
+      // Validate that sectionIndex is within bounds
+      if (sectionIndex < 0 || sectionIndex >= state.pageData.body.length) {
+        console.error("❌ Section index out of bounds:", sectionIndex, "body length:", state.pageData.body.length);
+        return;
+      }
+
+      // Create a new array instead of mutating the existing one
+      state.pageData.body = [
+        ...state.pageData.body.slice(0, sectionIndex),
+        newSection,
+        ...state.pageData.body.slice(sectionIndex + 1)
+      ];
       state.isDirty = true;
     },
     moveComponent: (state, action) => {
@@ -48,11 +66,18 @@ const pageSlice = createSlice({
 
       const component = state.pageData.body[fromSectionIndex].data[fromIndex];
 
-      // Remove from source
-      state.pageData.body[fromSectionIndex].data.splice(fromIndex, 1);
+      // Remove from source - create new array
+      state.pageData.body[fromSectionIndex].data = [
+        ...state.pageData.body[fromSectionIndex].data.slice(0, fromIndex),
+        ...state.pageData.body[fromSectionIndex].data.slice(fromIndex + 1)
+      ];
 
-      // Add to destination
-      state.pageData.body[toSectionIndex].data.splice(toIndex, 0, component);
+      // Add to destination - create new array
+      state.pageData.body[toSectionIndex].data = [
+        ...state.pageData.body[toSectionIndex].data.slice(0, toIndex),
+        component,
+        ...state.pageData.body[toSectionIndex].data.slice(toIndex)
+      ];
       state.isDirty = true;
     },
     duplicateComponent: (state, action) => {
@@ -67,11 +92,13 @@ const pageSlice = createSlice({
         JSON.stringify(state.pageData.body[sectionIndex].data[componentIndex])
       );
       component._id = Date.now().toString(); // Generate new ID for duplicate
-      state.pageData.body[sectionIndex].data.splice(
-        componentIndex + 1,
-        0,
-        component
-      );
+
+      // Create new array instead of using splice
+      state.pageData.body[sectionIndex].data = [
+        ...state.pageData.body[sectionIndex].data.slice(0, componentIndex + 1),
+        component,
+        ...state.pageData.body[sectionIndex].data.slice(componentIndex + 1)
+      ];
       state.isDirty = true;
     },
   },

@@ -6,7 +6,7 @@ import PageCard from "./PageCard";
 
 const RenderPages = ({
   webpages = [], // Ensure default value is an empty array
-  handleEditPage,
+  handlePreviewPage,
   handleExpand,
   expandedPageId,
   handleDeletePage,
@@ -21,7 +21,7 @@ const RenderPages = ({
             <div className="break-inside-avoid" key={page.id}>
               <PageCard
                 page={page}
-                handleEditPage={handleEditPage}
+                handlePreviewPage={handlePreviewPage}
                 handleExpand={handleExpand}
                 expandedPageId={expandedPageId}
                 handleDeletePage={handleDeletePage}

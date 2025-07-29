@@ -6,7 +6,7 @@ import PageBuilder from "../../components/PageBuilder/PageBuilder";
 
 const PageBuilderPage = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, edit } = router.query;
 
   // Ensure the page ID is available before rendering
   if (!id) {
@@ -16,7 +16,7 @@ const PageBuilderPage = () => {
   return (
     <>
       <div className="mavecontainer">
-        <PageBuilder pageId={id} />
+        <PageBuilder pageId={id} editMode={edit === 'true'} />
       </div>
     </>
   );

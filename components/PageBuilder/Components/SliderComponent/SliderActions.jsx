@@ -65,7 +65,7 @@ const SliderActions = React.memo(
                 </span>
               )}
               {autoPolling && (
-                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
                   Auto-refresh active
                 </span>
               )} */}

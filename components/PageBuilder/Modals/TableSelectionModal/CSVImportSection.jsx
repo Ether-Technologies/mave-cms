@@ -208,7 +208,7 @@ const CSVImportSection = React.memo(({ setHeaders, setRows }) => {
               <UploadOutlined />
               <span>Import CSV</span>
               {isProcessing && (
-                <span className="text-blue-500">(Processing...)</span>
+                <span className="text-yellow-500">(Processing...)</span>
               )}
             </div>
           }

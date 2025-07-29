@@ -2,13 +2,16 @@
 
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import SectionList from "./Sections/SectionList";
-import { Button, message, Spin } from "antd"; // Removed Tooltip for simplicity
+import SectionWrapper from "./Sections/SectionWrapper";
+import { Button, message, Spin, Alert, Modal } from "antd"; // Removed Tooltip for simplicity
 import {
   SaveOutlined,
   EyeOutlined,
+  EditOutlined,
   UndoOutlined,
   RedoOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
 } from "@ant-design/icons"; // Changed to EyeOutlined for Preview
 import instance from "../../axios";
 import PagePreview from "./PagePreview";
@@ -29,11 +32,10 @@ import {
   selectCanUndo,
   selectCanRedo,
 } from "../../store/slices/historySlice";
-import { DragDropContext } from "react-beautiful-dnd";
 
 const AUTOSAVE_DELAY = 30000; // 30 seconds
 
-const PageBuilder = ({ pageId }) => {
+const PageBuilder = ({ pageId, editMode = false }) => {
   const dispatch = useDispatch();
   const { pageData, loading, error, isDirty, lastSaved } = useSelector(
     (state) => state.page
@@ -41,6 +43,7 @@ const PageBuilder = ({ pageId }) => {
 
   const { canUndo, canRedo } = useSelector((state) => state.history);
   const [preview, setPreview] = useState(false);
+  const [isEditing, setIsEditing] = useState(editMode); // Use editMode prop
 
   const router = useRouter();
   const initialLoadRef = useRef(true);
@@ -49,6 +52,8 @@ const PageBuilder = ({ pageId }) => {
   const fetchPageData = useCallback(async () => {
     try {
       dispatch(setLoading(true));
+
+      // Always fetch fresh data from server for editing
       const response = await instance.get(`/pages/${pageId}`);
       const data = response.data;
 
@@ -66,10 +71,12 @@ const PageBuilder = ({ pageId }) => {
         }));
       }
 
+      console.log("📄 Loading fresh server data:", data);
       dispatch(setPageData(data));
       dispatch(pushToHistory(data)); // Add initial state to history
       dispatch(setError(null));
     } catch (err) {
+      console.error("❌ Error fetching page data:", err);
       dispatch(setError(err.message || "Failed to fetch page data"));
     } finally {
       dispatch(setLoading(false));
@@ -92,6 +99,7 @@ const PageBuilder = ({ pageId }) => {
       if (response.status === 200) {
         dispatch(setIsDirty(false));
         dispatch(setLastSaved(new Date().toISOString()));
+
         if (showMessage) {
           message.success("Page saved successfully");
         }
@@ -154,11 +162,11 @@ const PageBuilder = ({ pageId }) => {
   // Debounced autosave function
   const debouncedAutosave = useCallback(
     debounce(async () => {
-      if (isDirty) {
+      if (isDirty && !isEditing) {
         await savePageData(false);
       }
     }, AUTOSAVE_DELAY),
-    [isDirty, pageData]
+    [isDirty, pageData, isEditing]
   );
 
   // Effect for autosave
@@ -217,159 +225,321 @@ const PageBuilder = ({ pageId }) => {
     };
   }, [isDirty, router.events]);
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
+  // Set editing state when components are being edited
+  const handleEditingStateChange = useCallback((editing) => {
+    setIsEditing(editing);
+  }, []);
 
-    const { source, destination, type } = result;
+  // Handle section updates (when components are added/modified)
+  const handleSectionUpdate = useCallback(
+    (sectionIndex, updatedSection) => {
+      console.log("🔧 handleSectionUpdate called:", {
+        sectionIndex,
+        updatedSection,
+      });
 
-    // Handle section reordering
-    if (type === "SECTION") {
-      const sections = Array.from(pageData.body);
-      const [reorderedSection] = sections.splice(source.index, 1);
-      sections.splice(destination.index, 0, reorderedSection);
-      dispatch(setPageData({ ...pageData, body: sections }));
-      return;
+      // Validate inputs
+      if (sectionIndex === undefined || sectionIndex === null) {
+        console.error("❌ Invalid sectionIndex:", sectionIndex);
+        return;
+      }
+
+      if (!updatedSection) {
+        console.error("❌ Invalid updatedSection:", updatedSection);
+        return;
+      }
+
+      if (pageData && pageData.body && sectionIndex >= 0) {
+        const updatedPageData = { ...pageData };
+
+        // Ensure the sectionIndex is within bounds
+        if (sectionIndex < updatedPageData.body.length) {
+          // Create a new array instead of mutating the existing one
+          updatedPageData.body = [
+            ...updatedPageData.body.slice(0, sectionIndex),
+            updatedSection,
+            ...updatedPageData.body.slice(sectionIndex + 1),
+          ];
+          dispatch(setPageData(updatedPageData));
+          dispatch(setIsDirty(true));
+          console.log("✅ Section updated successfully");
+        } else {
+          console.error(
+            "❌ Section index out of bounds:",
+            sectionIndex,
+            "body length:",
+            updatedPageData.body.length
+          );
+        }
+      } else {
+        console.error("❌ Invalid parameters for handleSectionUpdate:", {
+          hasPageData: !!pageData,
+          hasBody: !!(pageData && pageData.body),
+          sectionIndex,
+          bodyLength: pageData?.body?.length,
+        });
+      }
+    },
+    [pageData, dispatch]
+  );
+
+  // Handle component updates (legacy - kept for compatibility)
+  const handleComponentUpdate = useCallback(
+    (updatedComponent, componentIndex) => {
+      if (pageData && pageData.body) {
+        const updatedPageData = { ...pageData };
+        // This will be handled by the Section component internally
+        dispatch(setPageData(updatedPageData));
+        dispatch(setIsDirty(true));
+      }
+    },
+    [pageData, dispatch]
+  );
+
+  // Handle component deletion
+  const handleComponentDelete = useCallback(
+    (componentIndex) => {
+      if (pageData && pageData.body) {
+        const updatedPageData = { ...pageData };
+        // This will be handled by the Section component internally
+        dispatch(setPageData(updatedPageData));
+        dispatch(setIsDirty(true));
+      }
+    },
+    [pageData, dispatch]
+  );
+
+  // Handle component duplication
+  const handleComponentDuplicate = useCallback(
+    (componentIndex) => {
+      if (pageData && pageData.body) {
+        const updatedPageData = { ...pageData };
+        // This will be handled by the Section component internally
+        dispatch(setPageData(updatedPageData));
+        dispatch(setIsDirty(true));
+      }
+    },
+    [pageData, dispatch]
+  );
+
+  // Handle adding new section
+  const handleAddSection = useCallback(() => {
+    if (pageData) {
+      const newSection = {
+        _id: `section_${Date.now()}`,
+        title: `Section ${(pageData.body?.length || 0) + 1}`,
+        data: [],
+        sectionTitle: `Section ${(pageData.body?.length || 0) + 1}`,
+      };
+
+      const updatedPageData = {
+        ...pageData,
+        body: [...(pageData.body || []), newSection],
+      };
+
+      dispatch(setPageData(updatedPageData));
+      dispatch(setIsDirty(true));
+      message.success("New section added successfully");
     }
+  }, [pageData, dispatch]);
 
-    // Handle component reordering within or between sections
-    const sourceSectionIndex = parseInt(source.droppableId);
-    const destinationSectionIndex = parseInt(destination.droppableId);
+  // Debug logging
+  useEffect(() => {
+    console.log("🔍 PageBuilder state:", {
+      loading,
+      error,
+      pageData: pageData
+        ? { id: pageData.id, bodyLength: pageData.body?.length }
+        : null,
+      isDirty,
+      isEditing,
+    });
+  }, [loading, error, pageData, isDirty, isEditing]);
 
-    // If moving within the same section
-    if (sourceSectionIndex === destinationSectionIndex) {
-      const sections = Array.from(pageData.body);
-      const section = sections[sourceSectionIndex];
-      const components = Array.from(section.data);
-      const [movedComponent] = components.splice(source.index, 1);
-      components.splice(destination.index, 0, movedComponent);
-
-      sections[sourceSectionIndex] = {
-        ...section,
-        data: components,
-      };
-
-      dispatch(setPageData({ ...pageData, body: sections }));
-    } else {
-      // If moving between sections
-      const sections = Array.from(pageData.body);
-      const sourceSection = sections[sourceSectionIndex];
-      const destinationSection = sections[destinationSectionIndex];
-      const sourceComponents = Array.from(sourceSection.data);
-      const destinationComponents = Array.from(destinationSection.data);
-
-      const [movedComponent] = sourceComponents.splice(source.index, 1);
-      destinationComponents.splice(destination.index, 0, movedComponent);
-
-      sections[sourceSectionIndex] = {
-        ...sourceSection,
-        data: sourceComponents,
-      };
-
-      sections[destinationSectionIndex] = {
-        ...destinationSection,
-        data: destinationComponents,
-      };
-
-      dispatch(setPageData({ ...pageData, body: sections }));
+  // Force loading to false if it gets stuck
+  useEffect(() => {
+    if (loading && pageData) {
+      console.log("🔧 Force setting loading to false");
+      dispatch(setLoading(false));
     }
-  };
+  }, [loading, pageData, dispatch]);
 
   if (loading) {
+    console.log("🔄 Showing loading spinner");
     return (
-      <div className="m-auto flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
+        <div className="ml-4">Loading page data...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center">
-        <div className="text-red-500 mb-4">{error}</div>
-        <Button onClick={fetchPageData} type="primary">
-          Retry Loading
-        </Button>
+      <div className="flex justify-center items-center h-screen">
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          action={
+            <Button size="small" onClick={fetchPageData}>
+              Retry
+            </Button>
+          }
+        />
       </div>
     );
   }
 
+  // Show loading if pageData is not available yet
   if (!pageData) {
     return (
-      <div className="text-center text-red-500">Error loading page data.</div>
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
+        <div className="ml-4">Loading page data...</div>
+      </div>
     );
   }
 
   return (
-    <div className="p-6 relative min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-8 p-4 bg-white rounded-lg shadow-sm">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold text-gray-800">
-            {pageData.page_name_en} Page
-          </h1>
-          {lastSaved && (
-            <p className="text-sm text-gray-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span>
-              {/* date format 06:22 PM, 04 March 2025 */}
-              {new Date(lastSaved).toLocaleString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b px-6 py-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {isEditing ? "Page Builder" : "Page Preview"}
+            </h1>
+            {isDirty && isEditing && (
+              <div className="flex items-center gap-2 text-yellow-500">
+                <ExclamationCircleOutlined />
+                <span className="text-sm">Unsaved changes</span>
+              </div>
+            )}
+
+            {!isEditing && (
+              <div className="flex items-center gap-2 text-green-500">
+                <span className="text-sm">
+                  Preview Mode - Auto-refresh enabled
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {isEditing ? (
+              <>
+                <Button
+                  icon={<UndoOutlined />}
+                  onClick={handleUndo}
+                  disabled={!canUndo}
+                  className="mavebutton"
+                >
+                  Undo
+                </Button>
+                <Button
+                  icon={<RedoOutlined />}
+                  onClick={handleRedo}
+                  disabled={!canRedo}
+                  className="mavebutton"
+                >
+                  Redo
+                </Button>
+                <Button
+                  icon={<EyeOutlined />}
+                  onClick={() => setIsEditing(false)}
+                  className="mavebutton"
+                >
+                  Preview
+                </Button>
+              </>
+            ) : (
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => setIsEditing(true)}
+                className="mavebutton"
+              >
+                Edit
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="bg-gray-50 min-h-screen">
+        <div className="p-6">
+          {pageData?.body?.length > 0 ? (
+            <>
+              {pageData.body.map((section, sectionIndex) => (
+                <div key={sectionIndex} className="mb-8">
+                  <SectionWrapper
+                    section={section}
+                    sectionIndex={sectionIndex}
+                    onSectionUpdate={handleSectionUpdate}
+                    onComponentDelete={handleComponentDelete}
+                    onComponentDuplicate={handleComponentDuplicate}
+                    onEditingStateChange={handleEditingStateChange}
+                  />
+                </div>
+              ))}
+              {isEditing && (
+                <div className="text-center py-8">
+                  <Button
+                    icon={<PlusOutlined />}
+                    onClick={handleAddSection}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-6 py-2 font-semibold"
+                    size="large"
+                  >
+                    Add Section
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No sections found in this page.</p>
+              <p className="text-sm text-gray-400 mt-2">
+                Add sections to start building your page.
+              </p>
+              {isEditing && (
+                <div className="mt-4">
+                  <Button
+                    icon={<PlusOutlined />}
+                    onClick={handleAddSection}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-6 py-2 font-semibold"
+                    size="large"
+                  >
+                    Add Section
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
-        <div className="flex gap-3">
-          <Button
-            icon={<UndoOutlined />}
-            onClick={handleUndo}
-            disabled={!canUndo}
-            className="flex items-center justify-center w-10 h-10 rounded-lg border-2 border-gray-200 hover:border-theme transition-colors"
-            title="Undo (Ctrl/⌘ + Z)"
-          />
-          <Button
-            icon={<RedoOutlined />}
-            onClick={handleRedo}
-            disabled={!canRedo}
-            className="flex items-center justify-center w-10 h-10 rounded-lg border-2 border-gray-200 hover:border-theme transition-colors"
-            title="Redo (Ctrl/⌘ + Y or Ctrl/⌘ + Shift + Z)"
-          />
-        </div>
       </div>
 
-      {/* Section List */}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          <SectionList
-            sections={pageData.body}
-            setSections={(newSections) => {
-              dispatch(setPageData({ ...pageData, body: newSections }));
-            }}
+      {/* Floating Action Buttons - Only show in edit mode */}
+      {isEditing && (
+        <div className="fixed bottom-14 right-6 flex gap-4">
+          <Button
+            icon={<EyeOutlined style={{ fontSize: "1.5rem" }} />}
+            onClick={() => setPreview(true)}
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-lg border-2 border-gray-200 hover:border-theme transition-colors"
+          />
+          <Button
+            icon={<SaveOutlined style={{ fontSize: "1.5rem" }} />}
+            onClick={() => savePageData(true)}
+            disabled={!isDirty}
+            className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg border-2 ${
+              isDirty
+                ? "bg-yellow-400 hover:bg-yellow-500 border-yellow-500 cursor-pointer"
+                : "bg-gray-300 border-gray-400 cursor-not-allowed"
+            } text-white transition-colors`}
+            title={isDirty ? "Save (Ctrl/⌘ + S)" : "No changes to save"}
           />
         </div>
-      </DragDropContext>
-
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-14 right-6 flex gap-4">
-        <Button
-          icon={<EyeOutlined style={{ fontSize: "1.5rem" }} />}
-          onClick={() => setPreview(true)}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-lg border-2 border-gray-200 hover:border-theme transition-colors"
-        />
-        <Button
-          icon={<SaveOutlined style={{ fontSize: "1.5rem" }} />}
-          onClick={() => savePageData(true)}
-          disabled={!isDirty}
-          className={`flex items-center justify-center w-14 h-14 rounded-full shadow-lg border-2 ${
-            isDirty
-              ? "bg-yellow-400 hover:bg-yellow-500 border-yellow-500 cursor-pointer"
-              : "bg-gray-300 border-gray-400 cursor-not-allowed"
-          } text-white transition-colors`}
-          title={isDirty ? "Save (Ctrl/⌘ + S)" : "No changes to save"}
-        />
-      </div>
+      )}
 
       {/* Page Preview Modal */}
       <PagePreview pageData={pageData} open={preview} setOpen={setPreview} />

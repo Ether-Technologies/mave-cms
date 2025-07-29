@@ -13,7 +13,7 @@ const PagesTabs = ({
   handleExpand,
   expandedPageId,
   handleDeletePage,
-  handleEditPage,
+  handlePreviewPage,
   handleEditPageInfo,
   handleDuplicatePage,
 }) => {
@@ -23,7 +23,7 @@ const PagesTabs = ({
         {typePages ? (
           <RenderPages
             webpages={typePages}
-            handleEditPage={handleEditPage}
+            handlePreviewPage={handlePreviewPage}
             handleExpand={handleExpand}
             expandedPageId={expandedPageId}
             handleDeletePage={handleDeletePage}
@@ -38,7 +38,7 @@ const PagesTabs = ({
         {typeSubpages ? (
           <RenderPages
             webpages={typeSubpages}
-            handleEditPage={handleEditPage}
+            handlePreviewPage={handlePreviewPage}
             handleExpand={handleExpand}
             expandedPageId={expandedPageId}
             handleDeletePage={handleDeletePage}

@@ -1,9 +1,8 @@
-// components/PageBuilder/Components/ComponentList.jsx
+// components/PageBuilder/Components/ComponentListSimple.jsx
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ComponentRenderer from "./ComponentRenderer";
 import ComponentSelectorModal from "../Modals/ComponentSelectorModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,7 +14,7 @@ import {
 } from "../../../store/slices/pageSlice";
 import { message } from "antd";
 
-const ComponentList = ({
+const ComponentListSimple = ({
   components = [],
   sectionIndex,
   onComponentsUpdate,
@@ -44,54 +43,14 @@ const ComponentList = ({
     [onEditingStateChange]
   );
 
-  const onDragEnd = useCallback(
-    (result) => {
-      if (!result.destination) return;
-
-      const items = Array.from(componentsState);
-      const reorderedItem = items[result.source.index];
-
-      // Create new array without mutating
-      const newItems = [
-        ...items.slice(0, result.source.index),
-        ...items.slice(result.source.index + 1),
-      ];
-
-      // Insert at destination
-      const finalItems = [
-        ...newItems.slice(0, result.destination.index),
-        reorderedItem,
-        ...newItems.slice(result.destination.index),
-      ];
-
-      setComponents(finalItems);
-
-      if (onComponentsUpdate) {
-        onComponentsUpdate(finalItems);
-      } else {
-        // Fallback to old system
-        const updatedPageData = {
-          ...pageData,
-          body: pageData.body.map((section, idx) => {
-            if (idx === sectionIndex) {
-              return {
-                ...section,
-                data: finalItems,
-              };
-            }
-            return section;
-          }),
-        };
-
-        dispatch(setPageData(updatedPageData));
-        dispatch(setIsDirty(true));
-      }
-    },
-    [componentsState, onComponentsUpdate, pageData, sectionIndex, dispatch]
-  );
-
   const addComponent = useCallback(
     (type) => {
+      console.log("🔧 addComponent called:", {
+        type,
+        sectionIndex,
+        componentsCount: componentsState.length,
+      });
+
       // Validate input
       if (!type) {
         console.error("❌ Invalid component type:", type);
@@ -118,6 +77,11 @@ const ComponentList = ({
       if (onComponentsUpdate) {
         // Use new callback system
         const updatedComponents = [...componentsState, newComponent];
+        console.log(
+          "🔧 Calling onComponentsUpdate with:",
+          updatedComponents.length,
+          "components"
+        );
         onComponentsUpdate(updatedComponents);
       } else {
         // Fallback to old system
@@ -156,6 +120,7 @@ const ComponentList = ({
       }
 
       setIsModalVisible(false);
+      message.success("Component added successfully");
     },
     [componentsState, onComponentsUpdate, pageData, sectionIndex, dispatch]
   );
@@ -280,66 +245,40 @@ const ComponentList = ({
   );
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="component-list">
-        <Droppable droppableId={`droppable-${sectionIndex}`}>
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="components-container min-h-[100px] p-1 bg-gray-50 rounded-md"
-            >
-              {Array.isArray(componentsState) &&
-                componentsState.map((component, index) => (
-                  <Draggable
-                    key={component._id}
-                    draggableId={component._id}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="component-wrapper mb-2"
-                      >
-                        <ComponentRenderer
-                          component={component}
-                          onUpdate={(updatedComponent) =>
-                            handleComponentUpdate(updatedComponent, index)
-                          }
-                          onDelete={() => handleComponentDelete(index)}
-                          onDuplicate={() => handleComponentDuplicate(index)}
-                          onEditingStateChange={
-                            handleComponentEditingStateChange
-                          }
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              {provided.placeholder}
+    <div className="component-list">
+      <div className="components-container min-h-[100px] p-1 bg-gray-50 rounded-md">
+        {Array.isArray(componentsState) &&
+          componentsState.map((component, index) => (
+            <div key={component._id} className="component-wrapper mb-2">
+              <ComponentRenderer
+                component={component}
+                onUpdate={(updatedComponent) =>
+                  handleComponentUpdate(updatedComponent, index)
+                }
+                onDelete={() => handleComponentDelete(index)}
+                onDuplicate={() => handleComponentDuplicate(index)}
+                onEditingStateChange={handleComponentEditingStateChange}
+              />
             </div>
-          )}
-        </Droppable>
-        <Button
-          type="dashed"
-          icon={<PlusOutlined />}
-          onClick={() => setIsModalVisible(true)}
-          block
-          className="mt-2"
-        >
-          Add Component
-        </Button>
+          ))}
       </div>
+      <Button
+        type="dashed"
+        icon={<PlusOutlined />}
+        onClick={() => setIsModalVisible(true)}
+        block
+        className="mt-2"
+      >
+        Add Component
+      </Button>
 
       <ComponentSelectorModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSelectComponent={addComponent}
       />
-    </DragDropContext>
+    </div>
   );
 };
 
-export default ComponentList;
+export default ComponentListSimple;

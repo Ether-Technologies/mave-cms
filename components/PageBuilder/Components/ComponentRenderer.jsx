@@ -51,108 +51,123 @@ const COMPONENT_MAP = {
 };
 
 const ComponentRenderer = React.memo(
-  ({ component, index, sectionIndex, preview = false }) => {
+  ({
+    component,
+    onUpdate,
+    onDelete,
+    onDuplicate,
+    onEditingStateChange,
+    preview = false,
+  }) => {
     const dispatch = useDispatch();
     const pageData = useSelector((state) => state.page.pageData);
+
+    // Handle editing state changes
+    const handleEditingStateChange = useCallback(
+      (editing) => {
+        if (onEditingStateChange) {
+          onEditingStateChange(editing);
+        }
+      },
+      [onEditingStateChange]
+    );
 
     // Memoize the update and delete handlers
     const updateComponent = useCallback(
       (updatedComponent) => {
+        if (onUpdate) {
+          onUpdate(updatedComponent);
+        } else {
+          // Fallback to old system
+          const updatedPageData = {
+            ...pageData,
+            body: pageData.body.map((section, idx) => {
+              if (idx === component.sectionIndex) {
+                return {
+                  ...section,
+                  data: section.data.map((comp, compIdx) =>
+                    compIdx === component.index ? updatedComponent : comp
+                  ),
+                };
+              }
+              return section;
+            }),
+          };
+
+          dispatch(setPageData(updatedPageData));
+          dispatch(setIsDirty(true));
+        }
+      },
+      [onUpdate, dispatch, pageData, component]
+    );
+
+    const deleteComponent = useCallback(() => {
+      if (onDelete) {
+        onDelete();
+      } else {
+        // Fallback to old system
         const updatedPageData = {
           ...pageData,
           body: pageData.body.map((section, idx) => {
-            if (idx === sectionIndex) {
+            if (idx === component.sectionIndex) {
               return {
                 ...section,
-                data: section.data.map((comp, compIdx) =>
-                  compIdx === index ? updatedComponent : comp
+                data: section.data.filter(
+                  (_, compIdx) => compIdx !== component.index
                 ),
               };
             }
             return section;
           }),
         };
-
         dispatch(setPageData(updatedPageData));
         dispatch(setIsDirty(true));
-      },
-      [dispatch, pageData, sectionIndex, index]
-    );
-
-    const deleteComponent = useCallback(() => {
-      const updatedPageData = {
-        ...pageData,
-        body: pageData.body.map((section, idx) => {
-          if (idx === sectionIndex) {
-            return {
-              ...section,
-              data: section.data.filter((_, compIdx) => compIdx !== index),
-            };
-          }
-          return section;
-        }),
-      };
-      dispatch(setPageData(updatedPageData));
-      dispatch(setIsDirty(true));
-    }, [dispatch, pageData, sectionIndex, index]);
+      }
+    }, [onDelete, dispatch, pageData, component]);
 
     const handleDuplicate = useCallback(() => {
-      dispatch(duplicateComponent({ sectionIndex, componentIndex: index }));
-    }, [dispatch, sectionIndex, index]);
+      if (onDuplicate) {
+        onDuplicate();
+      } else {
+        // Fallback to old system
+        dispatch(
+          duplicateComponent({
+            sectionIndex: component.sectionIndex,
+            componentIndex: component.index,
+          })
+        );
+      }
+    }, [onDuplicate, dispatch, component]);
 
-    // Get the actual component type, handling both object and string formats
-    const componentType =
-      typeof component.type === "object" ? component.type.type : component.type;
+    // Get the component type
+    const componentType = useMemo(() => {
+      if (typeof component.type === "object") {
+        return component.type.type;
+      }
+      return component.type;
+    }, [component.type]);
 
-    // Memoize the component type check
-    const SpecificComponent = useMemo(
-      () => COMPONENT_MAP[componentType],
-      [componentType]
-    );
+    // Get the component to render
+    const ComponentToRender = useMemo(() => {
+      return COMPONENT_MAP[componentType] || null;
+    }, [componentType]);
 
-    if (!SpecificComponent) {
-      console.warn(`Unknown component type: ${componentType}`);
+    if (!ComponentToRender) {
+      console.warn(`Component type "${componentType}" not found`);
       return null;
     }
 
-    // If in preview mode, render without drag-and-drop wrapper
-    if (preview) {
-      return (
-        <div className="relative mb-4">
-          <SpecificComponent
-            component={component}
-            updateComponent={updateComponent}
-            deleteComponent={deleteComponent}
-            preview={preview}
-            onDuplicateElement={handleDuplicate}
-          />
-        </div>
-      );
-    }
+    // Pass editing state to components that need it
+    const componentProps = {
+      component,
+      updateComponent,
+      deleteComponent,
+      preview,
+      onDuplicateElement: handleDuplicate,
+      onEditingStateChange: handleEditingStateChange,
+    };
 
-    // Normal mode with drag-and-drop
-    return (
-      <Draggable draggableId={component._id} index={index}>
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            className={`relative mb-4 ${
-              snapshot.isDragging ? "shadow-lg" : ""
-            }`}
-          >
-            <SpecificComponent
-              component={component}
-              updateComponent={updateComponent}
-              deleteComponent={deleteComponent}
-              preview={preview}
-              onDuplicateElement={handleDuplicate}
-            />
-          </div>
-        )}
-      </Draggable>
-    );
+    return <ComponentToRender {...componentProps} />;
   }
 );
 

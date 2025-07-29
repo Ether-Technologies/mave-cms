@@ -141,8 +141,10 @@ const AccordionComponent = ({
                   updateComponent({ ...component, _mave: newData });
                 }}
                 deleteComponent={() => {
-                  const newData = [...accordionData];
-                  newData.splice(index, 1);
+                  const newData = [
+                    ...accordionData.slice(0, index),
+                    ...accordionData.slice(index + 1),
+                  ];
                   updateComponent({ ...component, _mave: newData });
                 }}
                 preview={preview}

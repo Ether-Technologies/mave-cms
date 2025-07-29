@@ -1,7 +1,7 @@
 // pages/pages.jsx
 
 import { message, Spin } from "antd";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import instance from "../../axios";
 import { useRouter } from "next/router";
 import PagesHeader from "../../components/PageBuilder/PagesHeader";
@@ -10,6 +10,7 @@ import PagesTabs from "../../components/PageBuilder/PagesTabs";
 import CreateFooterModal from "../../components/PageBuilder/CreateFooterModal";
 
 const Pages = () => {
+  const [allPages, setAllPages] = useState([]);
   const [typePages, setTypePages] = useState([]);
   const [typeSubpages, setTypeSubpages] = useState([]);
   const [typeFooters, setTypeFooters] = useState([]);
@@ -29,6 +30,7 @@ const Pages = () => {
       setLoading(true);
       const response = await instance.get("/pages");
       if (response.data) {
+        setAllPages(response.data);
         const mainPages = response.data.filter((page) => page.type === "Page");
         const subPages = response.data.filter(
           (page) => page.type === "Subpage"
@@ -54,17 +56,16 @@ const Pages = () => {
     fetchPages();
   }, []);
 
-  // Sort typePages whenever sortType changes
-  useEffect(() => {
-    const sortedPages = [...typePages].sort((a, b) => {
+  // Sort pages when data is fetched or sortType changes
+  const sortedTypePages = React.useMemo(() => {
+    return [...typePages].sort((a, b) => {
       if (sortType === "asc") {
         return a.id - b.id;
       } else {
         return b.id - a.id;
       }
     });
-    setTypePages(sortedPages);
-  }, [sortType]);
+  }, [typePages, sortType]);
 
   const handleExpand = (pageId) => {
     setExpandedPageId((prevId) => (prevId === pageId ? null : pageId));
@@ -140,8 +141,8 @@ const Pages = () => {
     }
   };
 
-  const handleEditPage = (id) => {
-    router.push(`/page-builder/${id}`);
+  const handlePreviewPage = (id) => {
+    router.push(`/page-preview/${id}`);
   };
 
   const handleEditPageInfo = async ({
@@ -181,22 +182,22 @@ const Pages = () => {
           prevPages?.map((page) =>
             page.id === id
               ? {
-                  ...page,
-                  page_name_en: pageNameEn,
-                  page_name_bn: pageNameBn,
-                  slug: slug,
-                  type: type,
-                  additional: [
-                    {
-                      pageType,
-                      metaTitle,
-                      metaDescription,
-                      keywords,
-                      metaImage,
-                      metaImageAlt,
-                    },
-                  ],
-                }
+                ...page,
+                page_name_en: pageNameEn,
+                page_name_bn: pageNameBn,
+                slug: slug,
+                type: type,
+                additional: [
+                  {
+                    pageType,
+                    metaTitle,
+                    metaDescription,
+                    keywords,
+                    metaImage,
+                    metaImageAlt,
+                  },
+                ],
+              }
               : page
           )
         );
@@ -211,21 +212,25 @@ const Pages = () => {
 
   const handlePageSearch = (searchText) => {
     if (searchText.trim() === "") {
-      fetchPages();
+      // Reset to original data
+      const mainPages = allPages.filter((page) => page.type === "Page");
+      const subPages = allPages.filter((page) => page.type === "Subpage");
+      const footers = allPages.filter((page) => page.type === "Footer");
+
+      setTypePages(mainPages);
+      setTypeSubpages(subPages);
+      setTypeFooters(footers);
       return;
     }
 
-    const filteredMainPages = typePages.filter((page) =>
+    // Filter from the original data
+    const filteredPages = allPages.filter((page) =>
       page.page_name_en.toLowerCase().includes(searchText.toLowerCase())
     );
 
-    const filteredSubPages = typeSubpages.filter((page) =>
-      page.page_name_en.toLowerCase().includes(searchText.toLowerCase())
-    );
-
-    const filteredFooters = typeFooters.filter((page) =>
-      page.page_name_en.toLowerCase().includes(searchText.toLowerCase())
-    );
+    const filteredMainPages = filteredPages.filter((page) => page.type === "Page");
+    const filteredSubPages = filteredPages.filter((page) => page.type === "Subpage");
+    const filteredFooters = filteredPages.filter((page) => page.type === "Footer");
 
     setTypePages(filteredMainPages);
     setTypeSubpages(filteredSubPages);
@@ -283,13 +288,13 @@ const Pages = () => {
 
       {/* Tabs for Pages and Subpages */}
       <PagesTabs
-        typePages={typePages.slice(0, itemsPerPage)}
+        typePages={sortedTypePages.slice(0, itemsPerPage)}
         typeSubpages={typeSubpages.slice(0, itemsPerPage)}
         typeFooters={typeFooters.slice(0, itemsPerPage)}
         handleExpand={handleExpand}
         expandedPageId={expandedPageId}
         handleDeletePage={handleDeletePage}
-        handleEditPage={handleEditPage}
+        handlePreviewPage={handlePreviewPage}
         handleEditPageInfo={handleEditPageInfo}
         handleDuplicatePage={handleDuplicatePage}
       />

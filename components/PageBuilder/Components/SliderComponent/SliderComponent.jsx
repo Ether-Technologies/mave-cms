@@ -6,6 +6,7 @@ import { useSliderRefresh } from "./SliderRefresh";
 import SliderConfig from "./SliderConfig";
 import SliderActions from "./SliderActions";
 import SliderSelectionModal from "../../Modals/SliderSelectionModal";
+import { ReloadOutlined } from "@ant-design/icons";
 
 const SliderComponent = ({
   component,
@@ -27,7 +28,7 @@ const SliderComponent = ({
     height: component._mave?.config?.height ?? 400,
   });
 
-  // Use the refresh hook
+  // Use the refresh hook with isEditing state and preview mode
   const {
     isRefreshing,
     lastUpdated,
@@ -35,7 +36,13 @@ const SliderComponent = ({
     setAutoPolling,
     pollingError,
     handleManualRefresh,
-  } = useSliderRefresh(sliderData, component, updateComponent, preview);
+  } = useSliderRefresh(
+    sliderData,
+    component,
+    updateComponent,
+    preview,
+    isEditing
+  );
 
   // Synchronize sliderData with component._mave when it changes
   useEffect(() => {
@@ -123,6 +130,25 @@ const SliderComponent = ({
   if (preview) {
     return (
       <div className="preview-slider-component p-4 bg-gray-100 rounded-md">
+        {sliderData && (
+          <div className="flex justify-between items-center mb-2">
+            <div className="flex items-center gap-2">
+              <Button
+                icon={<ReloadOutlined spin={isRefreshing} />}
+                onClick={handleManualRefresh}
+                loading={isRefreshing}
+                size="small"
+                className="mavebutton"
+                title="Refresh slider data"
+              />
+              {autoPolling && (
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                  Auto-refresh active
+                </span>
+              )}
+            </div>
+          </div>
+        )}
         <SliderRenderer sliderData={sliderData} config={sliderData?.config} />
       </div>
     );
@@ -185,19 +211,16 @@ const SliderComponent = ({
         )}
       </div>
 
+      {isEditing && selectedSliderData && (
+        <div className="mt-4">
+          <SliderConfig config={sliderConfig} setConfig={setSliderConfig} />
+        </div>
+      )}
+
       <SliderSelectionModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSelectSlider={handleSelectSlider}
-        initialSlider={sliderData}
-      />
-
-      <SliderConfig
-        showConfig={showConfig}
-        setShowConfig={setShowConfig}
-        sliderConfig={sliderConfig}
-        setSliderConfig={setSliderConfig}
-        sliderData={sliderData}
       />
     </div>
   );
