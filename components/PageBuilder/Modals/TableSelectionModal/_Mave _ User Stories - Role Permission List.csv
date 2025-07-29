@@ -1,0 +1,76 @@
+Roles,Permission Category,Permissions,Permission Details,variable name,,,,
+Super Admin,Home,View Dashboard,Permission to view the dashboard,view_dashboard,,@ant-design/icons,npm i,npm i @ant-design/icons
+Admin,Components,View Components,Permission to view all components in the CMS,view_components,,@fortawesome/fontawesome-free,npm i,npm i @fortawesome/fontawesome-free
+Editor,,Create Components,"Permission to create new components (Gallery, Menu Items, Menus, etc.)",create_components,,@google/generative-ai,npm i,npm i @google/generative-ai
+Viewer,,Edit Components,Permission to edit existing components,edit_components,,@react-google-maps/api,npm i,npm i @react-google-maps/api
+,,Delete Components,Permission to delete components,delete_components,,@react-pdf-viewer/core,npm i,npm i @react-pdf-viewer/core
+,Gallery,View Gallery,Permission to view the gallery,view_gallery,,@react-pdf-viewer/thumbnail,npm i,npm i @react-pdf-viewer/thumbnail
+,,Upload Media to Gallery,Permission to upload media to the gallery,upload_media_to_gallery,,@tinymce/tinymce-react,npm i,npm i @tinymce/tinymce-react
+,Menu Items,View Menu Items,Permission to view menu items,view_menu_items,,ace-builds,npm i,npm i ace-builds
+,,Create Menu Items,Permission to create new menu items,create_menu_items,,antd,npm i,npm i antd
+,,Edit Menu Items,Permission to edit existing menu items,edit_menu_items,,apexcharts,npm i,npm i apexcharts
+,,Delete Menu Items,Permission to delete menu items,delete_menu_items,,autoprefixer,npm i,npm i autoprefixer
+,Menus,View Menus,Permission to view menus,view_menus,,axios,npm i,npm i axios
+,,Create Menus,Permission to create new menus,create_menus,,croppie,npm i,npm i croppie
+,,Edit Menus,Permission to edit existing menus,edit_menus,,dayjs,npm i,npm i dayjs
+,,Delete Menus,Permission to delete menus,delete_menus,,dotenv,npm i,npm i dotenv
+,Navbars,View Navbars,Permission to view navbars,view_navbars,,eslint-config-next,npm i,npm i eslint-config-next
+,,Create Navbars,Permission to create new navbars,create_navbars,,eslint,npm i,npm i eslint
+,,Edit Navbars,Permission to edit existing navbars,edit_navbars,,form-data,npm i,npm i form-data
+,,Delete Navbars,Permission to delete navbars,delete_navbars,,froala-editor,npm i,npm i froala-editor
+,Sliders,View Sliders,Permission to view sliders,view_sliders,,http-proxy-middleware,npm i,npm i http-proxy-middleware
+,,Create Sliders,Permission to create new sliders,create_sliders,,imagemin,npm i,npm i imagemin
+,,Edit Sliders,Permission to edit existing sliders,edit_sliders,,lodash,npm i,npm i lodash
+,,Delete Sliders,Permission to delete sliders,delete_sliders,,lottie-react,npm i,npm i lottie-react
+,Forms,View Forms,Permission to view forms,view_forms,,lottie-web,npm i,npm i lottie-web
+,,Create Forms,Permission to create new forms,create_forms,,marked,npm i,npm i marked
+,,Edit Forms,Permission to edit existing forms,edit_forms,,moment,npm i,npm i moment
+,,Delete Forms,Permission to delete forms,delete_forms,,next,npm i,npm i next
+,Footers,View Footers,Permission to view footers,view_footers,,papaparse,npm i,npm i papaparse
+,,Create Footers,Permission to create new footers,create_footers,,pluralize,npm i,npm i pluralize
+,,Edit Footers,Permission to edit existing footers,edit_footers,,postcss,npm i,npm i postcss
+,,Delete Footers,Permission to delete footers,delete_footers,,prismjs,npm i,npm i prismjs
+,Form Responses,View Form Responses,Permission to view form responses,view_form_responses,,quill,npm i,npm i quill
+,Creator Studio,View Pages,Permission to view pages,view_pages,,react-ace,npm i,npm i react-ace
+,,Create Page,Permission to create new pages,create_page,,react-apexcharts,npm i,npm i react-apexcharts
+,,Edit Pages,Permission to edit existing pages,edit_pages,,react-beautiful-dnd,npm i,npm i react-beautiful-dnd
+,,Delete Pages,Permission to delete pages,delete_pages,,react-copy-to-clipboard,npm i,npm i react-copy-to-clipboard
+,,View Blogs,Permission to view blogs,view_blogs,,react-countup,npm i,npm i react-countup
+,,Create Blog,Permission to create new blogs,create_blog,,react-dnd-html5-backend,npm i,npm i react-dnd-html5-backend
+,,Edit Blogs,Permission to edit existing blogs,edit_blogs,,react-dnd,npm i,npm i react-dnd
+,,Delete Blogs,Permission to delete blogs,delete_blogs,,react-dom,npm i,npm i react-dom
+,User Manual,View Changelog,Permission to view the changelog,view_changelog,,react-easy-crop,npm i,npm i react-easy-crop
+,,View Documentation,Permission to view documentation,view_documentation,,react-froala-wysiwyg,npm i,npm i react-froala-wysiwyg
+,,View User Guide,Permission to view user guide,view_user_guide,,react-google-charts,npm i,npm i react-google-charts
+,,View FAQ,Permission to view the FAQ,view_faq,,react-helmet,npm i,npm i react-helmet
+,,Access Support,Permission to access support,access_support,,react-markdown,npm i,npm i react-markdown
+,Tools,Access Doc to API,Permission to access Doc to API tool,access_doc_to_api,,react-pdf,npm i,npm i react-pdf
+,,Access Dynamic Form Builder,Permission to access Dynamic Form Builder,access_dynamic_form_builder,,react-quill,npm i,npm i react-quill
+,,Access Humanpal,Permission to access Humanpal tool,access_humanpal,,react-slick,npm i,npm i react-slick
+,User Management,Create Users,Permission to create new user accounts,create_users,,react-syntax-highlighter,npm i,npm i react-syntax-highlighter
+,,Edit Users,Permission to edit existing user accounts,edit_users,,react-text-to-speech,npm i,npm i react-text-to-speech
+,,Delete Users,Permission to delete user accounts,delete_users,,react-to-print,npm i,npm i react-to-print
+,,View Users,Permission to view user details,view_users,,react-virtualized,npm i,npm i react-virtualized
+,Role Management,Create Roles,Permission to create new roles,create_roles,,react,npm i,npm i react
+,,Edit Roles,Permission to edit existing roles,edit_roles,,recharts,npm i,npm i recharts
+,,Delete Roles,Permission to delete roles,delete_roles,,remark-gfm,npm i,npm i remark-gfm
+,,Assign Roles,Permission to assign roles to users,assign_roles,,slick-carousel,npm i,npm i slick-carousel
+,API Management,Access API,Permission to access the CMS API,access_api,,swr,npm i,npm i swr
+,,Create API Keys,Permission to create new API keys,create_api_keys,,tailwindcss,npm i,npm i tailwindcss
+,,Edit API Keys,Permission to edit existing API keys,edit_api_keys,,uuid,npm i,npm i uuid
+,,Delete API Keys,Permission to delete API keys,delete_api_keys,,yup,npm i,npm i yup
+,,View API Logs,Permission to view API access logs,view_api_logs,,,,
+,Workflow Management,Create Workflows,Permission to create new content workflows,create_workflows,,,,
+,,Edit Workflows,Permission to edit existing content workflows,edit_workflows,,,,
+,,Delete Workflows,Permission to delete content workflows,delete_workflows,,,,
+,,View Workflows,Permission to view content workflows,view_workflows,,,,
+,Plugin Management,Install Plugins,Permission to install new plugins,install_plugins,,,,
+,,Edit Plugins,Permission to configure installed plugins,edit_plugins,,,,
+,,Delete Plugins,Permission to delete installed plugins,delete_plugins,,,,
+,,View Plugins,Permission to view installed plugins,view_plugins,,,,
+,System Management,Backup System,Permission to initiate a backup of the CMS,backup_system,,,,
+,,Restore System,Permission to restore the CMS from a backup,restore_system,,,,
+,,System Monitoring,Permission to view system performance and monitoring metrics,system_monitoring,,,,
+,,System Updates,Permission to initiate system updates,system_updates,,,,
+,Audit Management,View Audit Logs,Permission to view audit logs for user activities,view_audit_logs,,,,
+,,Export Audit Logs,Permission to export audit logs,export_audit_logs,,,,

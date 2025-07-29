@@ -1,5 +1,3 @@
-// TableSelectionModal/TableSelectionDrawer.jsx
-
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Drawer, Form, Button, Typography, Select, message, Spin } from "antd";
 import CSVImportSection from "./CSVImportSection";
@@ -255,7 +253,11 @@ const TableSelectionDrawer = React.memo(
       <Drawer {...drawerProps}>
         <Form {...formProps}>
           {/* 1) CSV Import */}
-          <CSVImportSection setHeaders={setHeaders} setRows={setRows} />
+          <CSVImportSection
+            setHeaders={setHeaders}
+            setRows={setRows}
+            setVisibleColumns={setVisibleColumns}
+          />
 
           {/* 2) Column Headers + Visibility + Reordering */}
           <HeadersSection {...headersSectionProps} />

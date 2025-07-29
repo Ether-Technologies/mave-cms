@@ -1,5 +1,3 @@
-// TableSelectionModal/HeadersSection.jsx
-
 import React, { useCallback, useMemo } from "react";
 import { Form, Input, Button, Typography, Checkbox } from "antd";
 import { PlusOutlined, MinusOutlined, DragOutlined } from "@ant-design/icons";
