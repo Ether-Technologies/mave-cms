@@ -66,12 +66,12 @@ const CardComponent = ({
   updateComponent,
   deleteComponent,
   preview = false,
+  isEditing = false,
   onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [cardData, setCardData] = useState(component._mave);
   const [selectedCardData, setSelectedCardData] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [autoPolling, setAutoPolling] = useState(false); // Default to false - only enable in preview mode
@@ -94,13 +94,34 @@ const CardComponent = ({
   // Auto-refresh card data every 30 seconds when card data exists
   // Only when in preview mode and not editing
   useEffect(() => {
-    if (!cardData?.id || !autoPolling || isEditing || !preview) return;
+    // Disable auto-refresh when in edit mode
+    if (isEditing) {
+      console.log("🔄 Card auto-refresh disabled - in edit mode");
+      return;
+    }
 
+    // Only enable auto-refresh in preview mode
+    if (!preview) {
+      console.log("🔄 Card auto-refresh disabled - not in preview mode");
+      return;
+    }
+
+    if (!cardData?.id || !autoPolling) {
+      console.log(
+        "🔄 Card auto-refresh disabled - no card data or polling disabled"
+      );
+      return;
+    }
+
+    console.log("🔄 Card auto-refresh enabled - starting interval");
     const interval = setInterval(() => {
       refreshCardData(true); // Silent refresh for polling
     }, POLLING_INTERVAL);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log("🔄 Card auto-refresh disabled - cleaning up interval");
+      clearInterval(interval);
+    };
   }, [cardData?.id, autoPolling, isEditing, preview]);
 
   // Function to refresh card data from the server
@@ -191,7 +212,6 @@ const CardComponent = ({
   const handleSelectCard = useCallback((selectedCard) => {
     setSelectedCardData(selectedCard);
     setIsModalVisible(false);
-    setIsEditing(true);
   }, []);
 
   // Handle Submit (Confirm) Changes

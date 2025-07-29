@@ -6,7 +6,7 @@ import ParagraphComponent from "../ElementComponents/ParagraphComponent";
 import MediaComponent from "../ElementComponents/MediaComponent";
 import MenuComponent from "../ElementComponents/MenuComponent";
 import NavbarComponent from "../ElementComponents/NavbarComponent";
-import SliderComponent from "../ElementComponents/SliderComponent";
+// SliderComponent removed - not needed for this system
 import CardComponent from "../ElementComponents/CardComponent";
 import FooterComponent from "../ElementComponents/FooterComponent";
 import JsonPreview from "../PreviewComponents/JsonPreview";
@@ -125,15 +125,8 @@ const PageBuilder = ({ parsedYaml }) => {
                   />
                 );
               case "slider":
-                return (
-                  <SliderComponent
-                    key={element._id}
-                    data={element}
-                    onDataChange={(data) =>
-                      handleElementData(sectionIndex, data)
-                    }
-                  />
-                );
+                // SliderComponent removed - not needed for this system
+                return null;
               case "card":
                 return (
                   <CardComponent

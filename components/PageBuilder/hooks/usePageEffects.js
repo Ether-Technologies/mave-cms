@@ -1,0 +1,103 @@
+// components/PageBuilder/hooks/usePageEffects.js
+
+import { useEffect, useCallback } from "react";
+import { useRouter } from "next/router";
+import debounce from "lodash/debounce";
+
+const AUTOSAVE_DELAY = 30000; // 30 seconds
+
+export const usePageEffects = ({
+    pageId,
+    isEditing,
+    isDirty,
+    onSave,
+    onUndo,
+    onRedo,
+    onFetchData,
+}) => {
+    const router = useRouter();
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!isEditing) return;
+
+            // Save on Ctrl+S
+            if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+                e.preventDefault();
+                onSave();
+            }
+
+            // Undo on Ctrl+Z
+            if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+                e.preventDefault();
+                onUndo();
+            }
+
+            // Redo on Ctrl+Shift+Z or Ctrl+Y
+            if (
+                ((e.ctrlKey || e.metaKey) && e.key === "z" && e.shiftKey) ||
+                ((e.ctrlKey || e.metaKey) && e.key === "y")
+            ) {
+                e.preventDefault();
+                onRedo();
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isEditing, onSave, onUndo, onRedo]);
+
+    // Auto-save functionality
+    const debouncedSave = useCallback(
+        debounce(() => {
+            if (isDirty && isEditing) {
+                onSave(false);
+            }
+        }, AUTOSAVE_DELAY),
+        [isDirty, isEditing, onSave]
+    );
+
+    useEffect(() => {
+        debouncedSave();
+        return () => debouncedSave.cancel();
+    }, [debouncedSave]);
+
+    // Warn before leaving with unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty && isEditing) {
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [isDirty, isEditing]);
+
+    // Handle route changes
+    useEffect(() => {
+        const handleRouteChange = (url) => {
+            if (isDirty && isEditing) {
+                const confirmed = window.confirm(
+                    "You have unsaved changes. Are you sure you want to leave?"
+                );
+                if (!confirmed) {
+                    router.events.emit("routeChangeError");
+                    throw "Route change aborted";
+                }
+            }
+        };
+
+        router.events.on("routeChangeStart", handleRouteChange);
+        return () => router.events.off("routeChangeStart", handleRouteChange);
+    }, [isDirty, isEditing, router]);
+
+    // Initial data fetch
+    useEffect(() => {
+        if (pageId) {
+            onFetchData();
+        }
+    }, [pageId, onFetchData]);
+}; 

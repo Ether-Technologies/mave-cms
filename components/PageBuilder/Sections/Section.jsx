@@ -1,7 +1,8 @@
 // components/PageBuilder/Sections/Section.jsx
 
 import React, { useState, useCallback } from "react";
-import { Draggable } from "react-beautiful-dnd";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button, Modal, Input } from "antd";
 import {
   CopyOutlined,
@@ -12,7 +13,7 @@ import {
 } from "@ant-design/icons";
 import ComponentListSimple from "../Components/ComponentListSimple";
 import { useDispatch } from "react-redux";
-import { updateSection } from "../../../store/slices/pageSlice";
+import { updateSection, setIsDirty } from "../../../store/slices/pageSlice";
 
 const Section = ({
   section,
@@ -26,6 +27,7 @@ const Section = ({
   onDelete,
   onSectionDuplicate,
   onSectionDelete,
+  isEditing = false,
 }) => {
   const dispatch = useDispatch();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -37,6 +39,23 @@ const Section = ({
   // Ensure section has a valid _id
   const draggableId =
     section._id || `section-${sectionIndex || index}-${Date.now()}`;
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: draggableId,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   // Handle editing state changes from components
   const handleComponentEditingStateChange = useCallback(
@@ -50,27 +69,29 @@ const Section = ({
 
   const handleComponentsUpdate = useCallback(
     (updatedComponents) => {
+      console.log(
+        "🔧 Section handleComponentsUpdate called with:",
+        updatedComponents
+      );
       const updatedSection = {
         ...section,
         data: updatedComponents,
       };
 
-      if (onComponentUpdate) {
-        // Use the new callback system
-        updatedComponents.forEach((component, componentIndex) => {
-          onComponentUpdate(component, componentIndex);
-        });
-      } else {
-        // Fallback to old system
-        dispatch(
-          updateSection({
-            sectionIndex: sectionIndex || index,
-            newSection: updatedSection,
-          })
-        );
-      }
+      console.log("🔧 Updated section:", updatedSection);
+
+      // Update the section in the Redux store
+      dispatch(
+        updateSection({
+          sectionIndex: sectionIndex || index,
+          newSection: updatedSection,
+        })
+      );
+
+      // Ensure dirty state is set
+      dispatch(setIsDirty(true));
     },
-    [section, sectionIndex, index, onComponentUpdate, dispatch]
+    [section, sectionIndex, index, dispatch]
   );
 
   const handleDeleteClick = () => {
@@ -130,82 +151,80 @@ const Section = ({
 
   return (
     <>
-      <Draggable draggableId={draggableId} index={sectionIndex || index}>
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            className="section-container bg-white shadow-md rounded-lg p-4 mb-6"
-          >
-            <div
-              {...provided.dragHandleProps}
-              className="section-header flex items-center justify-between mb-4 pb-2 border-b"
-            >
-              {isEditingTitle ? (
-                <div className="flex items-center gap-2 flex-1">
-                  <Input
-                    value={tempTitle}
-                    onChange={(e) => setTempTitle(e.target.value)}
-                    onPressEnter={handleTitleSave}
-                    className="flex-1 max-w-[300px]"
-                  />
-                  <Button
-                    icon={<CheckOutlined />}
-                    onClick={handleTitleSave}
-                    className="mavebutton"
-                  />
-                  <Button
-                    icon={<CloseOutlined />}
-                    onClick={handleTitleCancel}
-                    className="mavecancelbutton"
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {section.title || `Section ${(sectionIndex || index) + 1}`}
-                  </h3>
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={handleTitleEdit}
-                    size="middle"
-                    className="mavebutton"
-                  />
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                {(onDuplicate || onSectionDuplicate) && (
-                  <Button
-                    icon={<CopyOutlined />}
-                    onClick={handleDuplicateClick}
-                    size="middle"
-                    className="mavebutton hover:bg-yellow-600"
-                    title="Duplicate Section"
-                  />
-                )}
-                {(onDelete || onSectionDelete) && (
-                  <Button
-                    icon={<DeleteOutlined />}
-                    onClick={handleDeleteClick}
-                    size="small"
-                    className="mavecancelbutton hover:bg-red-600"
-                    title="Delete Section"
-                  />
-                )}
-              </div>
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="section-container bg-white shadow-md rounded-lg p-4 mb-6"
+      >
+        <div
+          {...listeners}
+          {...attributes}
+          className="section-header flex items-center justify-between mb-4 pb-2 border-b cursor-move"
+        >
+          {isEditingTitle ? (
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                value={tempTitle}
+                onChange={(e) => setTempTitle(e.target.value)}
+                onPressEnter={handleTitleSave}
+                className="flex-1 max-w-[300px]"
+              />
+              <Button
+                icon={<CheckOutlined />}
+                onClick={handleTitleSave}
+                className="mavebutton"
+              />
+              <Button
+                icon={<CloseOutlined />}
+                onClick={handleTitleCancel}
+                className="mavecancelbutton"
+              />
             </div>
-
-            <ComponentListSimple
-              components={section.data}
-              onComponentsUpdate={handleComponentsUpdate}
-              onComponentDelete={onComponentDelete}
-              onComponentDuplicate={onComponentDuplicate}
-              onEditingStateChange={handleComponentEditingStateChange}
-              sectionIndex={sectionIndex || index}
-            />
+          ) : (
+            <div className="flex items-center gap-2 flex-1">
+              <h3 className="text-lg font-semibold text-gray-800">
+                {section.title || `Section ${(sectionIndex || index) + 1}`}
+              </h3>
+              <Button
+                icon={<EditOutlined />}
+                onClick={handleTitleEdit}
+                size="middle"
+                className="mavebutton"
+              />
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            {(onDuplicate || onSectionDuplicate) && (
+              <Button
+                icon={<CopyOutlined />}
+                onClick={handleDuplicateClick}
+                size="middle"
+                className="mavebutton hover:bg-yellow-600"
+                title="Duplicate Section"
+              />
+            )}
+            {(onDelete || onSectionDelete) && (
+              <Button
+                icon={<DeleteOutlined />}
+                onClick={handleDeleteClick}
+                size="small"
+                className="mavecancelbutton hover:bg-red-600"
+                title="Delete Section"
+              />
+            )}
           </div>
-        )}
-      </Draggable>
+        </div>
+
+        <ComponentListSimple
+          components={section.data}
+          onComponentsUpdate={handleComponentsUpdate}
+          onComponentDelete={onComponentDelete}
+          onComponentDuplicate={onComponentDuplicate}
+          onEditingStateChange={handleComponentEditingStateChange}
+          sectionIndex={sectionIndex || index}
+          isEditing={isEditing}
+        />
+      </div>
 
       <Modal
         title="Delete Section"

@@ -13,38 +13,67 @@ export const useDragAndDrop = ({
     const pageData = useSelector((state) => state.page.pageData);
 
     const onDragEnd = useCallback(
-        (result) => {
-            console.log("🔧 onDragEnd called:", result);
+        (event) => {
+            console.log("🔧 onDragEnd called:", event);
 
-            if (!result.destination) {
+            const { active, over } = event;
+
+            if (!over) {
                 console.log("🔧 No destination, returning");
                 return;
             }
 
-            if (result.source.index === result.destination.index) {
+            if (active.id === over.id) {
+                console.log("🔧 Same position, no change needed");
+                return;
+            }
+
+            // Find the indices
+            const activeIndex = componentsState.findIndex(
+                (component) => {
+                    const componentId = component._id ||
+                        `component-${sectionIndex}-${componentsState.indexOf(component)}-${Date.now()}`;
+                    return active.id === componentId;
+                }
+            );
+
+            const overIndex = componentsState.findIndex(
+                (component) => {
+                    const componentId = component._id ||
+                        `component-${sectionIndex}-${componentsState.indexOf(component)}-${Date.now()}`;
+                    return over.id === componentId;
+                }
+            );
+
+            if (activeIndex === -1 || overIndex === -1) {
+                console.log("🔧 Could not find indices, returning");
+                return;
+            }
+
+            if (activeIndex === overIndex) {
                 console.log("🔧 Same position, no change needed");
                 return;
             }
 
             const items = Array.from(componentsState);
-            const reorderedItem = items[result.source.index];
+            const reorderedItem = items[activeIndex];
 
             // Create new array without mutating
             const newItems = [
-                ...items.slice(0, result.source.index),
-                ...items.slice(result.source.index + 1),
+                ...items.slice(0, activeIndex),
+                ...items.slice(activeIndex + 1),
             ];
 
             // Insert at destination
             const finalItems = [
-                ...newItems.slice(0, result.destination.index),
+                ...newItems.slice(0, overIndex),
                 reorderedItem,
-                ...newItems.slice(result.destination.index),
+                ...newItems.slice(overIndex),
             ];
 
             console.log("🔧 Drag ended:", {
-                source: result.source.index,
-                destination: result.destination.index,
+                source: activeIndex,
+                destination: overIndex,
                 finalItems: finalItems.length,
             });
 

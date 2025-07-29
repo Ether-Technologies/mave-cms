@@ -8,7 +8,6 @@ import {
   CopyFilled,
   DragOutlined,
   ReloadOutlined,
-  SyncOutlined,
 } from "@ant-design/icons";
 
 const SliderActions = React.memo(
@@ -17,11 +16,8 @@ const SliderActions = React.memo(
     isEditing,
     selectedSliderData,
     isRefreshing,
-    autoPolling,
-    lastUpdated,
     pollingError,
     onRefresh,
-    onToggleAutoPolling,
     onEdit,
     onDuplicate,
     onDelete,
@@ -48,27 +44,6 @@ const SliderActions = React.memo(
                   className="mavebutton"
                 />
               </Tooltip>
-              {/* <Tooltip
-                title={`${autoPolling ? "Disable" : "Enable"} Auto Refresh`}
-              >
-                <Button
-                  icon={<SyncOutlined spin={autoPolling} />}
-                  onClick={onToggleAutoPolling}
-                  type={autoPolling ? "primary" : "default"}
-                  size="small"
-                  className={autoPolling ? "mavebutton" : "mavecancelbutton"}
-                />
-              </Tooltip> */}
-              {/* {lastUpdated && (
-                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-                  Updated {lastUpdated.toLocaleTimeString()}
-                </span>
-              )}
-              {autoPolling && (
-                <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
-                  Auto-refresh active
-                </span>
-              )} */}
               {pollingError && (
                 <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
                   {pollingError}

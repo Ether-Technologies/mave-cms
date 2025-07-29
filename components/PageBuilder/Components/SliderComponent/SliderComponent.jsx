@@ -6,20 +6,19 @@ import { useSliderRefresh } from "./SliderRefresh";
 import SliderConfig from "./SliderConfig";
 import SliderActions from "./SliderActions";
 import SliderSelectionModal from "../../Modals/SliderSelectionModal";
-import { ReloadOutlined } from "@ant-design/icons";
 
 const SliderComponent = ({
   component,
   updateComponent,
   deleteComponent,
   preview = false,
+  isEditing = false,
   onDuplicateElement,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sliderData, setSliderData] = useState(component._mave);
   const [selectedSliderData, setSelectedSliderData] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showConfig, setShowConfig] = useState(false);
+  // Removed showConfig state - not needed
   const [sliderConfig, setSliderConfig] = useState({
     autoplay: component._mave?.config?.autoplay ?? true,
     dots: component._mave?.config?.dots ?? false,
@@ -29,14 +28,7 @@ const SliderComponent = ({
   });
 
   // Use the refresh hook with isEditing state and preview mode
-  const {
-    isRefreshing,
-    lastUpdated,
-    autoPolling,
-    setAutoPolling,
-    pollingError,
-    handleManualRefresh,
-  } = useSliderRefresh(
+  const { isRefreshing, pollingError, handleManualRefresh } = useSliderRefresh(
     sliderData,
     component,
     updateComponent,
@@ -61,7 +53,6 @@ const SliderComponent = ({
   const handleSelectSlider = useCallback((selectedSlider) => {
     setSelectedSliderData(selectedSlider);
     setIsModalVisible(false);
-    setIsEditing(true);
   }, []);
 
   // Handle Submit (Confirm) Changes
@@ -130,25 +121,6 @@ const SliderComponent = ({
   if (preview) {
     return (
       <div className="preview-slider-component p-4 bg-gray-100 rounded-md">
-        {sliderData && (
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-              <Button
-                icon={<ReloadOutlined spin={isRefreshing} />}
-                onClick={handleManualRefresh}
-                loading={isRefreshing}
-                size="small"
-                className="mavebutton"
-                title="Refresh slider data"
-              />
-              {autoPolling && (
-                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-                  Auto-refresh active
-                </span>
-              )}
-            </div>
-          </div>
-        )}
         <SliderRenderer sliderData={sliderData} config={sliderData?.config} />
       </div>
     );
@@ -161,11 +133,8 @@ const SliderComponent = ({
         isEditing={isEditing}
         selectedSliderData={selectedSliderData}
         isRefreshing={isRefreshing}
-        autoPolling={autoPolling}
-        lastUpdated={lastUpdated}
         pollingError={pollingError}
         onRefresh={handleManualRefresh}
-        onToggleAutoPolling={() => setAutoPolling(!autoPolling)}
         onEdit={() => setIsModalVisible(true)}
         onDuplicate={onDuplicateElement}
         onDelete={handleDelete}

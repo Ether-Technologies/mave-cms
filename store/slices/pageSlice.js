@@ -14,6 +14,7 @@ const pageSlice = createSlice({
   initialState,
   reducers: {
     setPageData: (state, action) => {
+      console.log("🔧 setPageData called with:", action.payload);
       state.pageData = action.payload;
       state.isDirty = true;
     },
@@ -31,14 +32,17 @@ const pageSlice = createSlice({
     },
     updateSection: (state, action) => {
       const { sectionIndex, newSection } = action.payload;
+      console.log("🔧 updateSection called with:", { sectionIndex, newSection });
 
       // Validate that pageData and body exist
       if (!state.pageData || !state.pageData.body) {
+        console.error("❌ No pageData or body available for updateSection");
         return;
       }
 
       // Validate that sectionIndex is within bounds
       if (sectionIndex < 0 || sectionIndex >= state.pageData.body.length) {
+        console.error("❌ Section index out of bounds:", sectionIndex, "body length:", state.pageData.body.length);
         return;
       }
 
@@ -49,6 +53,7 @@ const pageSlice = createSlice({
         ...state.pageData.body.slice(sectionIndex + 1)
       ];
       state.isDirty = true;
+      console.log("✅ Section updated successfully");
     },
     moveComponent: (state, action) => {
       const { fromSectionIndex, toSectionIndex, fromIndex, toIndex } =

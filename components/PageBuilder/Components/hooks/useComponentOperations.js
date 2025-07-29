@@ -46,6 +46,8 @@ export const useComponentOperations = ({
                 },
             };
 
+            console.log("🔧 Created new component:", newComponent);
+
             if (onComponentsUpdate) {
                 // Use new callback system
                 const updatedComponents = [...componentsState, newComponent];
@@ -54,6 +56,7 @@ export const useComponentOperations = ({
                     updatedComponents.length,
                     "components"
                 );
+                console.log("🔧 Updated components array:", updatedComponents);
                 onComponentsUpdate(updatedComponents);
             } else {
                 // Fallback to old system
@@ -87,6 +90,7 @@ export const useComponentOperations = ({
                     }),
                 };
 
+                console.log("🔧 Updated page data:", updatedPageData);
                 dispatch(setPageData(updatedPageData));
                 dispatch(setIsDirty(true));
             }

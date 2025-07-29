@@ -1,13 +1,12 @@
 // components/PageBuilder/Components/ComponentRenderer.jsx
 
 import React, { useState, useMemo, useCallback } from "react";
-import { Draggable } from "react-beautiful-dnd";
 import TextComponent from "./TextComponent";
 import ParagraphComponent from "./ParagraphComponent";
 import MediaComponent from "./MediaComponent";
 import MenuComponent from "./MenuComponent";
 import NavbarComponent from "./NavbarComponent";
-import SliderComponent from "./SliderComponent";
+import SliderComponent from "./SliderComponent/SliderComponent";
 import CardComponent from "./CardComponent";
 import FooterComponent from "./FooterComponent";
 import VideoComponent from "./VideoComponent";
@@ -58,6 +57,7 @@ const ComponentRenderer = React.memo(
     onDuplicate,
     onEditingStateChange,
     preview = false,
+    isEditing = false,
   }) => {
     const dispatch = useDispatch();
     const pageData = useSelector((state) => state.page.pageData);
@@ -169,6 +169,7 @@ const ComponentRenderer = React.memo(
       updateComponent,
       deleteComponent,
       preview,
+      isEditing,
       onDuplicateElement: handleDuplicate,
       onEditingStateChange: handleEditingStateChange,
     };

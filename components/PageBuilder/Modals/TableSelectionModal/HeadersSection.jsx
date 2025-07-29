@@ -3,7 +3,13 @@
 import React, { useCallback, useMemo } from "react";
 import { Form, Input, Button, Typography, Checkbox } from "antd";
 import { PlusOutlined, MinusOutlined, DragOutlined } from "@ant-design/icons";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { v4 as uuidv4 } from "uuid";
 
 const { Title } = Typography;
@@ -26,8 +32,8 @@ const reorderColumnsInRows = (rows, sourceIndex, destIndex) => {
   });
 };
 
-// Memoized header item component
-const HeaderItem = React.memo(
+// Sortable header item component
+const SortableHeaderItem = React.memo(
   ({
     colObj,
     index,
@@ -36,23 +42,34 @@ const HeaderItem = React.memo(
     updateHeaderName,
     toggleColumnVisibility,
     removeHeader,
-    providedDraggable,
-    style,
   }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({
+      id: colObj.id,
+    });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
     return (
       <div
-        className="flex justify-between items-center bg-white my-2 rounded-lg py-2 px-4 gap-2
-      border-2 border-gray-300 shadow-md"
+        ref={setNodeRef}
+        style={style}
+        className="flex justify-between items-center bg-white my-2 rounded-lg py-2 px-4 gap-2 border-2 border-gray-300 shadow-md"
       >
         <div
-          ref={providedDraggable.innerRef}
-          {...providedDraggable.draggableProps}
-          {...providedDraggable.dragHandleProps}
-          style={{
-            ...providedDraggable.draggableProps.style,
-            ...style,
-          }}
-          className="flex items-center gap-2"
+          {...listeners}
+          {...attributes}
+          className="flex items-center gap-2 cursor-move"
         >
           {/* Header text input */}
           <Form.Item
@@ -97,7 +114,7 @@ const HeaderItem = React.memo(
   }
 );
 
-HeaderItem.displayName = "HeaderItem";
+SortableHeaderItem.displayName = "SortableHeaderItem";
 
 const HeadersSection = React.memo(
   ({
@@ -175,28 +192,34 @@ const HeadersSection = React.memo(
 
     // Reorder columns when user drags
     const onDragEnd = useCallback(
-      (result) => {
-        if (!result.destination) return;
-        const { source, destination } = result;
-        if (source.index === destination.index) return;
+      (event) => {
+        const { active, over } = event;
+
+        if (!over) return;
+        if (active.id === over.id) return;
+
+        // Find the indices
+        const activeIndex = headers.findIndex(
+          (header) => header.id === active.id
+        );
+        const overIndex = headers.findIndex((header) => header.id === over.id);
+
+        if (activeIndex === -1 || overIndex === -1) return;
+        if (activeIndex === overIndex) return;
 
         // Reorder the headers
-        const reorderedHeaders = reorderArray(
-          headers,
-          source.index,
-          destination.index
-        );
+        const reorderedHeaders = reorderArray(headers, activeIndex, overIndex);
         // Reorder the visibility array
         const reorderedVisible = reorderArray(
           visibleColumns,
-          source.index,
-          destination.index
+          activeIndex,
+          overIndex
         );
         // Reorder the columns in rows
         const reorderedRows = reorderColumnsInRows(
           rows,
-          source.index,
-          destination.index
+          activeIndex,
+          overIndex
         );
 
         setHeaders(reorderedHeaders);
@@ -206,60 +229,33 @@ const HeadersSection = React.memo(
       [headers, visibleColumns, rows, setHeaders, setVisibleColumns, setRows]
     );
 
-    // Memoized droppable props
-    const droppableProps = useMemo(
-      () => ({
-        droppableId: "droppable-headers",
-      }),
-      []
-    );
-
-    // Memoized container styles
-    const containerStyles = useMemo(
-      () => ({
-        className:
-          "bg-orange-100 p-4 rounded-lg flex flex-row flex-wrap gap-4 border-2 border-gray-400",
-      }),
-      []
-    );
+    // Create sortable items array
+    const sortableItems = headers.map((header) => header.id);
 
     return (
       <>
         <Title level={4}>Columns</Title>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable {...droppableProps}>
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="bg-orange-100 p-4 rounded-lg flex flex-row flex-wrap gap-4 border-2 border-gray-400"
-              >
-                {headers.map((colObj, index) => (
-                  <Draggable
-                    key={colObj.id} // stable unique key
-                    draggableId={colObj.id}
-                    index={index}
-                  >
-                    {(providedDraggable) => (
-                      <HeaderItem
-                        colObj={colObj}
-                        index={index}
-                        headers={headers}
-                        visibleColumns={visibleColumns}
-                        updateHeaderName={updateHeaderName}
-                        toggleColumnVisibility={toggleColumnVisibility}
-                        removeHeader={removeHeader}
-                        providedDraggable={providedDraggable}
-                        style={providedDraggable.draggableProps.style}
-                      />
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <DndContext onDragEnd={onDragEnd}>
+          <SortableContext
+            items={sortableItems}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="bg-orange-100 p-4 rounded-lg flex flex-row flex-wrap gap-4 border-2 border-gray-400">
+              {headers.map((colObj, index) => (
+                <SortableHeaderItem
+                  key={colObj.id}
+                  colObj={colObj}
+                  index={index}
+                  headers={headers}
+                  visibleColumns={visibleColumns}
+                  updateHeaderName={updateHeaderName}
+                  toggleColumnVisibility={toggleColumnVisibility}
+                  removeHeader={removeHeader}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
 
         <center>
           <Button

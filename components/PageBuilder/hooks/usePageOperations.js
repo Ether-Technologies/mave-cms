@@ -1,0 +1,201 @@
+// components/PageBuilder/hooks/usePageOperations.js
+
+import { useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { message } from "antd";
+import instance from "../../../axios";
+import {
+    setPageData,
+    setLoading,
+    setError,
+    setIsDirty,
+    setLastSaved,
+} from "../../../store/slices/pageSlice";
+import {
+    pushToHistory,
+    undo,
+    redo,
+} from "../../../store/slices/historySlice";
+
+export const usePageOperations = (pageId, pageData) => {
+    const dispatch = useDispatch();
+
+    // Fetch page data from the backend with error handling
+    const fetchPageData = useCallback(async () => {
+        try {
+            dispatch(setLoading(true));
+
+            // Always fetch fresh data from server for editing
+            const response = await instance.get(`/pages/${pageId}`);
+            const data = response.data;
+
+            // Normalize component types in the data
+            if (data.body) {
+                data.body = data.body.map((section) => ({
+                    ...section,
+                    data: section.data.map((component) => ({
+                        ...component,
+                        type:
+                            typeof component.type === "object"
+                                ? component.type.type
+                                : component.type,
+                    })),
+                }));
+            }
+
+            dispatch(setPageData(data));
+            dispatch(pushToHistory(data)); // Add initial state to history
+            dispatch(setError(null));
+        } catch (err) {
+            console.error("❌ Error fetching page data:", err);
+            dispatch(setError(err.message || "Failed to fetch page data"));
+        } finally {
+            dispatch(setLoading(false));
+        }
+    }, [pageId, dispatch]);
+
+    // Save the page data to the backend with error handling
+    const savePageData = useCallback(async (showMessage = true) => {
+        console.log("🔧 savePageData called with:", {
+            pageData: !!pageData,
+            pageDataId: pageData?.id,
+            showMessage,
+        });
+
+        if (!pageData) {
+            console.error("❌ No pageData available for saving");
+            message.error("No page data to save.");
+            return;
+        }
+
+        if (!pageData.id) {
+            console.error("❌ No page ID available for saving");
+            message.error("No page ID to save.");
+            return;
+        }
+
+        try {
+            dispatch(setLoading(true));
+            console.log("🔧 Sending page data to server:", pageData);
+
+            const response = await instance.put(`/pages/${pageData.id}`, pageData);
+
+            // Handle axios response directly
+            if (response.status === 200) {
+                console.log("✅ Page saved successfully");
+                dispatch(setIsDirty(false));
+                dispatch(setLastSaved(new Date().toISOString()));
+                if (showMessage) {
+                    message.success("Page saved successfully!");
+                }
+            } else {
+                throw new Error("Failed to save page");
+            }
+        } catch (err) {
+            console.error("❌ Error saving page data:", err);
+            message.error("Failed to save page. Please try again.");
+        } finally {
+            dispatch(setLoading(false));
+        }
+    }, [pageData, dispatch]);
+
+    // Handle section operations
+    const handleSectionDuplicate = useCallback(
+        (sectionIndex) => {
+            const sectionToDuplicate = pageData.body[sectionIndex];
+            const duplicatedSection = {
+                ...sectionToDuplicate,
+                _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                title: `${sectionToDuplicate.title || `Section ${sectionIndex + 1}`} (Copy)`,
+                data: sectionToDuplicate.data.map((component) => ({
+                    ...component,
+                    _id: `component-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                })),
+            };
+
+            const updatedPageData = {
+                ...pageData,
+                body: [
+                    ...pageData.body.slice(0, sectionIndex + 1),
+                    duplicatedSection,
+                    ...pageData.body.slice(sectionIndex + 1),
+                ],
+            };
+
+            dispatch(setPageData(updatedPageData));
+            dispatch(setIsDirty(true));
+            dispatch(pushToHistory(updatedPageData));
+            message.success("Section duplicated successfully!");
+        },
+        [pageData, dispatch]
+    );
+
+    const handleSectionDelete = useCallback(
+        (sectionIndex) => {
+            const updatedPageData = {
+                ...pageData,
+                body: pageData.body.filter((_, idx) => idx !== sectionIndex),
+            };
+
+            dispatch(setPageData(updatedPageData));
+            dispatch(setIsDirty(true));
+            dispatch(pushToHistory(updatedPageData));
+            message.success("Section deleted successfully!");
+        },
+        [pageData, dispatch]
+    );
+
+    // Handle adding new section
+    const handleAddSection = useCallback(() => {
+        const newSection = {
+            _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            title: `Section ${pageData.body.length + 1}`,
+            data: [],
+        };
+
+        const updatedPageData = {
+            ...pageData,
+            body: [...pageData.body, newSection],
+        };
+
+        dispatch(setPageData(updatedPageData));
+        dispatch(setIsDirty(true));
+        dispatch(pushToHistory(updatedPageData));
+        message.success("New section added successfully!");
+    }, [pageData, dispatch]);
+
+    // Handle sections update (for drag and drop)
+    const handleSectionsUpdate = useCallback(
+        (updatedSections) => {
+            const updatedPageData = {
+                ...pageData,
+                body: updatedSections,
+            };
+
+            dispatch(setPageData(updatedPageData));
+            dispatch(setIsDirty(true));
+            dispatch(pushToHistory(updatedPageData));
+        },
+        [pageData, dispatch]
+    );
+
+    // Handle undo/redo
+    const handleUndo = useCallback(() => {
+        dispatch(undo());
+    }, [dispatch]);
+
+    const handleRedo = useCallback(() => {
+        dispatch(redo());
+    }, [dispatch]);
+
+    return {
+        fetchPageData,
+        savePageData,
+        handleSectionDuplicate,
+        handleSectionDelete,
+        handleAddSection,
+        handleSectionsUpdate,
+        handleUndo,
+        handleRedo,
+    };
+}; 

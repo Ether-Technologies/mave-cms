@@ -19,13 +19,9 @@ export const useSliderRefresh = (
   const pollingIntervalRef = useRef(null);
   const lastUpdateRef = useRef(null);
 
-  // Auto-enable polling when in preview mode (not editing)
+  // Disable auto-polling by default - only enable when explicitly requested
   useEffect(() => {
-    if (preview && !isEditing) {
-      setAutoPolling(true);
-    } else {
-      setAutoPolling(false);
-    }
+    setAutoPolling(false);
   }, [preview, isEditing]);
 
   // Memoize the fetch function to avoid dependency issues
@@ -143,30 +139,36 @@ export const useSliderRefresh = (
     ]
   );
 
-  // Auto-polling effect - only when in preview mode and not editing
+  // Auto-polling effect - only when explicitly enabled and in preview mode
   useEffect(() => {
-    if (!autoPolling || !sliderData?.id || !preview || isEditing) {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-      return;
+    // Always disable auto-refresh by default
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
     }
 
-    // Clear any existing errors when starting polling
-    setPollingError(null);
+    // Only enable if explicitly requested AND in preview mode AND not editing
+    if (autoPolling && preview && !isEditing && sliderData?.id) {
+      console.log("🔄 Slider auto-refresh enabled - starting interval");
+      setPollingError(null);
 
-    // Set up polling interval (10 seconds)
-    pollingIntervalRef.current = setInterval(() => {
-      fetchSliderData(true);
-    }, POLLING_INTERVAL);
+      // Set up polling interval (10 seconds)
+      pollingIntervalRef.current = setInterval(() => {
+        fetchSliderData(true);
+      }, POLLING_INTERVAL);
 
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-    };
+      return () => {
+        console.log("🔄 Slider auto-refresh disabled - cleaning up interval");
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
+      };
+    } else {
+      console.log(
+        "🔄 Slider auto-refresh disabled - not enabled or not in preview mode"
+      );
+    }
   }, [autoPolling, sliderData?.id, preview, isEditing, fetchSliderData]);
 
   // Manual refresh function

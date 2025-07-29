@@ -3,7 +3,11 @@
 import React, { useCallback } from "react";
 import { Button, Typography, Empty } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import Section from "./Section";
 import { useDispatch, useSelector } from "react-redux";
 import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
@@ -19,6 +23,7 @@ const SectionList = ({
   setSections,
   onSectionDuplicate,
   onSectionDelete,
+  isEditing = false,
 }) => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
@@ -121,39 +126,41 @@ const SectionList = ({
         onEditingStateChange={handleEditingStateChange}
         onSectionDuplicate={onSectionDuplicate}
         onSectionDelete={onSectionDelete}
+        isEditing={isEditing}
       />
     );
   }
 
   if (sections) {
     // Multiple sections mode with drag and drop
+    const sortableItems = sections.map(
+      (section, index) => section._id || `section-${index}-${Date.now()}`
+    );
+
     return (
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="sections-droppable">
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="space-y-4"
-            >
-              {sections.map((section, index) => (
-                <Section
-                  key={section._id || `section-${index}`}
-                  section={section}
-                  sectionIndex={index}
-                  onComponentUpdate={handleComponentUpdate}
-                  onComponentDelete={handleComponentDelete}
-                  onComponentDuplicate={handleComponentDuplicate}
-                  onEditingStateChange={handleEditingStateChange}
-                  onSectionDuplicate={onSectionDuplicate}
-                  onSectionDelete={onSectionDelete}
-                />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <DndContext onDragEnd={onDragEnd}>
+        <SortableContext
+          items={sortableItems}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-4">
+            {sections.map((section, index) => (
+              <Section
+                key={section._id || `section-${index}`}
+                section={section}
+                sectionIndex={index}
+                onComponentUpdate={handleComponentUpdate}
+                onComponentDelete={handleComponentDelete}
+                onComponentDuplicate={handleComponentDuplicate}
+                onEditingStateChange={handleEditingStateChange}
+                onSectionDuplicate={onSectionDuplicate}
+                onSectionDelete={onSectionDelete}
+                isEditing={isEditing}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     );
   }
 
