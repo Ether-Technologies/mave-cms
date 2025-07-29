@@ -3,9 +3,11 @@
 import React, { useCallback } from "react";
 import { Button, Typography, Empty } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import Section from "./Section";
 import { useDispatch, useSelector } from "react-redux";
 import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
+import { useSectionDragAndDrop } from "./hooks/useSectionDragAndDrop";
 
 const { Title } = Typography;
 
@@ -15,6 +17,8 @@ const SectionList = ({
   onEditingStateChange,
   sections,
   setSections,
+  onSectionDuplicate,
+  onSectionDelete,
 }) => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
@@ -82,6 +86,29 @@ const SectionList = ({
     [pageData, sectionIndex, dispatch]
   );
 
+  // Handle sections update
+  const handleSectionsUpdate = useCallback(
+    (updatedSections) => {
+      if (setSections) {
+        setSections(updatedSections);
+      } else {
+        const updatedPageData = {
+          ...pageData,
+          body: updatedSections,
+        };
+        dispatch(setPageData(updatedPageData));
+        dispatch(setIsDirty(true));
+      }
+    },
+    [setSections, pageData, dispatch]
+  );
+
+  // Use section drag and drop hook
+  const { onDragEnd } = useSectionDragAndDrop({
+    sections: sections || pageData?.body,
+    onSectionsUpdate: handleSectionsUpdate,
+  });
+
   if (section) {
     // Single section mode
     return (
@@ -92,26 +119,41 @@ const SectionList = ({
         onComponentDelete={handleComponentDelete}
         onComponentDuplicate={handleComponentDuplicate}
         onEditingStateChange={handleEditingStateChange}
+        onSectionDuplicate={onSectionDuplicate}
+        onSectionDelete={onSectionDelete}
       />
     );
   }
 
   if (sections) {
-    // Multiple sections mode
+    // Multiple sections mode with drag and drop
     return (
-      <div className="space-y-4">
-        {sections.map((section, index) => (
-          <Section
-            key={index}
-            section={section}
-            sectionIndex={index}
-            onComponentUpdate={handleComponentUpdate}
-            onComponentDelete={handleComponentDelete}
-            onComponentDuplicate={handleComponentDuplicate}
-            onEditingStateChange={handleEditingStateChange}
-          />
-        ))}
-      </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="sections-droppable">
+          {(provided) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className="space-y-4"
+            >
+              {sections.map((section, index) => (
+                <Section
+                  key={section._id || `section-${index}`}
+                  section={section}
+                  sectionIndex={index}
+                  onComponentUpdate={handleComponentUpdate}
+                  onComponentDelete={handleComponentDelete}
+                  onComponentDuplicate={handleComponentDuplicate}
+                  onEditingStateChange={handleEditingStateChange}
+                  onSectionDuplicate={onSectionDuplicate}
+                  onSectionDelete={onSectionDelete}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     );
   }
 

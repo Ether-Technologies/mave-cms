@@ -23,6 +23,8 @@ const SectionWrapper = ({
   index,
   onDuplicate,
   onDelete,
+  onSectionDuplicate,
+  onSectionDelete,
 }) => {
   const dispatch = useDispatch();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -73,11 +75,21 @@ const SectionWrapper = ({
     setIsDeleteModalVisible(false);
     if (onDelete) {
       onDelete(sectionIndex);
+    } else if (onSectionDelete) {
+      onSectionDelete(sectionIndex);
     }
   };
 
   const handleDeleteCancel = () => {
     setIsDeleteModalVisible(false);
+  };
+
+  const handleDuplicateClick = () => {
+    if (onDuplicate) {
+      onDuplicate(sectionIndex);
+    } else if (onSectionDuplicate) {
+      onSectionDuplicate(sectionIndex);
+    }
   };
 
   const handleTitleEdit = () => {
@@ -157,20 +169,22 @@ const SectionWrapper = ({
             </div>
           )}
           <div className="flex items-center gap-2">
-            {onDuplicate && (
+            {(onDuplicate || onSectionDuplicate) && (
               <Button
                 icon={<CopyOutlined />}
-                onClick={() => onDuplicate(sectionIndex)}
+                onClick={handleDuplicateClick}
                 size="small"
-                className="mavebutton"
+                className="mavebutton hover:bg-yellow-600"
+                title="Duplicate Section"
               />
             )}
-            {onDelete && (
+            {(onDelete || onSectionDelete) && (
               <Button
                 icon={<DeleteOutlined />}
                 onClick={handleDeleteClick}
                 size="small"
                 className="mavecancelbutton"
+                title="Delete Section"
               />
             )}
           </div>

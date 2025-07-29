@@ -10,7 +10,7 @@ import {
   CheckOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
-import ComponentList from "../Components/ComponentList";
+import ComponentListSimple from "../Components/ComponentListSimple";
 import { useDispatch } from "react-redux";
 import { updateSection } from "../../../store/slices/pageSlice";
 
@@ -24,6 +24,8 @@ const Section = ({
   index,
   onDuplicate,
   onDelete,
+  onSectionDuplicate,
+  onSectionDelete,
 }) => {
   const dispatch = useDispatch();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -31,6 +33,10 @@ const Section = ({
   const [tempTitle, setTempTitle] = useState(
     section.title || `Section ${(sectionIndex || index) + 1}`
   );
+
+  // Ensure section has a valid _id
+  const draggableId =
+    section._id || `section-${sectionIndex || index}-${Date.now()}`;
 
   // Handle editing state changes from components
   const handleComponentEditingStateChange = useCallback(
@@ -75,11 +81,21 @@ const Section = ({
     setIsDeleteModalVisible(false);
     if (onDelete) {
       onDelete(sectionIndex || index);
+    } else if (onSectionDelete) {
+      onSectionDelete(sectionIndex || index);
     }
   };
 
   const handleDeleteCancel = () => {
     setIsDeleteModalVisible(false);
+  };
+
+  const handleDuplicateClick = () => {
+    if (onDuplicate) {
+      onDuplicate(sectionIndex || index);
+    } else if (onSectionDuplicate) {
+      onSectionDuplicate(sectionIndex || index);
+    }
   };
 
   const handleTitleEdit = () => {
@@ -114,7 +130,7 @@ const Section = ({
 
   return (
     <>
-      <Draggable draggableId={section._id} index={sectionIndex || index}>
+      <Draggable draggableId={draggableId} index={sectionIndex || index}>
         {(provided) => (
           <div
             ref={provided.innerRef}
@@ -152,32 +168,34 @@ const Section = ({
                   <Button
                     icon={<EditOutlined />}
                     onClick={handleTitleEdit}
-                    size="small"
+                    size="middle"
                     className="mavebutton"
                   />
                 </div>
               )}
               <div className="flex items-center gap-2">
-                {onDuplicate && (
+                {(onDuplicate || onSectionDuplicate) && (
                   <Button
                     icon={<CopyOutlined />}
-                    onClick={() => onDuplicate(sectionIndex || index)}
-                    size="small"
-                    className="mavebutton"
+                    onClick={handleDuplicateClick}
+                    size="middle"
+                    className="mavebutton hover:bg-yellow-600"
+                    title="Duplicate Section"
                   />
                 )}
-                {onDelete && (
+                {(onDelete || onSectionDelete) && (
                   <Button
                     icon={<DeleteOutlined />}
                     onClick={handleDeleteClick}
                     size="small"
-                    className="mavecancelbutton"
+                    className="mavecancelbutton hover:bg-red-600"
+                    title="Delete Section"
                   />
                 )}
               </div>
             </div>
 
-            <ComponentList
+            <ComponentListSimple
               components={section.data}
               onComponentsUpdate={handleComponentsUpdate}
               onComponentDelete={onComponentDelete}

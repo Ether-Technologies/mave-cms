@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import SectionWrapper from "./Sections/SectionWrapper";
+import SectionList from "./Sections/SectionList";
 import { Button, message, Spin, Alert, Modal } from "antd"; // Removed Tooltip for simplicity
 import {
   SaveOutlined,
@@ -98,231 +98,224 @@ const PageBuilder = ({ pageId, editMode = false }) => {
       if (response.status === 200) {
         dispatch(setIsDirty(false));
         dispatch(setLastSaved(new Date().toISOString()));
-
         if (showMessage) {
-          message.success("Page saved successfully");
+          message.success("Page saved successfully!");
         }
-        return true;
       } else {
         throw new Error("Failed to save page");
       }
     } catch (err) {
-      dispatch(setError(err.message || "Failed to save page"));
-      if (showMessage) {
-        message.error(
-          "Failed to save page data: " + (err.message || "Unknown error")
-        );
-      }
-      return false;
+      console.error("❌ Error saving page data:", err);
+      message.error("Failed to save page. Please try again.");
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-  // Handle undo/redo actions
   const handleUndo = () => {
-    if (canUndo) {
-      dispatch(undo());
-    }
+    dispatch(undo());
   };
 
   const handleRedo = () => {
-    if (canRedo) {
-      dispatch(redo());
-    }
+    dispatch(redo());
   };
 
-  // Handle keyboard shortcuts
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
-        if (e.shiftKey) {
-          e.preventDefault();
-          handleRedo();
-        } else {
-          e.preventDefault();
-          handleUndo();
-        }
-      } else if ((e.metaKey || e.ctrlKey) && e.key === "y") {
+      if (!isEditing) return;
+
+      // Save on Ctrl+S
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        savePageData();
+      }
+
+      // Undo on Ctrl+Z
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+
+      // Redo on Ctrl+Shift+Z or Ctrl+Y
+      if (
+        ((e.ctrlKey || e.metaKey) && e.key === "z" && e.shiftKey) ||
+        ((e.ctrlKey || e.metaKey) && e.key === "y")
+      ) {
         e.preventDefault();
         handleRedo();
-      } else if ((e.metaKey || e.ctrlKey) && e.key === "s") {
-        e.preventDefault();
-        if (isDirty) {
-          savePageData(true);
-        }
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [canUndo, canRedo, isDirty]);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isEditing]);
 
-  // Debounced autosave function
-  const debouncedAutosave = useCallback(
-    debounce(async () => {
-      if (isDirty && !isEditing) {
-        await savePageData(false);
+  // Auto-save functionality
+  const debouncedSave = useCallback(
+    debounce(() => {
+      if (isDirty && isEditing) {
+        savePageData(false);
       }
     }, AUTOSAVE_DELAY),
-    [isDirty, pageData, isEditing]
+    [isDirty, isEditing]
   );
 
-  // Effect for autosave
   useEffect(() => {
-    // Only save when explicitly triggered, not automatically
-    return () => {
-      debouncedAutosave.cancel();
-    };
-  }, [debouncedAutosave]);
+    debouncedSave();
+    return () => debouncedSave.cancel();
+  }, [debouncedSave]);
 
-  // Initial data fetch
-  useEffect(() => {
-    if (pageId) {
-      fetchPageData();
-    } else {
-    }
-  }, [pageId]);
-
-  // Force loading to false on mount if pageData exists
-  useEffect(() => {
-    if (pageData && loading) {
-      dispatch(setLoading(false));
-    }
-  }, []);
-
-  // Update history when pageData changes
-  useEffect(() => {
-    if (!initialLoadRef.current && pageData) {
-      dispatch(pushToHistory(pageData));
-    }
-  }, [pageData, dispatch]);
-
-  // Handle browser/tab close or refresh
+  // Warn before leaving with unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (isDirty) {
+      if (isDirty && isEditing) {
         e.preventDefault();
         e.returnValue = "";
       }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [isDirty]);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty, isEditing]);
 
-  // Handle in-app navigation
+  // Handle route changes
   useEffect(() => {
     const handleRouteChange = (url) => {
-      if (isDirty) {
-        const confirmLeave = window.confirm(
-          "All unsaved changes will be discarded. Do you want to leave?"
+      if (isDirty && isEditing) {
+        const confirmed = window.confirm(
+          "You have unsaved changes. Are you sure you want to leave?"
         );
-        if (!confirmLeave) {
-          throw "Route change aborted due to unsaved changes.";
+        if (!confirmed) {
+          router.events.emit("routeChangeError");
+          throw "Route change aborted";
         }
       }
     };
 
     router.events.on("routeChangeStart", handleRouteChange);
-    return () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-    };
-  }, [isDirty, router.events]);
+    return () => router.events.off("routeChangeStart", handleRouteChange);
+  }, [isDirty, isEditing, router]);
 
-  // Set editing state when components are being edited
-  const handleEditingStateChange = useCallback((editing) => {
-    setIsEditing(editing);
-  }, []);
+  // Initial data fetch
+  useEffect(() => {
+    if (pageId) {
+      fetchPageData();
+    }
+  }, [pageId, fetchPageData]);
 
-  // Handle section updates (when components are added/modified)
+  // Handle section updates
   const handleSectionUpdate = useCallback(
     (sectionIndex, updatedSection) => {
-      // Validate inputs
-      if (sectionIndex === undefined || sectionIndex === null) {
-        return;
-      }
-
-      if (!updatedSection) {
-        return;
-      }
-
-      if (pageData && pageData.body && sectionIndex >= 0) {
-        const updatedPageData = { ...pageData };
-
-        // Ensure the sectionIndex is within bounds
-        if (sectionIndex < updatedPageData.body.length) {
-          // Create a new array instead of mutating the existing one
-          updatedPageData.body = [
-            ...updatedPageData.body.slice(0, sectionIndex),
-            updatedSection,
-            ...updatedPageData.body.slice(sectionIndex + 1),
-          ];
-          dispatch(setPageData(updatedPageData));
-          dispatch(setIsDirty(true));
-        }
-      }
-    },
-    [pageData, dispatch]
-  );
-
-  // Handle component updates (legacy - kept for compatibility)
-  const handleComponentUpdate = useCallback(
-    (updatedComponent, componentIndex) => {
-      if (pageData && pageData.body) {
-        const updatedPageData = { ...pageData };
-        // This will be handled by the Section component internally
-        dispatch(setPageData(updatedPageData));
-        dispatch(setIsDirty(true));
-      }
-    },
-    [pageData, dispatch]
-  );
-
-  // Handle component deletion
-  const handleComponentDelete = useCallback((componentIndex) => {
-    // This is handled by the ComponentList components internally
-    // The componentIndex is passed from ComponentList to SectionWrapper
-    // and the actual deletion happens in the ComponentList components
-  }, []);
-
-  // Handle component duplication
-  const handleComponentDuplicate = useCallback(
-    (componentIndex) => {
-      if (pageData && pageData.body) {
-        const updatedPageData = { ...pageData };
-        // This will be handled by the Section component internally
-        dispatch(setPageData(updatedPageData));
-        dispatch(setIsDirty(true));
-      }
-    },
-    [pageData, dispatch]
-  );
-
-  // Handle adding new section
-  const handleAddSection = useCallback(() => {
-    if (pageData) {
-      const newSection = {
-        _id: `section_${Date.now()}`,
-        title: `Section ${(pageData.body?.length || 0) + 1}`,
-        data: [],
-        sectionTitle: `Section ${(pageData.body?.length || 0) + 1}`,
-      };
-
       const updatedPageData = {
         ...pageData,
-        body: [...(pageData.body || []), newSection],
+        body: pageData.body.map((section, idx) =>
+          idx === sectionIndex ? updatedSection : section
+        ),
       };
 
       dispatch(setPageData(updatedPageData));
       dispatch(setIsDirty(true));
-      message.success("New section added successfully");
-    }
+      dispatch(pushToHistory(updatedPageData));
+    },
+    [pageData, dispatch]
+  );
+
+  // Handle component operations
+  const handleComponentDelete = useCallback((componentIndex) => {
+    // This will be handled by the individual sections
+  }, []);
+
+  const handleComponentDuplicate = useCallback((componentIndex) => {
+    // This will be handled by the individual sections
+  }, []);
+
+  // Handle section operations
+  const handleSectionDuplicate = useCallback(
+    (sectionIndex) => {
+      const sectionToDuplicate = pageData.body[sectionIndex];
+      const duplicatedSection = {
+        ...sectionToDuplicate,
+        _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        title: `${sectionToDuplicate.title || `Section ${sectionIndex + 1}`} (Copy)`,
+        data: sectionToDuplicate.data.map((component) => ({
+          ...component,
+          _id: `component-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        })),
+      };
+
+      const updatedPageData = {
+        ...pageData,
+        body: [
+          ...pageData.body.slice(0, sectionIndex + 1),
+          duplicatedSection,
+          ...pageData.body.slice(sectionIndex + 1),
+        ],
+      };
+
+      dispatch(setPageData(updatedPageData));
+      dispatch(setIsDirty(true));
+      dispatch(pushToHistory(updatedPageData));
+      message.success("Section duplicated successfully!");
+    },
+    [pageData, dispatch]
+  );
+
+  const handleSectionDelete = useCallback(
+    (sectionIndex) => {
+      const updatedPageData = {
+        ...pageData,
+        body: pageData.body.filter((_, idx) => idx !== sectionIndex),
+      };
+
+      dispatch(setPageData(updatedPageData));
+      dispatch(setIsDirty(true));
+      dispatch(pushToHistory(updatedPageData));
+      message.success("Section deleted successfully!");
+    },
+    [pageData, dispatch]
+  );
+
+  // Handle editing state changes
+  const handleEditingStateChange = useCallback((editing) => {
+    setIsEditing(editing);
+  }, []);
+
+  // Handle adding new section
+  const handleAddSection = useCallback(() => {
+    const newSection = {
+      _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: `Section ${pageData.body.length + 1}`,
+      data: [],
+    };
+
+    const updatedPageData = {
+      ...pageData,
+      body: [...pageData.body, newSection],
+    };
+
+    dispatch(setPageData(updatedPageData));
+    dispatch(setIsDirty(true));
+    dispatch(pushToHistory(updatedPageData));
+    message.success("New section added successfully!");
   }, [pageData, dispatch]);
 
-  // Force loading to false if it gets stuck
+  // Handle sections update (for drag and drop)
+  const handleSectionsUpdate = useCallback(
+    (updatedSections) => {
+      const updatedPageData = {
+        ...pageData,
+        body: updatedSections,
+      };
+
+      dispatch(setPageData(updatedPageData));
+      dispatch(setIsDirty(true));
+      dispatch(pushToHistory(updatedPageData));
+    },
+    [pageData, dispatch]
+  );
+
+  // Reset loading state if data is available
   useEffect(() => {
     if (loading && pageData) {
       dispatch(setLoading(false));
@@ -453,18 +446,13 @@ const PageBuilder = ({ pageId, editMode = false }) => {
         <div className="p-6">
           {pageData?.body?.length > 0 ? (
             <>
-              {pageData.body.map((section, sectionIndex) => (
-                <div key={sectionIndex} className="mb-8">
-                  <SectionWrapper
-                    section={section}
-                    sectionIndex={sectionIndex}
-                    onSectionUpdate={handleSectionUpdate}
-                    onComponentDelete={handleComponentDelete}
-                    onComponentDuplicate={handleComponentDuplicate}
-                    onEditingStateChange={handleEditingStateChange}
-                  />
-                </div>
-              ))}
+              <SectionList
+                sections={pageData.body}
+                setSections={handleSectionsUpdate}
+                onSectionDuplicate={handleSectionDuplicate}
+                onSectionDelete={handleSectionDelete}
+                onEditingStateChange={handleEditingStateChange}
+              />
               {isEditing && (
                 <div className="text-center py-8">
                   <Button
