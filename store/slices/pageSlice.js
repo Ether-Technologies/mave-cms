@@ -14,7 +14,7 @@ const pageSlice = createSlice({
   initialState,
   reducers: {
     setPageData: (state, action) => {
-      console.log("🔧 setPageData called with:", action.payload);
+      // console.log("🔧 setPageData called with:", action.payload);
       state.pageData = action.payload;
       state.isDirty = true;
     },

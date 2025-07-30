@@ -1,6 +1,6 @@
 // components/PageBuilder/Sections/SectionList.jsx
 
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { Button, Typography, Empty } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
@@ -27,15 +27,6 @@ const SectionList = ({
 }) => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
-
-  // Debug props received by SectionList
-  useEffect(() => {}, [
-    section,
-    sectionIndex,
-    sections,
-    onSectionDelete,
-    onSectionDuplicate,
-  ]);
 
   // Handle editing state changes
   const handleEditingStateChange = useCallback(
@@ -66,13 +57,6 @@ const SectionList = ({
   // Handle component deletion
   const handleComponentDelete = useCallback(
     (componentIndex) => {
-      console.log("🔧 SectionList handleComponentDelete called:", {
-        componentIndex,
-        sectionIndex,
-        hasPageData: !!pageData,
-        pageDataBodyLength: pageData?.body?.length,
-      });
-
       if (pageData && sectionIndex !== undefined) {
         const updatedPageData = { ...pageData };
         const updatedSection = { ...updatedPageData.body[sectionIndex] };
@@ -137,12 +121,11 @@ const SectionList = ({
 
   // Add drag event handlers for debugging
   const handleSectionDragStart = useCallback((event) => {
-    console.log("🔧 Section drag start:", event);
+    // Drag start handler
   }, []);
 
   const handleSectionDragEnd = useCallback(
     (event) => {
-      console.log("🔧 Section drag end:", event);
       onDragEnd(event);
     },
     [onDragEnd]

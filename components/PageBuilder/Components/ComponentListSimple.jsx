@@ -31,9 +31,6 @@ const ComponentListSimple = ({
   const [localIsEditing, setLocalIsEditing] = useState(false);
   const [activeId, setActiveId] = useState(null);
 
-  // Debug sectionIndex
-  useEffect(() => {}, [sectionIndex]);
-
   useEffect(() => {
     setComponents(components);
   }, [components]);
@@ -80,26 +77,20 @@ const ComponentListSimple = ({
   // Handle components update from drag and drop
   const handleComponentsUpdate = useCallback(
     (updatedComponents) => {
-      console.log("🔧 handleComponentsUpdate called with:", updatedComponents);
       setComponents(updatedComponents);
       if (onComponentsUpdate) {
-        console.log("🔧 Calling onComponentsUpdate callback");
         onComponentsUpdate(updatedComponents);
-      } else {
-        console.log("🔧 No onComponentsUpdate callback provided");
       }
     },
     [onComponentsUpdate]
   );
 
   const handleDragStart = useCallback((event) => {
-    console.log("🔧 Component drag start:", event);
     setActiveId(event.active.id);
   }, []);
 
   const handleDragEnd = useCallback(
     (event) => {
-      console.log("🔧 Component drag end:", event);
       setActiveId(null);
       onDragEnd(event);
     },

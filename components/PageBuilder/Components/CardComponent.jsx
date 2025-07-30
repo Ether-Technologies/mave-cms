@@ -96,30 +96,31 @@ const CardComponent = ({
   useEffect(() => {
     // Disable auto-refresh when in edit mode
     if (isEditing) {
-      console.log("🔄 Card auto-refresh disabled - in edit mode");
+      // console.log("🔄 Card auto-refresh disabled - in edit mode");
       return;
     }
 
     // Only enable auto-refresh in preview mode
     if (!preview) {
-      console.log("🔄 Card auto-refresh disabled - not in preview mode");
+      // console.log("🔄 Card auto-refresh disabled - not in preview mode");
       return;
     }
 
     if (!cardData?.id || !autoPolling) {
-      console.log(
-        "🔄 Card auto-refresh disabled - no card data or polling disabled"
-      );
+      console
+        .log
+        // "🔄 Card auto-refresh disabled - no card data or polling disabled"
+        ();
       return;
     }
 
-    console.log("🔄 Card auto-refresh enabled - starting interval");
+    // console.log("🔄 Card auto-refresh enabled - starting interval");
     const interval = setInterval(() => {
       refreshCardData(true); // Silent refresh for polling
     }, POLLING_INTERVAL);
 
     return () => {
-      console.log("🔄 Card auto-refresh disabled - cleaning up interval");
+      // console.log("🔄 Card auto-refresh disabled - cleaning up interval");
       clearInterval(interval);
     };
   }, [cardData?.id, autoPolling, isEditing, preview]);
@@ -129,13 +130,13 @@ const CardComponent = ({
     async (silent = false) => {
       // Prevent updates during editing to avoid losing draft state
       if (isEditing) {
-        console.log("🔄 Skipping card refresh - component is being edited");
+        // console.log("🔄 Skipping card refresh - component is being edited");
         return;
       }
 
       // Only allow refresh in preview mode
       if (!preview) {
-        console.log("🔄 Skipping card refresh - not in preview mode");
+        // console.log("🔄 Skipping card refresh - not in preview mode");
         return;
       }
 

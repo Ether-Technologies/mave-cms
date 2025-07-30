@@ -1,6 +1,6 @@
 // components/PageBuilder/Components/hooks/useComponentOperations.js
 
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsDirty, setPageData } from "../../../../store/slices/pageSlice";
 import { message } from "antd";
@@ -15,18 +15,8 @@ export const useComponentOperations = ({
     const dispatch = useDispatch();
     const pageData = useSelector((state) => state.page.pageData);
 
-    // Debug sectionIndex
-    useEffect(() => {
-    }, [sectionIndex]);
-
     const addComponent = useCallback(
         (type) => {
-            console.log("🔧 addComponent called:", {
-                type,
-                sectionIndex,
-                componentsCount: componentsState.length,
-            });
-
             // Validate input
             if (!type) {
                 console.error("❌ Invalid component type:", type);
@@ -50,17 +40,9 @@ export const useComponentOperations = ({
                 },
             };
 
-            console.log("🔧 Created new component:", newComponent);
-
             if (onComponentsUpdate) {
                 // Use new callback system
                 const updatedComponents = [...componentsState, newComponent];
-                console.log(
-                    "🔧 Calling onComponentsUpdate with:",
-                    updatedComponents.length,
-                    "components"
-                );
-                console.log("🔧 Updated components array:", updatedComponents);
                 onComponentsUpdate(updatedComponents);
             } else {
                 // Fallback to old system
@@ -94,7 +76,6 @@ export const useComponentOperations = ({
                     }),
                 };
 
-                console.log("🔧 Updated page data:", updatedPageData);
                 dispatch(setPageData(updatedPageData));
                 dispatch(setIsDirty(true));
             }
@@ -135,14 +116,6 @@ export const useComponentOperations = ({
 
     const handleComponentDelete = useCallback(
         (componentIndex) => {
-            console.log("🔧 handleComponentDelete called with:", {
-                componentIndex,
-                sectionIndex,
-                componentsCount: componentsState.length,
-                hasOnComponentsUpdate: !!onComponentsUpdate,
-                hasOnComponentDelete: !!onComponentDelete
-            });
-
             if (sectionIndex === undefined || sectionIndex === null) {
                 console.error("❌ Section index is undefined or null for component deletion:", sectionIndex);
                 message.error("Cannot delete component - invalid section index.");
@@ -152,8 +125,6 @@ export const useComponentOperations = ({
             const updatedComponents = componentsState.filter(
                 (_, index) => index !== componentIndex
             );
-
-            console.log("🔧 Updated components count:", updatedComponents.length);
 
             if (onComponentsUpdate) {
                 onComponentsUpdate(updatedComponents);

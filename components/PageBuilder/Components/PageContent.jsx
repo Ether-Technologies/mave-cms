@@ -1,6 +1,6 @@
 // components/PageBuilder/Components/PageContent.jsx
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import SectionList from "../Sections/SectionList";
@@ -14,19 +14,6 @@ const PageContent = ({
   onEditingStateChange,
   onAddSection,
 }) => {
-  // Debug pageData
-  useEffect(() => {
-    console.log("🔧 PageContent received pageData:", {
-      hasPageData: !!pageData,
-      bodyLength: pageData?.body?.length,
-      bodySections: pageData?.body?.map((section, idx) => ({
-        index: idx,
-        title: section.title,
-        id: section._id,
-      })),
-    });
-  }, [pageData]);
-
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="p-6">

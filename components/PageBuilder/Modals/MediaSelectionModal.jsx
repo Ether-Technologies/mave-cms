@@ -90,9 +90,9 @@ const MediaSelectionModal = (props) => {
   }, [isVisible]);
 
   // Debug: Track selectedMedia changes
-  useEffect(() => {
-    console.log("🔴 selectedMedia state changed to:", selectedMedia);
-  }, [selectedMedia]);
+  // useEffect(() => {
+  //   console.log("🔴 selectedMedia state changed to:", selectedMedia);
+  // }, [selectedMedia]);
 
   const isItemSelected = (item) => {
     const selected = selectedMediaRef.current.some(

@@ -1,6 +1,6 @@
 // components/PageBuilder/Sections/Section.jsx
 
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button, Modal, Input } from "antd";
@@ -36,20 +36,6 @@ const Section = ({
     section.title || `Section ${(sectionIndex || index) + 1}`
   );
 
-  // Debug section props
-  useEffect(() => {}, [
-    sectionIndex,
-    index,
-    section.title,
-    onSectionDelete,
-    section._id,
-  ]);
-
-  // Monitor modal state changes
-  useEffect(() => {
-    console.log("🔧 Modal state changed:", isDeleteModalVisible);
-  }, [isDeleteModalVisible]);
-
   // Ensure section has a valid _id - use stable ID generation
   const draggableId = useMemo(() => {
     return section._id || `section-${sectionIndex || index}`;
@@ -84,16 +70,10 @@ const Section = ({
 
   const handleComponentsUpdate = useCallback(
     (updatedComponents) => {
-      console.log(
-        "🔧 Section handleComponentsUpdate called with:",
-        updatedComponents
-      );
       const updatedSection = {
         ...section,
         data: updatedComponents,
       };
-
-      console.log("🔧 Updated section:", updatedSection);
 
       // Update the section in the Redux store
       dispatch(
@@ -112,31 +92,14 @@ const Section = ({
   const handleDeleteClick = (e) => {
     // Prevent event from bubbling up to drag listeners
     e.stopPropagation();
-    console.log("🔧 handleDeleteClick called in Section:", {
-      sectionIndex: sectionIndex || index,
-      hasOnDelete: !!onDelete,
-      hasOnSectionDelete: !!onSectionDelete,
-      currentModalState: isDeleteModalVisible,
-    });
     setIsDeleteModalVisible(true);
-    console.log("🔧 Modal state set to true");
   };
 
   const handleDeleteConfirm = () => {
-    console.log("🔧 handleDeleteConfirm called in Section:", {
-      sectionIndex: sectionIndex || index,
-      hasOnDelete: !!onDelete,
-      hasOnSectionDelete: !!onSectionDelete,
-    });
     setIsDeleteModalVisible(false);
     if (onDelete) {
-      console.log("🔧 Calling onDelete with index:", sectionIndex || index);
       onDelete(sectionIndex || index);
     } else if (onSectionDelete) {
-      console.log(
-        "🔧 Calling onSectionDelete with index:",
-        sectionIndex || index
-      );
       onSectionDelete(sectionIndex || index);
     } else {
       console.error("❌ No delete handler available");
@@ -144,7 +107,6 @@ const Section = ({
   };
 
   const handleDeleteCancel = () => {
-    console.log("🔧 handleDeleteCancel called, closing modal");
     setIsDeleteModalVisible(false);
   };
 

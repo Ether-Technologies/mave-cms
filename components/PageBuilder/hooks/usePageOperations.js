@@ -56,12 +56,6 @@ export const usePageOperations = (pageId, pageData) => {
 
     // Save the page data to the backend with error handling
     const savePageData = useCallback(async (showMessage = true) => {
-        console.log("🔧 savePageData called with:", {
-            pageData: !!pageData,
-            pageDataId: pageData?.id,
-            showMessage,
-        });
-
         if (!pageData) {
             console.error("❌ No pageData available for saving");
             message.error("No page data to save.");
@@ -76,13 +70,11 @@ export const usePageOperations = (pageId, pageData) => {
 
         try {
             dispatch(setLoading(true));
-            console.log("🔧 Sending page data to server:", pageData);
 
             const response = await instance.put(`/pages/${pageData.id}`, pageData);
 
             // Handle axios response directly
             if (response.status === 200) {
-                console.log("✅ Page saved successfully");
                 dispatch(setIsDirty(false));
                 dispatch(setLastSaved(new Date().toISOString()));
                 if (showMessage) {
@@ -132,13 +124,6 @@ export const usePageOperations = (pageId, pageData) => {
 
     const handleSectionDelete = useCallback(
         (sectionIndex) => {
-            console.log("🔧 handleSectionDelete called with:", {
-                sectionIndex,
-                pageDataExists: !!pageData,
-                pageDataBodyLength: pageData?.body?.length,
-                pageDataBody: pageData?.body
-            });
-
             if (!pageData || !pageData.body) {
                 console.error("❌ No pageData or pageData.body available for deletion");
                 message.error("No page data available for deletion.");
@@ -161,8 +146,6 @@ export const usePageOperations = (pageId, pageData) => {
                 ...pageData,
                 body: pageData.body.filter((_, idx) => idx !== sectionIndex),
             };
-
-            console.log("🔧 Updated pageData after deletion:", updatedPageData);
 
             dispatch(setPageData(updatedPageData));
             dispatch(setIsDirty(true));
