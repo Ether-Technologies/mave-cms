@@ -1068,5 +1068,19 @@
                 "Text component in Page Builder structure type issue fixed"
             ]
         }
+    },
+    {
+        "version": "3.3.51",
+        "type": "minor",
+        "date": "2025-07-30",
+        "changes": {
+            "Features": [
+                "Page Builder got more robust \"Add Section\" & \"Add Component\" buttons between them",
+                "Drag and drop in page builder is more user friendly now."
+            ],
+            "Bug Fixes": [
+                "Fixed the issue of table component editing in page builder"
+            ]
+        }
     }
 ]
