@@ -1,7 +1,7 @@
 // pages/pages.jsx
 
 import { message, Spin } from "antd";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import instance from "../../axios";
 import { cachedApiCall } from "../../utils/apiUtils";
 import { useRouter } from "next/router";
@@ -17,168 +17,105 @@ const Pages = () => {
   const [typeFooters, setTypeFooters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [createFooterModalVisible, setCreateFooterModalVisible] =
-    useState(false);
+  const [createFooterModalVisible, setCreateFooterModalVisible] = useState(false);
   const [expandedPageId, setExpandedPageId] = useState(null);
-  const [sortType, setSortType] = useState("asc");
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
+  const [sortType, setSortType] = useState("desc");
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [currentFilter, setCurrentFilter] = useState("all");
 
   const router = useRouter();
 
-  // Fetch all pages from the API with caching
-  const fetchPages = async () => {
+  // Memoized sorted pages
+  const sortedTypePages = useMemo(() => {
+    return [...typePages].sort((a, b) =>
+      sortType === "asc" ? a.id - b.id : b.id - a.id
+    );
+  }, [typePages, sortType]);
+
+  // Memoized paginated data
+  const paginatedData = useMemo(() => ({
+    pages: sortedTypePages.slice(0, itemsPerPage),
+    subpages: typeSubpages.slice(0, itemsPerPage),
+    footers: typeFooters.slice(0, itemsPerPage),
+  }), [sortedTypePages, typeSubpages, typeFooters, itemsPerPage]);
+
+  // Fetch pages with caching
+  const fetchPages = useCallback(async () => {
     try {
       setLoading(true);
       const response = await cachedApiCall("pages", () => instance.get("/pages"));
+
       if (response.data) {
         setAllPages(response.data);
-        const mainPages = response.data.filter((page) => page.type === "Page");
-        const subPages = response.data.filter(
-          (page) => page.type === "Subpage"
-        );
-
-        const footers = response.data.filter((page) => page.type === "Footer");
-        setTypePages(mainPages);
-        setTypeSubpages(subPages);
-        setTypeFooters(footers);
-        setLoading(false);
+        setTypePages(response.data.filter(page => page.type === "Page"));
+        setTypeSubpages(response.data.filter(page => page.type === "Subpage"));
+        setTypeFooters(response.data.filter(page => page.type === "Footer"));
       } else {
         message.error("Failed to fetch pages.");
-        setLoading(false);
       }
     } catch (error) {
       console.error("Error fetching pages:", error);
       message.error("An error occurred while fetching pages.");
+    } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchPages();
+  }, [fetchPages]);
+
+  // Event handlers
+  const handleExpand = useCallback((pageId) => {
+    setExpandedPageId(prevId => prevId === pageId ? null : pageId);
   }, []);
 
-  // Sort pages when data is fetched or sortType changes
-  const sortedTypePages = React.useMemo(() => {
-    return [...typePages].sort((a, b) => {
-      if (sortType === "asc") {
-        return a.id - b.id;
-      } else {
-        return b.id - a.id;
-      }
-    });
-  }, [typePages, sortType]);
-
-  const handleExpand = (pageId) => {
-    setExpandedPageId((prevId) => (prevId === pageId ? null : pageId));
-  };
-
-  const openCreateModal = () => {
-    setCreateModalVisible(true);
-  };
-
-  const openFooterCreateModal = () => {
-    setCreateFooterModalVisible(true);
-  };
-
-  const closeCreateModal = () => {
-    setCreateModalVisible(false);
-    setCreateFooterModalVisible(false);
-  };
-
-  const handlePageCreated = (newPage) => {
-    // Optionally, add the new page to the state without refetching
-    setTypePages((prevPages) => [newPage, ...prevPages]);
-  };
-
-  const handleFooterCreated = (newPage) => {
-    // Optionally, add the new page to the state without refetching
-    setTypePages((prevPages) => [newPage, ...prevPages]);
-  };
-
-  const handleDeletePage = async (deletePageId) => {
+  const handleDeletePage = useCallback(async (deletePageId) => {
     try {
       await instance.delete(`/pages/${deletePageId}`);
       message.success("Page deleted successfully.");
-      // Remove the deleted page from state
-      setTypePages((prevPages) =>
-        prevPages.filter((page) => page.id !== deletePageId)
-      );
+      setTypePages(prevPages => prevPages.filter(page => page.id !== deletePageId));
     } catch (error) {
       console.error("Error deleting page:", error);
       message.error("An error occurred while deleting the page.");
     }
-  };
+  }, []);
 
-  const handleDuplicatePage = async (pageId) => {
+  const handleDuplicatePage = useCallback(async (pageId) => {
     try {
       const response = await instance.post(`/pages/${pageId}/duplicate`);
       if (response.status === 201) {
         message.success("Page duplicated successfully.");
-        fetchPages(); // Refresh the list
+        fetchPages();
       }
     } catch (error) {
       console.error("Error duplicating page:", error);
       message.error("An error occurred while duplicating the page.");
     }
-  };
+  }, [fetchPages]);
 
-  const handlePreviewPage = (id) => {
+  const handlePreviewPage = useCallback((id) => {
     router.push(`/page-preview/${id}`);
-  };
+  }, [router]);
 
-  const handleEditPageInfo = async ({
-    id,
-    pageNameEn,
-    pageNameBn,
-    slug,
-    pageType,
-    type,
-    metaTitle,
-    metaDescription,
-    keywords,
-    metaImage,
-    metaImageAlt,
-  }) => {
+  const handleEditPageInfo = useCallback(async (pageData) => {
     try {
+      const { id, pageNameEn, pageNameBn, slug, pageType, type, metaTitle, metaDescription, keywords, metaImage, metaImageAlt } = pageData;
+
       const response = await instance.put(`/pages/${id}`, {
         page_name_en: pageNameEn,
         page_name_bn: pageNameBn,
-        slug: slug,
-        type: type,
-        additional: [
-          {
-            pageType: pageType,
-            metaTitle: metaTitle,
-            metaDescription: metaDescription,
-            keywords: keywords,
-            metaImage: metaImage,
-            metaImageAlt: metaImageAlt,
-          },
-        ],
+        slug,
+        type,
+        additional: [{ pageType, metaTitle, metaDescription, keywords, metaImage, metaImageAlt }],
       });
+
       if (response.status === 200) {
         message.success("Page info updated successfully.");
-        // Update the page in state
-        setTypePages((prevPages) =>
-          prevPages?.map((page) =>
+        setTypePages(prevPages =>
+          prevPages?.map(page =>
             page.id === id
-              ? {
-                ...page,
-                page_name_en: pageNameEn,
-                page_name_bn: pageNameBn,
-                slug: slug,
-                type: type,
-                additional: [
-                  {
-                    pageType,
-                    metaTitle,
-                    metaDescription,
-                    keywords,
-                    metaImage,
-                    metaImageAlt,
-                  },
-                ],
-              }
+              ? { ...page, page_name_en: pageNameEn, page_name_bn: pageNameBn, slug, type, additional: [{ pageType, metaTitle, metaDescription, keywords, metaImage, metaImageAlt }] }
               : page
           )
         );
@@ -189,45 +126,75 @@ const Pages = () => {
       console.error("Error updating page info:", error);
       message.error("An error occurred while updating the page info.");
     }
-  };
+  }, []);
 
-  const handlePageSearch = (searchText) => {
-    if (searchText.trim() === "") {
-      // Reset to original data
-      const mainPages = allPages.filter((page) => page.type === "Page");
-      const subPages = allPages.filter((page) => page.type === "Subpage");
-      const footers = allPages.filter((page) => page.type === "Footer");
-
-      setTypePages(mainPages);
-      setTypeSubpages(subPages);
-      setTypeFooters(footers);
+  const handlePageSearch = useCallback((searchText) => {
+    if (!searchText.trim()) {
+      setTypePages(allPages.filter(page => page.type === "Page"));
+      setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
+      setTypeFooters(allPages.filter(page => page.type === "Footer"));
       return;
     }
 
-    // Filter from the original data
-    const filteredPages = allPages.filter((page) =>
+    const filteredPages = allPages.filter(page =>
       page.page_name_en.toLowerCase().includes(searchText.toLowerCase())
     );
 
-    const filteredMainPages = filteredPages.filter((page) => page.type === "Page");
-    const filteredSubPages = filteredPages.filter((page) => page.type === "Subpage");
-    const filteredFooters = filteredPages.filter((page) => page.type === "Footer");
+    setTypePages(filteredPages.filter(page => page.type === "Page"));
+    setTypeSubpages(filteredPages.filter(page => page.type === "Subpage"));
+    setTypeFooters(filteredPages.filter(page => page.type === "Footer"));
+  }, [allPages]);
 
-    setTypePages(filteredMainPages);
-    setTypeSubpages(filteredSubPages);
-    setTypeFooters(filteredFooters);
-  };
+  const handleFilter = useCallback((filterType) => {
+    setCurrentFilter(filterType);
 
-  const handleShowChange = (value) => {
-    setItemsPerPage(value);
-  };
+    switch (filterType) {
+      case 'all':
+        setTypePages(allPages.filter(page => page.type === "Page"));
+        setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
+        setTypeFooters(allPages.filter(page => page.type === "Footer"));
+        message.success("Showing all pages");
+        break;
+      case 'pages':
+        setTypePages(allPages.filter(page => page.type === "Page"));
+        setTypeSubpages([]);
+        setTypeFooters([]);
+        message.success("Showing pages only");
+        break;
+      case 'subpages':
+        setTypePages([]);
+        setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
+        setTypeFooters([]);
+        message.success("Showing subpages only");
+        break;
+      case 'footers':
+        setTypePages([]);
+        setTypeSubpages([]);
+        setTypeFooters(allPages.filter(page => page.type === "Footer"));
+        message.success("Showing footers only");
+        break;
+      default:
+        break;
+    }
+  }, [allPages]);
 
-  const handleFilter = () => {
-    // Implement your filter logic here
-    message.info("Filter functionality is not implemented yet.");
-  };
+  const handlePageCreated = useCallback((newPage) => {
+    setTypePages(prevPages => [newPage, ...prevPages]);
+  }, []);
 
-  // Loading State
+  const handleFooterCreated = useCallback((newPage) => {
+    setTypeFooters(prevFooters => [newPage, ...prevFooters]);
+  }, []);
+
+  const openCreateModal = useCallback(() => setCreateModalVisible(true), []);
+  const openFooterCreateModal = useCallback(() => setCreateFooterModalVisible(true), []);
+  const closeCreateModal = useCallback(() => {
+    setCreateModalVisible(false);
+    setCreateFooterModalVisible(false);
+  }, []);
+
+  const handleShowChange = useCallback((value) => setItemsPerPage(value), []);
+
   if (loading) {
     return (
       <div className="mavecontainer flex items-center justify-center h-screen">
@@ -238,20 +205,22 @@ const Pages = () => {
 
   return (
     <div className="mavecontainer bg-gray-50 rounded-xl p-4">
-      {/* Header */}
       <PagesHeader
         onSearch={handlePageSearch}
         onCreate={openCreateModal}
         onFooterCreate={openFooterCreateModal}
-        createMode={createModalVisible || createFooterModalVisible} // Updated
+        createMode={createModalVisible || createFooterModalVisible}
         onCancelCreate={closeCreateModal}
         sortType={sortType}
         setSortType={setSortType}
         onShowChange={handleShowChange}
         handleFilter={handleFilter}
+        onRefresh={fetchPages}
+        totalPages={typePages.length}
+        totalSubpages={typeSubpages.length}
+        totalFooters={typeFooters.length}
       />
 
-      {/* Create Page Modal */}
       <CreatePageModal
         visible={createModalVisible}
         onCancel={closeCreateModal}
@@ -259,7 +228,6 @@ const Pages = () => {
         fetchPages={fetchPages}
       />
 
-      {/* Create Footer Modal */}
       <CreateFooterModal
         visible={createFooterModalVisible}
         onCancel={closeCreateModal}
@@ -267,11 +235,10 @@ const Pages = () => {
         fetchPages={fetchPages}
       />
 
-      {/* Tabs for Pages and Subpages */}
       <PagesTabs
-        typePages={sortedTypePages.slice(0, itemsPerPage)}
-        typeSubpages={typeSubpages.slice(0, itemsPerPage)}
-        typeFooters={typeFooters.slice(0, itemsPerPage)}
+        typePages={paginatedData.pages}
+        typeSubpages={paginatedData.subpages}
+        typeFooters={paginatedData.footers}
         handleExpand={handleExpand}
         expandedPageId={expandedPageId}
         handleDeletePage={handleDeletePage}

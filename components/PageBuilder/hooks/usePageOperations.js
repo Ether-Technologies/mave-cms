@@ -29,17 +29,39 @@ export const usePageOperations = (pageId, pageData) => {
             const response = await instance.get(`/pages/${pageId}`);
             const data = response.data;
 
+            // Recursive function to normalize component types
+            const normalizeComponentTypes = (components) => {
+                if (!Array.isArray(components)) return components;
+
+                return components.map((component) => {
+                    // Handle the component's own type
+                    const normalizedType = !component.type
+                        ? null
+                        : typeof component.type === "object"
+                            ? component.type.type || null
+                            : component.type;
+
+                    // If component has nested data, recursively normalize it
+                    if (component.data && Array.isArray(component.data)) {
+                        return {
+                            ...component,
+                            type: normalizedType,
+                            data: normalizeComponentTypes(component.data)
+                        };
+                    }
+
+                    return {
+                        ...component,
+                        type: normalizedType
+                    };
+                });
+            };
+
             // Normalize component types in the data
             if (data.body) {
                 data.body = data.body.map((section) => ({
                     ...section,
-                    data: section.data.map((component) => ({
-                        ...component,
-                        type:
-                            typeof component.type === "object"
-                                ? component.type.type
-                                : component.type,
-                    })),
+                    data: normalizeComponentTypes(section.data),
                 }));
             }
 

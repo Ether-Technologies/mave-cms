@@ -143,7 +143,7 @@ const ComponentListSimple = ({
           <div className="component-wrapper mb-2 bg-white rounded-lg shadow-sm border border-gray-100 opacity-80">
             <div className="p-4">
               <div className="text-sm text-gray-500 font-medium">
-                {activeComponent.type || "Component"}
+                {activeComponent?.type || "Component"}
               </div>
             </div>
           </div>

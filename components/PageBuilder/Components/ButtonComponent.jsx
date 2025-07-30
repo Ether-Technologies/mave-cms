@@ -20,13 +20,18 @@ const ButtonComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
+  // Safety check for null component
+  if (!component) {
+    return null;
+  }
+
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [buttonData, setButtonData] = useState(component._mave || {});
+  const [buttonData, setButtonData] = useState(component?._mave || {});
   const router = useRouter();
 
   useEffect(() => {
-    setButtonData(component._mave || {});
-  }, [component._mave]);
+    setButtonData(component?._mave || {});
+  }, [component?._mave]);
 
   const handleSelectButton = (newButtonData) => {
     updateComponent({
