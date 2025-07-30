@@ -30,6 +30,7 @@ const ComponentListSimple = ({
   const [componentsState, setComponents] = useState(components);
   const [localIsEditing, setLocalIsEditing] = useState(false);
   const [activeId, setActiveId] = useState(null);
+  const [addComponentPosition, setAddComponentPosition] = useState(null);
 
   useEffect(() => {
     setComponents(components);
@@ -68,10 +69,11 @@ const ComponentListSimple = ({
 
   const handleAddComponent = useCallback(
     (type) => {
-      addComponent(type);
+      addComponent(type, addComponentPosition);
       setIsModalVisible(false);
+      setAddComponentPosition(null);
     },
-    [addComponent]
+    [addComponent, addComponentPosition]
   );
 
   // Handle components update from drag and drop
@@ -125,20 +127,14 @@ const ComponentListSimple = ({
             onComponentDelete={handleComponentDelete}
             onComponentDuplicate={handleComponentDuplicate}
             onEditingStateChange={handleComponentEditingStateChange}
+            onAddComponent={(position) => {
+              setIsModalVisible(true);
+              // Store the position where component should be added
+              setAddComponentPosition(position);
+            }}
             isEditing={isEditing}
           />
         </SortableContext>
-
-        {/* Add Component Button */}
-        <Button
-          type="dashed"
-          icon={<PlusOutlined />}
-          onClick={() => setIsModalVisible(true)}
-          block
-          className="mt-2"
-        >
-          Add Component
-        </Button>
       </div>
 
       {/* Drag Overlay */}

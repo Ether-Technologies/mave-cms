@@ -41,7 +41,7 @@ const DraggableComponent = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="component-wrapper mb-2 bg-white rounded-lg shadow-sm border border-gray-100"
+      className="component-wrapper mb-2 bg-white rounded-lg shadow-sm border-2 border-gray-300"
     >
       {/* Drag Handle */}
       <div

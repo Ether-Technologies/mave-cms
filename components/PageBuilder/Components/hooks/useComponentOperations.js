@@ -16,7 +16,7 @@ export const useComponentOperations = ({
     const pageData = useSelector((state) => state.page.pageData);
 
     const addComponent = useCallback(
-        (type) => {
+        (type, position = null) => {
             // Validate input
             if (!type) {
                 console.error("❌ Invalid component type:", type);
@@ -42,7 +42,18 @@ export const useComponentOperations = ({
 
             if (onComponentsUpdate) {
                 // Use new callback system
-                const updatedComponents = [...componentsState, newComponent];
+                let updatedComponents;
+                if (position !== null && position >= 0 && position <= componentsState.length) {
+                    // Insert at specific position
+                    updatedComponents = [
+                        ...componentsState.slice(0, position),
+                        newComponent,
+                        ...componentsState.slice(position)
+                    ];
+                } else {
+                    // Add to end
+                    updatedComponents = [...componentsState, newComponent];
+                }
                 onComponentsUpdate(updatedComponents);
             } else {
                 // Fallback to old system
@@ -67,9 +78,21 @@ export const useComponentOperations = ({
                     ...pageData,
                     body: pageData.body.map((section, idx) => {
                         if (idx === sectionIndex) {
+                            let updatedData;
+                            if (position !== null && position >= 0 && position <= (section.data || []).length) {
+                                // Insert at specific position
+                                updatedData = [
+                                    ...(section.data || []).slice(0, position),
+                                    newComponent,
+                                    ...(section.data || []).slice(position)
+                                ];
+                            } else {
+                                // Add to end
+                                updatedData = [...(section.data || []), newComponent];
+                            }
                             return {
                                 ...section,
-                                data: [...(section.data || []), newComponent],
+                                data: updatedData,
                             };
                         }
                         return section;
