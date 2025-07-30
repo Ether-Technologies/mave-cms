@@ -69,6 +69,7 @@ const TopBar = ({
             onConfirm={onDelete}
             okText="Yes"
             cancelText="No"
+            okButtonProps={{ danger: true }}
           >
             <Button
               icon={<DeleteOutlined />}

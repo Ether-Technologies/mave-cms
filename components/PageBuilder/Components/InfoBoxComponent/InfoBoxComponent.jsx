@@ -239,6 +239,7 @@ const InfoBoxComponent = ({
               onConfirm={handleDeleteComponent}
               okText="Yes"
               cancelText="No"
+              okButtonProps={{ danger: true }}
             >
               <Button danger>Delete</Button>
             </Popconfirm>

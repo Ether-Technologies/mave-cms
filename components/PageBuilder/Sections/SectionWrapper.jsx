@@ -1,7 +1,7 @@
 // components/PageBuilder/Sections/SectionWrapper.jsx
 
 import React, { useState, useCallback } from "react";
-import { Button, Modal, Input } from "antd";
+import { Button, Modal, Input, Popconfirm } from "antd";
 import {
   CopyOutlined,
   DeleteOutlined,
@@ -27,7 +27,7 @@ const SectionWrapper = ({
   onSectionDelete,
 }) => {
   const dispatch = useDispatch();
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(
     section.title ||
@@ -67,21 +67,12 @@ const SectionWrapper = ({
     [section, sectionIndex, onSectionUpdate, dispatch]
   );
 
-  const handleDeleteClick = () => {
-    setIsDeleteModalVisible(true);
-  };
-
   const handleDeleteConfirm = () => {
-    setIsDeleteModalVisible(false);
     if (onDelete) {
       onDelete(sectionIndex);
     } else if (onSectionDelete) {
       onSectionDelete(sectionIndex);
     }
-  };
-
-  const handleDeleteCancel = () => {
-    setIsDeleteModalVisible(false);
   };
 
   const handleDuplicateClick = () => {
@@ -179,13 +170,21 @@ const SectionWrapper = ({
               />
             )}
             {(onDelete || onSectionDelete) && (
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={handleDeleteClick}
-                size="small"
-                className="mavecancelbutton"
+              <Popconfirm
                 title="Delete Section"
-              />
+                description="Are you sure you want to delete this section? This action cannot be undone."
+                onConfirm={handleDeleteConfirm}
+                okText="Delete"
+                cancelText="Cancel"
+                okButtonProps={{ danger: true }}
+              >
+                <Button
+                  icon={<DeleteOutlined />}
+                  size="small"
+                  className="mavecancelbutton"
+                  title="Delete Section"
+                />
+              </Popconfirm>
             )}
           </div>
         </div>
@@ -199,21 +198,6 @@ const SectionWrapper = ({
           sectionIndex={sectionIndex}
         />
       </div>
-
-      <Modal
-        title="Delete Section"
-        open={isDeleteModalVisible}
-        onOk={handleDeleteConfirm}
-        onCancel={handleDeleteCancel}
-        okText="Delete"
-        cancelText="Cancel"
-        okButtonProps={{ danger: true }}
-      >
-        <p>
-          Are you sure you want to delete this section? This action cannot be
-          undone.
-        </p>
-      </Modal>
     </>
   );
 };

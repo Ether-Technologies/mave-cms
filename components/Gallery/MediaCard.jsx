@@ -37,6 +37,7 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
       okText="Yes"
       cancelText="No"
       key="delete"
+      okButtonProps={{ danger: true }}
     >
       <Button
         type="link"

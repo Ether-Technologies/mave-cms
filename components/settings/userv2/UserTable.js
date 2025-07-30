@@ -210,6 +210,7 @@ const UserTable = ({ users, fetchUsers, roles, currentUser }) => {
                 onCancel={() => message.info("User not deleted")}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ danger: true }}
               >
                 <Button icon={<DeleteOutlined />} danger />
               </Popconfirm>

@@ -231,6 +231,7 @@ export default function BlogPost() {
                 }}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ danger: true }}
               >
                 <Button
                   icon={<PauseCircleOutlined />}

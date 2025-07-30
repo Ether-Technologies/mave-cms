@@ -140,6 +140,7 @@ export default function CustomModelData({ model }) {
             onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
+            okButtonProps={{ danger: true }}
           >
             <Button type="link" danger>
               Delete

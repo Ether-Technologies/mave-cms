@@ -138,6 +138,7 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
                 onConfirm={() => handleDelete(record.id)}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ danger: true }}
               >
                 <Button icon={<DeleteOutlined />} danger />
               </Popconfirm>

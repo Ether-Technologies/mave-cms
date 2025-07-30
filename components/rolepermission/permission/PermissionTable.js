@@ -85,6 +85,7 @@ export default function PermissionTable({
             }}
             okText="Yes"
             cancelText="No"
+            okButtonProps={{ danger: true }}
           >
             <Button
               icon={<DeleteOutlined />}

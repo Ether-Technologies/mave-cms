@@ -311,7 +311,7 @@ const Footer = () => {
 
           setFooterData(res.data);
           setIsLoading(false);
-        } catch (error) {}
+        } catch (error) { }
       };
       getData();
     } catch (error) {
@@ -922,6 +922,7 @@ const Footer = () => {
                     handleCancelDelete();
                   }
                 }}
+                okButtonProps={{ danger: true }}
               >
                 <Button
                   type="primary"

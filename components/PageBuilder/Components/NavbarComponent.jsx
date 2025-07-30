@@ -180,6 +180,7 @@ const NavbarComponent = ({
               onConfirm={handleDelete}
               okText="Yes"
               cancelText="No"
+              okButtonProps={{ danger: true }}
             >
               <Tooltip title="Delete">
                 <Button

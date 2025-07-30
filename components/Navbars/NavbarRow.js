@@ -194,8 +194,8 @@ const NavbarRow = ({
             onClick={() =>
               navbar?.logo?.file_path
                 ? window.open(
-                    `${process.env.NEXT_PUBLIC_MEDIA_URL}/${navbar.logo.file_path}`
-                  )
+                  `${process.env.NEXT_PUBLIC_MEDIA_URL}/${navbar.logo.file_path}`
+                )
                 : message.warning("No logo found")
             }
           />
@@ -268,6 +268,7 @@ const NavbarRow = ({
               onConfirm={handleDelete}
               okText="Yes"
               cancelText="No"
+              okButtonProps={{ danger: true }}
             >
               <Button danger icon={<DeleteOutlined />}>
                 Delete

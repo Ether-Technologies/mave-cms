@@ -48,6 +48,7 @@ const TestimonialItem = ({
                   onConfirm={onDelete}
                   okText="Yes"
                   cancelText="No"
+                  okButtonProps={{ danger: true }}
                 >
                   <Button type="text" icon={<DeleteOutlined />} danger />
                 </Popconfirm>

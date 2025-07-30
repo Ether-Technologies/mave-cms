@@ -41,6 +41,7 @@ const UserRow = ({ user, roles, handleUserEdit, handleDeleteUser }) => {
           <Popconfirm
             title="Are you sure to delete this user?"
             onConfirm={() => handleDeleteUser(user.id)}
+            okButtonProps={{ danger: true }}
           >
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>

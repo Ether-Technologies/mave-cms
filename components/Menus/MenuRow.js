@@ -170,6 +170,7 @@ const MenuRow = ({
               onConfirm={handleDelete}
               okText="Yes"
               cancelText="No"
+              okButtonProps={{ danger: true }}
             >
               <Button danger icon={<DeleteOutlined />}>
                 Delete

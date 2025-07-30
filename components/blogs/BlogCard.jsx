@@ -84,6 +84,7 @@ const BlogCard = ({ blog, onDelete }) => {
                 onConfirm={() => onDelete(blog.id)}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ danger: true }}
               >
                 <Tooltip title="Delete Blog">
                   <Button

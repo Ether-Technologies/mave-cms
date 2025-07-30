@@ -120,6 +120,7 @@ const FormEditor = ({ formId }) => {
                 onConfirm={() => setFormElements([])}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ danger: true }}
               >
                 <Button danger>Clear Form</Button>
               </Popconfirm>

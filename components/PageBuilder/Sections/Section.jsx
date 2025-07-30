@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Modal, Input } from "antd";
+import { Button, Modal, Input, Popconfirm } from "antd";
 import {
   CopyOutlined,
   DeleteOutlined,
@@ -30,7 +30,7 @@ const Section = ({
   isEditing = false,
 }) => {
   const dispatch = useDispatch();
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(
     section.title || `Section ${(sectionIndex || index) + 1}`
@@ -92,11 +92,9 @@ const Section = ({
   const handleDeleteClick = (e) => {
     // Prevent event from bubbling up to drag listeners
     e.stopPropagation();
-    setIsDeleteModalVisible(true);
   };
 
   const handleDeleteConfirm = () => {
-    setIsDeleteModalVisible(false);
     if (onDelete) {
       onDelete(sectionIndex || index);
     } else if (onSectionDelete) {
@@ -104,10 +102,6 @@ const Section = ({
     } else {
       console.error("❌ No delete handler available");
     }
-  };
-
-  const handleDeleteCancel = () => {
-    setIsDeleteModalVisible(false);
   };
 
   const handleDuplicateClick = (e) => {
@@ -220,14 +214,23 @@ const Section = ({
               />
             )}
             {(onDelete || onSectionDelete) && (
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={handleDeleteClick}
-                size="small"
-                className="mavecancelbutton hover:bg-red-600"
+              <Popconfirm
                 title="Delete Section"
-                style={{ zIndex: 10, position: "relative" }}
-              />
+                description="Are you sure you want to delete this section? This action cannot be undone."
+                onConfirm={handleDeleteConfirm}
+                okText="Delete"
+                cancelText="Cancel"
+                okButtonProps={{ danger: true }}
+              >
+                <Button
+                  icon={<DeleteOutlined />}
+                  onClick={handleDeleteClick}
+                  size="small"
+                  className="mavecancelbutton hover:bg-red-600"
+                  title="Delete Section"
+                  style={{ zIndex: 10, position: "relative" }}
+                />
+              </Popconfirm>
             )}
           </div>
         </div>
@@ -242,24 +245,6 @@ const Section = ({
           isEditing={isEditing}
         />
       </div>
-
-      <Modal
-        title="Delete Section"
-        open={isDeleteModalVisible}
-        onOk={handleDeleteConfirm}
-        onCancel={handleDeleteCancel}
-        okText="Delete"
-        cancelText="Cancel"
-        okButtonProps={{ danger: true }}
-        destroyOnClose={true}
-        maskClosable={false}
-        keyboard={false}
-      >
-        <p>
-          Are you sure you want to delete this section? This action cannot be
-          undone.
-        </p>
-      </Modal>
     </>
   );
 };

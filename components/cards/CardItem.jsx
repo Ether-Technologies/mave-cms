@@ -160,6 +160,7 @@ const CardItem = ({ card, viewType, onDeleteCard, onPreviewCard }) => {
       onConfirm={() => onDeleteCard(card.id)}
       okText="Yes"
       cancelText="No"
+      okButtonProps={{ danger: true }}
     >
       <Button className="mavecancelbutton" icon={<DeleteOutlined />}>
         Delete

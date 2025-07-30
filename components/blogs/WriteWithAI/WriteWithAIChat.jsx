@@ -145,6 +145,7 @@ const WriteWithAIChat = ({ setVisible, setContent }) => {
             onConfirm={handleClearConversation}
             okText="Yes"
             cancelText="No"
+            okButtonProps={{ danger: true }}
           >
             <Button icon={<DeleteOutlined />} className="mavecancelbutton">
               Clear Conversation

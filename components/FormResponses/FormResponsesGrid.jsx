@@ -125,6 +125,7 @@ const FormResponsesGrid = ({ responses, refreshData, currentUser }) => {
                     onConfirm={() => handleDelete(response.id)}
                     okText="Yes"
                     cancelText="No"
+                    okButtonProps={{ danger: true }}
                   >
                     <DeleteOutlined key="delete" style={{ color: "red" }} />
                   </Popconfirm>

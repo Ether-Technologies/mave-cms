@@ -61,6 +61,7 @@ const EventCard = ({
               onConfirm={() => handleDeleteEvent(event.id)}
               okText="Yes"
               cancelText="No"
+              okButtonProps={{ danger: true }}
             >
               <Button icon={<DeleteFilled />} className="mavecancelbutton">
                 Delete Event

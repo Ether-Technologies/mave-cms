@@ -147,6 +147,7 @@ const RowsSection = ({ headers, rows, setRows }) => {
                 onConfirm={() => removeRow(rowIndex)}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ danger: true }}
               >
                 <Button
                   icon={<MinusOutlined />}

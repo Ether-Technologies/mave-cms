@@ -172,14 +172,20 @@ const SectionList = ({
                 >
                   {/* Add Section Button at the top for first section */}
                   {isEditing && index === 0 && (
-                    <div className="text-center py-2">
+                    <div className="text-center">
                       <Button
                         icon={<PlusOutlined />}
                         onClick={() => onAddSectionAtPosition(0)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-4 py-1 text-sm"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                        transition-all duration-200 px-2 py-1 text-sm group"
                         size="small"
                       >
-                        Add Section
+                        <span
+                          className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
+                        group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
+                        >
+                          Add Section
+                        </span>
                       </Button>
                     </div>
                   )}
@@ -199,14 +205,20 @@ const SectionList = ({
 
                   {/* Add Section Button between sections */}
                   {isEditing && index < sections.length - 1 && (
-                    <div className="text-center py-2">
+                    <div className="text-center">
                       <Button
                         icon={<PlusOutlined />}
                         onClick={() => onAddSectionAtPosition(index + 1)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-4 py-1 text-sm"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                        transition-all duration-200 px-2 py-1 text-sm group"
                         size="small"
                       >
-                        Add Section
+                        <span
+                          className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
+                        group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
+                        >
+                          Add Section
+                        </span>
                       </Button>
                     </div>
                   )}

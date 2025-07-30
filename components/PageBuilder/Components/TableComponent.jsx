@@ -153,6 +153,7 @@ const TableComponent = ({
                 onConfirm={handleDelete}
                 okText="Yes"
                 cancelText="No"
+                okButtonProps={{ danger: true }}
               >
                 <Button
                   icon={<DeleteOutlined />}

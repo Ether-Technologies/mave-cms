@@ -1,7 +1,7 @@
 // components/PageBuilder/Sections/SectionHeader.jsx
 
 import React, { useState } from "react";
-import { Input, Button, Modal } from "antd";
+import { Input, Button, Modal, Popconfirm } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -45,16 +45,6 @@ const SectionHeader = ({
     setIsEditing(false);
   };
 
-  // Handle deleting the section
-  const handleDelete = () => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this section?",
-      onOk: deleteSection,
-      okText: "Yes",
-      cancelText: "No",
-    });
-  };
-
   return (
     <div className="section-header flex justify-between items-center mb-4">
       {/* Left Side: Drag Handle and Title/Input */}
@@ -88,11 +78,16 @@ const SectionHeader = ({
               onClick={handleEdit}
               className="mr-2"
             />
-            <Button
-              icon={<DeleteOutlined />}
-              onClick={handleDelete}
-              className="mavecancelbutton"
-            />
+            <Popconfirm
+              title="Delete Section"
+              description="Are you sure you want to delete this section? This action cannot be undone."
+              onConfirm={deleteSection}
+              okText="Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true }}
+            >
+              <Button icon={<DeleteOutlined />} className="mavecancelbutton" />
+            </Popconfirm>
           </>
         ) : (
           <>

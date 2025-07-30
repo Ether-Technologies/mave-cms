@@ -299,6 +299,7 @@ const UserList = ({
                           onCancel={() => message.info("User not deleted")}
                           okText="Yes"
                           cancelText="No"
+                          okButtonProps={{ danger: true }}
                         >
                           <Button
                             danger

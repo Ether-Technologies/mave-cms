@@ -12,6 +12,7 @@ const ActionButtons = ({ onCreate, onCancel, loading }) => {
         onConfirm={onCancel}
         okText="Yes"
         cancelText="No"
+        okButtonProps={{ danger: true }}
       >
         <Button className="mavecancelbutton">Cancel</Button>
       </Popconfirm>

@@ -215,6 +215,7 @@ export default function ModelCreator({
                   onConfirm={() => handleFieldDelete(index)}
                   okText="Yes"
                   cancelText="No"
+                  okButtonProps={{ danger: true }}
                 >
                   <Button danger>Delete</Button>
                 </Popconfirm>
@@ -259,9 +260,8 @@ export default function ModelCreator({
           </Form.Item>
 
           <Popconfirm
-            title={`Are you sure you want to ${
-              editMode ? "update" : "generate"
-            } the model?`}
+            title={`Are you sure you want to ${editMode ? "update" : "generate"
+              } the model?`}
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleFormSubmit()}
@@ -270,6 +270,7 @@ export default function ModelCreator({
                 `Model ${editMode ? "update" : "generation"} cancelled.`
               )
             }
+            okButtonProps={{ danger: true }}
           >
             <Button
               type="primary"

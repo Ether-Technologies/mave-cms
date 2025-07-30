@@ -135,6 +135,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
                   onConfirm={() => handleDeleteForm(form.id)}
                   okText="Yes"
                   cancelText="No"
+                  okButtonProps={{ danger: true }}
                 >
                   <Button
                     danger
@@ -183,6 +184,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
                   onConfirm={() => handleDeleteForm(form.id)}
                   okText="Yes"
                   cancelText="No"
+                  okButtonProps={{ danger: true }}
                 >
                   <Button
                     danger

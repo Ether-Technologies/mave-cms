@@ -61,6 +61,7 @@ const IconListItem = ({ item, iconSize, iconColor, onUpdate, onDelete }) => {
         onConfirm={onDelete}
         okText="Yes"
         cancelText="No"
+        okButtonProps={{ danger: true }}
       >
         <Button type="text" danger icon={<DeleteOutlined />} />
       </Popconfirm>

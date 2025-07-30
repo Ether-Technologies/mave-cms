@@ -111,6 +111,7 @@ const IconListComponent = ({
               onConfirm={handleDeleteComponent}
               okText="Yes"
               cancelText="No"
+              okButtonProps={{ danger: true }}
             >
               <Button
                 className="mavecancelbutton"

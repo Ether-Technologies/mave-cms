@@ -11,8 +11,8 @@ const { Option } = Select;
 const FormElement = ({
   element,
   index,
-  moveElement = () => {},
-  onUpdateElement = () => {},
+  moveElement = () => { },
+  onUpdateElement = () => { },
   isPreview = false, // New prop to disable editing in preview
 }) => {
   const ref = useRef(null);
@@ -163,9 +163,8 @@ const FormElement = ({
   return (
     <div
       ref={ref}
-      className={`border rounded p-4 mb-2 bg-white transition-shadow ${
-        isPreview ? "" : "cursor-move"
-      } ${isDragging ? "opacity-50" : "opacity-100"}`}
+      className={`border rounded p-4 mb-2 bg-white transition-shadow ${isPreview ? "" : "cursor-move"
+        } ${isDragging ? "opacity-50" : "opacity-100"}`}
     >
       <div className="flex justify-between items-center mb-2">
         <h4 className="font-semibold text-lg">
@@ -193,6 +192,7 @@ const FormElement = ({
               }}
               okText="Yes"
               cancelText="No"
+              okButtonProps={{ danger: true }}
             >
               <Button size="small" danger>
                 Remove

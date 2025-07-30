@@ -104,6 +104,7 @@ export default function ModelsShowcase() {
                     onConfirm={async () => {
                       handleDeleteModel(model.id);
                     }}
+                    okButtonProps={{ danger: true }}
                   >
                     <DeleteOutlined className="text-red-500 cursor-pointer" />
                   </Popconfirm>
