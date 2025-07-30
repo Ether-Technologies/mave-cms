@@ -101,14 +101,12 @@ const SliderComponent = ({
     updateComponent(updatedComponent);
     setSliderData(selectedSliderData);
     setSelectedSliderData(null);
-    setIsEditing(false);
     message.success("Slider updated successfully.");
   }, [selectedSliderData, sliderConfig, component, updateComponent]);
 
   // Handle Cancel Changes
   const handleCancel = useCallback(() => {
     setSelectedSliderData(null);
-    setIsEditing(false);
     message.info("Slider update canceled.");
   }, []);
 
@@ -130,7 +128,7 @@ const SliderComponent = ({
     <div className="border p-4 rounded-md bg-white">
       <SliderActions
         sliderData={sliderData}
-        isEditing={isEditing}
+        isEditing={!!selectedSliderData}
         selectedSliderData={selectedSliderData}
         isRefreshing={isRefreshing}
         pollingError={pollingError}
@@ -144,9 +142,9 @@ const SliderComponent = ({
 
       <div className="flex flex-col md:flex-row items-start gap-4">
         <div
-          className={`flex flex-col ${isEditing && selectedSliderData ? "w-full md:w-1/2" : "w-full"}`}
+          className={`flex flex-col ${selectedSliderData ? "w-full md:w-1/2" : "w-full"}`}
         >
-          {sliderData && isEditing && (
+          {sliderData && selectedSliderData && (
             <h4 className="mb-2 text-md font-semibold">Current Slider</h4>
           )}
           {sliderData ? (
@@ -167,7 +165,7 @@ const SliderComponent = ({
           )}
         </div>
 
-        {isEditing && selectedSliderData && (
+        {selectedSliderData && (
           <div className="flex flex-col w-full md:w-1/2">
             <h4 className="mb-2 text-md font-semibold">Selected Slider</h4>
             <div className="w-full relative">
@@ -180,7 +178,7 @@ const SliderComponent = ({
         )}
       </div>
 
-      {isEditing && selectedSliderData && (
+      {selectedSliderData && (
         <div className="mt-4">
           <SliderConfig config={sliderConfig} setConfig={setSliderConfig} />
         </div>

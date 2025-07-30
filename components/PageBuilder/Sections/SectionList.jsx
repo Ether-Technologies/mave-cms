@@ -1,6 +1,6 @@
 // components/PageBuilder/Sections/SectionList.jsx
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Button, Typography, Empty } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
@@ -27,6 +27,18 @@ const SectionList = ({
 }) => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
+
+  // Debug props received by SectionList
+  useEffect(() => {
+    console.log("🔧 SectionList props:", {
+      hasSection: !!section,
+      sectionIndex,
+      hasSections: !!sections,
+      sectionsCount: sections?.length,
+      hasOnSectionDelete: !!onSectionDelete,
+      hasOnSectionDuplicate: !!onSectionDuplicate,
+    });
+  }, [section, sectionIndex, sections, onSectionDelete, onSectionDuplicate]);
 
   // Handle editing state changes
   const handleEditingStateChange = useCallback(
@@ -57,6 +69,13 @@ const SectionList = ({
   // Handle component deletion
   const handleComponentDelete = useCallback(
     (componentIndex) => {
+      console.log("🔧 SectionList handleComponentDelete called:", {
+        componentIndex,
+        sectionIndex,
+        hasPageData: !!pageData,
+        pageDataBodyLength: pageData?.body?.length,
+      });
+
       if (pageData && sectionIndex !== undefined) {
         const updatedPageData = { ...pageData };
         const updatedSection = { ...updatedPageData.body[sectionIndex] };
@@ -65,6 +84,11 @@ const SectionList = ({
 
         dispatch(setPageData(updatedPageData));
         dispatch(setIsDirty(true));
+      } else {
+        console.error(
+          "❌ Cannot delete component - invalid sectionIndex:",
+          sectionIndex
+        );
       }
     },
     [pageData, sectionIndex, dispatch]
@@ -116,10 +140,17 @@ const SectionList = ({
 
   if (section) {
     // Single section mode
+    console.log("🔧 SectionList rendering single section with handlers:", {
+      hasOnSectionDuplicate: !!onSectionDuplicate,
+      hasOnSectionDelete: !!onSectionDelete,
+      sectionIndex,
+      sectionTitle: section.title,
+    });
     return (
       <Section
         section={section}
         sectionIndex={sectionIndex}
+        index={sectionIndex}
         onComponentUpdate={handleComponentUpdate}
         onComponentDelete={handleComponentDelete}
         onComponentDuplicate={handleComponentDuplicate}
@@ -133,6 +164,15 @@ const SectionList = ({
 
   if (sections) {
     // Multiple sections mode with drag and drop
+    console.log("🔧 SectionList rendering multiple sections with handlers:", {
+      hasOnSectionDuplicate: !!onSectionDuplicate,
+      hasOnSectionDelete: !!onSectionDelete,
+      sectionsCount: sections.length,
+      sections: sections.map((section, idx) => ({
+        index: idx,
+        title: section.title,
+      })),
+    });
     const sortableItems = sections.map(
       (section, index) => section._id || `section-${index}-${Date.now()}`
     );
@@ -144,20 +184,30 @@ const SectionList = ({
           strategy={verticalListSortingStrategy}
         >
           <div className="space-y-4">
-            {sections.map((section, index) => (
-              <Section
-                key={section._id || `section-${index}`}
-                section={section}
-                sectionIndex={index}
-                onComponentUpdate={handleComponentUpdate}
-                onComponentDelete={handleComponentDelete}
-                onComponentDuplicate={handleComponentDuplicate}
-                onEditingStateChange={handleEditingStateChange}
-                onSectionDuplicate={onSectionDuplicate}
-                onSectionDelete={onSectionDelete}
-                isEditing={isEditing}
-              />
-            ))}
+            {sections.map((section, index) => {
+              const currentSectionIndex = index;
+              console.log(`🔧 Rendering section ${currentSectionIndex}:`, {
+                sectionTitle: section.title,
+                sectionIndex: currentSectionIndex,
+                sectionId: section._id,
+                mapIndex: index,
+              });
+              return (
+                <Section
+                  key={section._id || `section-${currentSectionIndex}`}
+                  section={section}
+                  sectionIndex={currentSectionIndex}
+                  index={currentSectionIndex}
+                  onComponentUpdate={handleComponentUpdate}
+                  onComponentDelete={handleComponentDelete}
+                  onComponentDuplicate={handleComponentDuplicate}
+                  onEditingStateChange={handleEditingStateChange}
+                  onSectionDuplicate={onSectionDuplicate}
+                  onSectionDelete={onSectionDelete}
+                  isEditing={isEditing}
+                />
+              );
+            })}
           </div>
         </SortableContext>
       </DndContext>

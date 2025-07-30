@@ -132,10 +132,37 @@ export const usePageOperations = (pageId, pageData) => {
 
     const handleSectionDelete = useCallback(
         (sectionIndex) => {
+            console.log("🔧 handleSectionDelete called with:", {
+                sectionIndex,
+                pageDataExists: !!pageData,
+                pageDataBodyLength: pageData?.body?.length,
+                pageDataBody: pageData?.body
+            });
+
+            if (!pageData || !pageData.body) {
+                console.error("❌ No pageData or pageData.body available for deletion");
+                message.error("No page data available for deletion.");
+                return;
+            }
+
+            if (sectionIndex === undefined || sectionIndex === null) {
+                console.error("❌ Section index is undefined or null:", sectionIndex);
+                message.error("Invalid section index.");
+                return;
+            }
+
+            if (sectionIndex < 0 || sectionIndex >= pageData.body.length) {
+                console.error("❌ Invalid section index:", sectionIndex);
+                message.error("Invalid section index.");
+                return;
+            }
+
             const updatedPageData = {
                 ...pageData,
                 body: pageData.body.filter((_, idx) => idx !== sectionIndex),
             };
+
+            console.log("🔧 Updated pageData after deletion:", updatedPageData);
 
             dispatch(setPageData(updatedPageData));
             dispatch(setIsDirty(true));

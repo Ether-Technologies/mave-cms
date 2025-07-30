@@ -1,6 +1,6 @@
 // components/PageBuilder/Sections/Section.jsx
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button, Modal, Input } from "antd";
@@ -35,6 +35,23 @@ const Section = ({
   const [tempTitle, setTempTitle] = useState(
     section.title || `Section ${(sectionIndex || index) + 1}`
   );
+
+  // Debug section props
+  useEffect(() => {
+    console.log("🔧 Section component props:", {
+      sectionIndex,
+      index,
+      finalIndex: sectionIndex || index,
+      sectionTitle: section.title,
+      hasOnSectionDelete: !!onSectionDelete,
+      sectionId: section._id,
+    });
+  }, [sectionIndex, index, section.title, onSectionDelete, section._id]);
+
+  // Monitor modal state changes
+  useEffect(() => {
+    console.log("🔧 Modal state changed:", isDeleteModalVisible);
+  }, [isDeleteModalVisible]);
 
   // Ensure section has a valid _id
   const draggableId =
@@ -94,24 +111,48 @@ const Section = ({
     [section, sectionIndex, index, dispatch]
   );
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e) => {
+    // Prevent event from bubbling up to drag listeners
+    e.stopPropagation();
+    console.log("🔧 handleDeleteClick called in Section:", {
+      sectionIndex: sectionIndex || index,
+      hasOnDelete: !!onDelete,
+      hasOnSectionDelete: !!onSectionDelete,
+      currentModalState: isDeleteModalVisible,
+    });
     setIsDeleteModalVisible(true);
+    console.log("🔧 Modal state set to true");
   };
 
   const handleDeleteConfirm = () => {
+    console.log("🔧 handleDeleteConfirm called in Section:", {
+      sectionIndex: sectionIndex || index,
+      hasOnDelete: !!onDelete,
+      hasOnSectionDelete: !!onSectionDelete,
+    });
     setIsDeleteModalVisible(false);
     if (onDelete) {
+      console.log("🔧 Calling onDelete with index:", sectionIndex || index);
       onDelete(sectionIndex || index);
     } else if (onSectionDelete) {
+      console.log(
+        "🔧 Calling onSectionDelete with index:",
+        sectionIndex || index
+      );
       onSectionDelete(sectionIndex || index);
+    } else {
+      console.error("❌ No delete handler available");
     }
   };
 
   const handleDeleteCancel = () => {
+    console.log("🔧 handleDeleteCancel called, closing modal");
     setIsDeleteModalVisible(false);
   };
 
-  const handleDuplicateClick = () => {
+  const handleDuplicateClick = (e) => {
+    // Prevent event from bubbling up to drag listeners
+    e.stopPropagation();
     if (onDuplicate) {
       onDuplicate(sectionIndex || index);
     } else if (onSectionDuplicate) {
@@ -119,7 +160,9 @@ const Section = ({
     }
   };
 
-  const handleTitleEdit = () => {
+  const handleTitleEdit = (e) => {
+    // Prevent event from bubbling up to drag listeners
+    e.stopPropagation();
     setIsEditingTitle(true);
   };
 
@@ -156,44 +199,50 @@ const Section = ({
         style={style}
         className="section-container bg-white shadow-md rounded-lg p-4 mb-6"
       >
-        <div
-          {...listeners}
-          {...attributes}
-          className="section-header flex items-center justify-between mb-4 pb-2 border-b cursor-move"
-        >
-          {isEditingTitle ? (
-            <div className="flex items-center gap-2 flex-1">
-              <Input
-                value={tempTitle}
-                onChange={(e) => setTempTitle(e.target.value)}
-                onPressEnter={handleTitleSave}
-                className="flex-1 max-w-[300px]"
-              />
-              <Button
-                icon={<CheckOutlined />}
-                onClick={handleTitleSave}
-                className="mavebutton"
-              />
-              <Button
-                icon={<CloseOutlined />}
-                onClick={handleTitleCancel}
-                className="mavecancelbutton"
-              />
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 flex-1">
-              <h3 className="text-lg font-semibold text-gray-800">
-                {section.title || `Section ${(sectionIndex || index) + 1}`}
-              </h3>
-              <Button
-                icon={<EditOutlined />}
-                onClick={handleTitleEdit}
-                size="middle"
-                className="mavebutton"
-              />
-            </div>
-          )}
-          <div className="flex items-center gap-2">
+        <div className="section-header flex items-center justify-between mb-4 pb-2 border-b">
+          <div
+            {...listeners}
+            {...attributes}
+            className="flex items-center gap-2 flex-1 cursor-move"
+            style={{ position: "relative", zIndex: 50 }}
+          >
+            {isEditingTitle ? (
+              <div className="flex items-center gap-2 flex-1">
+                <Input
+                  value={tempTitle}
+                  onChange={(e) => setTempTitle(e.target.value)}
+                  onPressEnter={handleTitleSave}
+                  className="flex-1 max-w-[300px]"
+                />
+                <Button
+                  icon={<CheckOutlined />}
+                  onClick={handleTitleSave}
+                  className="mavebutton"
+                />
+                <Button
+                  icon={<CloseOutlined />}
+                  onClick={handleTitleCancel}
+                  className="mavecancelbutton"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-1">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {section.title || `Section ${(sectionIndex || index) + 1}`}
+                </h3>
+                <Button
+                  icon={<EditOutlined />}
+                  onClick={handleTitleEdit}
+                  size="middle"
+                  className="mavebutton"
+                />
+              </div>
+            )}
+          </div>
+          <div
+            className="flex items-center gap-2"
+            style={{ position: "relative", zIndex: 100 }}
+          >
             {(onDuplicate || onSectionDuplicate) && (
               <Button
                 icon={<CopyOutlined />}
@@ -201,6 +250,7 @@ const Section = ({
                 size="middle"
                 className="mavebutton hover:bg-yellow-600"
                 title="Duplicate Section"
+                style={{ zIndex: 10, position: "relative" }}
               />
             )}
             {(onDelete || onSectionDelete) && (
@@ -210,6 +260,7 @@ const Section = ({
                 size="small"
                 className="mavecancelbutton hover:bg-red-600"
                 title="Delete Section"
+                style={{ zIndex: 10, position: "relative" }}
               />
             )}
           </div>
@@ -234,6 +285,9 @@ const Section = ({
         okText="Delete"
         cancelText="Cancel"
         okButtonProps={{ danger: true }}
+        destroyOnClose={true}
+        maskClosable={false}
+        keyboard={false}
       >
         <p>
           Are you sure you want to delete this section? This action cannot be

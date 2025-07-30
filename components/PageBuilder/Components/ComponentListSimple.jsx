@@ -31,6 +31,11 @@ const ComponentListSimple = ({
   const [localIsEditing, setLocalIsEditing] = useState(false);
   const [activeId, setActiveId] = useState(null);
 
+  // Debug sectionIndex
+  useEffect(() => {
+    console.log("🔧 ComponentListSimple received sectionIndex:", sectionIndex);
+  }, [sectionIndex]);
+
   useEffect(() => {
     setComponents(components);
   }, [components]);

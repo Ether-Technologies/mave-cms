@@ -1,6 +1,6 @@
 // components/PageBuilder/Components/hooks/useComponentOperations.js
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsDirty, setPageData } from "../../../../store/slices/pageSlice";
 import { message } from "antd";
@@ -14,6 +14,11 @@ export const useComponentOperations = ({
 }) => {
     const dispatch = useDispatch();
     const pageData = useSelector((state) => state.page.pageData);
+
+    // Debug sectionIndex
+    useEffect(() => {
+        console.log("🔧 useComponentOperations received sectionIndex:", sectionIndex);
+    }, [sectionIndex]);
 
     const addComponent = useCallback(
         (type) => {
@@ -135,7 +140,15 @@ export const useComponentOperations = ({
                 componentIndex,
                 sectionIndex,
                 componentsCount: componentsState.length,
+                hasOnComponentsUpdate: !!onComponentsUpdate,
+                hasOnComponentDelete: !!onComponentDelete
             });
+
+            if (sectionIndex === undefined || sectionIndex === null) {
+                console.error("❌ Section index is undefined or null for component deletion:", sectionIndex);
+                message.error("Cannot delete component - invalid section index.");
+                return;
+            }
 
             const updatedComponents = componentsState.filter(
                 (_, index) => index !== componentIndex
