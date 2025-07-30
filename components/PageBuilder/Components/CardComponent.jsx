@@ -76,57 +76,37 @@ const CardComponent = ({
   const [selectedCardData, setSelectedCardData] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [autoPolling, setAutoPolling] = useState(false); // Default to false
+  const [autoPolling, setAutoPolling] = useState(false); // Always false
   const lastUpdateRef = useRef(null);
 
   // Check if we're in page-builder context
   const isInPageBuilder = router.pathname.includes("/page-builder");
+  const isInPagePreview = router.pathname.includes("/page-preview");
 
   // Synchronize cardData with component._mave when it changes
   useEffect(() => {
     setCardData(component._mave);
   }, [component._mave]);
 
-  // Completely disable auto-polling in page-builder context
+  // Completely disable auto-polling in all contexts
   useEffect(() => {
-    if (isInPageBuilder) {
-      setAutoPolling(false);
-    } else {
-      setAutoPolling(false);
-    }
-  }, [preview, isEditing, isInPageBuilder]);
+    // Always disable auto-polling
+    setAutoPolling(false);
+  }, [preview, isEditing, isInPageBuilder, isInPagePreview]);
 
-  // Auto-refresh card data every 30 seconds when card data exists
-  // Only when in preview mode and not editing
+  // Auto-refresh card data - completely disabled
   useEffect(() => {
-    // Completely disable auto-refresh in page-builder context
-    if (isInPageBuilder) {
-      console.log("🔄 Card auto-refresh disabled - in page-builder context");
-      return;
-    }
-
-    // Disable auto-refresh when in edit mode
-    if (isEditing) {
-      return;
-    }
-
-    // Only enable auto-refresh in preview mode
-    if (!preview) {
-      return;
-    }
-
-    if (!cardData?.id || !autoPolling) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      refreshCardData(true); // Silent refresh for polling
-    }, POLLING_INTERVAL);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [cardData?.id, autoPolling, isEditing, preview, isInPageBuilder]);
+    // Completely disable auto-refresh in all contexts
+    console.log("🔄 Card auto-refresh disabled - all contexts");
+    return;
+  }, [
+    cardData?.id,
+    autoPolling,
+    isEditing,
+    preview,
+    isInPageBuilder,
+    isInPagePreview,
+  ]);
 
   // Function to refresh card data from the server
   const refreshCardData = useCallback(

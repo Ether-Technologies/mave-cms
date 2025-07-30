@@ -17,7 +17,7 @@ export const useSliderRefresh = (
   const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [autoPolling, setAutoPolling] = useState(false); // Default to false
+  const [autoPolling, setAutoPolling] = useState(false); // Always false
   const [pollingError, setPollingError] = useState(null);
   const pollingIntervalRef = useRef(null);
   const lastUpdateRef = useRef(null);
@@ -25,27 +25,31 @@ export const useSliderRefresh = (
 
   // Check if we're in page-builder context
   const isInPageBuilder = router.pathname.includes("/page-builder");
+  const isInPagePreview = router.pathname.includes("/page-preview");
 
-  // Completely disable auto-polling in page-builder context
+  // Completely disable auto-polling in all contexts
   useEffect(() => {
-    if (isInPageBuilder) {
-      setAutoPolling(false);
-      // Clear any existing intervals
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-    } else {
-      setAutoPolling(false);
+    // Always disable auto-polling
+    setAutoPolling(false);
+
+    // Clear any existing intervals
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
     }
-  }, [preview, isEditing, isInPageBuilder]);
+  }, [preview, isEditing, isInPageBuilder, isInPagePreview]);
+
+  // Get slider ID from component
+  const sliderId = component.id || sliderData?.id;
 
   // Memoize the fetch function to avoid dependency issues
   const fetchSliderData = useCallback(
     async (silent = false) => {
-      // Completely prevent updates when in page-builder context
-      if (isInPageBuilder) {
-        console.log("🔄 Skipping slider refresh - in page-builder context");
+      // Completely prevent updates in all contexts
+      if (isInPageBuilder || isInPagePreview) {
+        console.log(
+          "🔄 Skipping slider refresh - in page-builder or page-preview context"
+        );
         return;
       }
 
@@ -54,8 +58,8 @@ export const useSliderRefresh = (
         return;
       }
 
-      // Only allow refresh in preview mode
-      if (!preview) {
+      // Only allow refresh if explicitly enabled AND not in restricted contexts
+      if (!preview || isInPageBuilder || isInPagePreview) {
         return;
       }
 
@@ -158,45 +162,21 @@ export const useSliderRefresh = (
       isEditing,
       preview,
       isInPageBuilder,
+      isInPagePreview,
     ]
   );
 
-  // Auto-polling effect - completely disabled in page-builder context
+  // Auto-polling effect - completely disabled
   useEffect(() => {
-    // Always disable auto-refresh by default
+    // Always disable auto-refresh
     if (pollingIntervalRef.current) {
       clearInterval(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
 
-    // Completely disable auto-polling in page-builder context
-    if (isInPageBuilder) {
-      console.log("🔄 Auto-polling disabled - in page-builder context");
-      return;
-    }
-
-    // Only enable if explicitly requested AND in preview mode AND not editing AND not in page-builder
-    if (
-      autoPolling &&
-      preview &&
-      !isEditing &&
-      sliderData?.id &&
-      !isInPageBuilder
-    ) {
-      setPollingError(null);
-
-      // Set up polling interval (30 seconds)
-      pollingIntervalRef.current = setInterval(() => {
-        fetchSliderData(true);
-      }, POLLING_INTERVAL);
-
-      return () => {
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
-      };
-    }
+    // Completely disable auto-polling in all contexts
+    console.log("🔄 Auto-polling disabled - all contexts");
+    return;
   }, [
     autoPolling,
     sliderData?.id,
@@ -204,22 +184,23 @@ export const useSliderRefresh = (
     isEditing,
     fetchSliderData,
     isInPageBuilder,
+    isInPagePreview,
   ]);
 
-  // Manual refresh function - also disabled in page-builder context
+  // Manual refresh function - also disabled in restricted contexts
   const handleManualRefresh = useCallback(async () => {
-    if (isInPageBuilder) {
-      console.log("🔄 Manual refresh disabled - in page-builder context");
+    if (isInPageBuilder || isInPagePreview) {
+      console.log("🔄 Manual refresh disabled - in restricted context");
       return;
     }
     await fetchSliderData(false);
-  }, [fetchSliderData, isInPageBuilder]);
+  }, [fetchSliderData, isInPageBuilder, isInPagePreview]);
 
   return {
     isRefreshing,
     lastUpdated,
-    autoPolling,
-    setAutoPolling,
+    autoPolling: false, // Auto-polling disabled
+    setAutoPolling: () => {}, // No-op
     pollingError,
     handleManualRefresh,
   };
