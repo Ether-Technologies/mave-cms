@@ -1,3 +1,5 @@
+// components/PageBuilder/Modals/TableSelectionModal/StylingSection.jsx
+
 import React from "react";
 import { Form, Select, Input, Typography } from "antd";
 
@@ -16,6 +18,7 @@ const StylingSection = ({ styles, setStyles }) => {
         <Select
           value={styles.borderStyle}
           onChange={(value) => handleStyleChange("borderStyle", value)}
+          showSearch
         >
           <Option value="none">None</Option>
           <Option value="thin">Thin</Option>
@@ -33,6 +36,7 @@ const StylingSection = ({ styles, setStyles }) => {
         <Select
           value={styles.textAlign}
           onChange={(value) => handleStyleChange("textAlign", value)}
+          showSearch
         >
           <Option value="left">Left</Option>
           <Option value="center">Center</Option>
