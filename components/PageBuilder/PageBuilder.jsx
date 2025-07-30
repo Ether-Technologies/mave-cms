@@ -32,6 +32,7 @@ const PageBuilder = ({ pageId, editMode = false }) => {
     handleSectionDuplicate,
     handleSectionDelete,
     handleAddSection,
+    handleAddSectionAtPosition,
     handleSectionsUpdate,
     handleUndo,
     handleRedo,
@@ -111,6 +112,7 @@ const PageBuilder = ({ pageId, editMode = false }) => {
             onSectionDelete={handleSectionDelete}
             onEditingStateChange={handleEditingStateChange}
             onAddSection={handleAddSection}
+            onAddSectionAtPosition={handleAddSectionAtPosition}
           />
 
           {/* Floating Action Buttons */}

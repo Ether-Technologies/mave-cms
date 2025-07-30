@@ -23,6 +23,7 @@ const SectionList = ({
   setSections,
   onSectionDuplicate,
   onSectionDelete,
+  onAddSectionAtPosition,
   isEditing = false,
 }) => {
   const dispatch = useDispatch();
@@ -166,19 +167,50 @@ const SectionList = ({
             {sections.map((section, index) => {
               const currentSectionIndex = index;
               return (
-                <Section
+                <React.Fragment
                   key={section._id || `section-${currentSectionIndex}`}
-                  section={section}
-                  sectionIndex={currentSectionIndex}
-                  index={currentSectionIndex}
-                  onComponentUpdate={handleComponentUpdate}
-                  onComponentDelete={handleComponentDelete}
-                  onComponentDuplicate={handleComponentDuplicate}
-                  onEditingStateChange={handleEditingStateChange}
-                  onSectionDuplicate={onSectionDuplicate}
-                  onSectionDelete={onSectionDelete}
-                  isEditing={isEditing}
-                />
+                >
+                  {/* Add Section Button at the top for first section */}
+                  {isEditing && index === 0 && (
+                    <div className="text-center py-2">
+                      <Button
+                        icon={<PlusOutlined />}
+                        onClick={() => onAddSectionAtPosition(0)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-4 py-1 text-sm"
+                        size="small"
+                      >
+                        Add Section
+                      </Button>
+                    </div>
+                  )}
+
+                  <Section
+                    section={section}
+                    sectionIndex={currentSectionIndex}
+                    index={currentSectionIndex}
+                    onComponentUpdate={handleComponentUpdate}
+                    onComponentDelete={handleComponentDelete}
+                    onComponentDuplicate={handleComponentDuplicate}
+                    onEditingStateChange={handleEditingStateChange}
+                    onSectionDuplicate={onSectionDuplicate}
+                    onSectionDelete={onSectionDelete}
+                    isEditing={isEditing}
+                  />
+
+                  {/* Add Section Button between sections */}
+                  {isEditing && index < sections.length - 1 && (
+                    <div className="text-center py-2">
+                      <Button
+                        icon={<PlusOutlined />}
+                        onClick={() => onAddSectionAtPosition(index + 1)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-4 py-1 text-sm"
+                        size="small"
+                      >
+                        Add Section
+                      </Button>
+                    </div>
+                  )}
+                </React.Fragment>
               );
             })}
           </div>

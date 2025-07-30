@@ -174,6 +174,35 @@ export const usePageOperations = (pageId, pageData) => {
         message.success("New section added successfully!");
     }, [pageData, dispatch]);
 
+    // Handle adding new section at specific position
+    const handleAddSectionAtPosition = useCallback((position) => {
+        const newSection = {
+            _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            title: `Section ${position + 1}`,
+            data: [],
+        };
+
+        const updatedPageData = {
+            ...pageData,
+            body: [
+                ...pageData.body.slice(0, position),
+                newSection,
+                ...pageData.body.slice(position),
+            ],
+        };
+
+        // Update section titles to reflect new positions
+        updatedPageData.body = updatedPageData.body.map((section, index) => ({
+            ...section,
+            title: section.title || `Section ${index + 1}`,
+        }));
+
+        dispatch(setPageData(updatedPageData));
+        dispatch(setIsDirty(true));
+        dispatch(pushToHistory(updatedPageData));
+        message.success("New section added successfully!");
+    }, [pageData, dispatch]);
+
     // Handle sections update (for drag and drop)
     const handleSectionsUpdate = useCallback(
         (updatedSections) => {
@@ -204,6 +233,7 @@ export const usePageOperations = (pageId, pageData) => {
         handleSectionDuplicate,
         handleSectionDelete,
         handleAddSection,
+        handleAddSectionAtPosition,
         handleSectionsUpdate,
         handleUndo,
         handleRedo,

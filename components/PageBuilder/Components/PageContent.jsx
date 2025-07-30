@@ -13,6 +13,7 @@ const PageContent = ({
   onSectionDelete,
   onEditingStateChange,
   onAddSection,
+  onAddSectionAtPosition,
 }) => {
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -25,6 +26,7 @@ const PageContent = ({
               onSectionDuplicate={onSectionDuplicate}
               onSectionDelete={onSectionDelete}
               onEditingStateChange={onEditingStateChange}
+              onAddSectionAtPosition={onAddSectionAtPosition}
               isEditing={isEditing}
             />
             {isEditing && (
