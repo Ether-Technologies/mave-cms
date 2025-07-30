@@ -17,7 +17,6 @@ export const useComponentOperations = ({
 
     // Debug sectionIndex
     useEffect(() => {
-        console.log("🔧 useComponentOperations received sectionIndex:", sectionIndex);
     }, [sectionIndex]);
 
     const addComponent = useCallback(

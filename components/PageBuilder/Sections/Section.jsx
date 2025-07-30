@@ -1,6 +1,6 @@
 // components/PageBuilder/Sections/Section.jsx
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button, Modal, Input } from "antd";
@@ -37,25 +37,23 @@ const Section = ({
   );
 
   // Debug section props
-  useEffect(() => {
-    console.log("🔧 Section component props:", {
-      sectionIndex,
-      index,
-      finalIndex: sectionIndex || index,
-      sectionTitle: section.title,
-      hasOnSectionDelete: !!onSectionDelete,
-      sectionId: section._id,
-    });
-  }, [sectionIndex, index, section.title, onSectionDelete, section._id]);
+  useEffect(() => {}, [
+    sectionIndex,
+    index,
+    section.title,
+    onSectionDelete,
+    section._id,
+  ]);
 
   // Monitor modal state changes
   useEffect(() => {
     console.log("🔧 Modal state changed:", isDeleteModalVisible);
   }, [isDeleteModalVisible]);
 
-  // Ensure section has a valid _id
-  const draggableId =
-    section._id || `section-${sectionIndex || index}-${Date.now()}`;
+  // Ensure section has a valid _id - use stable ID generation
+  const draggableId = useMemo(() => {
+    return section._id || `section-${sectionIndex || index}`;
+  }, [section._id, sectionIndex, index]);
 
   const {
     attributes,
@@ -206,6 +204,12 @@ const Section = ({
             className="flex items-center gap-2 flex-1 cursor-move"
             style={{ position: "relative", zIndex: 50 }}
           >
+            {/* Drag Handle Icon */}
+            <div className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
+              </svg>
+            </div>
             {isEditingTitle ? (
               <div className="flex items-center gap-2 flex-1">
                 <Input

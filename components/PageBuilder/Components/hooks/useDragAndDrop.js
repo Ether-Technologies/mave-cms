@@ -1,6 +1,6 @@
 // components/PageBuilder/Components/hooks/useDragAndDrop.js
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsDirty, setPageData } from "../../../../store/slices/pageSlice";
 
@@ -12,9 +12,13 @@ export const useDragAndDrop = ({
     const dispatch = useDispatch();
     const pageData = useSelector((state) => state.page.pageData);
 
+    // Debug components
+    useEffect(() => {
+    }, [componentsState, sectionIndex]);
+
     const onDragEnd = useCallback(
         (event) => {
-            console.log("🔧 onDragEnd called:", event);
+            console.log("🔧 Component onDragEnd called:", event);
 
             const { active, over } = event;
 
@@ -28,22 +32,31 @@ export const useDragAndDrop = ({
                 return;
             }
 
-            // Find the indices
+            // Find the indices using stable ID generation
             const activeIndex = componentsState.findIndex(
-                (component) => {
+                (component, idx) => {
                     const componentId = component._id ||
-                        `component-${sectionIndex}-${componentsState.indexOf(component)}-${Date.now()}`;
+                        `component-${sectionIndex}-${idx}`;
                     return active.id === componentId;
                 }
             );
 
             const overIndex = componentsState.findIndex(
-                (component) => {
+                (component, idx) => {
                     const componentId = component._id ||
-                        `component-${sectionIndex}-${componentsState.indexOf(component)}-${Date.now()}`;
+                        `component-${sectionIndex}-${idx}`;
                     return over.id === componentId;
                 }
             );
+
+            console.log("🔧 Component drag indices:", {
+                activeId: active.id,
+                overId: over.id,
+                activeIndex,
+                overIndex,
+                sectionIndex,
+                componentsCount: componentsState.length
+            });
 
             if (activeIndex === -1 || overIndex === -1) {
                 console.log("🔧 Could not find indices, returning");
@@ -71,7 +84,7 @@ export const useDragAndDrop = ({
                 ...newItems.slice(overIndex),
             ];
 
-            console.log("🔧 Drag ended:", {
+            console.log("🔧 Component drag ended:", {
                 source: activeIndex,
                 destination: overIndex,
                 finalItems: finalItems.length,
@@ -79,6 +92,7 @@ export const useDragAndDrop = ({
 
             // Always call onComponentsUpdate if provided
             if (onComponentsUpdate) {
+                console.log("🔧 Calling onComponentsUpdate with reordered components");
                 onComponentsUpdate(finalItems);
             } else {
                 // Fallback to old system

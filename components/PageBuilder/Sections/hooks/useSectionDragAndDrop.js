@@ -1,6 +1,6 @@
 // components/PageBuilder/Sections/hooks/useSectionDragAndDrop.js
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsDirty, setPageData } from "../../../../store/slices/pageSlice";
 
@@ -10,6 +10,10 @@ export const useSectionDragAndDrop = ({
 }) => {
     const dispatch = useDispatch();
     const pageData = useSelector((state) => state.page.pageData);
+
+    // Debug sections
+    useEffect(() => {
+    }, [sections]);
 
     const onDragEnd = useCallback(
         (event) => {
@@ -31,20 +35,28 @@ export const useSectionDragAndDrop = ({
 
             // Find the indices
             const activeIndex = items.findIndex(
-                (section) => {
+                (section, idx) => {
                     const sectionId = section._id ||
-                        `section-${items.indexOf(section)}-${Date.now()}`;
+                        `section-${idx}`;
                     return active.id === sectionId;
                 }
             );
 
             const overIndex = items.findIndex(
-                (section) => {
+                (section, idx) => {
                     const sectionId = section._id ||
-                        `section-${items.indexOf(section)}-${Date.now()}`;
+                        `section-${idx}`;
                     return over.id === sectionId;
                 }
             );
+
+            console.log("🔧 Section drag indices:", {
+                activeId: active.id,
+                overId: over.id,
+                activeIndex,
+                overIndex,
+                itemsCount: items.length
+            });
 
             if (activeIndex === -1 || overIndex === -1) {
                 console.log("🔧 Could not find indices, returning");
@@ -78,6 +90,7 @@ export const useSectionDragAndDrop = ({
             });
 
             if (onSectionsUpdate) {
+                console.log("🔧 Calling onSectionsUpdate with reordered sections");
                 onSectionsUpdate(finalItems);
             } else {
                 // Fallback to old system

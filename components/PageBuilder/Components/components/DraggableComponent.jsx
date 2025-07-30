@@ -1,6 +1,6 @@
 // components/PageBuilder/Components/components/DraggableComponent.jsx
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import ComponentRenderer from "../ComponentRenderer";
@@ -15,9 +15,10 @@ const DraggableComponent = ({
   onEditingStateChange,
   isEditing = false,
 }) => {
-  // Ensure component has a valid _id
-  const draggableId =
-    component._id || `component-${sectionIndex}-${index}-${Date.now()}`;
+  // Ensure component has a valid _id - use stable ID generation
+  const draggableId = useMemo(() => {
+    return component._id || `component-${sectionIndex}-${index}`;
+  }, [component._id, sectionIndex, index]);
 
   const {
     attributes,

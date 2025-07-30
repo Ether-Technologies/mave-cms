@@ -32,9 +32,7 @@ const ComponentListSimple = ({
   const [activeId, setActiveId] = useState(null);
 
   // Debug sectionIndex
-  useEffect(() => {
-    console.log("🔧 ComponentListSimple received sectionIndex:", sectionIndex);
-  }, [sectionIndex]);
+  useEffect(() => {}, [sectionIndex]);
 
   useEffect(() => {
     setComponents(components);
@@ -95,11 +93,13 @@ const ComponentListSimple = ({
   );
 
   const handleDragStart = useCallback((event) => {
+    console.log("🔧 Component drag start:", event);
     setActiveId(event.active.id);
   }, []);
 
   const handleDragEnd = useCallback(
     (event) => {
+      console.log("🔧 Component drag end:", event);
       setActiveId(null);
       onDragEnd(event);
     },
@@ -108,18 +108,15 @@ const ComponentListSimple = ({
 
   // Get the active component for overlay
   const activeComponent = activeId
-    ? componentsState.find((component) => {
-        const componentId =
-          component._id ||
-          `component-${sectionIndex}-${componentsState.indexOf(component)}-${Date.now()}`;
+    ? componentsState.find((component, idx) => {
+        const componentId = component._id || `component-${sectionIndex}-${idx}`;
         return activeId === componentId;
       })
     : null;
 
   // Create sortable items array
   const sortableItems = componentsState.map(
-    (component, index) =>
-      component._id || `component-${sectionIndex}-${index}-${Date.now()}`
+    (component, index) => component._id || `component-${sectionIndex}-${index}`
   );
 
   return (

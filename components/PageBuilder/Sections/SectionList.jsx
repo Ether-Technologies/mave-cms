@@ -29,16 +29,13 @@ const SectionList = ({
   const pageData = useSelector((state) => state.page.pageData);
 
   // Debug props received by SectionList
-  useEffect(() => {
-    console.log("🔧 SectionList props:", {
-      hasSection: !!section,
-      sectionIndex,
-      hasSections: !!sections,
-      sectionsCount: sections?.length,
-      hasOnSectionDelete: !!onSectionDelete,
-      hasOnSectionDuplicate: !!onSectionDuplicate,
-    });
-  }, [section, sectionIndex, sections, onSectionDelete, onSectionDuplicate]);
+  useEffect(() => {}, [
+    section,
+    sectionIndex,
+    sections,
+    onSectionDelete,
+    onSectionDuplicate,
+  ]);
 
   // Handle editing state changes
   const handleEditingStateChange = useCallback(
@@ -103,7 +100,7 @@ const SectionList = ({
         const componentToDuplicate = updatedSection.data[componentIndex];
         const duplicatedComponent = {
           ...componentToDuplicate,
-          _id: `${componentToDuplicate._id}_${Date.now()}`,
+          _id: `${componentToDuplicate._id}_duplicate_${Math.random().toString(36).substr(2, 9)}`,
         };
         updatedSection.data.splice(componentIndex + 1, 0, duplicatedComponent);
         updatedPageData.body[sectionIndex] = updatedSection;
@@ -138,14 +135,20 @@ const SectionList = ({
     onSectionsUpdate: handleSectionsUpdate,
   });
 
+  // Add drag event handlers for debugging
+  const handleSectionDragStart = useCallback((event) => {
+    console.log("🔧 Section drag start:", event);
+  }, []);
+
+  const handleSectionDragEnd = useCallback(
+    (event) => {
+      console.log("🔧 Section drag end:", event);
+      onDragEnd(event);
+    },
+    [onDragEnd]
+  );
+
   if (section) {
-    // Single section mode
-    console.log("🔧 SectionList rendering single section with handlers:", {
-      hasOnSectionDuplicate: !!onSectionDuplicate,
-      hasOnSectionDelete: !!onSectionDelete,
-      sectionIndex,
-      sectionTitle: section.title,
-    });
     return (
       <Section
         section={section}
@@ -163,22 +166,15 @@ const SectionList = ({
   }
 
   if (sections) {
-    // Multiple sections mode with drag and drop
-    console.log("🔧 SectionList rendering multiple sections with handlers:", {
-      hasOnSectionDuplicate: !!onSectionDuplicate,
-      hasOnSectionDelete: !!onSectionDelete,
-      sectionsCount: sections.length,
-      sections: sections.map((section, idx) => ({
-        index: idx,
-        title: section.title,
-      })),
-    });
     const sortableItems = sections.map(
-      (section, index) => section._id || `section-${index}-${Date.now()}`
+      (section, index) => section._id || `section-${index}`
     );
 
     return (
-      <DndContext onDragEnd={onDragEnd}>
+      <DndContext
+        onDragStart={handleSectionDragStart}
+        onDragEnd={handleSectionDragEnd}
+      >
         <SortableContext
           items={sortableItems}
           strategy={verticalListSortingStrategy}
@@ -186,12 +182,6 @@ const SectionList = ({
           <div className="space-y-4">
             {sections.map((section, index) => {
               const currentSectionIndex = index;
-              console.log(`🔧 Rendering section ${currentSectionIndex}:`, {
-                sectionTitle: section.title,
-                sectionIndex: currentSectionIndex,
-                sectionId: section._id,
-                mapIndex: index,
-              });
               return (
                 <Section
                   key={section._id || `section-${currentSectionIndex}`}

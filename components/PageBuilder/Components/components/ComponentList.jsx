@@ -22,10 +22,7 @@ const ComponentList = ({
       {Array.isArray(componentsState) &&
         componentsState.map((component, index) => (
           <DraggableComponent
-            key={
-              component._id ||
-              `component-${sectionIndex}-${index}-${Date.now()}`
-            }
+            key={component._id || `component-${sectionIndex}-${index}`}
             component={component}
             index={index}
             sectionIndex={sectionIndex}

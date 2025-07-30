@@ -29,13 +29,13 @@ export const useSliderRefresh = (
     async (silent = false) => {
       // Prevent updates during editing to avoid losing draft state
       if (isEditing) {
-        console.log("🔄 Skipping slider refresh - component is being edited");
+        // console.log("🔄 Skipping slider refresh - component is being edited");
         return;
       }
 
       // Only allow refresh in preview mode
       if (!preview) {
-        console.log("🔄 Skipping slider refresh - not in preview mode");
+        // console.log("🔄 Skipping slider refresh - not in preview mode");
         return;
       }
 
@@ -149,7 +149,7 @@ export const useSliderRefresh = (
 
     // Only enable if explicitly requested AND in preview mode AND not editing
     if (autoPolling && preview && !isEditing && sliderData?.id) {
-      console.log("🔄 Slider auto-refresh enabled - starting interval");
+      // console.log("🔄 Slider auto-refresh enabled - starting interval");
       setPollingError(null);
 
       // Set up polling interval (10 seconds)
@@ -158,16 +158,16 @@ export const useSliderRefresh = (
       }, POLLING_INTERVAL);
 
       return () => {
-        console.log("🔄 Slider auto-refresh disabled - cleaning up interval");
+        // console.log("🔄 Slider auto-refresh disabled - cleaning up interval");
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
           pollingIntervalRef.current = null;
         }
       };
     } else {
-      console.log(
-        "🔄 Slider auto-refresh disabled - not enabled or not in preview mode"
-      );
+      // console.log(
+      //   // "🔄 Slider auto-refresh disabled - not enabled or not in preview mode"
+      // );
     }
   }, [autoPolling, sliderData?.id, preview, isEditing, fetchSliderData]);
 

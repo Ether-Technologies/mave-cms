@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "antd";
@@ -6,6 +6,11 @@ import { DeleteOutlined, CopyOutlined } from "@ant-design/icons";
 import ComponentRenderer from "./ComponentRenderer";
 
 const Component = ({ component, index, onUpdate, onDelete }) => {
+  // Use stable ID generation
+  const draggableId = useMemo(() => {
+    return component._id || `component-${index}`;
+  }, [component._id, index]);
+
   const {
     attributes,
     listeners,
@@ -14,7 +19,7 @@ const Component = ({ component, index, onUpdate, onDelete }) => {
     transition,
     isDragging,
   } = useSortable({
-    id: component._id || `component-${index}-${Date.now()}`,
+    id: draggableId,
   });
 
   const style = {
