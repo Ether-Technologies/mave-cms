@@ -15,6 +15,8 @@ const ComponentList = ({
   onAddComponent,
   isEditing = false,
 }) => {
+  const isEmpty = !componentsState || componentsState.length === 0;
+
   return (
     <div
       className="components-container min-h-[100px] p-1 bg-gray-50 rounded-md"
@@ -22,6 +24,24 @@ const ComponentList = ({
         minHeight: "100px",
       }}
     >
+      {/* Empty state with prominent Add Component button */}
+      {isEditing && isEmpty && (
+        <div className="text-center py-8">
+          <div className="mb-4">
+            <p className="text-gray-500 mb-4">This section is empty</p>
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => onAddComponent && onAddComponent(0)}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                transition-all duration-200 px-6 py-3 text-base font-semibold"
+              size="large"
+            >
+              Add Your First Component
+            </Button>
+          </div>
+        </div>
+      )}
+
       {Array.isArray(componentsState) &&
         componentsState.map((component, index) => (
           <React.Fragment
@@ -82,8 +102,8 @@ const ComponentList = ({
           </React.Fragment>
         ))}
 
-      {/* Add Component Button at the end of the section */}
-      {isEditing && componentsState.length > 0 && (
+      {/* Add Component Button at the end of the section - always show when editing and not empty */}
+      {isEditing && !isEmpty && (
         <div className="text-center py-2">
           <Button
             icon={<PlusOutlined />}
@@ -101,6 +121,13 @@ const ComponentList = ({
               Add Component
             </span>
           </Button>
+        </div>
+      )}
+
+      {/* Empty state message when no components and not editing */}
+      {!isEditing && isEmpty && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No components in this section</p>
         </div>
       )}
     </div>

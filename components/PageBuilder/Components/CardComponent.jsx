@@ -25,6 +25,7 @@ import {
 import CardSelectionModal from "../Modals/CardSelectionModal";
 import Image from "next/image";
 import instance from "../../../axios";
+import { useRouter } from "next/router";
 
 const { Text } = Typography;
 
@@ -69,74 +70,80 @@ const CardComponent = ({
   isEditing = false,
   onDuplicateElement,
 }) => {
+  const router = useRouter();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [cardData, setCardData] = useState(component._mave);
   const [selectedCardData, setSelectedCardData] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [autoPolling, setAutoPolling] = useState(false); // Default to false - only enable in preview mode
+  const [autoPolling, setAutoPolling] = useState(false); // Default to false
   const lastUpdateRef = useRef(null);
+
+  // Check if we're in page-builder context
+  const isInPageBuilder = router.pathname.includes("/page-builder");
 
   // Synchronize cardData with component._mave when it changes
   useEffect(() => {
     setCardData(component._mave);
   }, [component._mave]);
 
-  // Auto-enable polling when in preview mode (not editing)
+  // Completely disable auto-polling in page-builder context
   useEffect(() => {
-    if (preview && !isEditing) {
-      setAutoPolling(true);
+    if (isInPageBuilder) {
+      setAutoPolling(false);
     } else {
       setAutoPolling(false);
     }
-  }, [preview, isEditing]);
+  }, [preview, isEditing, isInPageBuilder]);
 
   // Auto-refresh card data every 30 seconds when card data exists
   // Only when in preview mode and not editing
   useEffect(() => {
+    // Completely disable auto-refresh in page-builder context
+    if (isInPageBuilder) {
+      console.log("🔄 Card auto-refresh disabled - in page-builder context");
+      return;
+    }
+
     // Disable auto-refresh when in edit mode
     if (isEditing) {
-      // console.log("🔄 Card auto-refresh disabled - in edit mode");
       return;
     }
 
     // Only enable auto-refresh in preview mode
     if (!preview) {
-      // console.log("🔄 Card auto-refresh disabled - not in preview mode");
       return;
     }
 
     if (!cardData?.id || !autoPolling) {
-      console
-        .log
-        // "🔄 Card auto-refresh disabled - no card data or polling disabled"
-        ();
       return;
     }
 
-    // console.log("🔄 Card auto-refresh enabled - starting interval");
     const interval = setInterval(() => {
       refreshCardData(true); // Silent refresh for polling
     }, POLLING_INTERVAL);
 
     return () => {
-      // console.log("🔄 Card auto-refresh disabled - cleaning up interval");
       clearInterval(interval);
     };
-  }, [cardData?.id, autoPolling, isEditing, preview]);
+  }, [cardData?.id, autoPolling, isEditing, preview, isInPageBuilder]);
 
   // Function to refresh card data from the server
   const refreshCardData = useCallback(
     async (silent = false) => {
+      // Completely prevent updates when in page-builder context
+      if (isInPageBuilder) {
+        console.log("🔄 Skipping card refresh - in page-builder context");
+        return;
+      }
+
       // Prevent updates during editing to avoid losing draft state
       if (isEditing) {
-        // console.log("🔄 Skipping card refresh - component is being edited");
         return;
       }
 
       // Only allow refresh in preview mode
       if (!preview) {
-        // console.log("🔄 Skipping card refresh - not in preview mode");
         return;
       }
 
@@ -144,6 +151,13 @@ const CardComponent = ({
         if (!silent) {
           message.warning("No card ID available to refresh");
         }
+        return;
+      }
+
+      // Check if we've already updated recently to prevent rapid updates
+      const now = Date.now();
+      if (lastUpdateRef.current && now - lastUpdateRef.current < 10000) {
+        console.log("🔄 Skipping card update - too recent");
         return;
       }
 
@@ -158,13 +172,6 @@ const CardComponent = ({
             JSON.stringify(updatedCard) !== JSON.stringify(component._mave);
 
           if (hasChanges) {
-            // Check if we've already updated recently to prevent rapid updates
-            const now = Date.now();
-            if (lastUpdateRef.current && now - lastUpdateRef.current < 5000) {
-              console.log("🔄 Skipping card update - too recent");
-              return;
-            }
-
             const updatedComponent = {
               ...component,
               _mave: {
@@ -206,6 +213,7 @@ const CardComponent = ({
       updateComponent,
       isEditing,
       preview,
+      isInPageBuilder,
     ]
   );
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import instance from "../axios";
+import { cachedApiCall } from "../utils/apiUtils";
 import CounterCards from "../components/dashboard/CounterCards";
 import UserStat from "../components/dashboard/UserStat";
 import SiteStat from "../components/dashboard/SiteStat";
@@ -16,6 +17,8 @@ const index = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+
+      // Use cached API calls to prevent excessive requests
       const [
         pages_response,
         media_response,
@@ -26,14 +29,14 @@ const index = () => {
         forms_response,
         footers_response,
       ] = await Promise.all([
-        instance.get("/pages"),
-        instance.get("/media"),
-        instance.get("/menus"),
-        instance.get("/navbars"),
-        instance.get("/sliders"),
-        instance.get("/cards"),
-        instance.get("/forms"),
-        instance.get("/footers"),
+        cachedApiCall("pages", () => instance.get("/pages")),
+        cachedApiCall("media", () => instance.get("/media")),
+        cachedApiCall("menus", () => instance.get("/menus")),
+        cachedApiCall("navbars", () => instance.get("/navbars")),
+        cachedApiCall("sliders", () => instance.get("/sliders")),
+        cachedApiCall("cards", () => instance.get("/cards")),
+        cachedApiCall("forms", () => instance.get("/forms")),
+        cachedApiCall("footers", () => instance.get("/footers")),
       ]);
 
       setData({
@@ -63,24 +66,21 @@ const index = () => {
   // console.log("Data: ", data);
 
   return (
-    <>
-      {userData ? (
-        <div className="mavecontainer">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24 ml-[5%]">
-            <CounterCards />
-            <Storage />
-            <SiteSpeed />
-            <UserStat />
-            <LatestEvents />
-            <AverageRequests />
-          </div>
-        </div>
-      ) : (
-        <div>
-          <h1>Dashboard</h1>
-        </div>
-      )}
-    </>
+    <div className="mavecontainer">
+      <CounterCards data={data} loading={loading} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <UserStat userData={userData} />
+        <SiteStat data={data} />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <LatestEvents data={data} />
+        <SiteSpeed />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <Storage data={data} />
+        <AverageRequests />
+      </div>
+    </div>
   );
 };
 

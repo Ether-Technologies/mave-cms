@@ -1,41 +1,61 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { message } from "antd";
 import instance from "../../../../axios";
+import { useRouter } from "next/router";
 
 // Configuration
-const POLLING_INTERVAL = 10000; // 10 seconds
+const POLLING_INTERVAL = 30000; // Increased to 30 seconds
+const MIN_UPDATE_INTERVAL = 10000; // Minimum 10 seconds between updates
 
 export const useSliderRefresh = (
   sliderData,
   component,
   updateComponent,
   preview = false,
-  isEditing = false // Add isEditing parameter to prevent updates during editing
+  isEditing = false
 ) => {
+  const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [autoPolling, setAutoPolling] = useState(false); // Default to false - only enable in preview mode
+  const [autoPolling, setAutoPolling] = useState(false); // Default to false
   const [pollingError, setPollingError] = useState(null);
   const pollingIntervalRef = useRef(null);
   const lastUpdateRef = useRef(null);
+  const isInitializedRef = useRef(false);
 
-  // Disable auto-polling by default - only enable when explicitly requested
+  // Check if we're in page-builder context
+  const isInPageBuilder = router.pathname.includes("/page-builder");
+
+  // Completely disable auto-polling in page-builder context
   useEffect(() => {
-    setAutoPolling(false);
-  }, [preview, isEditing]);
+    if (isInPageBuilder) {
+      setAutoPolling(false);
+      // Clear any existing intervals
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    } else {
+      setAutoPolling(false);
+    }
+  }, [preview, isEditing, isInPageBuilder]);
 
   // Memoize the fetch function to avoid dependency issues
   const fetchSliderData = useCallback(
     async (silent = false) => {
+      // Completely prevent updates when in page-builder context
+      if (isInPageBuilder) {
+        console.log("🔄 Skipping slider refresh - in page-builder context");
+        return;
+      }
+
       // Prevent updates during editing to avoid losing draft state
       if (isEditing) {
-        // console.log("🔄 Skipping slider refresh - component is being edited");
         return;
       }
 
       // Only allow refresh in preview mode
       if (!preview) {
-        // console.log("🔄 Skipping slider refresh - not in preview mode");
         return;
       }
 
@@ -43,6 +63,16 @@ export const useSliderRefresh = (
         if (!silent) {
           message.warning("No slider ID available to refresh");
         }
+        return;
+      }
+
+      // Check if we've already updated recently to prevent rapid updates
+      const now = Date.now();
+      if (
+        lastUpdateRef.current &&
+        now - lastUpdateRef.current < MIN_UPDATE_INTERVAL
+      ) {
+        console.log("🔄 Skipping slider update - too recent");
         return;
       }
 
@@ -67,14 +97,6 @@ export const useSliderRefresh = (
               JSON.stringify(currentMediaIds) !== JSON.stringify(newMediaIds);
 
             if (hasChanges) {
-              // Check if we've already updated recently to prevent rapid updates
-              const now = Date.now();
-              if (lastUpdateRef.current && now - lastUpdateRef.current < 5000) {
-                console.log("🔄 Skipping update - too recent");
-                return;
-              }
-
-              // Always update the component with fresh data
               const updatedComponent = {
                 ...component,
                 _mave: {
@@ -90,7 +112,6 @@ export const useSliderRefresh = (
                 id: updatedSlider.id,
               };
 
-              // Test if updateComponent is working
               try {
                 updateComponent(updatedComponent);
                 lastUpdateRef.current = now;
@@ -136,10 +157,11 @@ export const useSliderRefresh = (
       updateComponent,
       isEditing,
       preview,
+      isInPageBuilder,
     ]
   );
 
-  // Auto-polling effect - only when explicitly enabled and in preview mode
+  // Auto-polling effect - completely disabled in page-builder context
   useEffect(() => {
     // Always disable auto-refresh by default
     if (pollingIntervalRef.current) {
@@ -147,34 +169,51 @@ export const useSliderRefresh = (
       pollingIntervalRef.current = null;
     }
 
-    // Only enable if explicitly requested AND in preview mode AND not editing
-    if (autoPolling && preview && !isEditing && sliderData?.id) {
-      // console.log("🔄 Slider auto-refresh enabled - starting interval");
+    // Completely disable auto-polling in page-builder context
+    if (isInPageBuilder) {
+      console.log("🔄 Auto-polling disabled - in page-builder context");
+      return;
+    }
+
+    // Only enable if explicitly requested AND in preview mode AND not editing AND not in page-builder
+    if (
+      autoPolling &&
+      preview &&
+      !isEditing &&
+      sliderData?.id &&
+      !isInPageBuilder
+    ) {
       setPollingError(null);
 
-      // Set up polling interval (10 seconds)
+      // Set up polling interval (30 seconds)
       pollingIntervalRef.current = setInterval(() => {
         fetchSliderData(true);
       }, POLLING_INTERVAL);
 
       return () => {
-        // console.log("🔄 Slider auto-refresh disabled - cleaning up interval");
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
           pollingIntervalRef.current = null;
         }
       };
-    } else {
-      // console.log(
-      //   // "🔄 Slider auto-refresh disabled - not enabled or not in preview mode"
-      // );
     }
-  }, [autoPolling, sliderData?.id, preview, isEditing, fetchSliderData]);
+  }, [
+    autoPolling,
+    sliderData?.id,
+    preview,
+    isEditing,
+    fetchSliderData,
+    isInPageBuilder,
+  ]);
 
-  // Manual refresh function
+  // Manual refresh function - also disabled in page-builder context
   const handleManualRefresh = useCallback(async () => {
+    if (isInPageBuilder) {
+      console.log("🔄 Manual refresh disabled - in page-builder context");
+      return;
+    }
     await fetchSliderData(false);
-  }, [fetchSliderData]);
+  }, [fetchSliderData, isInPageBuilder]);
 
   return {
     isRefreshing,

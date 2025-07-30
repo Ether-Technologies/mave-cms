@@ -3,6 +3,7 @@
 import { message, Spin } from "antd";
 import React, { useState, useEffect, useMemo } from "react";
 import instance from "../../axios";
+import { cachedApiCall } from "../../utils/apiUtils";
 import { useRouter } from "next/router";
 import PagesHeader from "../../components/PageBuilder/PagesHeader";
 import CreatePageModal from "../../components/PageBuilder/CreatePageModal";
@@ -24,11 +25,11 @@ const Pages = () => {
 
   const router = useRouter();
 
-  // Fetch all pages from the API
+  // Fetch all pages from the API with caching
   const fetchPages = async () => {
     try {
       setLoading(true);
-      const response = await instance.get("/pages");
+      const response = await cachedApiCall("pages", () => instance.get("/pages"));
       if (response.data) {
         setAllPages(response.data);
         const mainPages = response.data.filter((page) => page.type === "Page");
@@ -110,30 +111,10 @@ const Pages = () => {
 
   const handleDuplicatePage = async (pageId) => {
     try {
-      // First, get the page data
-      const response = await instance.get(`/pages/${pageId}`);
-      const pageData = response.data;
-
-      // Create a new page with the same data but with a new name
-      const newPageData = {
-        ...pageData,
-        page_name_en: `${pageData.page_name_en} (Copy)`,
-        page_name_bn: `${pageData.page_name_bn} (Copy)`,
-        slug: `${pageData.slug}-copy`,
-      };
-
-      // Remove the id from the new page data
-      delete newPageData.id;
-
-      // Create the new page
-      const createResponse = await instance.post("/pages", newPageData);
-
-      if (createResponse.status === 201) {
+      const response = await instance.post(`/pages/${pageId}/duplicate`);
+      if (response.status === 201) {
         message.success("Page duplicated successfully.");
-        // Add the new page to the state
-        setTypePages((prevPages) => [createResponse.data, ...prevPages]);
-      } else {
-        message.error("Failed to duplicate page.");
+        fetchPages(); // Refresh the list
       }
     } catch (error) {
       console.error("Error duplicating page:", error);

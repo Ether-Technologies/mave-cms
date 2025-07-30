@@ -1079,7 +1079,8 @@
                 "Drag and drop in page builder is more user friendly now."
             ],
             "Bug Fixes": [
-                "Fixed the issue of table component editing in page builder"
+                "Fixed the issue of table component editing in page builder",
+                "Auto data fetching issues fixed"
             ]
         }
     }
