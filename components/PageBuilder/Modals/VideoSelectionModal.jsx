@@ -2,6 +2,10 @@
 
 import React, { useState } from "react";
 import { Modal, Form, Input, Checkbox, Select, message } from "antd";
+import {
+  getGoogleDriveEmbedUrl,
+  isGoogleDriveUrl,
+} from "../../../utils/googleDrive";
 
 const { Option } = Select;
 
@@ -19,7 +23,9 @@ const VideoSelectionModal = ({
       .then((values) => {
         const embedUrl = getEmbedUrl(values.url);
         if (!embedUrl) {
-          message.error("Unsupported video URL.");
+          message.error(
+            "Unsupported video URL. Please use YouTube, Vimeo, Google Drive, or direct video links."
+          );
           return;
         }
         onSelectVideo({
@@ -40,6 +46,11 @@ const VideoSelectionModal = ({
   };
 
   const getEmbedUrl = (url) => {
+    // Check for Google Drive URL first
+    if (isGoogleDriveUrl(url)) {
+      return getGoogleDriveEmbedUrl(url);
+    }
+
     const youtubeMatch = url.match(
       /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^\s&]+)/
     );
@@ -97,12 +108,16 @@ const VideoSelectionModal = ({
                 if (value && getEmbedUrl(value) !== null) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error("Unsupported video URL."));
+                return Promise.reject(
+                  new Error(
+                    "Unsupported video URL. Please use YouTube, Vimeo, Google Drive, or direct video links."
+                  )
+                );
               },
             },
           ]}
         >
-          <Input placeholder="Enter YouTube, Vimeo, or direct video URL" />
+          <Input placeholder="Enter YouTube, Vimeo, Google Drive, or direct video URL" />
         </Form.Item>
 
         <Form.Item label="Video Settings">
