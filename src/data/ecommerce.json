@@ -1,0 +1,34 @@
+[
+    {
+        "id": 104,
+        "menu": "E-Commerce",
+        "title": "E-Commerce",
+        "icon": "/icons/mave/shop.svg",
+        "submenu": [
+            {
+                "id": 105,
+                "icon": "/icons/mave/categories.svg",
+                "link": "/ecommerce/categories",
+                "title": "Categories"
+            },
+            {
+                "id": 106,
+                "icon": "/icons/mave/packages.svg",
+                "link": "/ecommerce/packages",
+                "title": "Packages"
+            },
+            {
+                "id": 107,
+                "icon": "/icons/mave/customers.svg",
+                "link": "/ecommerce/customers",
+                "title": "Customers"
+            },
+            {
+                "id": 108,
+                "icon": "/icons/mave/orders.svg",
+                "link": "/ecommerce/orders",
+                "title": "Orders"
+            }
+        ]
+    }
+]

@@ -57,12 +57,15 @@ export const usePageOperations = (pageId, pageData) => {
                 });
             };
 
-            // Normalize component types in the data
-            if (data.body) {
+            // Normalize component types in the data and ensure body is always an array
+            if (data.body && Array.isArray(data.body)) {
                 data.body = data.body.map((section) => ({
                     ...section,
                     data: normalizeComponentTypes(section.data),
                 }));
+            } else {
+                // Initialize body as empty array if it's null/undefined
+                data.body = [];
             }
 
             dispatch(setPageData(data));
@@ -116,6 +119,18 @@ export const usePageOperations = (pageId, pageData) => {
     // Handle section operations
     const handleSectionDuplicate = useCallback(
         (sectionIndex) => {
+            if (!pageData || !pageData.body || !Array.isArray(pageData.body)) {
+                console.error("❌ No pageData or pageData.body available for duplication");
+                message.error("No page data available for duplication.");
+                return;
+            }
+
+            if (sectionIndex < 0 || sectionIndex >= pageData.body.length) {
+                console.error("❌ Invalid section index for duplication:", sectionIndex);
+                message.error("Invalid section index for duplication.");
+                return;
+            }
+
             const sectionToDuplicate = pageData.body[sectionIndex];
             const duplicatedSection = {
                 ...sectionToDuplicate,
@@ -130,9 +145,9 @@ export const usePageOperations = (pageId, pageData) => {
             const updatedPageData = {
                 ...pageData,
                 body: [
-                    ...pageData.body.slice(0, sectionIndex + 1),
+                    ...(pageData.body || []).slice(0, sectionIndex + 1),
                     duplicatedSection,
-                    ...pageData.body.slice(sectionIndex + 1),
+                    ...(pageData.body || []).slice(sectionIndex + 1),
                 ],
             };
 
@@ -166,7 +181,7 @@ export const usePageOperations = (pageId, pageData) => {
 
             const updatedPageData = {
                 ...pageData,
-                body: pageData.body.filter((_, idx) => idx !== sectionIndex),
+                body: (pageData.body || []).filter((_, idx) => idx !== sectionIndex),
             };
 
             dispatch(setPageData(updatedPageData));
@@ -179,15 +194,24 @@ export const usePageOperations = (pageId, pageData) => {
 
     // Handle adding new section
     const handleAddSection = useCallback(() => {
+        if (!pageData) {
+            console.error("❌ No pageData available for adding section");
+            message.error("No page data available for adding section.");
+            return;
+        }
+
+        // Ensure body is an array, initialize if null/undefined
+        const currentBody = pageData.body || [];
+
         const newSection = {
             _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            title: `Section ${pageData.body.length + 1}`,
+            title: `Section ${currentBody.length + 1}`,
             data: [],
         };
 
         const updatedPageData = {
             ...pageData,
-            body: [...pageData.body, newSection],
+            body: [...currentBody, newSection],
         };
 
         dispatch(setPageData(updatedPageData));
@@ -198,6 +222,15 @@ export const usePageOperations = (pageId, pageData) => {
 
     // Handle adding new section at specific position
     const handleAddSectionAtPosition = useCallback((position) => {
+        if (!pageData) {
+            console.error("❌ No pageData available for adding section at position");
+            message.error("No page data available for adding section at position.");
+            return;
+        }
+
+        // Ensure body is an array, initialize if null/undefined
+        const currentBody = pageData.body || [];
+
         const newSection = {
             _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             title: `Section ${position + 1}`,
@@ -207,9 +240,9 @@ export const usePageOperations = (pageId, pageData) => {
         const updatedPageData = {
             ...pageData,
             body: [
-                ...pageData.body.slice(0, position),
+                ...currentBody.slice(0, position),
                 newSection,
-                ...pageData.body.slice(position),
+                ...currentBody.slice(position),
             ],
         };
 
@@ -228,6 +261,12 @@ export const usePageOperations = (pageId, pageData) => {
     // Handle sections update (for drag and drop)
     const handleSectionsUpdate = useCallback(
         (updatedSections) => {
+            if (!pageData) {
+                console.error("❌ No pageData available for updating sections");
+                message.error("No page data available for updating sections.");
+                return;
+            }
+
             const updatedPageData = {
                 ...pageData,
                 body: updatedSections,

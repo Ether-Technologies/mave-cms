@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { Drawer, Typography, Switch, Select, Space, Button } from "antd";
 import SliderRenderer from "./SliderRenderer";
 
@@ -12,20 +12,56 @@ const SliderConfig = React.memo(
     setSliderConfig,
     sliderData,
   }) => {
-    const handleConfigChange = (key, value) => {
-      setSliderConfig({ ...sliderConfig, [key]: value });
+    // Default configuration values
+    const defaultConfig = {
+      autoplay: false,
+      dots: true,
+      effect: "scroll",
+      speed: 500,
     };
+
+    // Ensure sliderConfig has all required properties
+    const safeSliderConfig = useMemo(() => {
+      return { ...defaultConfig, ...sliderConfig };
+    }, [sliderConfig]);
+
+    // Check if sliderData is available and valid
+    const hasValidSliderData = useMemo(() => {
+      return sliderData && Array.isArray(sliderData) && sliderData.length > 0;
+    }, [sliderData]);
+
+    const handleConfigChange = useCallback(
+      (key, value) => {
+        if (setSliderConfig) {
+          setSliderConfig((prev) => ({ ...prev, [key]: value }));
+        }
+      },
+      [setSliderConfig]
+    );
+
+    const handleSave = useCallback(() => {
+      setShowConfig(false);
+    }, [setShowConfig]);
+
+    const handleClose = useCallback(() => {
+      setShowConfig(false);
+    }, [setShowConfig]);
+
+    // Early return if required props are missing
+    if (!setSliderConfig || !setShowConfig) {
+      return null;
+    }
 
     return (
       <Drawer
         title="Slider Configuration"
         placement="right"
-        onClose={() => setShowConfig(false)}
+        onClose={handleClose}
         open={showConfig}
         width={400}
         extra={
           <Space>
-            <Button type="primary" onClick={() => setShowConfig(false)}>
+            <Button type="primary" onClick={handleSave}>
               Save
             </Button>
           </Space>
@@ -37,7 +73,16 @@ const SliderConfig = React.memo(
               Preview
             </Paragraph>
             <div className="mt-4 border rounded-lg overflow-hidden p-4 bg-gray-50">
-              <SliderRenderer sliderData={sliderData} config={sliderConfig} />
+              {hasValidSliderData ? (
+                <SliderRenderer
+                  sliderData={sliderData}
+                  config={safeSliderConfig}
+                />
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  No slider data available for preview
+                </div>
+              )}
             </div>
           </div>
 
@@ -54,7 +99,7 @@ const SliderConfig = React.memo(
                   </Paragraph>
                 </div>
                 <Switch
-                  checked={sliderConfig.autoplay}
+                  checked={safeSliderConfig.autoplay}
                   onChange={(checked) =>
                     handleConfigChange("autoplay", checked)
                   }
@@ -69,7 +114,7 @@ const SliderConfig = React.memo(
                   </Paragraph>
                 </div>
                 <Switch
-                  checked={sliderConfig.dots}
+                  checked={safeSliderConfig.dots}
                   onChange={(checked) => handleConfigChange("dots", checked)}
                 />
               </div>
@@ -78,7 +123,7 @@ const SliderConfig = React.memo(
                 <div className="space-y-1">
                   <Paragraph className="font-medium">Effect</Paragraph>
                   <Select
-                    value={sliderConfig.effect}
+                    value={safeSliderConfig.effect}
                     onChange={(value) => handleConfigChange("effect", value)}
                     className="w-full"
                     size="small"
@@ -92,7 +137,7 @@ const SliderConfig = React.memo(
                 <div className="space-y-1">
                   <Paragraph className="font-medium">Speed</Paragraph>
                   <Select
-                    value={sliderConfig.speed}
+                    value={safeSliderConfig.speed}
                     onChange={(value) => handleConfigChange("speed", value)}
                     className="w-full"
                     size="small"
