@@ -1,28 +1,60 @@
 [
-    {
-        "id": 100,
-        "menu": "E-Labs",
-        "title": "E-Labs",
-        "icon": "/icons/mave/lab.svg",
-        "submenu": [
-            {
-                "id": 101,
-                "icon": "/icons/mave/cms.svg",
-                "link": "/diy-cms",
-                "title": "Build CMS"
-            },
-            {
-                "id": 102,
-                "icon": "/icons/mave/response.svg",
-                "link": "/doc-to-api",
-                "title": "Doc to API"
-            },
-            {
-                "id": 103,
-                "icon": "/icons/mave/maveai.png",
-                "link": "/build-with-ai",
-                "title": "Build with AI"
-            }
-        ]
-    }
+  {
+    "id": 100,
+    "menu": "E-Labs",
+    "title": "E-Labs",
+    "icon": "/icons/mave/lab.svg",
+    "submenu": [
+      {
+        "id": 101,
+        "icon": "/icons/mave/cms.svg",
+        "link": "/diy-cms",
+        "title": "Build CMS"
+      },
+      {
+        "id": 102,
+        "icon": "/icons/mave/response.svg",
+        "link": "/doc-to-api",
+        "title": "Doc to API"
+      },
+      {
+        "id": 103,
+        "icon": "/icons/mave/maveai.png",
+        "link": "/build-with-ai",
+        "title": "Build with AI"
+      }
+    ]
+  },
+  {
+    "id": 104,
+    "menu": "E-Commerce",
+    "title": "E-Commerce",
+    "icon": "/icons/mave/shop.svg",
+    "submenu": [
+      {
+        "id": 105,
+        "icon": "/icons/mave/categories.svg",
+        "link": "/ecommerce/categories",
+        "title": "Categories"
+      },
+      {
+        "id": 106,
+        "icon": "/icons/mave/packages.svg",
+        "link": "/ecommerce/packages",
+        "title": "Packages"
+      },
+      {
+        "id": 107,
+        "icon": "/icons/mave/customers.svg",
+        "link": "/ecommerce/customers",
+        "title": "Customers"
+      },
+      {
+        "id": 108,
+        "icon": "/icons/mave/orders.svg",
+        "link": "/ecommerce/orders",
+        "title": "Orders"
+      }
+    ]
+  }
 ]

@@ -21,8 +21,13 @@ const ParagraphComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
+  // Safety check for null component
+  if (!component) {
+    return null;
+  }
+
   const [isEditing, setIsEditing] = useState(false);
-  const [tempValue, setTempValue] = useState(component.value || "");
+  const [tempValue, setTempValue] = useState(component?.value || "");
   const [isHovered, setIsHovered] = useState(false);
 
   const handleSubmit = () => {
@@ -38,7 +43,7 @@ const ParagraphComponent = ({
   };
 
   const handleCancel = () => {
-    setTempValue(component.value || "");
+    setTempValue(component?.value || "");
     setIsEditing(false);
   };
 
@@ -51,7 +56,7 @@ const ParagraphComponent = ({
       <div className="preview-paragraph-component p-4 bg-gray-50 rounded-lg shadow-sm">
         <div
           className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: component.value }}
+          dangerouslySetInnerHTML={{ __html: component?.value || "" }}
         />
       </div>
     );
@@ -97,7 +102,7 @@ const ParagraphComponent = ({
               </>
             ) : (
               <>
-                {component.value && (
+                {component?.value && (
                   <Tooltip title="Edit paragraph">
                     <Button
                       icon={<EditOutlined />}

@@ -1,7 +1,7 @@
 // components/PageBuilder/PagesTabs.jsx
 
 import React from "react";
-import { Spin, Tabs } from "antd";
+import { Tabs } from "antd";
 import RenderPages from "./Renderpages";
 
 const { TabPane } = Tabs;
@@ -17,12 +17,18 @@ const PagesTabs = ({
   handleEditPageInfo,
   handleDuplicatePage,
 }) => {
+  const tabs = [
+    { key: "1", tab: "Pages", data: typePages },
+    { key: "2", tab: "Subpages", data: typeSubpages },
+    { key: "3", tab: "Footers", data: typeFooters },
+  ];
+
   return (
     <Tabs centered animated defaultActiveKey="1" className="mt-8">
-      <TabPane tab="Pages" key="1">
-        {typePages ? (
+      {tabs.map(({ key, tab, data }) => (
+        <TabPane tab={tab} key={key}>
           <RenderPages
-            webpages={typePages}
+            webpages={data}
             handlePreviewPage={handlePreviewPage}
             handleExpand={handleExpand}
             expandedPageId={expandedPageId}
@@ -30,25 +36,8 @@ const PagesTabs = ({
             handleEditPageInfo={handleEditPageInfo}
             handleDuplicatePage={handleDuplicatePage}
           />
-        ) : (
-          <div>No pages found</div>
-        )}
-      </TabPane>
-      <TabPane tab="Subpages" key="2">
-        {typeSubpages ? (
-          <RenderPages
-            webpages={typeSubpages}
-            handlePreviewPage={handlePreviewPage}
-            handleExpand={handleExpand}
-            expandedPageId={expandedPageId}
-            handleDeletePage={handleDeletePage}
-            handleEditPageInfo={handleEditPageInfo}
-            handleDuplicatePage={handleDuplicatePage}
-          />
-        ) : (
-          <div>No subpages found</div>
-        )}
-      </TabPane>
+        </TabPane>
+      ))}
     </Tabs>
   );
 };

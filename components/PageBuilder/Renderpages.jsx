@@ -1,11 +1,11 @@
 // components/PageBuilder/RenderPages.jsx
 
 import React from "react";
-import { Spin } from "antd";
+import { Empty } from "antd";
 import PageCard from "./PageCard";
 
 const RenderPages = ({
-  webpages = [], // Ensure default value is an empty array
+  webpages = [],
   handlePreviewPage,
   handleExpand,
   expandedPageId,
@@ -13,29 +13,29 @@ const RenderPages = ({
   handleEditPageInfo,
   handleDuplicatePage,
 }) => {
+  if (!webpages.length) {
+    return (
+      <div className="flex items-center justify-center w-full h-64">
+        <Empty description="No pages found" />
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {webpages.length > 0 ? (
-        <div className="columns-1 gap-4 xl:columns-2 2xl:columns-2">
-          {webpages?.map((page) => (
-            <div className="break-inside-avoid" key={page.id}>
-              <PageCard
-                page={page}
-                handlePreviewPage={handlePreviewPage}
-                handleExpand={handleExpand}
-                expandedPageId={expandedPageId}
-                handleDeletePage={handleDeletePage}
-                handleEditPageInfo={handleEditPageInfo}
-                handleDuplicatePage={handleDuplicatePage}
-              />
-            </div>
-          ))}
+    <div className="columns-1 gap-4 xl:columns-2 2xl:columns-2">
+      {webpages.map((page) => (
+        <div className="break-inside-avoid mb-4" key={page.id}>
+          <PageCard
+            page={page}
+            handlePreviewPage={handlePreviewPage}
+            handleExpand={handleExpand}
+            expandedPageId={expandedPageId}
+            handleDeletePage={handleDeletePage}
+            handleEditPageInfo={handleEditPageInfo}
+            handleDuplicatePage={handleDuplicatePage}
+          />
         </div>
-      ) : (
-        <div className="flex items-center justify-center w-full h-full">
-          <Spin size="large" />
-        </div>
-      )}
+      ))}
     </div>
   );
 };

@@ -33,8 +33,13 @@ const MediaComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
+  // Safety check for null component
+  if (!component) {
+    return null;
+  }
+
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [mediaData, setMediaData] = useState(component._mave);
+  const [mediaData, setMediaData] = useState(component?._mave);
   const [selectedMediaData, setSelectedMediaData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -45,7 +50,7 @@ const MediaComponent = ({
   };
 
   const handleSubmit = () => {
-    if (component.selectionMode === "multiple") {
+    if (component?.selectionMode === "multiple") {
       if (selectedMediaData.length === 0) {
         message.error("Please select at least one media item.");
         return;
@@ -200,7 +205,7 @@ const MediaComponent = ({
     return (
       <div className="preview-media-component p-4 bg-gray-100 rounded-md">
         {mediaData ? (
-          component.selectionMode === "multiple" ? (
+          component?.selectionMode === "multiple" ? (
             <div className="grid grid-cols-2 gap-4">
               {mediaData.map((media) => renderMediaItem(media))}
             </div>
@@ -284,7 +289,7 @@ const MediaComponent = ({
         {!isEditing ? (
           <div className="w-full">
             {mediaData ? (
-              component.selectionMode === "multiple" ? (
+              component?.selectionMode === "multiple" ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
                   {mediaData.map((media) => renderMediaItem(media))}
                 </div>
@@ -309,7 +314,7 @@ const MediaComponent = ({
             <div className="w-full md:w-1/2">
               <h4 className="mb-2 text-md font-semibold">Current Media</h4>
               {mediaData ? (
-                component.selectionMode === "multiple" ? (
+                component?.selectionMode === "multiple" ? (
                   <div className="grid grid-cols-1 gap-4 w-full">
                     {mediaData.map((media) => renderMediaItem(media))}
                   </div>
@@ -323,7 +328,7 @@ const MediaComponent = ({
             {selectedMediaData && (
               <div className="w-full md:w-1/2">
                 <h4 className="mb-2 text-md font-medium">Selected Media</h4>
-                {component.selectionMode === "multiple" ? (
+                {component?.selectionMode === "multiple" ? (
                   <div className="grid grid-cols-1 gap-4 w-full">
                     {selectedMediaData.map((media) => renderMediaItem(media))}
                   </div>
@@ -342,8 +347,8 @@ const MediaComponent = ({
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSelectMedia={handleSelectMedia}
-        selectionMode={component.selectionMode || "single"}
-        maxSelection={component.maxSelection}
+        selectionMode={component?.selectionMode || "single"}
+        maxSelection={component?.maxSelection}
         initialSelectedMedia={
           mediaData ? (Array.isArray(mediaData) ? mediaData : [mediaData]) : []
         }

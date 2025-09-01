@@ -12,12 +12,21 @@ import {
   DragOutlined,
 } from "@ant-design/icons";
 import VideoSelectionModal from "../Modals/VideoSelectionModal";
+import {
+  getGoogleDriveEmbedUrl,
+  isGoogleDriveUrl,
+} from "../../../utils/googleDrive";
 
 const { Paragraph } = Typography;
 
 // Helper function to validate and get embed URL
 const getEmbedUrl = (url) => {
   if (!url) return null;
+
+  // Check for Google Drive URL first
+  if (isGoogleDriveUrl(url)) {
+    return getGoogleDriveEmbedUrl(url);
+  }
 
   const youtubeMatch = url.match(
     /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^\s&]+)/
@@ -49,6 +58,8 @@ const VideoComponent = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [videoData, setVideoData] = useState(component._mave || {});
   const [isEditing, setIsEditing] = useState(false);
+  const [currentGoogleDriveUrl, setCurrentGoogleDriveUrl] = useState(null);
+  const [googleDriveFallbackIndex, setGoogleDriveFallbackIndex] = useState(0);
 
   useEffect(() => {
     setVideoData(component._mave || {});
@@ -86,6 +97,28 @@ const VideoComponent = ({
     deleteComponent();
   };
 
+  const handleGoogleDriveError = () => {
+    if (isGoogleDriveUrl(videoData.url)) {
+      const googleDriveUrls = getGoogleDriveEmbedUrl(videoData.url);
+      if (googleDriveUrls && googleDriveUrls.fileId) {
+        const fallbackUrls = [
+          googleDriveUrls.primary,
+          googleDriveUrls.fallback,
+          googleDriveUrls.direct,
+          googleDriveUrls.embedApi
+        ].filter(Boolean);
+
+        if (googleDriveFallbackIndex < fallbackUrls.length - 1) {
+          setGoogleDriveFallbackIndex(prev => prev + 1);
+          setCurrentGoogleDriveUrl(fallbackUrls[googleDriveFallbackIndex + 1]);
+        } else {
+          // All fallbacks failed, show error message
+          message.error("Google Drive video could not be loaded. Please check the file permissions or try a different video.");
+        }
+      }
+    }
+  };
+
   const renderVideo = () => {
     if (!videoData || !videoData.url) {
       return (
@@ -107,11 +140,53 @@ const VideoComponent = ({
       return (
         <div className="p-4 bg-red-50 rounded-lg border border-red-100">
           <Paragraph className="text-red-600">
-            Invalid video URL. Please select a valid YouTube, Vimeo, or direct
-            video link.
+            Invalid video URL. Please select a valid YouTube, Vimeo, Google
+            Drive, or direct video link.
           </Paragraph>
         </div>
       );
+    }
+
+    // Handle Google Drive URLs with fallback mechanism
+    if (isGoogleDriveUrl(videoData.url)) {
+      const googleDriveUrls = embedUrl;
+      if (googleDriveUrls && googleDriveUrls.fileId) {
+        const urls = [
+          googleDriveUrls.primary,
+          googleDriveUrls.fallback,
+          googleDriveUrls.direct,
+          googleDriveUrls.embedApi
+        ].filter(Boolean);
+
+        const currentUrl = currentGoogleDriveUrl || urls[googleDriveFallbackIndex] || urls[0];
+
+        return (
+          <div className="video-container relative w-full overflow-hidden rounded-lg bg-gray-900">
+            <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+              <iframe
+                key={`${currentUrl}-${googleDriveFallbackIndex}`}
+                src={currentUrl}
+                title="Google Drive Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute top-0 left-0 w-full h-full"
+                onError={handleGoogleDriveError}
+                onLoad={() => {
+                  // Reset fallback index on successful load
+                  setGoogleDriveFallbackIndex(0);
+                  setCurrentGoogleDriveUrl(null);
+                }}
+              />
+            </div>
+            {googleDriveFallbackIndex > 0 && (
+              <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs">
+                Using fallback {googleDriveFallbackIndex + 1}
+              </div>
+            )}
+          </div>
+        );
+      }
     }
 
     // Determine if it's an iframe embed or direct video
