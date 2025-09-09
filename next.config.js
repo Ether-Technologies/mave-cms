@@ -1,14 +1,12 @@
 const nextConfig = {
-  target: "server",
-  dangerouslyAllowSVG: true,
   distDir: ".next",
-  output: "out",
+  output: "standalone",
   eslint: {
     dirs: ["."],
     ignoreDuringBuilds: true,
   },
   images: {
-    reactStrictMode: true,
+    dangerouslyAllowSVG: true,
     domains: [
       "mave-cms.vercel.app",
       "res.cloudinary.com",
