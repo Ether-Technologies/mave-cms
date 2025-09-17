@@ -1094,5 +1094,24 @@
                 "Fixed Add Component button issue in page builder"
             ]
         }
+    },
+    {
+        "version": "3.3.56",
+        "type": "minor",
+        "date": "2025-09-17",
+        "changes": {
+            "Features": [
+                "Form builder got new ui and features",
+                "Form renderer got new ui and features",
+                "Form component smart features",
+                "Action URL in form builder now generates automatically"
+            ],
+            "Bug Fixes": [
+                "Fixed the issue of form submission in page builder",
+                "Fixed the issue of form submission in form builder",
+                "Fixed the issue of form submission in form component",
+                "Fixed the issue of form submission in form renderer"
+            ]
+        }
     }
 ]
