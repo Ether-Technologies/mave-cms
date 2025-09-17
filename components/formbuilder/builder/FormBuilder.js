@@ -49,6 +49,72 @@ const FormBuilder = () => {
     setFormElements(newElements);
   };
 
+  // Generate test data based on form fields
+  const generateTestData = (elements) => {
+    const testData = {};
+
+    elements.forEach((element) => {
+      if (element.element_type === 'button') return; // Skip button elements
+
+      const fieldName = element.label || element.placeholder || 'field';
+      const fieldType = element.input_type || element.element_type;
+
+      switch (fieldType) {
+        case 'text':
+          testData[fieldName] = `Test ${fieldName}`;
+          break;
+        case 'email':
+          testData[fieldName] = `test.${fieldName}@example.com`;
+          break;
+        case 'number':
+          testData[fieldName] = Math.floor(Math.random() * 1000) + 1;
+          break;
+        case 'tel':
+          testData[fieldName] = `+1${Math.floor(Math.random() * 9000000000) + 1000000000}`;
+          break;
+        case 'password':
+          testData[fieldName] = 'TestPassword123!';
+          break;
+        case 'date':
+          testData[fieldName] = new Date().toISOString().split('T')[0];
+          break;
+        case 'radio':
+          // If options exist, pick the first one, otherwise use a default
+          if (element.options && element.options.length > 0) {
+            testData[fieldName] = element.options[0].value || element.options[0].title || 'Test Option';
+          } else {
+            testData[fieldName] = 'Test Option';
+          }
+          break;
+        case 'select':
+          // If options exist, pick the first one, otherwise use a default
+          if (element.options && element.options.length > 0) {
+            testData[fieldName] = element.options[0].value || element.options[0].title || 'Test Option';
+          } else {
+            testData[fieldName] = 'Test Option';
+          }
+          break;
+        case 'location':
+          testData[fieldName] = {
+            latitude: 40.7128 + (Math.random() - 0.5) * 0.1,
+            longitude: -74.0060 + (Math.random() - 0.5) * 0.1,
+            address: 'Test Location Address'
+          };
+          break;
+        case 'textarea':
+          testData[fieldName] = `This is a test message for ${fieldName} field.`;
+          break;
+        case 'file':
+          testData[fieldName] = 'test-file.txt';
+          break;
+        default:
+          testData[fieldName] = `Test ${fieldName}`;
+      }
+    });
+
+    return testData;
+  };
+
   // Test form submission
   const testFormSubmission = async () => {
     if (!createdFormId) {
@@ -58,13 +124,13 @@ const FormBuilder = () => {
 
     try {
       setTestLoading(true);
+
+      // Generate test data based on actual form fields
+      const generatedFormData = generateTestData(formElements);
+
       const testData = {
         form_id: createdFormId,
-        form_data: {
-          test_field: "Test submission",
-          test_number: 123,
-          test_message: "This is a test submission from the form builder"
-        },
+        form_data: generatedFormData,
         submitted_at: new Date().toISOString()
       };
 

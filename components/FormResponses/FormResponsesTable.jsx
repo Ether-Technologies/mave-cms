@@ -1,6 +1,6 @@
 // components/FormResponses/FormResponsesTable.jsx
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Table, Button, Popconfirm, Space, message, Tag } from "antd";
 import {
   EyeOutlined,
@@ -18,14 +18,14 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
   const [editDrawerVisible, setEditDrawerVisible] = useState(false);
   const [selectedResponse, setSelectedResponse] = useState(null);
 
-  // Check if user is admin
-  const isAdmin = currentUser?.role_id === "1";
+  // All users can delete responses - no admin check needed
 
   // Handle Delete Action
-  const handleDelete = async (id) => {
-    if (!isAdmin) {
-      message.error("You don't have permission to delete responses");
-      return;
+  const handleDelete = async (id, event) => {
+    // Prevent any form submission or page refresh
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
     }
 
     try {
@@ -84,80 +84,167 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
     );
   };
 
-  const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      width: 80,
-    },
-    {
-      title: "Type",
-      dataIndex: "form_type",
-      key: "form_type",
-      width: 100,
-      render: (formType) => renderFormTypeTag(formType),
-    },
-    {
-      title: "Name",
-      dataIndex: ["form_data", "name"],
-      key: "name",
-      render: (text) => text || "N/A",
-    },
-    {
-      title: "Position",
-      dataIndex: ["form_data", "type"],
-      key: "position",
-      render: (text, record) =>
-        record.form_type === "career" ? text || "N/A" : "-",
-    },
-    {
+  // Function to get all unique field names from form responses
+  const getAllFieldNames = (responses) => {
+    const fieldNames = new Set();
+    responses.forEach((response) => {
+      if (response.form_data && typeof response.form_data === "object") {
+        Object.keys(response.form_data).forEach((key) => {
+          fieldNames.add(key);
+        });
+      }
+    });
+    return Array.from(fieldNames);
+  };
+
+  // Function to render field value
+  const renderFieldValue = (value) => {
+    if (value === null || value === undefined) return "N/A";
+    if (typeof value === "object") {
+      return JSON.stringify(value);
+    }
+    if (typeof value === "string" && value.length > 50) {
+      return value.substring(0, 50) + "...";
+    }
+    return value;
+  };
+
+  // Generate dynamic columns based on form data
+  const generateColumns = useMemo(() => {
+    if (!responses || responses.length === 0) {
+      return [
+        {
+          title: "ID",
+          dataIndex: "id",
+          key: "id",
+          width: 80,
+        },
+        {
+          title: "Actions",
+          key: "actions",
+          width: 150,
+          render: (_, record) => (
+            <Space size="middle">
+              <Button
+                className="mavecancelbutton"
+                icon={<EyeOutlined />}
+                onClick={() => {
+                  setSelectedResponse(record);
+                  setViewDrawerVisible(true);
+                }}
+              />
+              <Popconfirm
+                title="Are you sure you want to delete this response?"
+                onConfirm={(e) => handleDelete(record.id, e)}
+                okText="Yes"
+                cancelText="No"
+                okButtonProps={{ danger: true, type: "button" }}
+              >
+                <Button
+                  className="mavecancelbutton"
+                  icon={<DeleteOutlined />}
+                  danger
+                  type="button"
+                  onClick={(e) => e.preventDefault()}
+                />
+              </Popconfirm>
+            </Space>
+          ),
+        },
+      ];
+    }
+
+    const fieldNames = getAllFieldNames(responses);
+    const baseColumns = [
+      {
+        title: "ID",
+        dataIndex: "id",
+        key: "id",
+        width: 80,
+        fixed: "left",
+      },
+    ];
+
+    // Add dynamic columns for form fields (max 2 for responsiveness - total 3 columns: ID + 2 fields + Actions)
+    const dynamicColumns = fieldNames.slice(0, 2).map((fieldName) => ({
+      title: fieldName,
+      dataIndex: ["form_data", fieldName],
+      key: fieldName,
+      render: (text) => renderFieldValue(text),
+      ellipsis: true,
+    }));
+
+    const actionColumn = {
       title: "Actions",
       key: "actions",
       width: 150,
+      fixed: "right",
       render: (_, record) => (
         <Space size="middle">
           <Button
+            className="mavebutton"
             icon={<EyeOutlined />}
             onClick={() => {
               setSelectedResponse(record);
               setViewDrawerVisible(true);
             }}
+            title="View Details"
           />
-          {isAdmin && (
-            <>
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => {
-                  setSelectedResponse(record);
-                  setEditDrawerVisible(true);
-                }}
-              />
-              <Popconfirm
-                title="Are you sure you want to delete this response?"
-                onConfirm={() => handleDelete(record.id)}
-                okText="Yes"
-                cancelText="No"
-                okButtonProps={{ danger: true }}
-              >
-                <Button icon={<DeleteOutlined />} danger />
-              </Popconfirm>
-            </>
-          )}
+          <Popconfirm
+            title="Are you sure you want to delete this response?"
+            onConfirm={(e) => handleDelete(record.id, e)}
+            okText="Yes"
+            cancelText="No"
+            okButtonProps={{ danger: true, type: "button" }}
+          >
+            <Button
+              className="mavecancelbutton"
+              icon={<DeleteOutlined />}
+              danger
+              title="Delete Response"
+              type="button"
+              onClick={(e) => e.preventDefault()}
+            />
+          </Popconfirm>
         </Space>
       ),
-    },
-  ];
+    };
+
+    return [...baseColumns, ...dynamicColumns, actionColumn];
+  }, [responses]);
+
+  const columns = generateColumns;
 
   return (
     <>
-      <Table
-        dataSource={responses}
-        columns={columns}
-        rowKey="id"
-        pagination={{ pageSize: 10 }}
-        bordered
-      />
+      <div className="bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 px-6 py-4 border-b border-orange-200">
+          <h3 className="text-lg font-semibold text-orange-800 flex items-center">
+            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+            Form Responses
+          </h3>
+        </div>
+
+        <div className="p-0">
+          <Table
+            dataSource={responses}
+            columns={columns}
+            rowKey="id"
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} responses`,
+              className: "px-6 py-4",
+            }}
+            scroll={{ x: 800 }}
+            size="middle"
+            className="modern-table"
+            rowClassName="hover:bg-orange-50 transition-colors duration-200"
+          />
+        </div>
+      </div>
 
       {/* View Details Drawer */}
       <ViewDetailsDrawer
@@ -174,14 +261,12 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
       />
 
       {/* Edit Response Drawer */}
-      {isAdmin && (
-        <EditResponseDrawer
-          visible={editDrawerVisible}
-          onClose={() => setEditDrawerVisible(false)}
-          data={selectedResponse}
-          onUpdate={refreshData}
-        />
-      )}
+      <EditResponseDrawer
+        visible={editDrawerVisible}
+        onClose={() => setEditDrawerVisible(false)}
+        data={selectedResponse}
+        onUpdate={refreshData}
+      />
     </>
   );
 };
