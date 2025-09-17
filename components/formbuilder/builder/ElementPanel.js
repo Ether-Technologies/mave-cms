@@ -155,9 +155,9 @@ const elements = [
 const ElementPanel = () => {
   return (
     <>
-      <h3 className="text-center text-xl font-bold">Elements</h3>
-      <Card className="border-2 border-theme p-4 h-[65vh] overflow-auto mt-10">
-        <div className="grid grid-cols-2 gap-4">
+      <h3 className="text-center text-lg sm:text-xl font-bold px-2">Elements</h3>
+      <Card className="border-2 border-theme p-2 sm:p-4 h-[65vh] overflow-auto mt-4 sm:mt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-2 sm:gap-4">
           {elements.map((element, index) => (
             <DraggableElement key={index} element={element} />
           ))}

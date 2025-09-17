@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Select, Button, Drawer, Card, Space } from "antd";
 import { EyeOutlined, CheckOutlined } from "@ant-design/icons";
 import BaseComponent from "./BaseComponent";
-import axios from "../../../axios";
+import FormRenderer from "./FormRenderer";
 import instance from "../../../axios";
 
 const FormComponent = ({
@@ -87,6 +87,7 @@ const FormComponent = ({
         title: selectedForm.title,
         description: selectedForm.description,
         elements: selectedForm.elements,
+        attributes: selectedForm.attributes, // Include form attributes for proper submission
       },
     });
     setIsDrawerVisible(false);
@@ -96,99 +97,13 @@ const FormComponent = ({
   const renderFormPreview = () => {
     if (!selectedForm) return null;
 
-    return (
-      <div className="form-preview p-4">
-        <h3 className="text-lg font-semibold mb-4">{selectedForm.title}</h3>
-        <p className="text-gray-600 mb-4">{selectedForm.description}</p>
-        <Form layout="vertical">
-          {selectedForm.elements?.map((element, index) => (
-            <Form.Item
-              key={index}
-              label={element.label}
-              name={element.label.toLowerCase().replace(/\s+/g, "_")}
-            >
-              {renderFormElement(element)}
-            </Form.Item>
-          ))}
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    );
-  };
-
-  const renderFormElement = (element) => {
-    switch (element.type) {
-      case "input":
-        return <Input placeholder={element.placeholder} disabled />;
-      case "textarea":
-        return <Input.TextArea placeholder={element.placeholder} disabled />;
-      case "select":
-        return (
-          <Select placeholder={element.placeholder} disabled>
-            {element.options?.map((option, index) => (
-              <Select.Option key={index} value={option}>
-                {option}
-              </Select.Option>
-            ))}
-          </Select>
-        );
-      case "radio":
-        return (
-          <Select placeholder={element.placeholder} disabled>
-            {element.options?.map((option, index) => (
-              <Select.Option key={index} value={option}>
-                {option}
-              </Select.Option>
-            ))}
-          </Select>
-        );
-      case "checkbox":
-        return (
-          <Select mode="multiple" placeholder={element.placeholder} disabled>
-            {element.options?.map((option, index) => (
-              <Select.Option key={index} value={option}>
-                {option}
-              </Select.Option>
-            ))}
-          </Select>
-        );
-      default:
-        return <Input placeholder={element.placeholder} disabled />;
-    }
+    return <FormRenderer formData={selectedForm} preview={true} />;
   };
 
   const renderContent = () => {
     if (preview || component.data?.formId) {
-      return (
-        <div className="form-preview p-4">
-          <h3 className="text-lg font-semibold mb-4">
-            {component.data?.title || "Form"}
-          </h3>
-          <p className="text-gray-600 mb-4">
-            {component.data?.description || ""}
-          </p>
-          <Form layout="vertical">
-            {component.data?.elements?.map((element, index) => (
-              <Form.Item
-                key={index}
-                label={element.label}
-                name={element.label.toLowerCase().replace(/\s+/g, "_")}
-              >
-                {renderFormElement(element)}
-              </Form.Item>
-            ))}
-            <Form.Item>
-              <Button type="primary" htmlType="submit" disabled>
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-      );
+      // Use the new FormRenderer for proper form display
+      return <FormRenderer formData={component.data} preview={preview} />;
     }
 
     return (
