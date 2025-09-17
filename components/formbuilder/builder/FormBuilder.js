@@ -15,6 +15,9 @@ const FormBuilder = () => {
   const [formMeta, setFormMeta] = useState({});
   const [preview, setPreview] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [createdFormId, setCreatedFormId] = useState(null);
+  const [testFormData, setTestFormData] = useState(null);
+  const [testLoading, setTestLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,7 +26,7 @@ const FormBuilder = () => {
       component_id: "dummy_form",
       component_class: "form, bg-light",
       method: "POST",
-      action_url: "https://example.com",
+      action_url: "", // Initially blank, will be set after form creation
       enctype: "multipart/form-data",
     });
     setFormMeta({
@@ -46,6 +49,69 @@ const FormBuilder = () => {
     setFormElements(newElements);
   };
 
+  // Test form submission
+  const testFormSubmission = async () => {
+    if (!createdFormId) {
+      message.error("Please save the form first before testing.");
+      return;
+    }
+
+    try {
+      setTestLoading(true);
+      const testData = {
+        form_id: createdFormId,
+        form_data: {
+          test_field: "Test submission",
+          test_number: 123,
+          test_message: "This is a test submission from the form builder"
+        },
+        submitted_at: new Date().toISOString()
+      };
+
+      const response = await instance.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/form-submission?form_id=${createdFormId}`,
+        testData
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        message.success("Test submission successful! Check the form responses.");
+        setTestFormData(response.data);
+      } else {
+        message.error("Test submission failed.");
+      }
+    } catch (error) {
+      console.error("Error testing form submission:", error);
+      message.error("Test submission failed. Please check your form configuration.");
+    } finally {
+      setTestLoading(false);
+    }
+  };
+
+  // Fetch form submissions for testing
+  const fetchFormSubmissions = async () => {
+    if (!createdFormId) {
+      message.error("Please save the form first before testing.");
+      return;
+    }
+
+    try {
+      setTestLoading(true);
+      const response = await instance.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/form-submission?form_id=${createdFormId}`
+      );
+
+      if (response.status === 200) {
+        setTestFormData(response.data);
+        message.success(`Found ${response.data.length} form submissions.`);
+      }
+    } catch (error) {
+      console.error("Error fetching form submissions:", error);
+      message.error("Failed to fetch form submissions.");
+    } finally {
+      setTestLoading(false);
+    }
+  };
+
   // Save form to server
   const saveForm = async () => {
     try {
@@ -57,7 +123,26 @@ const FormBuilder = () => {
         elements: formElements,
       });
       if (response.status === 201) {
-        message.success("Form saved successfully!");
+        const formId = response.data.id;
+        // Auto-update action URL with form ID
+        const updatedAttributes = {
+          ...formAttributes,
+          action_url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/form-submission?form_id=${formId}`
+        };
+
+        // Update the form with the correct action URL
+        await instance.put(`/form_builder/${formId}`, {
+          title: formMeta.title,
+          description: formMeta.description,
+          attributes: updatedAttributes,
+          elements: formElements,
+        });
+
+        // Update local state with the new action URL
+        setFormAttributes(updatedAttributes);
+        setCreatedFormId(formId);
+
+        message.success("Form saved successfully with auto-generated action URL!");
         setPreview(false);
         await router.push("/formbuilder");
       } else {
@@ -65,6 +150,7 @@ const FormBuilder = () => {
       }
     } catch (error) {
       console.error("Error saving form:", error);
+      message.error("Error saving form. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -138,22 +224,80 @@ const FormBuilder = () => {
                   })
                 }
               />
-              {/* Action URL */}
+              {/* Action URL - Read Only */}
               <label className="block text-gray-700 font-bold mb-2">
-                Action URL
+                Action URL <span className="text-sm text-gray-500">(Auto-generated)</span>
               </label>
               <input
-                className="border rounded w-full p-2 mb-4"
+                className="border rounded w-full p-2 mb-4 bg-gray-100 cursor-not-allowed"
                 type="url"
-                placeholder="https://example.com"
+                placeholder={createdFormId ? "Action URL will appear after form creation" : "Save form to generate Action URL"}
                 value={formAttributes.action_url || ""}
-                onChange={(e) =>
-                  setFormAttributes({
-                    ...formAttributes,
-                    action_url: e.target.value,
-                  })
-                }
+                readOnly
+                disabled
               />
+              {!createdFormId && (
+                <p className="text-sm text-gray-500 mb-4">
+                  💡 The Action URL will be automatically generated after you save the form.
+                </p>
+              )}
+            </Card>
+          </TabPane>
+
+          <TabPane tab="Test" key="3">
+            <Card className="mb-4">
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-gray-800 mb-2">Form Testing</h3>
+                <p className="text-gray-600 mb-4">
+                  Test your form submission to ensure it's working correctly.
+                </p>
+
+                {!createdFormId ? (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                    <p className="text-yellow-800">
+                      ⚠️ Please save the form first before testing. The form needs to be created to get a form ID.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                      <p className="text-green-800">
+                        ✅ Form is ready for testing! Form ID: <strong>{createdFormId}</strong>
+                      </p>
+                    </div>
+
+                    <div className="flex space-x-4">
+                      <Button
+                        type="primary"
+                        onClick={testFormSubmission}
+                        loading={testLoading}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        Test Form Submission
+                      </Button>
+                      <Button
+                        onClick={fetchFormSubmissions}
+                        loading={testLoading}
+                        className="bg-gray-600 hover:bg-gray-700 text-white"
+                      >
+                        View Form Responses
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Test Results */}
+              {testFormData && (
+                <div className="mt-6">
+                  <h4 className="text-md font-bold text-gray-800 mb-3">Test Results</h4>
+                  <div className="bg-gray-50 border rounded-md p-4">
+                    <pre className="text-sm text-gray-700 whitespace-pre-wrap">
+                      {JSON.stringify(testFormData, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
             </Card>
           </TabPane>
         </Tabs>

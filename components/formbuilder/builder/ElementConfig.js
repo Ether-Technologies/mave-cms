@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button, Input, Switch, Modal } from "antd";
-import MediaSelectionModal from "../../PageBuilder/Modals/MediaSelectionModal";
+import MediaSelectionModal from "../../PageBuilder/Modals/MediaSelectionModal.jsx";
 
 const { TextArea } = Input;
 
@@ -91,22 +91,22 @@ const ElementConfig = ({ element, onUpdate }) => {
         element.element_type === "textarea" ||
         element.element_type === "select" ||
         element.element_type === "button") && (
-        <>
-          <label className="block font-semibold mb-1">Label</label>
-          <Input
-            className="mb-4"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-          />
+          <>
+            <label className="block font-semibold mb-1">Label</label>
+            <Input
+              className="mb-4"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+            />
 
-          <label className="block font-semibold mb-1">Placeholder</label>
-          <Input
-            className="mb-4"
-            value={placeholder}
-            onChange={(e) => setPlaceholder(e.target.value)}
-          />
-        </>
-      )}
+            <label className="block font-semibold mb-1">Placeholder</label>
+            <Input
+              className="mb-4"
+              value={placeholder}
+              onChange={(e) => setPlaceholder(e.target.value)}
+            />
+          </>
+        )}
 
       {element.element_type === "input" && element.input_type === "radio" && (
         <div className="mb-4">

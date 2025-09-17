@@ -1083,5 +1083,16 @@
                 "Auto data fetching issues fixed"
             ]
         }
+    },
+    {
+        "version": "3.3.53",
+        "type": "minor",
+        "date": "2025-08-06",
+        "changes": {
+            "Bug Fixes": [
+                "Fixed Add Section button issue in page builder",
+                "Fixed Add Component button issue in page builder"
+            ]
+        }
     }
 ]
