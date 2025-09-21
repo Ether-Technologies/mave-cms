@@ -1,7 +1,7 @@
 // components/PageBuilder/Components/ParagraphComponent.jsx
 
 import React, { useState } from "react";
-import { Button, Modal, Popconfirm, Space, Tooltip } from "antd";
+import { Button, Modal, Popconfirm, Space, Tooltip, Switch, Collapse } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -11,8 +11,11 @@ import {
   ExportOutlined,
   CopyFilled,
   DragOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import RichTextEditor from "../../RichTextEditor";
+
+const { Panel } = Collapse;
 
 const ParagraphComponent = ({
   component,
@@ -27,24 +30,47 @@ const ParagraphComponent = ({
   }
 
   const [isEditing, setIsEditing] = useState(false);
-  const [tempValue, setTempValue] = useState(component?.value || "");
   const [isHovered, setIsHovered] = useState(false);
+  const [formData, setFormData] = useState({
+    content: component?.value || "",
+    altContent: component?._mave?.altContent || "",
+    showAltContent: component?._mave?.showAltContent || false,
+  });
 
   const handleSubmit = () => {
-    if (tempValue.trim() === "") {
+    if (formData.content.trim() === "") {
       Modal.error({
         title: "Validation Error",
-        content: "Paragraph cannot be empty.",
+        content: "Paragraph content cannot be empty.",
       });
       return;
     }
-    updateComponent({ ...component, value: tempValue });
+
+    const updatedComponent = {
+      ...component,
+      value: formData.content,
+      _mave: {
+        ...component._mave,
+        altContent: formData.altContent,
+        showAltContent: formData.showAltContent,
+      },
+    };
+
+    updateComponent(updatedComponent);
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setTempValue(component?.value || "");
+    setFormData({
+      content: component?.value || "",
+      altContent: component?._mave?.altContent || "",
+      showAltContent: component?._mave?.showAltContent || false,
+    });
     setIsEditing(false);
+  };
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleDelete = () => {
@@ -56,8 +82,14 @@ const ParagraphComponent = ({
       <div className="preview-paragraph-component p-4 bg-gray-50 rounded-lg shadow-sm">
         <div
           className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: component?.value || "" }}
+          dangerouslySetInnerHTML={{ __html: formData.content || "" }}
         />
+        {formData.showAltContent && formData.altContent && (
+          <div
+            className="prose max-w-none italic text-gray-600 mt-2"
+            dangerouslySetInnerHTML={{ __html: formData.altContent }}
+          />
+        )}
       </div>
     );
   }
@@ -102,7 +134,7 @@ const ParagraphComponent = ({
               </>
             ) : (
               <>
-                {component?.value && (
+                {(component?.value || component?._mave?.altContent) && (
                   <Tooltip title="Edit paragraph">
                     <Button
                       icon={<EditOutlined />}
@@ -137,24 +169,77 @@ const ParagraphComponent = ({
           </Space>
         </div>
         {isEditing ? (
-          <RichTextEditor
-            defaultValue={tempValue}
-            onChange={(html) => setTempValue(html)}
-            editMode={true}
-            maxLength={5000}
-          />
+          <div className="space-y-4">
+            <Collapse defaultActiveKey={["1", "2"]} ghost>
+              <Panel header="Main Content" key="1">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content *
+                  </label>
+                  <RichTextEditor
+                    defaultValue={formData.content}
+                    onChange={(html) => handleChange("content", html)}
+                    editMode={true}
+                    maxLength={5000}
+                  />
+                </div>
+              </Panel>
+              <Panel header="Multi-Language Support" key="2">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Enable Alternative Content
+                    </label>
+                    <Switch
+                      checked={formData.showAltContent}
+                      onChange={(checked) => handleChange("showAltContent", checked)}
+                    />
+                  </div>
+                  {formData.showAltContent && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Alternative Content
+                      </label>
+                      <RichTextEditor
+                        defaultValue={formData.altContent}
+                        onChange={(html) => handleChange("altContent", html)}
+                        editMode={true}
+                        maxLength={5000}
+                      />
+                      <p className="text-xs text-gray-500 mt-2">
+                        <GlobalOutlined className="mr-1" />
+                        Add content in another language for multi-language support
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </Panel>
+            </Collapse>
+          </div>
         ) : component?.value ? (
-          <div
-            className="prose max-w-none p-4 bg-white rounded-lg"
-            dangerouslySetInnerHTML={{ __html: component.value }}
-          />
+          <div className="space-y-4">
+            <div
+              className="prose max-w-none p-4 bg-white rounded-lg"
+              dangerouslySetInnerHTML={{ __html: component.value }}
+            />
+            {formData.showAltContent && formData.altContent && (
+              <div
+                className="prose max-w-none p-4 bg-gray-50 rounded-lg italic text-gray-600"
+                dangerouslySetInnerHTML={{ __html: formData.altContent }}
+              />
+            )}
+          </div>
         ) : (
           <Button
             icon={<PlusOutlined />}
             type="dashed"
             onClick={() => {
               setIsEditing(true);
-              setTempValue("");
+              setFormData({
+                content: "",
+                altContent: "",
+                showAltContent: false,
+              });
             }}
             className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-yellow-500 transition-colors"
           >

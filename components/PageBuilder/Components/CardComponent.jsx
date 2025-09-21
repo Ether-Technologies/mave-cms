@@ -10,6 +10,8 @@ import {
   Space,
   Tooltip,
   Drawer,
+  Switch,
+  Collapse,
 } from "antd";
 import {
   EditOutlined,
@@ -21,7 +23,10 @@ import {
   DragOutlined,
   SettingOutlined,
   ReloadOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
+
+const { Panel } = Collapse;
 import CardSelectionModal from "../Modals/CardSelectionModal";
 import Image from "next/image";
 import instance from "../../../axios";
@@ -33,7 +38,7 @@ const { Text } = Typography;
 const POLLING_INTERVAL = 30000; // 30 seconds
 
 // Helper function to render card media
-const renderCardMedia = (media) => {
+const renderCardMedia = (media, altTitle = "Card Image") => {
   if (!media || !media.file_path) {
     return (
       <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-lg">
@@ -52,7 +57,7 @@ const renderCardMedia = (media) => {
   return (
     <Image
       src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
-      alt={media.title_en || "Card Image"}
+      alt={altTitle}
       width={900}
       height={400}
       objectFit="cover"
@@ -60,6 +65,23 @@ const renderCardMedia = (media) => {
       priority
     />
   );
+};
+
+// Helper function to get display content based on language preference
+const getDisplayContent = (cardData, showAltContent = false) => {
+  if (!cardData) return { title: "Untitled Card", description: "No description available" };
+  
+  if (showAltContent) {
+    return {
+      title: cardData.title_bn || cardData.title_en || "Untitled Card",
+      description: cardData.description_bn || cardData.description_en || "No description available"
+    };
+  }
+  
+  return {
+    title: cardData.title_en || "Untitled Card",
+    description: cardData.description_en || "No description available"
+  };
 };
 
 const CardComponent = ({
@@ -77,6 +99,7 @@ const CardComponent = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [autoPolling, setAutoPolling] = useState(false); // Always false
+  const [showAltContent, setShowAltContent] = useState(component._mave?.showAltContent || false);
   const lastUpdateRef = useRef(null);
 
   // Check if we're in page-builder context
@@ -86,6 +109,7 @@ const CardComponent = ({
   // Synchronize cardData with component._mave when it changes
   useEffect(() => {
     setCardData(component._mave);
+    setShowAltContent(component._mave?.showAltContent || false);
   }, [component._mave]);
 
   // Completely disable auto-polling in all contexts
@@ -247,6 +271,9 @@ const CardComponent = ({
 
   // If in preview mode, render the card content only
   if (preview) {
+    const displayContent = getDisplayContent(cardData, showAltContent);
+    const altContent = getDisplayContent(cardData, !showAltContent);
+    
     return (
       <div className="preview-card-component p-4 bg-gray-100 rounded-md">
         {cardData && (
@@ -269,16 +296,33 @@ const CardComponent = ({
           </div>
         )}
         {cardData ? (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {renderCardMedia(cardData.media_files)}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                {cardData.title_en || "Untitled Card"}
-              </h3>
-              <p className="text-gray-600">
-                {cardData.description_en || "No description available"}
-              </p>
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              {renderCardMedia(cardData.media_files, displayContent.title)}
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">
+                  {displayContent.title}
+                </h3>
+                <div 
+                  className="text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: displayContent.description }}
+                />
+              </div>
             </div>
+            {showAltContent && (cardData.title_bn || cardData.description_bn) && (
+              <div className="bg-gray-50 rounded-lg shadow-md overflow-hidden">
+                {renderCardMedia(cardData.media_files, altContent.title)}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                    {altContent.title}
+                  </h3>
+                  <div 
+                    className="text-gray-600"
+                    dangerouslySetInnerHTML={{ __html: altContent.description }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <Text className="text-gray-500">No card data available.</Text>
@@ -326,57 +370,121 @@ const CardComponent = ({
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row items-start gap-4">
-        <div
-          className={`flex flex-col ${isEditing && selectedCardData ? "w-full md:w-1/2" : "w-full"}`}
-        >
-          {cardData && isEditing && (
-            <h4 className="mb-2 text-md font-semibold">Current Card</h4>
-          )}
-          {cardData ? (
-            <div className="w-full relative">
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                {renderCardMedia(cardData.media_files)}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">
-                    {cardData.title_en || "Untitled Card"}
-                  </h3>
-                  <p className="text-gray-600">
-                    {cardData.description_en || "No description available"}
-                  </p>
-                </div>
+      <div className="space-y-4">
+        {/* Multi-Language Configuration */}
+        {cardData && (
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="text-md font-semibold mb-3 flex items-center gap-2">
+              <GlobalOutlined />
+              Multi-Language Settings
+            </h4>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium mb-1">Display Alternative Language</p>
+                <p className="text-sm text-gray-600">
+                  Show Bengali content alongside English (if available)
+                </p>
               </div>
-            </div>
-          ) : (
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => setIsModalVisible(true)}
-              className="mavebutton w-fit"
-            >
-              Select Card
-            </Button>
-          )}
-        </div>
-
-        {isEditing && selectedCardData && (
-          <div className="flex flex-col w-full md:w-1/2">
-            <h4 className="mb-2 text-md font-semibold">Selected Card</h4>
-            <div className="w-full relative">
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                {renderCardMedia(selectedCardData.media_files)}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">
-                    {selectedCardData.title_en || "Untitled Card"}
-                  </h3>
-                  <p className="text-gray-600">
-                    {selectedCardData.description_en ||
-                      "No description available"}
-                  </p>
-                </div>
-              </div>
+              <Switch
+                checked={showAltContent}
+                onChange={(checked) => {
+                  setShowAltContent(checked);
+                  // Update component with new setting
+                  const updatedComponent = {
+                    ...component,
+                    _mave: {
+                      ...component._mave,
+                      showAltContent: checked,
+                    },
+                  };
+                  updateComponent(updatedComponent);
+                }}
+              />
             </div>
           </div>
         )}
+
+        <div className="flex flex-col md:flex-row items-start gap-4">
+          <div
+            className={`flex flex-col ${isEditing && selectedCardData ? "w-full md:w-1/2" : "w-full"}`}
+          >
+            {cardData && isEditing && (
+              <h4 className="mb-2 text-md font-semibold">Current Card</h4>
+            )}
+            {cardData ? (
+              <div className="w-full relative">
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                  {renderCardMedia(cardData.media_files)}
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-2">
+                      {cardData.title_en || "Untitled Card"}
+                    </h3>
+                    <div 
+                      className="text-gray-600"
+                      dangerouslySetInnerHTML={{ __html: cardData.description_en || "No description available" }}
+                    />
+                  </div>
+                </div>
+                {showAltContent && (cardData.title_bn || cardData.description_bn) && (
+                  <div className="mt-2 bg-gray-50 rounded-lg shadow-md overflow-hidden">
+                    {renderCardMedia(cardData.media_files)}
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                        {cardData.title_bn || cardData.title_en || "Untitled Card"}
+                      </h3>
+                      <div 
+                        className="text-gray-600"
+                        dangerouslySetInnerHTML={{ __html: cardData.description_bn || cardData.description_en || "No description available" }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => setIsModalVisible(true)}
+                className="mavebutton w-fit"
+              >
+                Select Card
+              </Button>
+            )}
+          </div>
+
+          {isEditing && selectedCardData && (
+            <div className="flex flex-col w-full md:w-1/2">
+              <h4 className="mb-2 text-md font-semibold">Selected Card</h4>
+              <div className="w-full relative">
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                  {renderCardMedia(selectedCardData.media_files)}
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-2">
+                      {selectedCardData.title_en || "Untitled Card"}
+                    </h3>
+                    <div 
+                      className="text-gray-600"
+                      dangerouslySetInnerHTML={{ __html: selectedCardData.description_en || "No description available" }}
+                    />
+                  </div>
+                </div>
+                {showAltContent && (selectedCardData.title_bn || selectedCardData.description_bn) && (
+                  <div className="mt-2 bg-gray-50 rounded-lg shadow-md overflow-hidden">
+                    {renderCardMedia(selectedCardData.media_files)}
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                        {selectedCardData.title_bn || selectedCardData.title_en || "Untitled Card"}
+                      </h3>
+                      <div 
+                        className="text-gray-600"
+                        dangerouslySetInnerHTML={{ __html: selectedCardData.description_bn || selectedCardData.description_en || "No description available" }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {isEditing && selectedCardData && (

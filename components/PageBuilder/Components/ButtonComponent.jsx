@@ -90,6 +90,18 @@ const ButtonComponent = ({
             >
               {buttonData.text}
             </Button>
+            {buttonData.showAltText && buttonData.altText && (
+              <div className="mt-2">
+                <Button
+                  className="mavebutton"
+                  icon={getButtonIcon()}
+                  onClick={handleButtonClick}
+                  aria-label={buttonData.altText}
+                >
+                  {buttonData.altText}
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <Paragraph className="text-gray-500">No button configured.</Paragraph>
@@ -138,6 +150,18 @@ const ButtonComponent = ({
           >
             {buttonData.text}
           </Button>
+          {buttonData.showAltText && buttonData.altText && (
+            <div className="mt-2">
+              <Button
+                className="mavebutton"
+                icon={getButtonIcon()}
+                onClick={handleButtonClick}
+                aria-label={buttonData.altText}
+              >
+                {buttonData.altText}
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <Paragraph>No button configured.</Paragraph>

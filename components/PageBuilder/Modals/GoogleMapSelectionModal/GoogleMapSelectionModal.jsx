@@ -16,6 +16,7 @@ const GoogleMapSelectionModal = ({
       form.setFieldsValue({
         mapUrl: initialMap.mapUrl || "",
         zoom: initialMap.zoom || 8,
+        altTitle: initialMap.altTitle || "",
       });
     } else {
       form.resetFields();
@@ -26,7 +27,7 @@ const GoogleMapSelectionModal = ({
     form
       .validateFields()
       .then((values) => {
-        const { mapUrl, zoom } = values;
+        const { mapUrl, zoom, altTitle } = values;
 
         // Validate the URL
         try {
@@ -62,6 +63,7 @@ const GoogleMapSelectionModal = ({
           mapUrl,
           zoom,
           coordinates,
+          altTitle: altTitle || "",
           markers: initialMap.markers || [],
         };
 
@@ -113,6 +115,10 @@ const GoogleMapSelectionModal = ({
           ]}
         >
           <Input type="number" placeholder="Enter zoom level (0-21)" />
+        </Form.Item>
+
+        <Form.Item name="altTitle" label="Alternative Title">
+          <Input placeholder="Enter alternative title (optional)" />
         </Form.Item>
       </Form>
     </Modal>

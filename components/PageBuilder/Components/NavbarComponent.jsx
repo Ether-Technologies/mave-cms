@@ -12,6 +12,7 @@ import {
   Radio,
   Select,
   message,
+  Input,
 } from "antd";
 import {
   DeleteOutlined,
@@ -25,6 +26,7 @@ import {
   SettingOutlined,
   MenuOutlined,
   ArrowLeftOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import NavbarSelectionModal from "../Modals/NavbarSelectionModal";
 import Image from "next/image";
@@ -46,6 +48,7 @@ const NavbarComponent = ({
   const [logoSize, setLogoSize] = useState(component.logoSize || "medium");
   const [selectedNavbar, setSelectedNavbar] = useState(null);
   const [showConfig, setShowConfig] = useState(false);
+  const [altTitle, setAltTitle] = useState(component._mave?.altTitle || "");
 
   const handleSelectNavbar = (selectedNavbar) => {
     setSelectedNavbar(selectedNavbar);
@@ -59,13 +62,19 @@ const NavbarComponent = ({
     }
     updateComponent({
       ...component,
-      _mave: selectedNavbar,
+      _mave: {
+        ...selectedNavbar,
+        altTitle,
+      },
       id: selectedNavbar.id,
       menuMode,
       menuTheme,
       logoSize,
     });
-    setNavbarData(selectedNavbar);
+    setNavbarData({
+      ...selectedNavbar,
+      altTitle,
+    });
     setIsDrawerVisible(false);
     setShowConfig(false);
     setSelectedNavbar(null);
@@ -89,8 +98,17 @@ const NavbarComponent = ({
     }
   };
 
+  const getDisplayTitle = (item) => {
+    if (altTitle && item.title_bn) {
+      return item.title_bn;
+    }
+    return item.title;
+  };
+
   const renderMenuItems = (menuItems) => {
     return menuItems?.map((item) => {
+      const displayTitle = getDisplayTitle(item);
+
       if (item.all_children && item.all_children.length > 0) {
         return (
           <Menu.SubMenu
@@ -98,7 +116,7 @@ const NavbarComponent = ({
             title={
               <span className="flex items-center gap-2">
                 {item.icon && <span className="text-lg">{item.icon}</span>}
-                {item.title}
+                {displayTitle}
               </span>
             }
           >
@@ -110,7 +128,7 @@ const NavbarComponent = ({
           <Menu.Item key={item.id}>
             <span className="flex items-center gap-2">
               {item.icon && <span className="text-lg">{item.icon}</span>}
-              {item.title}
+              {displayTitle}
             </span>
           </Menu.Item>
         );
@@ -276,6 +294,27 @@ const NavbarComponent = ({
           />
         ) : (
           <div className="flex flex-col gap-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="text-md font-semibold mb-3 flex items-center gap-2">
+                <GlobalOutlined />
+                Multi-Language Settings
+              </h4>
+              <div className="flex flex-col gap-2">
+                <div>
+                  <p className="font-medium mb-1">Alternative Title</p>
+                  <p className="text-sm text-gray-600">
+                    Enter alternative title to display instead of default menu
+                    title
+                  </p>
+                </div>
+                <Input
+                  placeholder="Enter alternative title"
+                  value={altTitle}
+                  onChange={(e) => setAltTitle(e.target.value)}
+                />
+              </div>
+            </div>
+
             <div className="flex flex-col gap-2">
               <Text strong>Menu Mode</Text>
               <Radio.Group

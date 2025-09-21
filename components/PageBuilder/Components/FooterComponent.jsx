@@ -13,6 +13,7 @@ import {
   Divider,
   Modal,
   message,
+  Input,
 } from "antd";
 import {
   DeleteOutlined,
@@ -42,6 +43,7 @@ const FooterComponent = ({
   const [selectedFooterData, setSelectedFooterData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
+  const [altTitle, setAltTitle] = useState(component._mave?.altTitle || "");
   const [footerConfig, setFooterConfig] = useState({
     showLogo: true,
     showSocialLinks: true,
@@ -57,6 +59,7 @@ const FooterComponent = ({
     setSelectedFooterData(selectedFooter);
     setIsModalVisible(false);
     setIsEditing(true);
+    setShowConfig(true);
   };
 
   const handleSubmit = () => {
@@ -73,18 +76,24 @@ const FooterComponent = ({
       _mave: {
         ...selectedFooterData,
         config: footerConfig,
+        altTitle,
       },
       id: selectedFooterData.id,
     });
-    setFooterData(selectedFooterData);
+    setFooterData({
+      ...selectedFooterData,
+      altTitle,
+    });
     setSelectedFooterData(null);
     setIsEditing(false);
+    setShowConfig(false);
     message.success("Footer updated successfully.");
   };
 
   const handleCancel = () => {
     setSelectedFooterData(null);
     setIsEditing(false);
+    setShowConfig(false);
     message.info("Footer update canceled.");
   };
 
@@ -95,11 +104,11 @@ const FooterComponent = ({
   const renderFooterContent = (footer) => {
     if (!footer?.body?.[0]?.data) return null;
 
+    const displayTitle = altTitle || footer.page_name_en;
+
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-theme">
-          {footer.page_name_en}
-        </h2>
+        <h2 className="text-xl font-semibold text-theme">{displayTitle}</h2>
         {footer.body[0].data.map((comp, index) => (
           <ComponentRenderer
             key={comp._id || index}
@@ -230,18 +239,43 @@ const FooterComponent = ({
       <Drawer
         title="Footer Configuration"
         placement="right"
-        onClose={() => setShowConfig(false)}
-        open={showConfig}
+        onClose={handleCancel}
+        open={showConfig && isEditing}
         width={400}
         extra={
           <Space>
-            <Button type="primary" onClick={() => setShowConfig(false)}>
+            <Button onClick={handleCancel}>Cancel</Button>
+            <Button type="primary" onClick={handleSubmit}>
               Save
             </Button>
           </Space>
         }
       >
         <div className="space-y-6 p-4">
+          <div>
+            <Paragraph strong className="text-lg">
+              Multi-Language Settings
+            </Paragraph>
+            <div className="mt-4 space-y-4">
+              <div className="flex flex-col gap-2">
+                <div>
+                  <Paragraph className="font-medium mb-1">
+                    Alternative Title
+                  </Paragraph>
+                  <Paragraph type="secondary" className="text-xs mb-0">
+                    Enter alternative title to display instead of default footer
+                    title
+                  </Paragraph>
+                </div>
+                <Input
+                  placeholder="Enter alternative title"
+                  value={altTitle}
+                  onChange={(e) => setAltTitle(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
           <div>
             <Paragraph strong className="text-lg">
               Display Settings

@@ -11,6 +11,7 @@ import {
   Drawer,
   Radio,
   message,
+  Input,
 } from "antd";
 import {
   EditOutlined,
@@ -23,6 +24,7 @@ import {
   SettingOutlined,
   MenuOutlined,
   ArrowLeftOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import MenuSelectionModal from "../Modals/MenuSelectionModal";
 
@@ -41,6 +43,7 @@ const MenuComponent = ({
   const [menuTheme, setMenuTheme] = useState(component.menuTheme || "light");
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [showConfig, setShowConfig] = useState(false);
+  const [altTitle, setAltTitle] = useState(component._mave?.altTitle || "");
 
   const handleSelectMenu = (selectedMenu) => {
     setSelectedMenu(selectedMenu);
@@ -54,12 +57,18 @@ const MenuComponent = ({
     }
     updateComponent({
       ...component,
-      _mave: selectedMenu,
+      _mave: {
+        ...selectedMenu,
+        altTitle,
+      },
       id: selectedMenu.id,
       menuMode,
       menuTheme,
     });
-    setMenuData(selectedMenu);
+    setMenuData({
+      ...selectedMenu,
+      altTitle,
+    });
     setIsDrawerVisible(false);
     setShowConfig(false);
     setSelectedMenu(null);
@@ -70,8 +79,17 @@ const MenuComponent = ({
     deleteComponent();
   };
 
+  const getDisplayTitle = (item) => {
+    if (altTitle && item.title_bn) {
+      return item.title_bn;
+    }
+    return item.title;
+  };
+
   const renderMenuItems = (menuItems) => {
     return menuItems?.map((item) => {
+      const displayTitle = getDisplayTitle(item);
+
       if (item.all_children && item.all_children.length > 0) {
         return (
           <Menu.SubMenu
@@ -79,7 +97,7 @@ const MenuComponent = ({
             title={
               <span className="flex items-center gap-2">
                 {item.icon && <span className="text-lg">{item.icon}</span>}
-                {item.title}
+                {displayTitle}
               </span>
             }
           >
@@ -91,7 +109,7 @@ const MenuComponent = ({
           <Menu.Item key={item.id}>
             <span className="flex items-center gap-2">
               {item.icon && <span className="text-lg">{item.icon}</span>}
-              {item.title}
+              {displayTitle}
             </span>
           </Menu.Item>
         );
@@ -231,6 +249,27 @@ const MenuComponent = ({
           />
         ) : (
           <div className="flex flex-col gap-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="text-md font-semibold mb-3 flex items-center gap-2">
+                <GlobalOutlined />
+                Multi-Language Settings
+              </h4>
+              <div className="flex flex-col gap-2">
+                <div>
+                  <p className="font-medium mb-1">Alternative Title</p>
+                  <p className="text-sm text-gray-600">
+                    Enter alternative title to display instead of default menu
+                    title
+                  </p>
+                </div>
+                <Input
+                  placeholder="Enter alternative title"
+                  value={altTitle}
+                  onChange={(e) => setAltTitle(e.target.value)}
+                />
+              </div>
+            </div>
+
             <div className="flex flex-col gap-2">
               <Text strong>Menu Mode</Text>
               <Radio.Group

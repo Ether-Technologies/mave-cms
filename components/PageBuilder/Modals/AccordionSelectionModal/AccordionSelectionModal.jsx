@@ -44,7 +44,9 @@ const AccordionSelectionModal = ({
   const handleAddItem = () => {
     const newItem = {
       title: "",
+      altTitle: "",
       content: "",
+      altContent: "",
       contentType: "text",
       style: {
         headerBg: "#ffffff",
@@ -73,6 +75,9 @@ const AccordionSelectionModal = ({
       const updatedItems = accordionItems.map((item, index) => ({
         ...item,
         title: values[`title_${index}`],
+        altTitle: values[`altTitle_${index}`] || "",
+        content: item.content, // Keep the current content from RichTextEditor
+        altContent: item.altContent || "", // Keep the current altContent from RichTextEditor
         contentType: values[`contentType_${index}`],
         style: {
           headerBg: values[`headerBg_${index}`] || "#ffffff",
@@ -91,6 +96,16 @@ const AccordionSelectionModal = ({
     const newItems = accordionItems.map((item, i) => {
       if (i === index) {
         return { ...item, content };
+      }
+      return item;
+    });
+    setAccordionItems(newItems);
+  };
+
+  const handleAltContentChange = (content, index) => {
+    const newItems = accordionItems.map((item, i) => {
+      if (i === index) {
+        return { ...item, altContent: content };
       }
       return item;
     });
@@ -155,6 +170,14 @@ const AccordionSelectionModal = ({
             </Form.Item>
 
             <Form.Item
+              label="Alternative Title"
+              name={`altTitle_${index}`}
+              initialValue={item.altTitle || ""}
+            >
+              <Input placeholder="Enter alternative title (optional)" />
+            </Form.Item>
+
+            <Form.Item
               label="Content Type"
               name={`contentType_${index}`}
               initialValue={item.contentType}
@@ -169,6 +192,14 @@ const AccordionSelectionModal = ({
               <RichTextEditor
                 defaultValue={item.content}
                 onChange={(content) => handleContentChange(content, index)}
+                editMode={true}
+              />
+            </Form.Item>
+
+            <Form.Item label="Alternative Content">
+              <RichTextEditor
+                defaultValue={item.altContent || ""}
+                onChange={(content) => handleAltContentChange(content, index)}
                 editMode={true}
               />
             </Form.Item>

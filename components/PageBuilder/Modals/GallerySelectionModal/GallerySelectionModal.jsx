@@ -139,6 +139,7 @@ const GallerySelectionModal = ({
   const [shadow, setShadow] = useState(
     initialGallery?.settings?.shadow || "sm"
   );
+  const [altTitle, setAltTitle] = useState(initialGallery?.altTitle || "");
 
   useEffect(() => {
     if (isVisible) {
@@ -149,6 +150,7 @@ const GallerySelectionModal = ({
       setHoverEffect(initialGallery?.settings?.hoverEffect || "scale");
       setBorderRadius(initialGallery?.settings?.borderRadius || "8px");
       setShadow(initialGallery?.settings?.shadow || "sm");
+      setAltTitle(initialGallery?.altTitle || "");
       form.setFieldsValue({
         layout: initialGallery?.layout || "grid",
         columns: initialGallery?.settings?.columns || 3,
@@ -156,6 +158,7 @@ const GallerySelectionModal = ({
         hoverEffect: initialGallery?.settings?.hoverEffect || "scale",
         borderRadius: initialGallery?.settings?.borderRadius || "8px",
         shadow: initialGallery?.settings?.shadow || "sm",
+        altTitle: initialGallery?.altTitle || "",
       });
     }
   }, [isVisible, initialGallery, form]);
@@ -182,6 +185,7 @@ const GallerySelectionModal = ({
     const galleryData = {
       images: selectedMedia,
       layout: values.layout,
+      altTitle: values.altTitle || "",
       settings: {
         columns: values.layout !== "carousel" ? values.columns : null,
         spacing: values.spacing,
@@ -329,6 +333,12 @@ const GallerySelectionModal = ({
                 />
               </Form.Item>
             )}
+          </Card>
+
+          <Card title="Multi-Language Settings" className="mb-6">
+            <Form.Item name="altTitle" label="Alternative Title">
+              <Input placeholder="Enter alternative title (optional)" />
+            </Form.Item>
           </Card>
 
           <Card title="Style Settings" className="mb-6">

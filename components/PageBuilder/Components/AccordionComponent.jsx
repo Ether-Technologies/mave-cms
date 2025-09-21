@@ -9,8 +9,17 @@ import {
   Collapse,
   Space,
   Tooltip,
+  Input,
+  Switch,
+  Form,
+  Drawer,
 } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import AccordionSelectionModal from "../Modals/AccordionSelectionModal/AccordionSelectionModal";
 import RichTextEditor from "../../RichTextEditor";
 
@@ -39,20 +48,31 @@ const AccordionComponent = ({
   preview = false,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [accordionData, setAccordionData] = useState(component._mave || []);
+  const [accordionData, setAccordionData] = useState(
+    Array.isArray(component._mave) ? component._mave : []
+  );
   const [activeKeys, setActiveKeys] = useState([]);
+  const [showAltContent, setShowAltContent] = useState(
+    component._mave?.showAltContent || false
+  );
+  const [isEditDrawerVisible, setIsEditDrawerVisible] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [form] = Form.useForm();
 
   useEffect(() => {
-    setAccordionData(component._mave || []);
+    setAccordionData(Array.isArray(component._mave) ? component._mave : []);
   }, [component._mave]);
 
   const handleSelectAccordion = (newAccordionData) => {
+    const accordionItems = Array.isArray(newAccordionData)
+      ? newAccordionData
+      : [];
     updateComponent({
       ...component,
-      _mave: newAccordionData,
+      _mave: accordionItems,
       id: component._id,
     });
-    setAccordionData(newAccordionData);
+    setAccordionData(accordionItems);
     setIsModalVisible(false);
     message.success("Accordion updated successfully");
   };
@@ -84,14 +104,63 @@ const AccordionComponent = ({
     setAccordionData(newData);
   };
 
+  const handleEditItem = (item, index) => {
+    setEditingItem({ ...item, index });
+    form.setFieldsValue({
+      title: item.title,
+      altTitle: item.altTitle || "",
+      content: item.content,
+      altContent: item.altContent || "",
+    });
+    setIsEditDrawerVisible(true);
+  };
+
+  const handleSaveItem = () => {
+    form.validateFields().then((values) => {
+      const newData = accordionData.map((item, i) => {
+        if (i === editingItem.index) {
+          return {
+            ...item,
+            title: values.title,
+            altTitle: values.altTitle,
+            content: values.content,
+            altContent: values.altContent,
+          };
+        }
+        return item;
+      });
+      updateComponent({
+        ...component,
+        _mave: newData,
+        id: component._id,
+      });
+      setAccordionData(newData);
+      setIsEditDrawerVisible(false);
+      setEditingItem(null);
+      message.success("Accordion item updated successfully");
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditDrawerVisible(false);
+    setEditingItem(null);
+    form.resetFields();
+  };
+
   const renderPanels = (data) => {
-    return data?.map((item, index) => {
+    if (!Array.isArray(data)) return null;
+    return data.map((item, index) => {
       const headerBg = getColorValue(item.style?.headerBg);
       const headerTextColor = getColorValue(item.style?.headerTextColor);
       const contentBg = getColorValue(item.style?.contentBg);
       const contentTextColor = getColorValue(item.style?.contentTextColor);
       const borderColor = getColorValue(item.style?.borderColor);
       const borderRadius = item.style?.borderRadius || "8px";
+
+      const displayTitle =
+        showAltContent && item.altTitle ? item.altTitle : item.title;
+      const displayContent =
+        showAltContent && item.altContent ? item.altContent : item.content;
 
       return (
         <Panel
@@ -108,9 +177,25 @@ const AccordionComponent = ({
                 }}
               >
                 <Text strong className="text-lg">
-                  {item.title}
+                  {displayTitle}
                 </Text>
               </div>
+              {!preview && (
+                <div className="ml-2">
+                  <Tooltip title="Edit Item">
+                    <Button
+                      type="text"
+                      icon={<SettingOutlined />}
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditItem(item, index);
+                      }}
+                      style={{ color: headerTextColor }}
+                    />
+                  </Tooltip>
+                </div>
+              )}
             </div>
           }
           key={index}
@@ -127,7 +212,7 @@ const AccordionComponent = ({
             {item.contentType === "text" ? (
               <div className="accordion-content">
                 <RichTextEditor
-                  defaultValue={item.content}
+                  defaultValue={displayContent}
                   onChange={(content) => handleContentChange(content, index)}
                   editMode={!preview}
                 />
@@ -238,6 +323,36 @@ const AccordionComponent = ({
         </div>
       )}
 
+      {/* Multi-Language Configuration */}
+      {!preview && accordionData.length > 0 && (
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <h4 className="text-md font-semibold mb-3 flex items-center gap-2">
+            <span>🌐</span>
+            Multi-Language Settings
+          </h4>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium mb-1">Display Alternative Content</p>
+              <p className="text-sm text-gray-600">
+                Show alternative titles and content for accordion items (if
+                available)
+              </p>
+            </div>
+            <Switch
+              checked={showAltContent}
+              onChange={(checked) => {
+                setShowAltContent(checked);
+                updateComponent({
+                  ...component,
+                  _mave: accordionData,
+                  showAltContent: checked,
+                });
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Accordion Selection Modal */}
       {!preview && (
         <AccordionSelectionModal
@@ -246,6 +361,61 @@ const AccordionComponent = ({
           onSelectAccordion={handleSelectAccordion}
           initialData={accordionData}
         />
+      )}
+
+      {/* Edit Item Drawer */}
+      {!preview && (
+        <Drawer
+          title="Edit Accordion Item"
+          placement="right"
+          width={600}
+          onClose={handleCancelEdit}
+          open={isEditDrawerVisible}
+          extra={
+            <Space>
+              <Button onClick={handleCancelEdit}>Cancel</Button>
+              <Button type="primary" onClick={handleSaveItem}>
+                Save
+              </Button>
+            </Space>
+          }
+        >
+          <Form form={form} layout="vertical">
+            <Form.Item
+              name="title"
+              label="Title"
+              rules={[{ required: true, message: "Please enter the title" }]}
+            >
+              <Input placeholder="Enter title" />
+            </Form.Item>
+
+            <Form.Item name="altTitle" label="Alternative Title">
+              <Input placeholder="Enter alternative title (optional)" />
+            </Form.Item>
+
+            <Form.Item
+              name="content"
+              label="Content"
+              rules={[{ required: true, message: "Please enter the content" }]}
+            >
+              <RichTextEditor
+                defaultValue={editingItem?.content || ""}
+                onChange={(content) => form.setFieldValue("content", content)}
+                editMode={true}
+              />
+            </Form.Item>
+
+            <Form.Item name="altContent" label="Alternative Content">
+              <RichTextEditor
+                defaultValue={editingItem?.altContent || ""}
+                onChange={(content) =>
+                  form.setFieldValue("altContent", content)
+                }
+                editMode={true}
+              />
+            </Form.Item>
+          </Form>
+        </Drawer>
       )}
     </div>
   );
