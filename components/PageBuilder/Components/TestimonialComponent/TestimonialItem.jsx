@@ -2,18 +2,26 @@
 
 import React from "react";
 import { Card, Rate, Button, Tooltip, Popconfirm } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  GlobalOutlined,
+} from "@ant-design/icons";
 import Image from "next/image";
 
 const TestimonialItem = ({
   testimonial,
   onEdit,
   onDelete,
+  onEditAltContent,
   font,
   color,
   background,
   preview = false,
   isEditMode,
+  showAltContent = false,
+  getDisplayContent,
+  testimonialIndex,
 }) => {
   const getImageUrl = () => {
     if (!testimonial.image) return null;
@@ -24,6 +32,14 @@ const TestimonialItem = ({
     const baseUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "";
     return `${baseUrl}/${imagePath}`;
   };
+
+  // Get display content based on language preference
+  const displayContent = getDisplayContent
+    ? getDisplayContent(testimonial, showAltContent)
+    : {
+        quote: testimonial.quote || "",
+        author: testimonial.author || "",
+      };
 
   return (
     <Card
@@ -40,6 +56,15 @@ const TestimonialItem = ({
           ? [
               <Tooltip title="Edit">
                 <Button type="text" icon={<EditOutlined />} onClick={onEdit} />
+              </Tooltip>,
+              <Tooltip title="Edit Alternative Content">
+                <Button
+                  type="text"
+                  icon={<GlobalOutlined />}
+                  onClick={() =>
+                    onEditAltContent && onEditAltContent(testimonialIndex)
+                  }
+                />
               </Tooltip>,
               <Tooltip title="Delete">
                 <Popconfirm
@@ -68,9 +93,9 @@ const TestimonialItem = ({
           objectFit="cover"
         />
       )}
-      <p className="italic">"{testimonial.quote}"</p>
+      <p className="italic">"{displayContent.quote}"</p>
       <div className="flex justify-between items-center mt-4">
-        <span className="font-semibold">{testimonial.author}</span>
+        <span className="font-semibold">{displayContent.author}</span>
         <Rate disabled defaultValue={testimonial.rating} />
       </div>
     </Card>

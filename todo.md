@@ -81,58 +81,53 @@ This document tracks the implementation status of multi-language support for Pag
 - **Features**: Alternative accordion item titles and content with toggle switch
 - **Implementation**: Added language switching for accordion items with preview support
 
-## ❌ Widgets Missing Multi-Language Support (7 Remaining)
+## ✅ Widgets WITH Multi-Language Support (12 Total)
 
-### 1. **MediaComponent**
+### 12. **MediaComponent** ✅ **[NEWLY IMPLEMENTED]**
 
 - **File**: `components/PageBuilder/Components/MediaComponent.jsx`
-- **Missing**: Alternative title and description fields for media items
-- **Current Fields**: Only `title` field for media items
-- **Impact**: Cannot add media descriptions in other languages
+- **Has**: `showAltContent` toggle to display alternative titles and descriptions (`altTitle`, `altDescription`)
+- **Features**: Alternative media titles and descriptions with configuration panel
+- **Implementation**: Added multi-language support for media items with toggle switch and preview support
 
-### 2. **TableComponent**
+## ❌ Widgets Missing Multi-Language Support (6 Remaining)
 
-- **File**: `components/PageBuilder/Components/TableComponent.jsx`
-- **Missing**: Alternative title and description fields for table headers and cells
-- **Current Fields**: Only basic table data (headers, rows)
-- **Impact**: Cannot add table content in other languages
-
-### 3. **VideoComponent**
+### 1. **VideoComponent**
 
 - **File**: `components/PageBuilder/Components/VideoComponent.jsx`
 - **Missing**: Alternative title and description fields for video content
 - **Current Fields**: Only video URL and basic configuration
 - **Impact**: Cannot add video titles or descriptions in other languages
 
-### 4. **FormComponent**
+### 2. **FormComponent**
 
 - **File**: `components/PageBuilder/Components/FormComponent.jsx`
 - **Missing**: Alternative title and description fields for form elements
 - **Current Fields**: Only basic form configuration
 - **Impact**: Cannot add form labels and descriptions in other languages
 
-### 9. **IconListComponent**
+### 3. **IconListComponent**
 
 - **File**: `components/PageBuilder/Components/IconListComponent/IconListComponent.jsx`
 - **Missing**: Alternative text fields for icon list items
 - **Current Fields**: Only `text` field for icon items
 - **Impact**: Cannot add icon item descriptions in other languages
 
-### 10. **InfoBoxComponent**
+### 4. **InfoBoxComponent**
 
 - **File**: `components/PageBuilder/Components/InfoBoxComponent/InfoBoxComponent.jsx`
 - **Missing**: Alternative title and description fields for info box content and items
 - **Current Fields**: Only `title` and `description` for main content and info items
 - **Impact**: Cannot add info box content in other languages
 
-### 11. **SliderComponent**
+### 5. **SliderComponent**
 
 - **File**: `components/PageBuilder/Components/SliderComponent/SliderComponent.jsx`
 - **Missing**: Alternative title and description fields for slider content
 - **Current Fields**: Only basic slider configuration and media
 - **Impact**: Cannot add slider content descriptions in other languages
 
-### 12. **TestimonialComponent**
+### 6. **TestimonialComponent**
 
 - **File**: `components/PageBuilder/Components/TestimonialComponent/TestimonialComponent.jsx`
 - **Missing**: Alternative quote and author fields for testimonials
@@ -142,8 +137,8 @@ This document tracks the implementation status of multi-language support for Pag
 ## Summary
 
 - **Total Widgets Analyzed**: 19
-- **Widgets WITH Multi-Language Support**: 8 ✅ (42% Complete)
-- **Widgets Missing Multi-Language Support**: 11 ❌ (58% Remaining)
+- **Widgets WITH Multi-Language Support**: 12 ✅ (63% Complete)
+- **Widgets Missing Multi-Language Support**: 7 ❌ (37% Remaining)
 
 ## ✅ Implementation Progress
 
@@ -154,14 +149,10 @@ This document tracks the implementation status of multi-language support for Pag
 - ✅ **CardComponent** - Bengali content toggle (`title_bn`, `description_bn`)
 - ✅ **MenuComponent** - Bengali menu item titles (`title_bn`)
 - ✅ **NavbarComponent** - Bengali navbar menu titles (`title_bn`)
+- ✅ **MediaComponent** - Alternative titles and descriptions (`altTitle`, `altDescription`)
 
 ### **Phase 2 - REMAINING** (Lower Priority)
 
-- ❌ **AccordionComponent** - Alternative title and content for accordion items
-- ❌ **FooterComponent** - Alternative footer content
-- ❌ **GalleryComponent** - Alternative media descriptions
-- ❌ **GoogleMapComponent** - Alternative map descriptions
-- ❌ **MediaComponent** - Alternative media metadata
 - ❌ **TableComponent** - Alternative table content
 - ❌ **VideoComponent** - Alternative video descriptions
 - ❌ **FormComponent** - Alternative form labels
@@ -184,17 +175,13 @@ This document tracks the implementation status of multi-language support for Pag
 
 ### **Next Steps for Remaining Components:**
 
-1. **AccordionComponent** - Add `altTitle` and `altContent` for each accordion item
-2. **FooterComponent** - Add alternative footer content fields
-3. **GalleryComponent** - Add alternative media descriptions
-4. **MediaComponent** - Add alternative media metadata
-5. **TableComponent** - Add alternative table headers and cell content
-6. **VideoComponent** - Add alternative video titles and descriptions
-7. **FormComponent** - Add alternative form labels and descriptions
-8. **IconListComponent** - Add alternative icon descriptions
-9. **InfoBoxComponent** - Add alternative info box content
-10. **SliderComponent** - Add alternative slider content
-11. **TestimonialComponent** - Add alternative testimonial content
+1. **TableComponent** - Add alternative table headers and cell content
+2. **VideoComponent** - Add alternative video titles and descriptions
+3. **FormComponent** - Add alternative form labels and descriptions
+4. **IconListComponent** - Add alternative icon descriptions
+5. **InfoBoxComponent** - Add alternative info box content
+6. **SliderComponent** - Add alternative slider content
+7. **TestimonialComponent** - Add alternative testimonial content
 
 ## 📊 Impact Assessment
 
@@ -202,11 +189,12 @@ This document tracks the implementation status of multi-language support for Pag
 
 - Content-heavy widgets (Paragraph, Card, Button) now support multi-language
 - Navigation components (Menu, Navbar) now support multi-language
+- Media components (MediaComponent) now support multi-language
 - All implementations maintain backward compatibility
 - Consistent user experience across all implemented components
 
 **Remaining Impact:**
 
-- Media and specialized components still need multi-language support
+- Specialized components (Table, Video, Form) still need multi-language support
 - Form components need localization for better accessibility
 - Complex components (Accordion, Table) need structured multi-language approach

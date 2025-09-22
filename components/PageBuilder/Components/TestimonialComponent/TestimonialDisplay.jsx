@@ -14,9 +14,12 @@ const TestimonialDisplay = ({
   background,
   handleEditTestimonial,
   handleDeleteTestimonial,
+  handleEditAltContent,
   preview,
   containerStyle,
   isEditMode,
+  showAltContent,
+  getDisplayContent,
 }) => {
   const renderTestimonialGrid = () => {
     return (
@@ -33,11 +36,15 @@ const TestimonialDisplay = ({
               testimonial={testimonial}
               onEdit={() => handleEditTestimonial(testimonial, index)}
               onDelete={() => handleDeleteTestimonial(testimonial.id)}
+              onEditAltContent={handleEditAltContent}
               font={font}
               color={color}
               background={background}
               preview={preview}
               isEditMode={isEditMode}
+              showAltContent={showAltContent}
+              getDisplayContent={getDisplayContent}
+              testimonialIndex={index}
             />
           </Col>
         ))}
@@ -54,10 +61,15 @@ const TestimonialDisplay = ({
             testimonial={testimonial}
             onEdit={() => handleEditTestimonial(testimonial, index)}
             onDelete={() => handleDeleteTestimonial(testimonial.id)}
+            onEditAltContent={handleEditAltContent}
             font={font}
             color={color}
             background={background}
             preview={preview}
+            isEditMode={isEditMode}
+            showAltContent={showAltContent}
+            getDisplayContent={getDisplayContent}
+            testimonialIndex={index}
           />
         ))}
       </div>

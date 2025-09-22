@@ -1,19 +1,26 @@
 // components/PageBuilder/Components/TestimonialComponent/TestimonialComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import { Button, Form, message, Typography, Space, Popconfirm } from "antd";
 import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  CopyFilled,
-} from "@ant-design/icons";
+  Button,
+  Form,
+  message,
+  Typography,
+  Space,
+  Popconfirm,
+  Switch,
+  Modal,
+  Collapse,
+  Input,
+} from "antd";
+import { PlusOutlined, CopyFilled, GlobalOutlined } from "@ant-design/icons";
 import MediaSelectionModal from "../../Modals/MediaSelectionModal";
 import ConfigSection from "./ConfigSection";
 import TestimonialDisplay from "./TestimonialDisplay";
 import TestimonialForm from "./TestimonialForm";
 
 const { Paragraph } = Typography;
+const { Panel } = Collapse;
 
 const TestimonialComponent = ({
   component,
@@ -22,48 +29,94 @@ const TestimonialComponent = ({
   preview = false,
   onDuplicateElement,
 }) => {
-  const [testimonials, setTestimonials] = useState(
-    component._mave?.testimonials || []
-  );
+  const [testimonials, setTestimonials] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEdit, setCurrentEdit] = useState(null);
-  const [layout, setLayout] = useState(component._mave?.layout || "grid");
-  const [font, setFont] = useState(component._mave?.font || "Arial");
-  const [color, setColor] = useState(component._mave?.color || "#000000");
-  const [background, setBackground] = useState(
-    component._mave?.background || "#ffffff"
-  );
+  const [layout, setLayout] = useState("grid");
+  const [font, setFont] = useState("Arial");
+  const [color, setColor] = useState("#000000");
+  const [background, setBackground] = useState("#ffffff");
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showAltContent, setShowAltContent] = useState(false);
+  const [editAltContentModal, setEditAltContentModal] = useState(false);
+  const [editingTestimonialIndex, setEditingTestimonialIndex] = useState(null);
 
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
+  const [altForm] = Form.useForm();
 
+  // Sync state with component prop changes
   useEffect(() => {
-    if (isEditMode) {
-      updateComponent({
-        ...component,
-        _mave: {
-          testimonials,
-          layout,
-          font,
-          color,
-          background,
-        },
-      });
+    if (component?._mave) {
+      setTestimonials(component._mave.testimonials || []);
+      setLayout(component._mave.layout || "grid");
+      setFont(component._mave.font || "Arial");
+      setColor(component._mave.color || "#000000");
+      setBackground(component._mave.background || "#ffffff");
+      setShowAltContent(component._mave.showAltContent || false);
     }
-  }, [
-    isEditMode,
-    testimonials,
-    layout,
-    font,
-    color,
-    background,
-    updateComponent,
-    component,
-  ]);
+  }, [component?._mave]);
+
+  // Helper function to get display content based on language preference
+  const getDisplayContent = (testimonial, showAlt = false) => {
+    if (!testimonial) return { quote: "", author: "" };
+
+    if (showAlt) {
+      return {
+        quote: testimonial.altQuote || testimonial.quote || "",
+        author: testimonial.altAuthor || testimonial.author || "",
+      };
+    }
+
+    return {
+      quote: testimonial.quote || "",
+      author: testimonial.author || "",
+    };
+  };
+
+  // Function to handle editing alternative content for a specific testimonial
+  const handleEditAltContent = (index) => {
+    setEditingTestimonialIndex(index);
+    const testimonial = testimonials[index];
+    altForm.setFieldsValue({
+      altQuote: testimonial.altQuote || "",
+      altAuthor: testimonial.altAuthor || "",
+    });
+    setEditAltContentModal(true);
+  };
+
+  // Function to save alternative content
+  const handleSaveAltContent = (values) => {
+    const updatedTestimonials = [...testimonials];
+    updatedTestimonials[editingTestimonialIndex] = {
+      ...updatedTestimonials[editingTestimonialIndex],
+      altQuote: values.altQuote,
+      altAuthor: values.altAuthor,
+    };
+
+    setTestimonials(updatedTestimonials);
+
+    // Update component immediately
+    updateComponent({
+      ...component,
+      _mave: {
+        testimonials: updatedTestimonials,
+        layout,
+        font,
+        color,
+        background,
+        showAltContent,
+      },
+    });
+
+    setEditAltContentModal(false);
+    setEditingTestimonialIndex(null);
+    altForm.resetFields();
+    message.success("Alternative content updated successfully.");
+  };
 
   const handleAddTestimonial = () => {
     if (!preview && isEditMode) {
@@ -80,8 +133,25 @@ const TestimonialComponent = ({
       author: values.author,
       rating: values.rating,
       image: selectedImage,
+      altQuote: values.altQuote || "",
+      altAuthor: values.altAuthor || "",
     };
-    setTestimonials([...testimonials, newTestimonial]);
+    const updatedTestimonials = [...testimonials, newTestimonial];
+    setTestimonials(updatedTestimonials);
+
+    // Update component immediately
+    updateComponent({
+      ...component,
+      _mave: {
+        testimonials: updatedTestimonials,
+        layout,
+        font,
+        color,
+        background,
+        showAltContent,
+      },
+    });
+
     setIsAdding(false);
     setSelectedImage(null);
     form.resetFields();
@@ -98,6 +168,8 @@ const TestimonialComponent = ({
         author: testimonial.author,
         rating: testimonial.rating,
         image: testimonial.image,
+        altQuote: testimonial.altQuote || "",
+        altAuthor: testimonial.altAuthor || "",
       });
     }
   };
@@ -109,12 +181,27 @@ const TestimonialComponent = ({
       author: values.author,
       rating: values.rating,
       image: selectedImage,
+      altQuote: values.altQuote || "",
+      altAuthor: values.altAuthor || "",
     };
-    setTestimonials(
-      testimonials.map((t) =>
-        t.id === updatedTestimonial.id ? updatedTestimonial : t
-      )
+    const updatedTestimonials = testimonials.map((t) =>
+      t.id === updatedTestimonial.id ? updatedTestimonial : t
     );
+    setTestimonials(updatedTestimonials);
+
+    // Update component immediately
+    updateComponent({
+      ...component,
+      _mave: {
+        testimonials: updatedTestimonials,
+        layout,
+        font,
+        color,
+        background,
+        showAltContent,
+      },
+    });
+
     setIsEditing(false);
     setCurrentEdit(null);
     setSelectedImage(null);
@@ -124,7 +211,21 @@ const TestimonialComponent = ({
 
   const handleDeleteTestimonial = (id) => {
     if (!preview && isEditMode) {
-      setTestimonials(testimonials.filter((t) => t.id !== id));
+      const updatedTestimonials = testimonials.filter((t) => t.id !== id);
+      setTestimonials(updatedTestimonials);
+
+      // Update component immediately
+      updateComponent({
+        ...component,
+        _mave: {
+          testimonials: updatedTestimonials,
+          layout,
+          font,
+          color,
+          background,
+        },
+      });
+
       message.success("Testimonial deleted successfully.");
     }
   };
@@ -148,6 +249,7 @@ const TestimonialComponent = ({
           background,
         },
       });
+      message.success("Changes saved successfully.");
     }
     setIsEditMode(!isEditMode);
   };
@@ -218,10 +320,60 @@ const TestimonialComponent = ({
             font={font}
             color={color}
             background={background}
-            handleLayoutChange={setLayout}
-            handleFontChange={setFont}
-            handleColorChange={(e) => setColor(e.target.value)}
-            handleBackgroundChange={(e) => setBackground(e.target.value)}
+            handleLayoutChange={(newLayout) => {
+              setLayout(newLayout);
+              updateComponent({
+                ...component,
+                _mave: {
+                  testimonials,
+                  layout: newLayout,
+                  font,
+                  color,
+                  background,
+                },
+              });
+            }}
+            handleFontChange={(newFont) => {
+              setFont(newFont);
+              updateComponent({
+                ...component,
+                _mave: {
+                  testimonials,
+                  layout,
+                  font: newFont,
+                  color,
+                  background,
+                },
+              });
+            }}
+            handleColorChange={(e) => {
+              const newColor = e.target.value;
+              setColor(newColor);
+              updateComponent({
+                ...component,
+                _mave: {
+                  testimonials,
+                  layout,
+                  font,
+                  color: newColor,
+                  background,
+                },
+              });
+            }}
+            handleBackgroundChange={(e) => {
+              const newBackground = e.target.value;
+              setBackground(newBackground);
+              updateComponent({
+                ...component,
+                _mave: {
+                  testimonials,
+                  layout,
+                  font,
+                  color,
+                  background: newBackground,
+                },
+              });
+            }}
             preview={preview}
           />
 
@@ -271,9 +423,12 @@ const TestimonialComponent = ({
         background={background}
         handleEditTestimonial={handleEditTestimonial}
         handleDeleteTestimonial={handleDeleteTestimonial}
+        handleEditAltContent={handleEditAltContent}
         preview={preview}
         containerStyle={containerStyle}
         isEditMode={isEditMode}
+        showAltContent={showAltContent}
+        getDisplayContent={getDisplayContent}
       />
 
       {!isAdding && !isEditing && (
@@ -289,6 +444,61 @@ const TestimonialComponent = ({
         </div>
       )}
 
+      {/* Multi-Language Configuration */}
+      {testimonials.length > 0 && (
+        <Collapse className="mt-4">
+          <Panel
+            header={
+              <div className="flex items-center gap-2">
+                <GlobalOutlined />
+                Multi-Language Settings
+              </div>
+            }
+            key="multilang"
+          >
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-md font-semibold">
+                    Display Alternative Content
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Toggle to show alternative quotes and author names for
+                    testimonials
+                  </p>
+                </div>
+                <Switch
+                  checked={showAltContent}
+                  onChange={(checked) => {
+                    setShowAltContent(checked);
+                    updateComponent({
+                      ...component,
+                      _mave: {
+                        testimonials,
+                        layout,
+                        font,
+                        color,
+                        background,
+                        showAltContent: checked,
+                      },
+                    });
+                  }}
+                />
+              </div>
+
+              {showAltContent && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <div className="text-sm text-blue-800">
+                    <strong>Alternative Content Mode:</strong> Testimonials will
+                    display alternative quotes and author names when available.
+                  </div>
+                </div>
+              )}
+            </div>
+          </Panel>
+        </Collapse>
+      )}
+
       {!preview && isEditMode && (
         <MediaSelectionModal
           isVisible={isImageModalVisible}
@@ -301,6 +511,62 @@ const TestimonialComponent = ({
           selectionMode="single"
         />
       )}
+
+      {/* Modal for editing alternative content */}
+      <Modal
+        title="Edit Alternative Content"
+        open={editAltContentModal}
+        onCancel={() => {
+          setEditAltContentModal(false);
+          setEditingTestimonialIndex(null);
+          altForm.resetFields();
+        }}
+        footer={null}
+        width={600}
+      >
+        <Form form={altForm} layout="vertical" onFinish={handleSaveAltContent}>
+          <Form.Item
+            label="Alternative Quote"
+            name="altQuote"
+            rules={[
+              { required: true, message: "Please enter an alternative quote." },
+            ]}
+          >
+            <Input.TextArea
+              rows={4}
+              placeholder="Enter alternative quote in another language"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Alternative Author"
+            name="altAuthor"
+            rules={[
+              {
+                required: true,
+                message: "Please enter an alternative author name.",
+              },
+            ]}
+          >
+            <Input placeholder="Enter alternative author name in another language" />
+          </Form.Item>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              onClick={() => {
+                setEditAltContentModal(false);
+                setEditingTestimonialIndex(null);
+                altForm.resetFields();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Save Changes
+            </Button>
+          </div>
+        </Form>
+      </Modal>
     </div>
   );
 };

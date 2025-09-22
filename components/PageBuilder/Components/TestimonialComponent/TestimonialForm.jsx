@@ -53,6 +53,25 @@ const TestimonialForm = ({
       >
         <Input placeholder="Enter author's name" />
       </Form.Item>
+
+      <Form.Item
+        label="Alternative Quote (Optional)"
+        name="altQuote"
+        help="Enter the quote in another language for multilingual support"
+      >
+        <Input.TextArea
+          rows={4}
+          placeholder="Enter alternative quote in another language"
+        />
+      </Form.Item>
+
+      <Form.Item
+        label="Alternative Author (Optional)"
+        name="altAuthor"
+        help="Enter the author's name in another language for multilingual support"
+      >
+        <Input placeholder="Enter alternative author name in another language" />
+      </Form.Item>
       <Form.Item label="Rating" name="rating" initialValue={5}>
         <Rate />
       </Form.Item>
