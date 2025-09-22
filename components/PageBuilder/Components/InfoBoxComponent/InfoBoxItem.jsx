@@ -1,6 +1,11 @@
-import React from "react";
-import { Card, Button, Tooltip } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Card, Button, Tooltip, Input, Form } from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
 import Image from "next/image";
 import styles from "./InfoBoxItem.module.css";
 
@@ -8,11 +13,58 @@ const InfoBoxItem = ({
   item,
   onEdit,
   onDelete,
+  onUpdate,
   font,
   color,
   background,
   preview = false,
+  showAltContent = false,
 }) => {
+  const [isEditingAlt, setIsEditingAlt] = useState(false);
+  const [tempAltTitle, setTempAltTitle] = useState(item.altTitle || "");
+  const [tempAltDescription, setTempAltDescription] = useState(
+    item.altDescription || ""
+  );
+
+  // Helper function to get display content based on language preference
+  const getDisplayContent = () => {
+    if (showAltContent) {
+      return {
+        title: item.altTitle || item.title || "",
+        description: item.altDescription || item.description || "",
+      };
+    }
+    return {
+      title: item.title || "",
+      description: item.description || "",
+    };
+  };
+
+  const displayContent = getDisplayContent();
+
+  const handleEditAltContent = () => {
+    setTempAltTitle(item.altTitle || "");
+    setTempAltDescription(item.altDescription || "");
+    setIsEditingAlt(true);
+  };
+
+  const handleSaveAltContent = () => {
+    if (onUpdate) {
+      onUpdate({
+        ...item,
+        altTitle: tempAltTitle,
+        altDescription: tempAltDescription,
+      });
+    }
+    setIsEditingAlt(false);
+  };
+
+  const handleCancelAltContent = () => {
+    setTempAltTitle(item.altTitle || "");
+    setTempAltDescription(item.altDescription || "");
+    setIsEditingAlt(false);
+  };
+
   return (
     <Card
       style={{
@@ -28,6 +80,14 @@ const InfoBoxItem = ({
           ? [
               <Tooltip title="Edit">
                 <Button type="text" icon={<EditOutlined />} onClick={onEdit} />
+              </Tooltip>,
+              <Tooltip title="Edit Alt Content">
+                <Button
+                  type="text"
+                  icon={<EditOutlined />}
+                  onClick={handleEditAltContent}
+                  style={{ color: "#1890ff" }}
+                />
               </Tooltip>,
               <Tooltip title="Delete">
                 <Button
@@ -56,8 +116,55 @@ const InfoBoxItem = ({
           ))}
         </div>
       )}
-      <h4 className={styles.title}>{item.title}</h4>
-      <p className={styles.description}>{item.description}</p>
+      <h4 className={styles.title}>{displayContent.title}</h4>
+      <p className={styles.description}>{displayContent.description}</p>
+
+      {/* Alt Content Editing Section */}
+      {!preview && isEditingAlt && (
+        <div className="mt-4 p-3 bg-blue-50 rounded border">
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Alternative Title
+            </label>
+            <Input
+              value={tempAltTitle}
+              onChange={(e) => setTempAltTitle(e.target.value)}
+              placeholder="Enter alternative title"
+              size="small"
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Alternative Description
+            </label>
+            <Input.TextArea
+              value={tempAltDescription}
+              onChange={(e) => setTempAltDescription(e.target.value)}
+              placeholder="Enter alternative description"
+              rows={3}
+              size="small"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              size="small"
+              onClick={handleCancelAltContent}
+              className="mavecancelbutton"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="small"
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={handleSaveAltContent}
+              className="mavebutton"
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

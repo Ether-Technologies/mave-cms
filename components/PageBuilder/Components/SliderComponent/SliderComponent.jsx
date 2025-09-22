@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Modal, message, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Modal, message, Button, Collapse, Switch, Form, Input } from "antd";
+import { EditOutlined, GlobalOutlined, CheckOutlined } from "@ant-design/icons";
 import SliderRenderer from "./SliderRenderer";
 import { useSliderRefresh } from "./SliderRefresh";
 import SliderConfig from "./SliderConfig";
 import SliderActions from "./SliderActions";
 import SliderSelectionModal from "../../Modals/SliderSelectionModal";
+
+const { Panel } = Collapse;
 
 const SliderComponent = ({
   component,
@@ -26,6 +28,17 @@ const SliderComponent = ({
     speed: component._mave?.config?.speed ?? 500,
     height: component._mave?.config?.height ?? 400,
   });
+  const [showAltContent, setShowAltContent] = useState(false);
+  const [showAltInputs, setShowAltInputs] = useState(false);
+  const [showSliderAltInputs, setShowSliderAltInputs] = useState(false);
+  const [sliderAltTitle, setSliderAltTitle] = useState(
+    component._mave?.altTitle || ""
+  );
+  const [sliderAltDescription, setSliderAltDescription] = useState(
+    component._mave?.altDescription || ""
+  );
+  const [tempSliderAltTitle, setTempSliderAltTitle] = useState("");
+  const [tempSliderAltDescription, setTempSliderAltDescription] = useState("");
 
   // Use the refresh hook with isEditing state and preview mode
   const { isRefreshing, pollingError, handleManualRefresh } = useSliderRefresh(
@@ -39,6 +52,9 @@ const SliderComponent = ({
   // Synchronize sliderData with component._mave when it changes
   useEffect(() => {
     setSliderData(component._mave);
+    setShowAltContent(component._mave?.showAltContent || false);
+    setSliderAltTitle(component._mave?.altTitle || "");
+    setSliderAltDescription(component._mave?.altDescription || "");
 
     // Also sync the config if it exists
     if (component._mave?.config) {
@@ -115,6 +131,42 @@ const SliderComponent = ({
     deleteComponent();
   }, [deleteComponent]);
 
+  // Handle Main Slider Alt Content Edit
+  const handleEditSliderAltContent = useCallback(() => {
+    setTempSliderAltTitle(sliderAltTitle);
+    setTempSliderAltDescription(sliderAltDescription);
+    setShowSliderAltInputs(true);
+  }, [sliderAltTitle, sliderAltDescription]);
+
+  // Handle Main Slider Alt Content Save
+  const handleSaveSliderAltContent = useCallback(() => {
+    setSliderAltTitle(tempSliderAltTitle);
+    setSliderAltDescription(tempSliderAltDescription);
+    updateComponent({
+      ...component,
+      _mave: {
+        ...sliderData,
+        altTitle: tempSliderAltTitle,
+        altDescription: tempSliderAltDescription,
+      },
+    });
+    setShowSliderAltInputs(false);
+    message.success("Main slider alternative content updated successfully.");
+  }, [
+    tempSliderAltTitle,
+    tempSliderAltDescription,
+    component,
+    sliderData,
+    updateComponent,
+  ]);
+
+  // Handle Main Slider Alt Content Cancel
+  const handleCancelSliderAltContent = useCallback(() => {
+    setTempSliderAltTitle(sliderAltTitle);
+    setTempSliderAltDescription(sliderAltDescription);
+    setShowSliderAltInputs(false);
+  }, [sliderAltTitle, sliderAltDescription]);
+
   // If in preview mode, render the slider content only
   if (preview) {
     return (
@@ -182,6 +234,388 @@ const SliderComponent = ({
         <div className="mt-4">
           <SliderConfig config={sliderConfig} setConfig={setSliderConfig} />
         </div>
+      )}
+
+      {/* Multi-Language Configuration */}
+      {sliderData && !preview && (
+        <Collapse className="mt-4">
+          <Panel
+            header={
+              <div className="flex items-center gap-2">
+                <GlobalOutlined />
+                Multi-Language Settings
+              </div>
+            }
+            key="multilang"
+          >
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-md font-semibold">
+                    Display Alternative Content
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Toggle to show alternative titles and descriptions for
+                    slider items
+                  </p>
+                </div>
+                <Switch
+                  checked={showAltContent}
+                  onChange={(checked) => {
+                    setShowAltContent(checked);
+                    updateComponent({
+                      ...component,
+                      _mave: {
+                        ...sliderData,
+                        showAltContent: checked,
+                      },
+                    });
+                  }}
+                />
+              </div>
+
+              {showAltContent && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <div className="text-sm text-blue-800">
+                    <strong>Alternative Content Mode:</strong> Slider items will
+                    display alternative titles and descriptions when available.
+                  </div>
+                </div>
+              )}
+
+              {/* Main Slider Alternative Content */}
+              <div className="mt-6 p-4 bg-white rounded-lg border">
+                <div className="flex items-center justify-between mb-4">
+                  <h5 className="text-lg font-semibold flex items-center gap-2">
+                    <EditOutlined />
+                    Main Slider Alternative Content
+                  </h5>
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={handleEditSliderAltContent}
+                    className="mavebutton"
+                    size="small"
+                  >
+                    Edit
+                  </Button>
+                </div>
+
+                {showSliderAltInputs ? (
+                  <div className="space-y-4">
+                    <Form layout="vertical" className="w-full">
+                      <Form.Item label="Alternative Title" className="mb-3">
+                        <Input
+                          placeholder="Enter alternative title for the slider"
+                          value={tempSliderAltTitle}
+                          onChange={(e) =>
+                            setTempSliderAltTitle(e.target.value)
+                          }
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Alternative Description"
+                        className="mb-3"
+                      >
+                        <Input.TextArea
+                          rows={3}
+                          placeholder="Enter alternative description for the slider"
+                          value={tempSliderAltDescription}
+                          onChange={(e) =>
+                            setTempSliderAltDescription(e.target.value)
+                          }
+                        />
+                      </Form.Item>
+                    </Form>
+
+                    {/* Save/Cancel Buttons */}
+                    <div className="mt-4 flex justify-end gap-2">
+                      <Button
+                        onClick={handleCancelSliderAltContent}
+                        className="mavecancelbutton"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="primary"
+                        icon={<CheckOutlined />}
+                        onClick={handleSaveSliderAltContent}
+                        className="mavebutton"
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Display Current Main Slider Alternative Content */
+                  <div className="border rounded-lg p-3 bg-blue-50">
+                    <div className="font-medium text-sm mb-2">Main Slider</div>
+                    <div className="text-sm">
+                      <div>
+                        <strong>Alt Title:</strong>{" "}
+                        {sliderAltTitle || "Not set"}
+                      </div>
+                      <div>
+                        <strong>Alt Description:</strong>{" "}
+                        {sliderAltDescription || "Not set"}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Individual Items Alternative Content Editing Section */}
+              <div className="mt-6 p-4 bg-white rounded-lg border">
+                <div className="flex items-center justify-between mb-4">
+                  <h5 className="text-lg font-semibold flex items-center gap-2">
+                    <EditOutlined />
+                    Individual Items Alternative Content
+                  </h5>
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={() => setShowAltInputs(true)}
+                    className="mavebutton"
+                    size="small"
+                  >
+                    Edit
+                  </Button>
+                </div>
+
+                {showAltInputs ? (
+                  <div className="space-y-4">
+                    {sliderData.type === "image" &&
+                      sliderData.medias &&
+                      sliderData.medias.map((media, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-lg p-4 bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
+                              alt={media.title || "Media"}
+                              className="w-16 h-12 rounded object-cover"
+                            />
+                            <div>
+                              <div className="font-medium text-sm">
+                                {media.title || media.file_name || "Untitled"}
+                              </div>
+                            </div>
+                          </div>
+
+                          <Form layout="vertical" className="w-full">
+                            <Form.Item
+                              label="Alternative Title"
+                              className="mb-3"
+                            >
+                              <Input
+                                placeholder="Enter alternative title"
+                                defaultValue={media.altTitle || ""}
+                                onChange={(e) => {
+                                  const updatedMedias = [...sliderData.medias];
+                                  updatedMedias[index] = {
+                                    ...updatedMedias[index],
+                                    altTitle: e.target.value,
+                                  };
+                                  setSliderData({
+                                    ...sliderData,
+                                    medias: updatedMedias,
+                                  });
+                                }}
+                              />
+                            </Form.Item>
+
+                            <Form.Item
+                              label="Alternative Description"
+                              className="mb-3"
+                            >
+                              <Input.TextArea
+                                rows={3}
+                                placeholder="Enter alternative description"
+                                defaultValue={media.altDescription || ""}
+                                onChange={(e) => {
+                                  const updatedMedias = [...sliderData.medias];
+                                  updatedMedias[index] = {
+                                    ...updatedMedias[index],
+                                    altDescription: e.target.value,
+                                  };
+                                  setSliderData({
+                                    ...sliderData,
+                                    medias: updatedMedias,
+                                  });
+                                }}
+                              />
+                            </Form.Item>
+                          </Form>
+                        </div>
+                      ))}
+
+                    {sliderData.type === "card" &&
+                      sliderData.cards &&
+                      sliderData.cards.map((card, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-lg p-4 bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            {card.image && (
+                              <img
+                                src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${card.image.file_path}`}
+                                alt={card.title || "Card"}
+                                className="w-16 h-12 rounded object-cover"
+                              />
+                            )}
+                            <div>
+                              <div className="font-medium text-sm">
+                                {card.title || "Untitled Card"}
+                              </div>
+                            </div>
+                          </div>
+
+                          <Form layout="vertical" className="w-full">
+                            <Form.Item
+                              label="Alternative Title"
+                              className="mb-3"
+                            >
+                              <Input
+                                placeholder="Enter alternative title"
+                                defaultValue={card.altTitle || ""}
+                                onChange={(e) => {
+                                  const updatedCards = [...sliderData.cards];
+                                  updatedCards[index] = {
+                                    ...updatedCards[index],
+                                    altTitle: e.target.value,
+                                  };
+                                  setSliderData({
+                                    ...sliderData,
+                                    cards: updatedCards,
+                                  });
+                                }}
+                              />
+                            </Form.Item>
+
+                            <Form.Item
+                              label="Alternative Description"
+                              className="mb-3"
+                            >
+                              <Input.TextArea
+                                rows={3}
+                                placeholder="Enter alternative description"
+                                defaultValue={card.altDescription || ""}
+                                onChange={(e) => {
+                                  const updatedCards = [...sliderData.cards];
+                                  updatedCards[index] = {
+                                    ...updatedCards[index],
+                                    altDescription: e.target.value,
+                                  };
+                                  setSliderData({
+                                    ...sliderData,
+                                    cards: updatedCards,
+                                  });
+                                }}
+                              />
+                            </Form.Item>
+                          </Form>
+                        </div>
+                      ))}
+
+                    {/* Update Button */}
+                    <div className="mt-4 flex justify-end">
+                      <Button
+                        type="primary"
+                        icon={<CheckOutlined />}
+                        onClick={() => {
+                          updateComponent({
+                            ...component,
+                            _mave: sliderData,
+                          });
+                          setShowAltInputs(false);
+                          message.success(
+                            "Alternative content updated successfully."
+                          );
+                        }}
+                        className="mavebutton"
+                      >
+                        Update Alternative Content
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Display Current Individual Items Alternative Content */
+                  <div className="space-y-3">
+                    {sliderData.type === "image" &&
+                      sliderData.medias &&
+                      sliderData.medias.map((media, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-lg p-3 bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
+                              alt={media.title || "Media"}
+                              className="w-12 h-8 rounded object-cover"
+                            />
+                            <div>
+                              <div className="font-medium text-sm">
+                                {media.title || media.file_name || "Untitled"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-sm">
+                            <div>
+                              <strong>Alt Title:</strong>{" "}
+                              {media.altTitle || "Not set"}
+                            </div>
+                            <div>
+                              <strong>Alt Description:</strong>{" "}
+                              {media.altDescription || "Not set"}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                    {sliderData.type === "card" &&
+                      sliderData.cards &&
+                      sliderData.cards.map((card, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-lg p-3 bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            {card.image && (
+                              <img
+                                src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${card.image.file_path}`}
+                                alt={card.title || "Card"}
+                                className="w-12 h-8 rounded object-cover"
+                              />
+                            )}
+                            <div>
+                              <div className="font-medium text-sm">
+                                {card.title || "Untitled Card"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-sm">
+                            <div>
+                              <strong>Alt Title:</strong>{" "}
+                              {card.altTitle || "Not set"}
+                            </div>
+                            <div>
+                              <strong>Alt Description:</strong>{" "}
+                              {card.altDescription || "Not set"}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Panel>
+        </Collapse>
       )}
 
       <SliderSelectionModal

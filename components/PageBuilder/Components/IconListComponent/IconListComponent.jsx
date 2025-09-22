@@ -1,18 +1,40 @@
 // components/PageBuilder/Components/IconListComponent/IconListComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import { Button, Popconfirm, Select, Space, message, Typography } from "antd";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Popconfirm,
+  Select,
+  Space,
+  message,
+  Typography,
+  Collapse,
+  Switch,
+  Form,
+  Input,
+  Tooltip,
+} from "antd";
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  GlobalOutlined,
+  EditOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  CopyFilled,
+} from "@ant-design/icons";
 import IconListItem from "./IconListItem";
 import IconListSelectionModal from "../../Modals/IconListSelectionModal/IconListSelectionModal";
 const { Paragraph } = Typography;
 const { Option } = Select;
+const { Panel } = Collapse;
 
 const IconListComponent = ({
   component,
   updateComponent,
   deleteComponent,
   preview = false, // New prop with default value
+  onDuplicateElement,
 }) => {
   const [items, setItems] = useState(component._mave?.items || []);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -23,8 +45,30 @@ const IconListComponent = ({
   const [iconColor, setIconColor] = useState(
     component._mave?.iconColor || "#000000"
   );
+  const [showAltContent, setShowAltContent] = useState(false);
+  const [showAltInputs, setShowAltInputs] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempData, setTempData] = useState({});
+
+  // Remove the automatic update useEffect to prevent infinite loops
+  // Updates will be handled manually through save button
 
   useEffect(() => {
+    setShowAltContent(component._mave?.showAltContent || false);
+  }, [component._mave?.showAltContent]);
+
+  const handleEditClick = () => {
+    setTempData({
+      items: [...items],
+      orientation,
+      iconSize,
+      iconColor,
+      showAltContent,
+    });
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
     updateComponent({
       ...component,
       _mave: {
@@ -32,13 +76,24 @@ const IconListComponent = ({
         orientation,
         iconSize,
         iconColor,
+        showAltContent,
       },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, orientation, iconSize, iconColor]);
+    setIsEditing(false);
+    message.success("Icon list updated successfully.");
+  };
+
+  const handleCancel = () => {
+    setItems(tempData.items || []);
+    setOrientation(tempData.orientation || "vertical");
+    setIconSize(tempData.iconSize || 24);
+    setIconColor(tempData.iconColor || "#000000");
+    setShowAltContent(tempData.showAltContent || false);
+    setIsEditing(false);
+  };
 
   const handleAddItem = () => {
-    if (!preview) {
+    if (!preview && isEditing) {
       setIsModalVisible(true);
     }
   };
@@ -59,7 +114,7 @@ const IconListComponent = ({
   };
 
   const handleUpdateItem = (id, updatedItem) => {
-    if (!preview) {
+    if (!preview && isEditing) {
       const newItems = items.map((item) =>
         item.id === id ? updatedItem : item
       );
@@ -69,7 +124,7 @@ const IconListComponent = ({
   };
 
   const handleDeleteItem = (id) => {
-    if (!preview) {
+    if (!preview && isEditing) {
       const newItems = items.filter((item) => item.id !== id);
       setItems(newItems);
       message.success("Item deleted successfully.");
@@ -77,19 +132,19 @@ const IconListComponent = ({
   };
 
   const handleOrientationChange = (value) => {
-    if (!preview) {
+    if (!preview && isEditing) {
       setOrientation(value);
     }
   };
 
   const handleIconSizeChange = (value) => {
-    if (!preview) {
+    if (!preview && isEditing) {
       setIconSize(value);
     }
   };
 
   const handleIconColorChange = (e) => {
-    if (!preview) {
+    if (!preview && isEditing) {
       setIconColor(e.target.value);
     }
   };
@@ -105,26 +160,65 @@ const IconListComponent = ({
       {!preview && (
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Icon List Component</h3>
-          <div>
-            <Popconfirm
-              title="Are you sure you want to delete this component?"
-              onConfirm={handleDeleteComponent}
-              okText="Yes"
-              cancelText="No"
-              okButtonProps={{ danger: true }}
-            >
-              <Button
-                className="mavecancelbutton"
-                icon={<DeleteOutlined />}
-                danger
-              />
-            </Popconfirm>
-          </div>
+          <Space>
+            {!isEditing ? (
+              <>
+                <Tooltip title="Edit component">
+                  <Button
+                    icon={<EditOutlined />}
+                    onClick={handleEditClick}
+                    className="mavebutton"
+                  >
+                    Edit
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Duplicate component">
+                  <Button
+                    icon={<CopyFilled />}
+                    onClick={onDuplicateElement}
+                    className="mavebutton"
+                  />
+                </Tooltip>
+                <Popconfirm
+                  title="Are you sure you want to delete this component?"
+                  onConfirm={handleDeleteComponent}
+                  okText="Yes"
+                  cancelText="No"
+                  okButtonProps={{ danger: true }}
+                >
+                  <Tooltip title="Delete component">
+                    <Button icon={<DeleteOutlined />} danger />
+                  </Tooltip>
+                </Popconfirm>
+              </>
+            ) : (
+              <>
+                <Tooltip title="Save changes">
+                  <Button
+                    icon={<CheckOutlined />}
+                    onClick={handleSave}
+                    className="mavebutton"
+                  >
+                    Save
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Cancel editing">
+                  <Button
+                    icon={<CloseOutlined />}
+                    onClick={handleCancel}
+                    className="mavecancelbutton"
+                  >
+                    Cancel
+                  </Button>
+                </Tooltip>
+              </>
+            )}
+          </Space>
         </div>
       )}
 
       {/* Configurations (Only in Edit Mode) */}
-      {!preview && (
+      {!preview && isEditing && (
         <div className="flex flex-wrap gap-4 mb-4">
           <Select
             value={orientation}
@@ -182,15 +276,16 @@ const IconListComponent = ({
                   handleUpdateItem(item.id, updatedItem)
                 }
                 onDelete={() => handleDeleteItem(item.id)}
-                preview={preview}
+                preview={preview || !isEditing}
+                showAltContent={showAltContent}
               />
             ))
-          : !preview && (
+          : (!preview || isEditing) && (
               <Paragraph>
                 No icons added. Click "Add Icon" to get started.
               </Paragraph>
             )}
-        {!preview && (
+        {!preview && isEditing && (
           <Button
             type="dashed"
             icon={<PlusOutlined />}
@@ -202,8 +297,59 @@ const IconListComponent = ({
         )}
       </div>
 
+      {/* Multi-Language Configuration */}
+      {items.length > 0 && !preview && isEditing && (
+        <Collapse className="mt-4">
+          <Panel
+            header={
+              <div className="flex items-center gap-2">
+                <GlobalOutlined />
+                Multi-Language Settings
+              </div>
+            }
+            key="multilang"
+          >
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-md font-semibold">
+                    Display Alternative Content
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Toggle to show alternative text for icon items
+                  </p>
+                </div>
+                <Switch
+                  checked={showAltContent}
+                  onChange={(checked) => {
+                    setShowAltContent(checked);
+                  }}
+                />
+              </div>
+
+              {showAltContent && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <div className="text-sm text-blue-800">
+                    <strong>Alternative Content Mode:</strong> Icon items will
+                    display alternative text when available.
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 p-3 bg-white rounded-lg border">
+                <div className="text-sm text-gray-600">
+                  <strong>Note:</strong> You can edit both main text and alt
+                  text directly in the icon items above. The alt text will be
+                  displayed when "Display Alternative Content" is enabled.
+                </div>
+              </div>
+            </div>
+          </Panel>
+        </Collapse>
+      )}
+
       {/* Icon Selection Modal */}
-      {!preview && (
+      {!preview && isEditing && (
         <IconListSelectionModal
           isVisible={isModalVisible}
           onClose={() => setIsModalVisible(false)}

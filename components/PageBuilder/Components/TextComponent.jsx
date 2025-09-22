@@ -38,6 +38,10 @@ const TextComponent = ({
     fontWeight: component?._mave?.fontWeight || "normal",
     isDualColor: component?._mave?.isDualColor || false,
     secondPartText: component?._mave?.secondPartText || "",
+    // Alternative text content only
+    altText: component?._mave?.altText || "",
+    altSecondPartText: component?._mave?.altSecondPartText || "",
+    showAltContent: component?._mave?.showAltContent || false,
   });
 
   // Handle both old _mave.text format and new value format
@@ -71,7 +75,10 @@ const TextComponent = ({
         textAlign: tempSettings.textAlign,
         fontWeight: tempSettings.fontWeight,
         isDualColor: tempSettings.isDualColor,
+        secondPartText: tempSettings.secondPartText,
         altText: formData.altText,
+        altSecondPartText: tempSettings.altSecondPartText,
+        showAltContent: tempSettings.showAltContent,
       },
     };
 
@@ -93,6 +100,9 @@ const TextComponent = ({
       fontWeight: component?._mave?.fontWeight || "normal",
       isDualColor: component?._mave?.isDualColor || false,
       secondPartText: component?._mave?.secondPartText || "",
+      altText: component?._mave?.altText || "",
+      altSecondPartText: component?._mave?.altSecondPartText || "",
+      showAltContent: component?._mave?.showAltContent || false,
     });
     setFormData({
       text: getTextContent(),
@@ -248,9 +258,12 @@ const TextComponent = ({
                   Second Part Text
                 </label>
                 <Input.TextArea
-                  value={formData.altText}
+                  value={tempSettings.secondPartText}
                   onChange={(e) =>
-                    setFormData({ ...formData, altText: e.target.value })
+                    setTempSettings({
+                      ...tempSettings,
+                      secondPartText: e.target.value,
+                    })
                   }
                   rows={4}
                   className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
@@ -275,6 +288,60 @@ const TextComponent = ({
               </div>
             </div>
           )}
+
+          <div className="mb-6">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-semibold text-gray-700">
+                Alternative Content
+              </label>
+              <Switch
+                checked={tempSettings.showAltContent}
+                onChange={(checked) =>
+                  setTempSettings({ ...tempSettings, showAltContent: checked })
+                }
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Show alternative text content alongside the main text
+            </p>
+          </div>
+
+          {tempSettings.showAltContent && (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Alternative Text
+                </label>
+                <Input.TextArea
+                  value={formData.altText}
+                  onChange={(e) =>
+                    setFormData({ ...formData, altText: e.target.value })
+                  }
+                  rows={4}
+                  className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
+                  placeholder="Enter alternative text here..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Alternative Second Part Text
+                </label>
+                <Input.TextArea
+                  value={tempSettings.altSecondPartText}
+                  onChange={(e) =>
+                    setTempSettings({
+                      ...tempSettings,
+                      altSecondPartText: e.target.value,
+                    })
+                  }
+                  rows={4}
+                  className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
+                  placeholder="Enter alternative second part text here..."
+                />
+              </div>
+            </div>
+          )}
         </div>
       );
     }
@@ -282,10 +349,31 @@ const TextComponent = ({
     return (
       <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
         {formData.text ? (
-          <div style={{ textAlign: tempSettings.textAlign }}>
-            {tempSettings.isDualColor ? (
-              <div className="flex items-center gap-2">
-                <span
+          <div className="space-y-4">
+            <div style={{ textAlign: tempSettings.textAlign }}>
+              {tempSettings.isDualColor ? (
+                <div className="flex items-center gap-2">
+                  <span
+                    className={getFontSizeClass(tempSettings.fontSize)}
+                    style={{
+                      color: tempSettings.primaryColor,
+                      fontWeight: tempSettings.fontWeight,
+                    }}
+                  >
+                    {formData.text}
+                  </span>
+                  <span
+                    className={getFontSizeClass(tempSettings.fontSize)}
+                    style={{
+                      color: tempSettings.secondaryColor,
+                      fontWeight: tempSettings.fontWeight,
+                    }}
+                  >
+                    {tempSettings.secondPartText}
+                  </span>
+                </div>
+              ) : (
+                <div
                   className={getFontSizeClass(tempSettings.fontSize)}
                   style={{
                     color: tempSettings.primaryColor,
@@ -293,26 +381,47 @@ const TextComponent = ({
                   }}
                 >
                   {formData.text}
-                </span>
-                <span
-                  className={getFontSizeClass(tempSettings.fontSize)}
-                  style={{
-                    color: tempSettings.secondaryColor,
-                    fontWeight: tempSettings.fontWeight,
-                  }}
-                >
-                  {formData.altText}
-                </span>
-              </div>
-            ) : (
-              <div
-                className={getFontSizeClass(tempSettings.fontSize)}
-                style={{
-                  color: tempSettings.primaryColor,
-                  fontWeight: tempSettings.fontWeight,
-                }}
-              >
-                {formData.text}
+                </div>
+              )}
+            </div>
+
+            {tempSettings.showAltContent && formData.altText && (
+              <div style={{ textAlign: tempSettings.textAlign }}>
+                <div className="text-sm text-gray-600 mb-1">
+                  Alternative Content:
+                </div>
+                {tempSettings.isDualColor ? (
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={getFontSizeClass(tempSettings.fontSize)}
+                      style={{
+                        color: tempSettings.primaryColor,
+                        fontWeight: tempSettings.fontWeight,
+                      }}
+                    >
+                      {formData.altText}
+                    </span>
+                    <span
+                      className={getFontSizeClass(tempSettings.fontSize)}
+                      style={{
+                        color: tempSettings.secondaryColor,
+                        fontWeight: tempSettings.fontWeight,
+                      }}
+                    >
+                      {tempSettings.altSecondPartText}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className={getFontSizeClass(tempSettings.fontSize)}
+                    style={{
+                      color: tempSettings.primaryColor,
+                      fontWeight: tempSettings.fontWeight,
+                    }}
+                  >
+                    {formData.altText}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -335,29 +444,33 @@ const TextComponent = ({
 
   // Preview mode rendering
   if (preview) {
-    const textStyle = {
-      fontSize:
-        component.settings?.fontSize === "2xl"
-          ? "1.5rem"
-          : component.settings?.fontSize === "xl"
-            ? "1.25rem"
-            : component.settings?.fontSize === "lg"
-              ? "1.125rem"
-              : component.settings?.fontSize === "base"
-                ? "1rem"
-                : component.settings?.fontSize === "sm"
-                  ? "0.875rem"
-                  : "2rem",
-      fontWeight: component.settings?.fontWeight || "normal",
-      textAlign: component.settings?.textAlign || "left",
-    };
-
     return (
-      <div className="preview-text-component p-6 bg-gray-50 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md text-center">
-        <h1 style={textStyle} className="text-3xl font-bold">
-          {tempSettings.isDualColor ? (
-            <div className="flex items-center gap-2">
-              <span
+      <div className="preview-text-component p-6 bg-gray-50 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md">
+        <div className="space-y-4">
+          <div style={{ textAlign: tempSettings.textAlign }}>
+            {tempSettings.isDualColor ? (
+              <div className="flex items-center gap-2">
+                <span
+                  className={getFontSizeClass(tempSettings.fontSize)}
+                  style={{
+                    color: tempSettings.primaryColor,
+                    fontWeight: tempSettings.fontWeight,
+                  }}
+                >
+                  {formData.text}
+                </span>
+                <span
+                  className={getFontSizeClass(tempSettings.fontSize)}
+                  style={{
+                    color: tempSettings.secondaryColor,
+                    fontWeight: tempSettings.fontWeight,
+                  }}
+                >
+                  {tempSettings.secondPartText}
+                </span>
+              </div>
+            ) : (
+              <div
                 className={getFontSizeClass(tempSettings.fontSize)}
                 style={{
                   color: tempSettings.primaryColor,
@@ -365,29 +478,50 @@ const TextComponent = ({
                 }}
               >
                 {formData.text}
-              </span>
-              <span
-                className={getFontSizeClass(tempSettings.fontSize)}
-                style={{
-                  color: tempSettings.secondaryColor,
-                  fontWeight: tempSettings.fontWeight,
-                }}
-              >
-                {formData.altText}
-              </span>
-            </div>
-          ) : (
-            <div
-              className={getFontSizeClass(tempSettings.fontSize)}
-              style={{
-                color: tempSettings.primaryColor,
-                fontWeight: tempSettings.fontWeight,
-              }}
-            >
-              {formData.text}
+              </div>
+            )}
+          </div>
+
+          {tempSettings.showAltContent && formData.altText && (
+            <div style={{ textAlign: tempSettings.textAlign }}>
+              <div className="text-sm text-gray-600 mb-1">
+                Alternative Content:
+              </div>
+              {tempSettings.isDualColor ? (
+                <div className="flex items-center gap-2">
+                  <span
+                    className={getFontSizeClass(tempSettings.fontSize)}
+                    style={{
+                      color: tempSettings.primaryColor,
+                      fontWeight: tempSettings.fontWeight,
+                    }}
+                  >
+                    {formData.altText}
+                  </span>
+                  <span
+                    className={getFontSizeClass(tempSettings.fontSize)}
+                    style={{
+                      color: tempSettings.secondaryColor,
+                      fontWeight: tempSettings.fontWeight,
+                    }}
+                  >
+                    {tempSettings.altSecondPartText}
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className={getFontSizeClass(tempSettings.fontSize)}
+                  style={{
+                    color: tempSettings.primaryColor,
+                    fontWeight: tempSettings.fontWeight,
+                  }}
+                >
+                  {formData.altText}
+                </div>
+              )}
             </div>
           )}
-        </h1>
+        </div>
       </div>
     );
   }

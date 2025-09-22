@@ -12,6 +12,7 @@ import {
   Drawer,
   Switch,
   Collapse,
+  Input,
 } from "antd";
 import {
   EditOutlined,
@@ -69,18 +70,22 @@ const renderCardMedia = (media, altTitle = "Card Image") => {
 
 // Helper function to get display content based on language preference
 const getDisplayContent = (cardData, showAltContent = false) => {
-  if (!cardData) return { title: "Untitled Card", description: "No description available" };
-  
+  if (!cardData)
+    return { title: "Untitled Card", description: "No description available" };
+
   if (showAltContent) {
     return {
       title: cardData.title_bn || cardData.title_en || "Untitled Card",
-      description: cardData.description_bn || cardData.description_en || "No description available"
+      description:
+        cardData.description_bn ||
+        cardData.description_en ||
+        "No description available",
     };
   }
-  
+
   return {
     title: cardData.title_en || "Untitled Card",
-    description: cardData.description_en || "No description available"
+    description: cardData.description_en || "No description available",
   };
 };
 
@@ -99,7 +104,15 @@ const CardComponent = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [autoPolling, setAutoPolling] = useState(false); // Always false
-  const [showAltContent, setShowAltContent] = useState(component._mave?.showAltContent || false);
+  const [showAltContent, setShowAltContent] = useState(
+    component._mave?.showAltContent || false
+  );
+  const [isEditingState, setIsEditingState] = useState(false);
+  const [isEditingAltContent, setIsEditingAltContent] = useState(false);
+  const [altContentData, setAltContentData] = useState({
+    altTitle: component._mave?.altTitle || "",
+    altDescription: component._mave?.altDescription || "",
+  });
   const lastUpdateRef = useRef(null);
 
   // Check if we're in page-builder context
@@ -110,6 +123,10 @@ const CardComponent = ({
   useEffect(() => {
     setCardData(component._mave);
     setShowAltContent(component._mave?.showAltContent || false);
+    setAltContentData({
+      altTitle: component._mave?.altTitle || "",
+      altDescription: component._mave?.altDescription || "",
+    });
   }, [component._mave]);
 
   // Completely disable auto-polling in all contexts
@@ -225,6 +242,7 @@ const CardComponent = ({
   const handleSelectCard = useCallback((selectedCard) => {
     setSelectedCardData(selectedCard);
     setIsModalVisible(false);
+    setIsEditingState(true);
   }, []);
 
   // Handle Submit (Confirm) Changes
@@ -253,14 +271,14 @@ const CardComponent = ({
     updateComponent(updatedComponent);
     setCardData(selectedCardData);
     setSelectedCardData(null);
-    setIsEditing(false);
+    setIsEditingState(false);
     message.success("Card updated successfully.");
   }, [selectedCardData, component, updateComponent]);
 
   // Handle Cancel Changes
   const handleCancel = useCallback(() => {
     setSelectedCardData(null);
-    setIsEditing(false);
+    setIsEditingState(false);
     message.info("Card update canceled.");
   }, []);
 
@@ -269,11 +287,39 @@ const CardComponent = ({
     deleteComponent();
   }, [deleteComponent]);
 
+  // Handle Alternative Content Editing
+  const handleEditAltContent = useCallback(() => {
+    setIsEditingAltContent(true);
+  }, []);
+
+  const handleSaveAltContent = useCallback(() => {
+    const updatedComponent = {
+      ...component,
+      _mave: {
+        ...component._mave,
+        altTitle: altContentData.altTitle,
+        altDescription: altContentData.altDescription,
+      },
+    };
+    updateComponent(updatedComponent);
+    setIsEditingAltContent(false);
+    message.success("Alternative content updated successfully.");
+  }, [component, altContentData, updateComponent]);
+
+  const handleCancelAltContent = useCallback(() => {
+    setAltContentData({
+      altTitle: component._mave?.altTitle || "",
+      altDescription: component._mave?.altDescription || "",
+    });
+    setIsEditingAltContent(false);
+    message.info("Alternative content editing canceled.");
+  }, [component._mave]);
+
   // If in preview mode, render the card content only
   if (preview) {
     const displayContent = getDisplayContent(cardData, showAltContent);
     const altContent = getDisplayContent(cardData, !showAltContent);
-    
+
     return (
       <div className="preview-card-component p-4 bg-gray-100 rounded-md">
         {cardData && (
@@ -303,26 +349,36 @@ const CardComponent = ({
                 <h3 className="text-lg font-semibold mb-2">
                   {displayContent.title}
                 </h3>
-                <div 
+                <div
                   className="text-gray-600"
-                  dangerouslySetInnerHTML={{ __html: displayContent.description }}
+                  dangerouslySetInnerHTML={{
+                    __html: displayContent.description,
+                  }}
                 />
               </div>
             </div>
-            {showAltContent && (cardData.title_bn || cardData.description_bn) && (
-              <div className="bg-gray-50 rounded-lg shadow-md overflow-hidden">
-                {renderCardMedia(cardData.media_files, altContent.title)}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2 text-gray-700">
-                    {altContent.title}
-                  </h3>
-                  <div 
-                    className="text-gray-600"
-                    dangerouslySetInnerHTML={{ __html: altContent.description }}
-                  />
+            {showAltContent &&
+              (cardData.title_bn ||
+                cardData.description_bn ||
+                altContentData.altTitle ||
+                altContentData.altDescription) && (
+                <div className="bg-gray-50 rounded-lg shadow-md overflow-hidden">
+                  {renderCardMedia(cardData.media_files, altContent.title)}
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                      {altContentData.altTitle || altContent.title}
+                    </h3>
+                    <div
+                      className="text-gray-600"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          altContentData.altDescription ||
+                          altContent.description,
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         ) : (
           <Text className="text-gray-500">No card data available.</Text>
@@ -404,11 +460,110 @@ const CardComponent = ({
           </div>
         )}
 
+        {/* Alternative Content Editing Section */}
+        {cardData && (
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-md font-semibold flex items-center gap-2">
+                <EditOutlined />
+                Custom Alternative Content
+              </h4>
+              {!isEditingAltContent ? (
+                <Button
+                  icon={<EditOutlined />}
+                  onClick={handleEditAltContent}
+                  className="mavebutton"
+                  size="small"
+                >
+                  Edit Alternative Content
+                </Button>
+              ) : (
+                <Space>
+                  <Button
+                    icon={<CheckOutlined />}
+                    onClick={handleSaveAltContent}
+                    className="mavebutton"
+                    size="small"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    icon={<CloseOutlined />}
+                    onClick={handleCancelAltContent}
+                    className="mavecancelbutton"
+                    size="small"
+                  >
+                    Cancel
+                  </Button>
+                </Space>
+              )}
+            </div>
+
+            {isEditingAltContent ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Alternative Title
+                  </label>
+                  <Input
+                    value={altContentData.altTitle}
+                    onChange={(e) =>
+                      setAltContentData({
+                        ...altContentData,
+                        altTitle: e.target.value,
+                      })
+                    }
+                    placeholder="Enter alternative title"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Alternative Description
+                  </label>
+                  <Input.TextArea
+                    value={altContentData.altDescription}
+                    onChange={(e) =>
+                      setAltContentData({
+                        ...altContentData,
+                        altDescription: e.target.value,
+                      })
+                    }
+                    placeholder="Enter alternative description"
+                    rows={4}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div>
+                  <span className="text-sm font-medium text-gray-700">
+                    Alternative Title:
+                  </span>
+                  <p className="text-gray-600">
+                    {altContentData.altTitle || "No alternative title set"}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-700">
+                    Alternative Description:
+                  </span>
+                  <p className="text-gray-600">
+                    {altContentData.altDescription ||
+                      "No alternative description set"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row items-start gap-4">
           <div
-            className={`flex flex-col ${isEditing && selectedCardData ? "w-full md:w-1/2" : "w-full"}`}
+            className={`flex flex-col ${isEditingState && selectedCardData ? "w-full md:w-1/2" : "w-full"}`}
           >
-            {cardData && isEditing && (
+            {cardData && isEditingState && (
               <h4 className="mb-2 text-md font-semibold">Current Card</h4>
             )}
             {cardData ? (
@@ -419,26 +574,42 @@ const CardComponent = ({
                     <h3 className="text-lg font-semibold mb-2">
                       {cardData.title_en || "Untitled Card"}
                     </h3>
-                    <div 
+                    <div
                       className="text-gray-600"
-                      dangerouslySetInnerHTML={{ __html: cardData.description_en || "No description available" }}
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          cardData.description_en || "No description available",
+                      }}
                     />
                   </div>
                 </div>
-                {showAltContent && (cardData.title_bn || cardData.description_bn) && (
-                  <div className="mt-2 bg-gray-50 rounded-lg shadow-md overflow-hidden">
-                    {renderCardMedia(cardData.media_files)}
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
-                        {cardData.title_bn || cardData.title_en || "Untitled Card"}
-                      </h3>
-                      <div 
-                        className="text-gray-600"
-                        dangerouslySetInnerHTML={{ __html: cardData.description_bn || cardData.description_en || "No description available" }}
-                      />
+                {showAltContent &&
+                  (cardData.title_bn ||
+                    cardData.description_bn ||
+                    altContentData.altTitle ||
+                    altContentData.altDescription) && (
+                    <div className="mt-2 bg-gray-50 rounded-lg shadow-md overflow-hidden">
+                      {renderCardMedia(cardData.media_files)}
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                          {altContentData.altTitle ||
+                            cardData.title_bn ||
+                            cardData.title_en ||
+                            "Untitled Card"}
+                        </h3>
+                        <div
+                          className="text-gray-600"
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              altContentData.altDescription ||
+                              cardData.description_bn ||
+                              cardData.description_en ||
+                              "No description available",
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             ) : (
               <Button
@@ -451,7 +622,7 @@ const CardComponent = ({
             )}
           </div>
 
-          {isEditing && selectedCardData && (
+          {isEditingState && selectedCardData && (
             <div className="flex flex-col w-full md:w-1/2">
               <h4 className="mb-2 text-md font-semibold">Selected Card</h4>
               <div className="w-full relative">
@@ -461,33 +632,50 @@ const CardComponent = ({
                     <h3 className="text-lg font-semibold mb-2">
                       {selectedCardData.title_en || "Untitled Card"}
                     </h3>
-                    <div 
+                    <div
                       className="text-gray-600"
-                      dangerouslySetInnerHTML={{ __html: selectedCardData.description_en || "No description available" }}
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          selectedCardData.description_en ||
+                          "No description available",
+                      }}
                     />
                   </div>
                 </div>
-                {showAltContent && (selectedCardData.title_bn || selectedCardData.description_bn) && (
-                  <div className="mt-2 bg-gray-50 rounded-lg shadow-md overflow-hidden">
-                    {renderCardMedia(selectedCardData.media_files)}
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
-                        {selectedCardData.title_bn || selectedCardData.title_en || "Untitled Card"}
-                      </h3>
-                      <div 
-                        className="text-gray-600"
-                        dangerouslySetInnerHTML={{ __html: selectedCardData.description_bn || selectedCardData.description_en || "No description available" }}
-                      />
+                {showAltContent &&
+                  (selectedCardData.title_bn ||
+                    selectedCardData.description_bn ||
+                    altContentData.altTitle ||
+                    altContentData.altDescription) && (
+                    <div className="mt-2 bg-gray-50 rounded-lg shadow-md overflow-hidden">
+                      {renderCardMedia(selectedCardData.media_files)}
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                          {altContentData.altTitle ||
+                            selectedCardData.title_bn ||
+                            selectedCardData.title_en ||
+                            "Untitled Card"}
+                        </h3>
+                        <div
+                          className="text-gray-600"
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              altContentData.altDescription ||
+                              selectedCardData.description_bn ||
+                              selectedCardData.description_en ||
+                              "No description available",
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {isEditing && selectedCardData && (
+      {isEditingState && selectedCardData && (
         <div className="mt-4 flex gap-2">
           <Button
             type="primary"

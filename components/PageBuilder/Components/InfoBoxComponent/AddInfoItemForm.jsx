@@ -27,6 +27,15 @@ const AddInfoItemForm = ({ form, onFinish, onMediaSelect, selectedMedia }) => {
         >
           <Input placeholder="Enter link URL (optional)" />
         </Form.Item>
+        <Form.Item label="Alternative Title" name="altTitle">
+          <Input placeholder="Enter alternative title (optional)" />
+        </Form.Item>
+        <Form.Item label="Alternative Description" name="altDescription">
+          <Input.TextArea
+            rows={3}
+            placeholder="Enter alternative description (optional)"
+          />
+        </Form.Item>
         <Form.Item label="Media">
           <Button
             className="mavebutton"

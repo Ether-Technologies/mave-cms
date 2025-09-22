@@ -27,7 +27,7 @@ import MediaList from "./MediaSelectionModal/MediaList";
 import SettingsDrawer from "./MediaSelectionModal/SettingsDrawer";
 import { useMediaData } from "./MediaSelectionModal/useMediaData";
 
-const { TabPane } = Tabs;
+// Remove deprecated TabPane usage
 
 const MediaSelectionModal = (props) => {
   const {
@@ -226,30 +226,44 @@ const MediaSelectionModal = (props) => {
             </div>
           )}
 
-          <Tabs defaultActiveKey="1" className="flex-1">
-            <TabPane tab="Native Storage" key="1">
-              <MediaList
-                media={paginatedMedia}
-                loading={loading}
-                viewMode={viewMode}
-                imageSize={imageSize}
-                selectedMedia={selectedMedia}
-                onSelectMedia={handleSelection}
-              />
-            </TabPane>
-            <TabPane tab="Upload" key="2">
-              <UploadMediaTabs
-                onUploadSuccess={handleUploadSuccess}
-                addMedia={(media) => {
-                  fetchMedia();
-                  // Don't automatically select uploaded media
-                }}
-              />
-            </TabPane>
-            <TabPane tab="Cloudinary" key="3">
-              <Cloudinary />
-            </TabPane>
-          </Tabs>
+          <Tabs
+            defaultActiveKey="1"
+            className="flex-1"
+            items={[
+              {
+                key: "1",
+                label: "Native Storage",
+                children: (
+                  <MediaList
+                    media={paginatedMedia}
+                    loading={loading}
+                    viewMode={viewMode}
+                    imageSize={imageSize}
+                    selectedMedia={selectedMedia}
+                    onSelectMedia={handleSelection}
+                  />
+                ),
+              },
+              {
+                key: "2",
+                label: "Upload",
+                children: (
+                  <UploadMediaTabs
+                    onUploadSuccess={handleUploadSuccess}
+                    addMedia={(media) => {
+                      fetchMedia();
+                      // Don't automatically select uploaded media
+                    }}
+                  />
+                ),
+              },
+              {
+                key: "3",
+                label: "Cloudinary",
+                children: <Cloudinary />,
+              },
+            ]}
+          />
 
           <div className="flex justify-between items-center mt-4 pt-4 border-t">
             <Pagination

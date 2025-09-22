@@ -7,6 +7,13 @@ const MainContentSection = ({
   onInfoBoxChange,
   onMediaSelect,
   media,
+  updateComponent,
+  component,
+  layout,
+  font,
+  color,
+  background,
+  showAltContent,
 }) => {
   return (
     <div className="mb-4">
@@ -14,19 +21,96 @@ const MainContentSection = ({
         <Form.Item label="Title">
           <Input
             value={infoBox.title}
-            onChange={(e) =>
-              onInfoBoxChange({ ...infoBox, title: e.target.value })
-            }
+            onChange={(e) => {
+              const updatedInfoBox = { ...infoBox, title: e.target.value };
+              onInfoBoxChange(updatedInfoBox);
+              // Also update component immediately
+              updateComponent({
+                ...component,
+                _mave: {
+                  ...updatedInfoBox,
+                  layout,
+                  font,
+                  color,
+                  background,
+                  showAltContent,
+                },
+              });
+            }}
             placeholder="Enter title"
           />
         </Form.Item>
         <Form.Item label="Description">
           <Input.TextArea
             value={infoBox.description}
-            onChange={(e) =>
-              onInfoBoxChange({ ...infoBox, description: e.target.value })
-            }
+            onChange={(e) => {
+              const updatedInfoBox = {
+                ...infoBox,
+                description: e.target.value,
+              };
+              onInfoBoxChange(updatedInfoBox);
+              // Also update component immediately
+              updateComponent({
+                ...component,
+                _mave: {
+                  ...updatedInfoBox,
+                  layout,
+                  font,
+                  color,
+                  background,
+                  showAltContent,
+                },
+              });
+            }}
             placeholder="Enter description"
+            rows={4}
+          />
+        </Form.Item>
+        <Form.Item label="Alternative Title">
+          <Input
+            value={infoBox.altTitle || ""}
+            onChange={(e) => {
+              const updatedInfoBox = { ...infoBox, altTitle: e.target.value };
+              onInfoBoxChange(updatedInfoBox);
+              // Also update component immediately
+              updateComponent({
+                ...component,
+                _mave: {
+                  ...updatedInfoBox,
+                  layout,
+                  font,
+                  color,
+                  background,
+                  showAltContent,
+                },
+              });
+            }}
+            placeholder="Enter alternative title (optional)"
+          />
+        </Form.Item>
+        <Form.Item label="Alternative Description">
+          <Input.TextArea
+            value={infoBox.altDescription || ""}
+            onChange={(e) => {
+              const updatedInfoBox = {
+                ...infoBox,
+                altDescription: e.target.value,
+              };
+              onInfoBoxChange(updatedInfoBox);
+              // Also update component immediately
+              updateComponent({
+                ...component,
+                _mave: {
+                  ...updatedInfoBox,
+                  layout,
+                  font,
+                  color,
+                  background,
+                  showAltContent,
+                },
+              });
+            }}
+            placeholder="Enter alternative description (optional)"
             rows={4}
           />
         </Form.Item>

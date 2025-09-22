@@ -4,13 +4,14 @@ import UploadMedia from "./UploadMedia";
 import GrabFromWeb from "./GrabFromWeb";
 import { addMediaToDB } from "../../utils/indexedDB"; // Import the function
 
-const { TabPane } = Tabs;
+// Remove deprecated TabPane usage
 
 const UploadMediaTabs = ({ onUploadSuccess, addMedia }) => {
-  return (
-    <Tabs defaultActiveKey="1" type="card" centered>
-      {/* Native Storage */}
-      <TabPane tab="Native Storage" key="1">
+  const tabItems = [
+    {
+      key: "1",
+      label: "Native Storage",
+      children: (
         <UploadMedia
           onUploadSuccess={(newMedia) => {
             onUploadSuccess(newMedia); // Call the callback with new media
@@ -21,10 +22,12 @@ const UploadMediaTabs = ({ onUploadSuccess, addMedia }) => {
           uploadDestination="native"
           addMediaToDB={addMediaToDB}
         />
-      </TabPane>
-
-      {/* Grab from Web */}
-      <TabPane tab="Grab from Web" key="2">
+      ),
+    },
+    {
+      key: "2",
+      label: "Grab from Web",
+      children: (
         <GrabFromWeb
           onUploadSuccess={(newMedia) => {
             onUploadSuccess(newMedia); // Call the callback with new media
@@ -32,25 +35,31 @@ const UploadMediaTabs = ({ onUploadSuccess, addMedia }) => {
           }}
           addMediaToDB={addMediaToDB}
         />
-      </TabPane>
+      ),
+    },
+  ];
 
-      {/* Cloudinary */}
-      {process.env.NEXT_PUBLIC_CLOUDINARY_STATUS === "activated" && (
-        <TabPane tab="Cloudinary" key="3">
-          <UploadMedia
-            onUploadSuccess={(newMedia) => {
-              onUploadSuccess(newMedia); // Call the callback with new media
-              addMedia(newMedia); // Add media to IndexedDB
-            }}
-            selectionMode="multiple"
-            onSelectMedia={(media) => onUploadSuccess(media)}
-            uploadDestination="cloudinary"
-            addMediaToDB={addMediaToDB}
-          />
-        </TabPane>
-      )}
-    </Tabs>
-  );
+  // Add Cloudinary tab if activated
+  if (process.env.NEXT_PUBLIC_CLOUDINARY_STATUS === "activated") {
+    tabItems.push({
+      key: "3",
+      label: "Cloudinary",
+      children: (
+        <UploadMedia
+          onUploadSuccess={(newMedia) => {
+            onUploadSuccess(newMedia); // Call the callback with new media
+            addMedia(newMedia); // Add media to IndexedDB
+          }}
+          selectionMode="multiple"
+          onSelectMedia={(media) => onUploadSuccess(media)}
+          uploadDestination="cloudinary"
+          addMediaToDB={addMediaToDB}
+        />
+      ),
+    });
+  }
+
+  return <Tabs defaultActiveKey="1" type="card" centered items={tabItems} />;
 };
 
 export default UploadMediaTabs;

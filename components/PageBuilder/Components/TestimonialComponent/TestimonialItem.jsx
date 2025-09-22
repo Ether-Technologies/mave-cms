@@ -13,7 +13,6 @@ const TestimonialItem = ({
   testimonial,
   onEdit,
   onDelete,
-  onEditAltContent,
   font,
   color,
   background,
@@ -56,15 +55,6 @@ const TestimonialItem = ({
           ? [
               <Tooltip title="Edit">
                 <Button type="text" icon={<EditOutlined />} onClick={onEdit} />
-              </Tooltip>,
-              <Tooltip title="Edit Alternative Content">
-                <Button
-                  type="text"
-                  icon={<GlobalOutlined />}
-                  onClick={() =>
-                    onEditAltContent && onEditAltContent(testimonialIndex)
-                  }
-                />
               </Tooltip>,
               <Tooltip title="Delete">
                 <Popconfirm

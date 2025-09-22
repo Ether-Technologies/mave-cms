@@ -13,7 +13,13 @@ import {
   Collapse,
   Input,
 } from "antd";
-import { PlusOutlined, CopyFilled, GlobalOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  CopyFilled,
+  GlobalOutlined,
+  EditOutlined,
+  CheckOutlined,
+} from "@ant-design/icons";
 import MediaSelectionModal from "../../Modals/MediaSelectionModal";
 import ConfigSection from "./ConfigSection";
 import TestimonialDisplay from "./TestimonialDisplay";
@@ -43,6 +49,7 @@ const TestimonialComponent = ({
   const [showAltContent, setShowAltContent] = useState(false);
   const [editAltContentModal, setEditAltContentModal] = useState(false);
   const [editingTestimonialIndex, setEditingTestimonialIndex] = useState(null);
+  const [showAltInputs, setShowAltInputs] = useState(false);
 
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
@@ -75,47 +82,6 @@ const TestimonialComponent = ({
       quote: testimonial.quote || "",
       author: testimonial.author || "",
     };
-  };
-
-  // Function to handle editing alternative content for a specific testimonial
-  const handleEditAltContent = (index) => {
-    setEditingTestimonialIndex(index);
-    const testimonial = testimonials[index];
-    altForm.setFieldsValue({
-      altQuote: testimonial.altQuote || "",
-      altAuthor: testimonial.altAuthor || "",
-    });
-    setEditAltContentModal(true);
-  };
-
-  // Function to save alternative content
-  const handleSaveAltContent = (values) => {
-    const updatedTestimonials = [...testimonials];
-    updatedTestimonials[editingTestimonialIndex] = {
-      ...updatedTestimonials[editingTestimonialIndex],
-      altQuote: values.altQuote,
-      altAuthor: values.altAuthor,
-    };
-
-    setTestimonials(updatedTestimonials);
-
-    // Update component immediately
-    updateComponent({
-      ...component,
-      _mave: {
-        testimonials: updatedTestimonials,
-        layout,
-        font,
-        color,
-        background,
-        showAltContent,
-      },
-    });
-
-    setEditAltContentModal(false);
-    setEditingTestimonialIndex(null);
-    altForm.resetFields();
-    message.success("Alternative content updated successfully.");
   };
 
   const handleAddTestimonial = () => {
@@ -423,7 +389,6 @@ const TestimonialComponent = ({
         background={background}
         handleEditTestimonial={handleEditTestimonial}
         handleDeleteTestimonial={handleDeleteTestimonial}
-        handleEditAltContent={handleEditAltContent}
         preview={preview}
         containerStyle={containerStyle}
         isEditMode={isEditMode}
@@ -431,7 +396,7 @@ const TestimonialComponent = ({
         getDisplayContent={getDisplayContent}
       />
 
-      {!isAdding && !isEditing && (
+      {isEditMode && (
         <div className="flex justify-center">
           <Button
             type="dashed"
@@ -444,8 +409,21 @@ const TestimonialComponent = ({
         </div>
       )}
 
-      {/* Multi-Language Configuration */}
-      {testimonials.length > 0 && (
+      {!preview && isEditMode && (
+        <MediaSelectionModal
+          isVisible={isImageModalVisible}
+          onClose={() => setIsImageModalVisible(false)}
+          onSelectMedia={(media) => {
+            setSelectedImage(media);
+            setIsImageModalVisible(false);
+            message.success("Image selected successfully.");
+          }}
+          selectionMode="single"
+        />
+      )}
+
+      {/* Alternative Content Editing Section */}
+      {testimonials.length > 0 && !preview && (
         <Collapse className="mt-4">
           <Panel
             header={
@@ -494,79 +472,154 @@ const TestimonialComponent = ({
                   </div>
                 </div>
               )}
+
+              {/* Alternative Content Editing Section */}
+              <div className="mt-6 p-4 bg-white rounded-lg border">
+                <div className="flex items-center justify-between mb-4">
+                  <h5 className="text-lg font-semibold flex items-center gap-2">
+                    <EditOutlined />
+                    Alternative Content
+                  </h5>
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={() => setShowAltInputs(true)}
+                    className="mavebutton"
+                    size="small"
+                  >
+                    Edit
+                  </Button>
+                </div>
+
+                {showAltInputs ? (
+                  <div className="space-y-4">
+                    {testimonials.map((testimonial, index) => (
+                      <div
+                        key={testimonial.id}
+                        className="border rounded-lg p-4 bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          {testimonial.image && (
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${testimonial.image.file_path}`}
+                              alt={testimonial.author || "Testimonial"}
+                              className="w-16 h-12 rounded object-cover"
+                            />
+                          )}
+                          <div>
+                            <div className="font-medium text-sm">
+                              {testimonial.author || "Untitled Testimonial"}
+                            </div>
+                          </div>
+                        </div>
+
+                        <Form layout="vertical" className="w-full">
+                          <Form.Item label="Alternative Quote" className="mb-3">
+                            <Input.TextArea
+                              rows={3}
+                              placeholder="Enter alternative quote"
+                              defaultValue={testimonial.altQuote || ""}
+                              onChange={(e) => {
+                                const updatedTestimonials = [...testimonials];
+                                updatedTestimonials[index] = {
+                                  ...updatedTestimonials[index],
+                                  altQuote: e.target.value,
+                                };
+                                setTestimonials(updatedTestimonials);
+                              }}
+                            />
+                          </Form.Item>
+
+                          <Form.Item
+                            label="Alternative Author"
+                            className="mb-3"
+                          >
+                            <Input
+                              placeholder="Enter alternative author name"
+                              defaultValue={testimonial.altAuthor || ""}
+                              onChange={(e) => {
+                                const updatedTestimonials = [...testimonials];
+                                updatedTestimonials[index] = {
+                                  ...updatedTestimonials[index],
+                                  altAuthor: e.target.value,
+                                };
+                                setTestimonials(updatedTestimonials);
+                              }}
+                            />
+                          </Form.Item>
+                        </Form>
+                      </div>
+                    ))}
+
+                    {/* Update Button */}
+                    <div className="mt-4 flex justify-end">
+                      <Button
+                        type="primary"
+                        icon={<CheckOutlined />}
+                        onClick={() => {
+                          updateComponent({
+                            ...component,
+                            _mave: {
+                              testimonials,
+                              layout,
+                              font,
+                              color,
+                              background,
+                              showAltContent,
+                            },
+                          });
+                          setShowAltInputs(false);
+                          message.success(
+                            "Alternative content updated successfully."
+                          );
+                        }}
+                        className="mavebutton"
+                      >
+                        Update Alternative Content
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Display Current Alternative Content */
+                  <div className="space-y-3">
+                    {testimonials.map((testimonial, index) => (
+                      <div
+                        key={testimonial.id}
+                        className="border rounded-lg p-3 bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          {testimonial.image && (
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${testimonial.image.file_path}`}
+                              alt={testimonial.author || "Testimonial"}
+                              className="w-12 h-8 rounded object-cover"
+                            />
+                          )}
+                          <div>
+                            <div className="font-medium text-sm">
+                              {testimonial.author || "Untitled Testimonial"}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-sm">
+                          <div>
+                            <strong>Alt Quote:</strong>{" "}
+                            {testimonial.altQuote || "Not set"}
+                          </div>
+                          <div>
+                            <strong>Alt Author:</strong>{" "}
+                            {testimonial.altAuthor || "Not set"}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </Panel>
         </Collapse>
       )}
-
-      {!preview && isEditMode && (
-        <MediaSelectionModal
-          isVisible={isImageModalVisible}
-          onClose={() => setIsImageModalVisible(false)}
-          onSelectMedia={(media) => {
-            setSelectedImage(media);
-            setIsImageModalVisible(false);
-            message.success("Image selected successfully.");
-          }}
-          selectionMode="single"
-        />
-      )}
-
-      {/* Modal for editing alternative content */}
-      <Modal
-        title="Edit Alternative Content"
-        open={editAltContentModal}
-        onCancel={() => {
-          setEditAltContentModal(false);
-          setEditingTestimonialIndex(null);
-          altForm.resetFields();
-        }}
-        footer={null}
-        width={600}
-      >
-        <Form form={altForm} layout="vertical" onFinish={handleSaveAltContent}>
-          <Form.Item
-            label="Alternative Quote"
-            name="altQuote"
-            rules={[
-              { required: true, message: "Please enter an alternative quote." },
-            ]}
-          >
-            <Input.TextArea
-              rows={4}
-              placeholder="Enter alternative quote in another language"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Alternative Author"
-            name="altAuthor"
-            rules={[
-              {
-                required: true,
-                message: "Please enter an alternative author name.",
-              },
-            ]}
-          >
-            <Input placeholder="Enter alternative author name in another language" />
-          </Form.Item>
-
-          <div className="flex justify-end gap-2">
-            <Button
-              onClick={() => {
-                setEditAltContentModal(false);
-                setEditingTestimonialIndex(null);
-                altForm.resetFields();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Save Changes
-            </Button>
-          </div>
-        </Form>
-      </Modal>
     </div>
   );
 };

@@ -1,7 +1,18 @@
 // components/PageBuilder/Components/VideoComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Popconfirm, Typography, message, Carousel } from "antd";
+import {
+  Button,
+  Modal,
+  Popconfirm,
+  Typography,
+  message,
+  Carousel,
+  Form,
+  Input,
+  Collapse,
+  Switch,
+} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -10,6 +21,7 @@ import {
   ExportOutlined,
   CopyFilled,
   DragOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import VideoSelectionModal from "../Modals/VideoSelectionModal";
 import {
@@ -18,6 +30,7 @@ import {
 } from "../../../utils/googleDrive";
 
 const { Paragraph } = Typography;
+const { Panel } = Collapse;
 
 // Helper function to validate and get embed URL
 const getEmbedUrl = (url) => {
@@ -60,9 +73,12 @@ const VideoComponent = ({
   const [isEditing, setIsEditing] = useState(false);
   const [currentGoogleDriveUrl, setCurrentGoogleDriveUrl] = useState(null);
   const [googleDriveFallbackIndex, setGoogleDriveFallbackIndex] = useState(0);
+  const [showAltContent, setShowAltContent] = useState(false);
+  const [showAltInputs, setShowAltInputs] = useState(false);
 
   useEffect(() => {
     setVideoData(component._mave || {});
+    setShowAltContent(component._mave?.showAltContent || false);
   }, [component._mave]);
 
   const handleSelectVideo = (selectedVideo) => {
@@ -105,18 +121,40 @@ const VideoComponent = ({
           googleDriveUrls.primary,
           googleDriveUrls.fallback,
           googleDriveUrls.direct,
-          googleDriveUrls.embedApi
+          googleDriveUrls.embedApi,
         ].filter(Boolean);
 
         if (googleDriveFallbackIndex < fallbackUrls.length - 1) {
-          setGoogleDriveFallbackIndex(prev => prev + 1);
+          setGoogleDriveFallbackIndex((prev) => prev + 1);
           setCurrentGoogleDriveUrl(fallbackUrls[googleDriveFallbackIndex + 1]);
         } else {
           // All fallbacks failed, show error message
-          message.error("Google Drive video could not be loaded. Please check the file permissions or try a different video.");
+          message.error(
+            "Google Drive video could not be loaded. Please check the file permissions or try a different video."
+          );
         }
       }
     }
+  };
+
+  // Helper function to get display content based on language preference
+  const getDisplayContent = (showAlt = false) => {
+    if (!videoData) return { title: "", description: "" };
+
+    if (showAlt) {
+      return {
+        title: videoData.altTitle || videoData.title || "Untitled Video",
+        description:
+          videoData.altDescription ||
+          videoData.description ||
+          "No description available",
+      };
+    }
+
+    return {
+      title: videoData.title || "Untitled Video",
+      description: videoData.description || "No description available",
+    };
   };
 
   const renderVideo = () => {
@@ -155,10 +193,11 @@ const VideoComponent = ({
           googleDriveUrls.primary,
           googleDriveUrls.fallback,
           googleDriveUrls.direct,
-          googleDriveUrls.embedApi
+          googleDriveUrls.embedApi,
         ].filter(Boolean);
 
-        const currentUrl = currentGoogleDriveUrl || urls[googleDriveFallbackIndex] || urls[0];
+        const currentUrl =
+          currentGoogleDriveUrl || urls[googleDriveFallbackIndex] || urls[0];
 
         return (
           <div className="video-container relative w-full overflow-hidden rounded-lg bg-gray-900">
@@ -296,6 +335,141 @@ const VideoComponent = ({
       </div>
 
       {renderVideo()}
+
+      {/* Multi-Language Configuration */}
+      {videoData && videoData.url && (
+        <Collapse className="mt-4">
+          <Panel
+            header={
+              <div className="flex items-center gap-2">
+                <GlobalOutlined />
+                Multi-Language Settings
+              </div>
+            }
+            key="multilang"
+          >
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-md font-semibold">
+                    Display Alternative Content
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Toggle to show alternative title and description for video
+                  </p>
+                </div>
+                <Switch
+                  checked={showAltContent}
+                  onChange={(checked) => {
+                    setShowAltContent(checked);
+                    updateComponent({
+                      ...component,
+                      _mave: {
+                        ...videoData,
+                        showAltContent: checked,
+                      },
+                    });
+                  }}
+                />
+              </div>
+
+              {showAltContent && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <div className="text-sm text-blue-800">
+                    <strong>Alternative Content Mode:</strong> Video will
+                    display alternative title and description when available.
+                  </div>
+                </div>
+              )}
+
+              {/* Alternative Content Editing Section */}
+              <div className="mt-6 p-4 bg-white rounded-lg border">
+                <div className="flex items-center justify-between mb-4">
+                  <h5 className="text-lg font-semibold flex items-center gap-2">
+                    <EditOutlined />
+                    Alternative Content
+                  </h5>
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={() => setShowAltInputs(true)}
+                    className="mavebutton"
+                    size="small"
+                  >
+                    Edit
+                  </Button>
+                </div>
+
+                {showAltInputs ? (
+                  <Form layout="vertical" className="w-full">
+                    <Form.Item label="Alternative Title" className="mb-3">
+                      <Input
+                        placeholder="Enter alternative title"
+                        defaultValue={videoData.altTitle || ""}
+                        onChange={(e) => {
+                          setVideoData({
+                            ...videoData,
+                            altTitle: e.target.value,
+                          });
+                        }}
+                      />
+                    </Form.Item>
+
+                    <Form.Item label="Alternative Description" className="mb-4">
+                      <Input.TextArea
+                        rows={3}
+                        placeholder="Enter alternative description"
+                        defaultValue={videoData.altDescription || ""}
+                        onChange={(e) => {
+                          setVideoData({
+                            ...videoData,
+                            altDescription: e.target.value,
+                          });
+                        }}
+                      />
+                    </Form.Item>
+
+                    {/* Update Button */}
+                    <div className="mt-4 flex justify-end">
+                      <Button
+                        type="primary"
+                        icon={<CheckOutlined />}
+                        onClick={() => {
+                          updateComponent({
+                            ...component,
+                            _mave: videoData,
+                          });
+                          setShowAltInputs(false);
+                          message.success(
+                            "Alternative content updated successfully."
+                          );
+                        }}
+                        className="mavebutton"
+                      >
+                        Update Alternative Content
+                      </Button>
+                    </div>
+                  </Form>
+                ) : (
+                  /* Display Current Alternative Content */
+                  <div className="border rounded-lg p-3 bg-gray-50">
+                    <div className="text-sm">
+                      <div>
+                        <strong>Alt Title:</strong>{" "}
+                        {videoData.altTitle || "Not set"}
+                      </div>
+                      <div>
+                        <strong>Alt Description:</strong>{" "}
+                        {videoData.altDescription || "Not set"}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Panel>
+        </Collapse>
+      )}
 
       <VideoSelectionModal
         isVisible={isModalVisible}

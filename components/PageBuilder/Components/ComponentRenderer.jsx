@@ -176,6 +176,13 @@ const ComponentRenderer = React.memo(
           onUpdate(updatedComponent);
         } else {
           // Fallback to old system
+          if (!pageData || !pageData.body) {
+            console.warn(
+              "pageData or pageData.body is null, cannot update component"
+            );
+            return;
+          }
+
           const updatedPageData = {
             ...pageData,
             body: pageData.body.map((section, idx) => {
@@ -212,6 +219,13 @@ const ComponentRenderer = React.memo(
         onDelete();
       } else {
         // Fallback to old system
+        if (!pageData || !pageData.body) {
+          console.warn(
+            "pageData or pageData.body is null, cannot delete component"
+          );
+          return;
+        }
+
         const updatedPageData = {
           ...pageData,
           body: pageData.body.map((section, idx) => {

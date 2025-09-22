@@ -1,22 +1,40 @@
 // components/PageBuilder/Components/InfoBoxComponent/InfoBoxComponent.jsx
 
 import React, { useState, useEffect } from "react";
-import { Button, Space, Form, message, Popconfirm, Input, Switch } from "antd";
+import {
+  Button,
+  Space,
+  Form,
+  message,
+  Popconfirm,
+  Input,
+  Switch,
+  Collapse,
+} from "antd";
 import {
   PlusOutlined,
   MinusOutlined,
-  EditOutlined,
   DeleteOutlined,
   SettingOutlined,
   CopyFilled,
+  CheckOutlined,
+  GlobalOutlined,
+  ExportOutlined,
+  DragOutlined,
+  FontColorsOutlined,
+  EyeOutlined,
+  DownloadOutlined,
+  LinkOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import Image from "next/image";
-import InfoBoxItem from "./InfoBoxItem";
 import MediaSelectionModal from "../../Modals/MediaSelectionModal";
 import ConfigSection from "./ConfigSection";
 import MainContentSection from "./MainContentSection";
 import AddInfoItemForm from "./AddInfoItemForm";
+import InfoBoxItem from "./InfoBoxItem";
 
+const { Panel } = Collapse;
 const InfoBoxComponent = ({
   component,
   updateComponent,
@@ -27,6 +45,8 @@ const InfoBoxComponent = ({
   const [infoBox, setInfoBox] = useState({
     title: component._mave?.title || "",
     description: component._mave?.description || "",
+    altTitle: component._mave?.altTitle || "",
+    altDescription: component._mave?.altDescription || "",
     media: component._mave?.media || [],
     infoItems: component._mave?.infoItems || [],
   });
@@ -42,40 +62,35 @@ const InfoBoxComponent = ({
   const [isMediaModalVisible, setIsMediaModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [mediaSelectionMode, setMediaSelectionMode] = useState("multiple");
+  const [editingItemMedia, setEditingItemMedia] = useState([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAltContent, setShowAltContent] = useState(false);
+  const [showAltInputs, setShowAltInputs] = useState(false);
+  const [editingAltItemId, setEditingAltItemId] = useState(null);
+  const [tempAltTitle, setTempAltTitle] = useState("");
+  const [tempAltDescription, setTempAltDescription] = useState("");
 
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  useEffect(() => {
-    // Only update if we're in edit mode
-    if (isEditMode) {
-      updateComponent({
-        ...component,
-        _mave: {
-          ...infoBox,
-          layout,
-          font,
-          color,
-          background,
-        },
-      });
-    }
-  }, [
-    isEditMode,
-    infoBox,
-    layout,
-    font,
-    color,
-    background,
-    updateComponent,
-    component,
-  ]);
+  // Remove the automatic update useEffect to prevent infinite loops
+  // Updates will be handled manually through save button
 
-  // Handle media selection
+  useEffect(() => {
+    setShowAltContent(component._mave?.showAltContent || false);
+  }, [component._mave?.showAltContent]);
+
+  // Handle media selection for adding new items
   const handleSelectMedia = (media) => {
     const mediaArray = Array.isArray(media) ? media : [media];
     setSelectedMedia(mediaArray);
+    setIsMediaModalVisible(false);
+  };
+
+  // Handle media selection for editing existing items
+  const handleEditItemMediaSelect = (media) => {
+    const mediaArray = Array.isArray(media) ? media : [media];
+    setEditingItemMedia(mediaArray);
     setIsMediaModalVisible(false);
   };
 
@@ -97,6 +112,8 @@ const InfoBoxComponent = ({
       title: values.title,
       description: values.description,
       link: values.link,
+      altTitle: values.altTitle || "",
+      altDescription: values.altDescription || "",
       media: selectedMedia,
     };
     setInfoBox({
@@ -116,8 +133,10 @@ const InfoBoxComponent = ({
       title: item.title,
       description: item.description,
       link: item.link,
+      altTitle: item.altTitle || "",
+      altDescription: item.altDescription || "",
     });
-    setSelectedMedia(item.media);
+    setEditingItemMedia(item.media || []);
   };
 
   // Handle edit submit
@@ -127,7 +146,9 @@ const InfoBoxComponent = ({
       title: values.title,
       description: values.description,
       link: values.link,
-      media: selectedMedia,
+      altTitle: values.altTitle || "",
+      altDescription: values.altDescription || "",
+      media: editingItemMedia,
     };
     setInfoBox({
       ...infoBox,
@@ -136,14 +157,14 @@ const InfoBoxComponent = ({
       ),
     });
     setEditingItemId(null);
-    setSelectedMedia([]);
+    setEditingItemMedia([]);
     message.success("Info item updated successfully.");
   };
 
   // Handle cancel edit
   const handleCancelEdit = () => {
     setEditingItemId(null);
-    setSelectedMedia([]);
+    setEditingItemMedia([]);
     editForm.resetFields();
   };
 
@@ -163,8 +184,14 @@ const InfoBoxComponent = ({
     }
   };
 
-  // Handle media modal open
+  // Handle media modal open for adding new items
   const handleMediaModalOpen = (mode) => {
+    setMediaSelectionMode(mode);
+    setIsMediaModalVisible(true);
+  };
+
+  // Handle media modal open for editing existing items
+  const handleEditItemMediaModalOpen = (mode) => {
     setMediaSelectionMode(mode);
     setIsMediaModalVisible(true);
   };
@@ -181,10 +208,83 @@ const InfoBoxComponent = ({
           font,
           color,
           background,
+          showAltContent,
         },
       });
+      message.success("Info box updated successfully.");
     }
     setIsEditMode(!isEditMode);
+  };
+
+  // Handle cancel edit mode
+  const handleCancelEditMode = () => {
+    // Reset to original values
+    setInfoBox({
+      title: component._mave?.title || "",
+      description: component._mave?.description || "",
+      altTitle: component._mave?.altTitle || "",
+      altDescription: component._mave?.altDescription || "",
+      media: component._mave?.media || [],
+      infoItems: component._mave?.infoItems || [],
+    });
+    setLayout(component._mave?.layout || "horizontal");
+    setFont(component._mave?.font || "Arial");
+    setColor(component._mave?.color || "#000000");
+    setBackground(component._mave?.background || "#ffffff");
+    setShowAltContent(component._mave?.showAltContent || false);
+    setIsEditMode(false);
+  };
+
+  // Handle edit alt content for individual item
+  const handleEditAltContent = (item) => {
+    console.log("Edit alt content clicked for item:", item);
+    setEditingAltItemId(item.id);
+    setTempAltTitle(item.altTitle || "");
+    setTempAltDescription(item.altDescription || "");
+  };
+
+  // Handle save alt content for individual item
+  const handleSaveAltContent = () => {
+    if (editingAltItemId) {
+      const updatedInfoBox = {
+        ...infoBox,
+        infoItems: infoBox.infoItems.map((item) =>
+          item.id === editingAltItemId
+            ? {
+                ...item,
+                altTitle: tempAltTitle,
+                altDescription: tempAltDescription,
+              }
+            : item
+        ),
+      };
+      setInfoBox(updatedInfoBox);
+
+      // Also update the component immediately
+      updateComponent({
+        ...component,
+        _mave: {
+          ...updatedInfoBox,
+          layout,
+          font,
+          color,
+          background,
+          showAltContent,
+        },
+      });
+
+      setEditingAltItemId(null);
+      setTempAltTitle("");
+      setTempAltDescription("");
+      message.success("Alternative content updated successfully.");
+    }
+  };
+
+  // Handle cancel alt content editing
+  const handleCancelAltContent = () => {
+    setEditingAltItemId(null);
+    setTempAltTitle("");
+    setTempAltDescription("");
   };
 
   // Styles based on configuration
@@ -213,7 +313,7 @@ const InfoBoxComponent = ({
                 </Button>
                 <Button
                   className="mavecancelbutton"
-                  onClick={() => setIsEditMode(false)}
+                  onClick={handleCancelEditMode}
                 >
                   Cancel
                 </Button>
@@ -276,6 +376,13 @@ const InfoBoxComponent = ({
             onInfoBoxChange={setInfoBox}
             onMediaSelect={handleMediaModalOpen}
             media={infoBox.media}
+            updateComponent={updateComponent}
+            component={component}
+            layout={layout}
+            font={font}
+            color={color}
+            background={background}
+            showAltContent={showAltContent}
           />
 
           <div className="border-t pt-4 mt-4">
@@ -307,8 +414,16 @@ const InfoBoxComponent = ({
         {/* Title and Description - Full Width */}
         {(preview || !isEditMode) && (
           <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-2">{infoBox.title}</h2>
-            <p className="mb-4">{infoBox.description}</p>
+            <h2 className="text-2xl font-bold mb-2">
+              {showAltContent
+                ? infoBox.altTitle || infoBox.title
+                : infoBox.title}
+            </h2>
+            <p className="mb-4">
+              {showAltContent
+                ? infoBox.altDescription || infoBox.description
+                : infoBox.description}
+            </p>
           </div>
         )}
 
@@ -355,14 +470,16 @@ const InfoBoxComponent = ({
                   {editingItemId === item.id ? (
                     <div className="flex gap-4">
                       <div className="flex flex-col justify-center w-1/3">
-                        {item.media && item.media.length > 0 && (
+                        {editingItemMedia && editingItemMedia.length > 0 && (
                           <div
                             className="relative cursor-pointer"
-                            onClick={() => handleMediaModalOpen("multiple")}
+                            onClick={() =>
+                              handleEditItemMediaModalOpen("multiple")
+                            }
                           >
                             <Image
-                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.media[0].file_path}`}
-                              alt={item.media[0].title || "Media"}
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${editingItemMedia[0].file_path}`}
+                              alt={editingItemMedia[0].title || "Media"}
                               width={200}
                               height={200}
                               objectFit="cover"
@@ -372,7 +489,9 @@ const InfoBoxComponent = ({
                         )}
                         <Button
                           className="mavebutton mt-2"
-                          onClick={() => handleMediaModalOpen("multiple")}
+                          onClick={() =>
+                            handleEditItemMediaModalOpen("multiple")
+                          }
                         >
                           Change Media
                         </Button>
@@ -410,6 +529,15 @@ const InfoBoxComponent = ({
                           </Form.Item>
                           <Form.Item name="link">
                             <Input placeholder="Link URL (optional)" />
+                          </Form.Item>
+                          <Form.Item name="altTitle">
+                            <Input placeholder="Alternative Title (optional)" />
+                          </Form.Item>
+                          <Form.Item name="altDescription">
+                            <Input.TextArea
+                              rows={3}
+                              placeholder="Alternative Description (optional)"
+                            />
                           </Form.Item>
                           <Form.Item>
                             <Space>
@@ -449,9 +577,15 @@ const InfoBoxComponent = ({
                       </div>
                       <div className="col-span-8">
                         <h3 className="text-lg font-semibold mb-2">
-                          {item.title}
+                          {showAltContent
+                            ? item.altTitle || item.title
+                            : item.title}
                         </h3>
-                        <p className="mb-2">{item.description}</p>
+                        <p className="mb-2">
+                          {showAltContent
+                            ? item.altDescription || item.description
+                            : item.description}
+                        </p>
                         {item.link && (
                           <a
                             href={item.link}
@@ -471,6 +605,13 @@ const InfoBoxComponent = ({
                             onClick={() => handleEditInfoItem(item)}
                           />
                           <Button
+                            className="mavebutton"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditAltContent(item)}
+                            style={{ color: "#1890ff" }}
+                            title="Edit Alt Content"
+                          />
+                          <Button
                             className="-ml-3"
                             danger
                             icon={<DeleteOutlined />}
@@ -478,6 +619,58 @@ const InfoBoxComponent = ({
                           />
                         </Space>
                       )}
+                    </div>
+                  )}
+
+                  {/* Alt Content Editing Form */}
+                  {!preview && isEditMode && editingAltItemId === item.id && (
+                    <div className="mt-4 p-3 bg-blue-50 rounded border-2 border-blue-300">
+                      <div className="mb-2 text-sm text-blue-600 font-medium">
+                        ✏️ Editing Alt Content for: {item.title}
+                      </div>
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Alternative Title
+                        </label>
+                        <Input
+                          value={tempAltTitle}
+                          onChange={(e) => setTempAltTitle(e.target.value)}
+                          placeholder="Enter alternative title"
+                          size="small"
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Alternative Description
+                        </label>
+                        <Input.TextArea
+                          value={tempAltDescription}
+                          onChange={(e) =>
+                            setTempAltDescription(e.target.value)
+                          }
+                          placeholder="Enter alternative description"
+                          rows={3}
+                          size="small"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="small"
+                          onClick={handleCancelAltContent}
+                          className="mavecancelbutton"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="small"
+                          type="primary"
+                          icon={<CheckOutlined />}
+                          onClick={handleSaveAltContent}
+                          className="mavebutton"
+                        >
+                          Save
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -496,13 +689,244 @@ const InfoBoxComponent = ({
           }}
           onSelectMedia={(media) => {
             if (mediaSelectionMode === "multiple") {
-              handleSelectMedia(media);
+              if (editingItemId) {
+                handleEditItemMediaSelect(media);
+              } else {
+                handleSelectMedia(media);
+              }
             } else {
               handleMainMediaSelect(media);
             }
           }}
           selectionMode={mediaSelectionMode}
         />
+      )}
+
+      {/* Multi-Language Configuration */}
+      {infoBox.infoItems.length > 0 && !preview && (
+        <Collapse className="mt-4">
+          <Panel
+            header={
+              <div className="flex items-center gap-2">
+                <GlobalOutlined />
+                Multi-Language Settings
+              </div>
+            }
+            key="multilang"
+          >
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-md font-semibold">
+                    Display Alternative Content
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    Toggle to show alternative titles and descriptions for info
+                    items
+                  </p>
+                </div>
+                <Switch
+                  checked={showAltContent}
+                  onChange={(checked) => {
+                    setShowAltContent(checked);
+                  }}
+                />
+              </div>
+
+              {showAltContent && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <div className="text-sm text-blue-800">
+                    <strong>Alternative Content Mode:</strong> Info items will
+                    display alternative titles and descriptions when available.
+                  </div>
+                </div>
+              )}
+
+              {/* Alternative Content Editing Section */}
+              <div className="mt-6 p-4 bg-white rounded-lg border">
+                <div className="flex items-center justify-between mb-4">
+                  <h5 className="text-lg font-semibold flex items-center gap-2">
+                    <EditOutlined />
+                    Alternative Content
+                  </h5>
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={() => setShowAltInputs(true)}
+                    className="mavebutton"
+                    size="small"
+                  >
+                    Edit
+                  </Button>
+                </div>
+
+                {showAltInputs ? (
+                  <div className="space-y-4">
+                    {infoBox.infoItems.map((item, index) => (
+                      <div
+                        key={item.id}
+                        className="border rounded-lg p-4 bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          {item.media && item.media.length > 0 && (
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.media[0].file_path}`}
+                              alt={item.media[0].title || "Media"}
+                              width={60}
+                              height={40}
+                              className="rounded object-cover"
+                            />
+                          )}
+                          <div>
+                            <div className="font-medium text-sm">
+                              {item.title || "Untitled Item"}
+                            </div>
+                          </div>
+                        </div>
+
+                        <Form layout="vertical" className="w-full">
+                          <Form.Item label="Alternative Title" className="mb-3">
+                            <Input
+                              placeholder="Enter alternative title"
+                              defaultValue={item.altTitle || ""}
+                              onChange={(e) => {
+                                const updatedItems = [...infoBox.infoItems];
+                                updatedItems[index] = {
+                                  ...updatedItems[index],
+                                  altTitle: e.target.value,
+                                };
+                                const updatedInfoBox = {
+                                  ...infoBox,
+                                  infoItems: updatedItems,
+                                };
+                                setInfoBox(updatedInfoBox);
+
+                                // Update component immediately
+                                updateComponent({
+                                  ...component,
+                                  _mave: {
+                                    ...updatedInfoBox,
+                                    layout,
+                                    font,
+                                    color,
+                                    background,
+                                    showAltContent,
+                                  },
+                                });
+                              }}
+                            />
+                          </Form.Item>
+
+                          <Form.Item
+                            label="Alternative Description"
+                            className="mb-3"
+                          >
+                            <Input.TextArea
+                              rows={3}
+                              placeholder="Enter alternative description"
+                              defaultValue={item.altDescription || ""}
+                              onChange={(e) => {
+                                const updatedItems = [...infoBox.infoItems];
+                                updatedItems[index] = {
+                                  ...updatedItems[index],
+                                  altDescription: e.target.value,
+                                };
+                                const updatedInfoBox = {
+                                  ...infoBox,
+                                  infoItems: updatedItems,
+                                };
+                                setInfoBox(updatedInfoBox);
+
+                                // Update component immediately
+                                updateComponent({
+                                  ...component,
+                                  _mave: {
+                                    ...updatedInfoBox,
+                                    layout,
+                                    font,
+                                    color,
+                                    background,
+                                    showAltContent,
+                                  },
+                                });
+                              }}
+                            />
+                          </Form.Item>
+                        </Form>
+                      </div>
+                    ))}
+
+                    {/* Update Button */}
+                    <div className="mt-4 flex justify-end">
+                      <Button
+                        type="primary"
+                        icon={<CheckOutlined />}
+                        onClick={() => {
+                          // Ensure all changes are saved to component
+                          updateComponent({
+                            ...component,
+                            _mave: {
+                              ...infoBox,
+                              layout,
+                              font,
+                              color,
+                              background,
+                              showAltContent,
+                            },
+                          });
+                          setShowAltInputs(false);
+                          message.success(
+                            "Alternative content updated successfully."
+                          );
+                        }}
+                        className="mavebutton"
+                      >
+                        Update Alternative Content
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Display Current Alternative Content */
+                  <div className="space-y-3">
+                    {infoBox.infoItems.map((item, index) => (
+                      <div
+                        key={item.id}
+                        className="border rounded-lg p-3 bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          {item.media && item.media.length > 0 && (
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.media[0].file_path}`}
+                              alt={item.media[0].title || "Media"}
+                              width={40}
+                              height={30}
+                              className="rounded object-cover"
+                            />
+                          )}
+                          <div>
+                            <div className="font-medium text-sm">
+                              {item.title || "Untitled Item"}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-sm">
+                          <div>
+                            <strong>Alt Title:</strong>{" "}
+                            {item.altTitle || "Not set"}
+                          </div>
+                          <div>
+                            <strong>Alt Description:</strong>{" "}
+                            {item.altDescription || "Not set"}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Panel>
+        </Collapse>
       )}
     </div>
   );

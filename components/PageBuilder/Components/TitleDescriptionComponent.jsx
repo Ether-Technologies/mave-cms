@@ -76,6 +76,10 @@ const TitleDescriptionComponent = ({
     titleFontSize: "medium",
     titleFontWeight: "normal",
     titleAlign: "left",
+    showAltContent: false,
+    // Alternative content for dual color parts
+    altTitleFirst: "",
+    altTitleSecond: "",
   });
 
   // Fetch pages on mount
@@ -111,6 +115,9 @@ const TitleDescriptionComponent = ({
         titleFontSize = "medium",
         titleFontWeight = "normal",
         titleAlign = "left",
+        showAltContent = false,
+        altTitleFirst = "",
+        altTitleSecond = "",
       } = component._mave;
       setFormData({
         title,
@@ -128,6 +135,9 @@ const TitleDescriptionComponent = ({
         titleFontSize,
         titleFontWeight,
         titleAlign,
+        showAltContent,
+        altTitleFirst,
+        altTitleSecond,
       });
     }
   }, [component]);
@@ -163,6 +173,9 @@ const TitleDescriptionComponent = ({
         titleFontSize: orig.titleFontSize || "medium",
         titleFontWeight: orig.titleFontWeight || "normal",
         titleAlign: orig.titleAlign || "left",
+        showAltContent: orig.showAltContent || false,
+        altTitleFirst: orig.altTitleFirst || "",
+        altTitleSecond: orig.altTitleSecond || "",
       });
     }
     setIsEditing(false);
@@ -274,17 +287,52 @@ const TitleDescriptionComponent = ({
               </span>
             )}
           </div>
+          {formData.showAltContent &&
+            formData.isDualColor &&
+            (formData.altTitleFirst || formData.altTitleSecond) && (
+              <div className="mt-2">
+                <div className="text-sm text-gray-600 mb-1">
+                  Alternative Title:
+                </div>
+                <div
+                  className={`${getFontSizeClass(formData.titleFontSize)}`}
+                  style={{
+                    color: formData.titleColor,
+                    fontWeight: formData.titleFontWeight,
+                    textAlign: formData.titleAlign,
+                  }}
+                >
+                  {formData.altTitleFirst || "No Alternative First Part"}
+                  {formData.altTitleSecond && (
+                    <span
+                      style={{
+                        color: formData.altTitleColor,
+                        fontWeight: formData.titleFontWeight,
+                      }}
+                      className="ml-2"
+                    >
+                      / {formData.altTitleSecond}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           <div
             className="prose max-w-none"
             dangerouslySetInnerHTML={{
               __html: description || "No Description",
             }}
           />
-          {altDescription && (
-            <div
-              className="prose max-w-none italic text-gray-600"
-              dangerouslySetInnerHTML={{ __html: altDescription }}
-            />
+          {formData.showAltContent && altDescription && (
+            <div className="mt-4">
+              <div className="text-sm text-gray-600 mb-2">
+                Alternative Content:
+              </div>
+              <div
+                className="prose max-w-none italic text-gray-600"
+                dangerouslySetInnerHTML={{ __html: altDescription }}
+              />
+            </div>
           )}
           {link && (
             <div className="flex items-center gap-2 text-yellow-600">
@@ -420,18 +468,50 @@ const TitleDescriptionComponent = ({
                     />
                   </div>
                   {formData.isDualColor && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Alternative Title
-                      </label>
-                      <Input
-                        value={formData.altTitle}
-                        onChange={(e) =>
-                          handleChange("altTitle", e.target.value)
-                        }
-                        placeholder="Enter alternative title"
-                        className="w-full"
-                      />
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Second Part Title
+                        </label>
+                        <Input
+                          value={formData.altTitle}
+                          onChange={(e) =>
+                            handleChange("altTitle", e.target.value)
+                          }
+                          placeholder="Enter second part title"
+                          className="w-full"
+                        />
+                      </div>
+                      {formData.showAltContent && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Alternative First Part Title
+                            </label>
+                            <Input
+                              value={formData.altTitleFirst}
+                              onChange={(e) =>
+                                handleChange("altTitleFirst", e.target.value)
+                              }
+                              placeholder="Enter alternative first part title"
+                              className="w-full"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Alternative Second Part Title
+                            </label>
+                            <Input
+                              value={formData.altTitleSecond}
+                              onChange={(e) =>
+                                handleChange("altTitleSecond", e.target.value)
+                              }
+                              placeholder="Enter alternative second part title"
+                              className="w-full"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                   <div className="grid grid-cols-2 gap-4">
@@ -542,6 +622,23 @@ const TitleDescriptionComponent = ({
                       maxLength={5000}
                     />
                   </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Show Alternative Content
+                      </label>
+                      <p className="text-xs text-gray-500">
+                        Display alternative title and description alongside the
+                        main content
+                      </p>
+                    </div>
+                    <Switch
+                      checked={formData.showAltContent}
+                      onChange={(checked) =>
+                        handleChange("showAltContent", checked)
+                      }
+                    />
+                  </div>
                 </div>
               </Panel>
               <Panel header="Link Settings" key="3">
@@ -643,17 +740,52 @@ const TitleDescriptionComponent = ({
                 </span>
               )}
             </div>
+            {formData.showAltContent &&
+              formData.isDualColor &&
+              (formData.altTitleFirst || formData.altTitleSecond) && (
+                <div className="mt-2">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Alternative Title:
+                  </div>
+                  <div
+                    className={`${getFontSizeClass(formData.titleFontSize)}`}
+                    style={{
+                      color: formData.titleColor,
+                      fontWeight: formData.titleFontWeight,
+                      textAlign: formData.titleAlign,
+                    }}
+                  >
+                    {formData.altTitleFirst || "No Alternative First Part"}
+                    {formData.altTitleSecond && (
+                      <span
+                        style={{
+                          color: formData.altTitleColor,
+                          fontWeight: formData.titleFontWeight,
+                        }}
+                        className="ml-2"
+                      >
+                        / {formData.altTitleSecond}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
             <div
               className="prose max-w-none"
               dangerouslySetInnerHTML={{
                 __html: description || "No Description",
               }}
             />
-            {altDescription && (
-              <div
-                className="prose max-w-none italic text-gray-600"
-                dangerouslySetInnerHTML={{ __html: altDescription }}
-              />
+            {formData.showAltContent && altDescription && (
+              <div className="mt-4">
+                <div className="text-sm text-gray-600 mb-2">
+                  Alternative Content:
+                </div>
+                <div
+                  className="prose max-w-none italic text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: altDescription }}
+                />
+              </div>
             )}
             {link && (
               <div className="flex items-center gap-2 text-yellow-600">
