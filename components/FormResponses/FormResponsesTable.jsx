@@ -1,13 +1,8 @@
 // components/FormResponses/FormResponsesTable.jsx
 
 import React, { useState, useMemo } from "react";
-import { Table, Button, Popconfirm, Space, message, Tag } from "antd";
-import {
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  DownloadOutlined,
-} from "@ant-design/icons";
+import { Table, Button, Popconfirm, Space, message, Tag, Select } from "antd";
+import { EditOutlined, DownloadOutlined } from "@ant-design/icons";
 import ViewDetailsDrawer from "./ViewDetailsDrawer";
 import EditResponseDrawer from "./EditResponseDrawer";
 import instance from "../../axios";
@@ -39,6 +34,29 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
     } catch (error) {
       console.error("Error deleting form response:", error);
       message.error("An error occurred while deleting the form response.");
+    }
+  };
+
+  // Handle Status Change
+  const handleStatusChange = async (id, currentStatus) => {
+    // Current status is already normalized to lowercase from getCurrentStatus
+    const newStatus = currentStatus === "pending" ? "resolved" : "pending";
+
+    try {
+      const response = await instance.put(`/form-submission/${id}`, {
+        status: newStatus,
+      });
+      if (response.status === 200) {
+        message.success(`Form response marked as ${newStatus}.`);
+        refreshData();
+      } else {
+        message.error("Failed to update the form response status.");
+      }
+    } catch (error) {
+      console.error("Error updating form response status:", error);
+      message.error(
+        "An error occurred while updating the form response status."
+      );
     }
   };
 
@@ -84,6 +102,31 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
     );
   };
 
+  // Function to render status tag
+  const renderStatusTag = (status) => {
+    const statusColors = {
+      pending: "orange",
+      resolved: "green",
+    };
+
+    return (
+      <Tag color={statusColors[status?.toLowerCase()] || "default"}>
+        {status?.toUpperCase() || "PENDING"}
+      </Tag>
+    );
+  };
+
+  // Function to get current status from root status field only (default to pending)
+  const getCurrentStatus = (formData, record) => {
+    // Only check root status field, ignore form_data.status completely
+    const rootStatus = record?.status;
+
+    // Return root status normalized to lowercase, or default to pending
+    const status = rootStatus || "pending";
+    const normalizedStatus = status?.toLowerCase();
+    return normalizedStatus;
+  };
+
   // Function to get all unique field names from form responses
   const getAllFieldNames = (responses) => {
     const fieldNames = new Set();
@@ -122,17 +165,17 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
         {
           title: "Actions",
           key: "actions",
-          width: 150,
           render: (_, record) => (
             <Space size="middle">
               <Button
                 className="mavecancelbutton"
-                icon={<EyeOutlined />}
                 onClick={() => {
                   setSelectedResponse(record);
                   setViewDrawerVisible(true);
                 }}
-              />
+              >
+                View Details
+              </Button>
               <Popconfirm
                 title="Are you sure you want to delete this response?"
                 onConfirm={(e) => handleDelete(record.id, e)}
@@ -141,12 +184,12 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
                 okButtonProps={{ danger: true, type: "button" }}
               >
                 <Button
-                  className="mavecancelbutton"
-                  icon={<DeleteOutlined />}
                   danger
                   type="button"
                   onClick={(e) => e.preventDefault()}
-                />
+                >
+                  Delete
+                </Button>
               </Popconfirm>
             </Space>
           ),
@@ -163,33 +206,58 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
         width: 80,
         fixed: "left",
       },
+      {
+        title: "Status",
+        key: "status",
+        width: 200,
+        render: (_, record) => {
+          const currentStatus = getCurrentStatus(record.form_data, record);
+          return (
+            <Space>
+              {renderStatusTag(currentStatus)}
+              <Popconfirm
+                title={`Mark as ${currentStatus === "pending" ? "Resolved" : "Pending"}?`}
+                onConfirm={() => handleStatusChange(record.id, currentStatus)}
+                okText="Yes"
+                cancelText="No"
+                okButtonProps={{ type: "button" }}
+              >
+                <Button
+                  size="small"
+                  style={{
+                    minWidth: "60px",
+                    backgroundColor: "var(--theme)",
+                    color: "white",
+                    borderColor: "var(--theme)",
+                  }}
+                >
+                  Update
+                </Button>
+              </Popconfirm>
+            </Space>
+          );
+        },
+      },
     ];
-
-    // Add dynamic columns for form fields (max 2 for responsiveness - total 3 columns: ID + 2 fields + Actions)
-    const dynamicColumns = fieldNames.slice(0, 2).map((fieldName) => ({
-      title: fieldName,
-      dataIndex: ["form_data", fieldName],
-      key: fieldName,
-      render: (text) => renderFieldValue(text),
-      ellipsis: true,
-    }));
 
     const actionColumn = {
       title: "Actions",
       key: "actions",
-      width: 150,
+      width: 120,
       fixed: "right",
       render: (_, record) => (
-        <Space size="middle">
+        <Space size="small">
           <Button
             className="mavebutton"
-            icon={<EyeOutlined />}
             onClick={() => {
               setSelectedResponse(record);
               setViewDrawerVisible(true);
             }}
             title="View Details"
-          />
+            size="small"
+          >
+            View Details
+          </Button>
           <Popconfirm
             title="Are you sure you want to delete this response?"
             onConfirm={(e) => handleDelete(record.id, e)}
@@ -199,18 +267,20 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
           >
             <Button
               className="mavecancelbutton"
-              icon={<DeleteOutlined />}
               danger
               title="Delete Response"
               type="button"
+              size="small"
               onClick={(e) => e.preventDefault()}
-            />
+            >
+              Delete
+            </Button>
           </Popconfirm>
         </Space>
       ),
     };
 
-    return [...baseColumns, ...dynamicColumns, actionColumn];
+    return [...baseColumns, actionColumn];
   }, [responses]);
 
   const columns = generateColumns;
@@ -218,13 +288,6 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
   return (
     <>
       <div className="bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 px-6 py-4 border-b border-orange-200">
-          <h3 className="text-lg font-semibold text-orange-800 flex items-center">
-            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-            Form Responses
-          </h3>
-        </div>
-
         <div className="p-0">
           <Table
             dataSource={responses}
