@@ -18,6 +18,7 @@ import {
 import instance from "../../axios";
 import { setThemeColors } from "../../utils/themeUtils";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import RichTextEditor from "../RichTextEditor";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -145,9 +146,11 @@ const GeneralSettings = ({ config, id }) => {
                 { required: true, message: "Site Description is required." },
               ]}
             >
-              <Input.TextArea
-                rows={4}
-                placeholder="Enter your site description"
+              <RichTextEditor
+                defaultValue={form.getFieldValue("siteDescription")}
+                onChange={(html) => form.setFieldValue("siteDescription", html)}
+                editMode={true}
+                maxLength={1000}
               />
             </Form.Item>
           </Col>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Input, Button } from "antd";
 import Image from "next/image";
+import RichTextEditor from "../../../RichTextEditor";
 
 const MainContentSection = ({
   infoBox,
@@ -41,12 +42,12 @@ const MainContentSection = ({
           />
         </Form.Item>
         <Form.Item label="Description">
-          <Input.TextArea
-            value={infoBox.description}
-            onChange={(e) => {
+          <RichTextEditor
+            defaultValue={infoBox.description}
+            onChange={(html) => {
               const updatedInfoBox = {
                 ...infoBox,
-                description: e.target.value,
+                description: html,
               };
               onInfoBoxChange(updatedInfoBox);
               // Also update component immediately
@@ -62,8 +63,8 @@ const MainContentSection = ({
                 },
               });
             }}
-            placeholder="Enter description"
-            rows={4}
+            editMode={true}
+            maxLength={2000}
           />
         </Form.Item>
         <Form.Item label="Alternative Title">
@@ -89,12 +90,12 @@ const MainContentSection = ({
           />
         </Form.Item>
         <Form.Item label="Alternative Description">
-          <Input.TextArea
-            value={infoBox.altDescription || ""}
-            onChange={(e) => {
+          <RichTextEditor
+            defaultValue={infoBox.altDescription || ""}
+            onChange={(html) => {
               const updatedInfoBox = {
                 ...infoBox,
-                altDescription: e.target.value,
+                altDescription: html,
               };
               onInfoBoxChange(updatedInfoBox);
               // Also update component immediately
@@ -110,8 +111,8 @@ const MainContentSection = ({
                 },
               });
             }}
-            placeholder="Enter alternative description (optional)"
-            rows={4}
+            editMode={true}
+            maxLength={2000}
           />
         </Form.Item>
         <Form.Item label="Main Media">

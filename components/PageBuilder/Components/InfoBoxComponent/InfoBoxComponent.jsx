@@ -420,11 +420,10 @@ const InfoBoxComponent = ({
                 ? infoBox.altTitle || infoBox.title
                 : infoBox.title}
             </h2>
-            <p className="mb-4">
-              {showAltContent
-                ? infoBox.altDescription || infoBox.description
-                : infoBox.description}
-            </p>
+            <div
+              className="mb-4"
+              dangerouslySetInnerHTML={{ __html: infoBox.description }}
+            />
           </div>
         )}
 
@@ -590,11 +589,14 @@ const InfoBoxComponent = ({
                             ? item.altTitle || item.title
                             : item.title}
                         </h3>
-                        <p className="mb-2">
-                          {showAltContent
-                            ? item.altDescription || item.description
-                            : item.description}
-                        </p>
+                        <p
+                          className="mb-2"
+                          dangerouslySetInnerHTML={{
+                            __html: showAltContent
+                              ? item.altDescription || item.description
+                              : item.description,
+                          }}
+                        />
                         {item.link && (
                           <a
                             href={item.link}

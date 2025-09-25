@@ -7,9 +7,9 @@ import {
   CheckCircleOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
+import RichTextEditor from "../RichTextEditor";
 
 const { Option } = Select;
-const { TextArea } = Input;
 
 const SEOFields = ({ seo, setSeo }) => {
   const calculateSeoScore = () => {
@@ -124,13 +124,11 @@ const SEOFields = ({ seo, setSeo }) => {
           `${seo.seoDescription.length} characters (recommended: 120-160)`
         }
       >
-        <TextArea
-          placeholder="Enter meta description"
-          value={seo.seoDescription}
-          onChange={(e) => setSeo({ ...seo, seoDescription: e.target.value })}
+        <RichTextEditor
+          defaultValue={seo.seoDescription}
+          onChange={(html) => setSeo({ ...seo, seoDescription: html })}
+          editMode={true}
           maxLength={160}
-          showCount
-          rows={3}
         />
       </Form.Item>
 
@@ -174,9 +172,12 @@ const SEOFields = ({ seo, setSeo }) => {
             <div className="border border-gray-200 rounded p-2">
               <div className="w-16 h-16 bg-gray-200 rounded mb-2"></div>
               <h6 className="font-medium text-sm">{seo.seoTitle || "Title"}</h6>
-              <p className="text-xs text-gray-500 line-clamp-2">
-                {seo.seoDescription || "Description"}
-              </p>
+              <div
+                className="text-xs text-gray-500 line-clamp-2"
+                dangerouslySetInnerHTML={{
+                  __html: seo.seoDescription || "Description",
+                }}
+              />
             </div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -184,9 +185,12 @@ const SEOFields = ({ seo, setSeo }) => {
             <div className="border border-gray-200 rounded p-2">
               <div className="w-16 h-16 bg-gray-200 rounded mb-2"></div>
               <h6 className="font-medium text-sm">{seo.seoTitle || "Title"}</h6>
-              <p className="text-xs text-gray-500 line-clamp-2">
-                {seo.seoDescription || "Description"}
-              </p>
+              <div
+                className="text-xs text-gray-500 line-clamp-2"
+                dangerouslySetInnerHTML={{
+                  __html: seo.seoDescription || "Description",
+                }}
+              />
             </div>
           </div>
         </div>

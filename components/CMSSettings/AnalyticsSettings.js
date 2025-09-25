@@ -16,6 +16,7 @@ import {
 } from "antd";
 import instance from "../../axios";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import RichTextEditor from "../RichTextEditor";
 
 const { Title, Text } = Typography;
 
@@ -176,9 +177,11 @@ const AnalyticsSettings = ({ config, id }) => {
                 </Text>
               }
             >
-              <Input.TextArea
-                rows={4}
-                placeholder="Enter custom analytics code"
+              <RichTextEditor
+                defaultValue={form.getFieldValue("customAnalyticsCode")}
+                onChange={(html) => form.setFieldValue("customAnalyticsCode", html)}
+                editMode={true}
+                maxLength={2000}
               />
             </Form.Item>
           </Col>

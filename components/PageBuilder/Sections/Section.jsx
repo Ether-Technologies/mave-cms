@@ -36,6 +36,11 @@ const Section = ({
     section.title || `Section ${(sectionIndex || index) + 1}`
   );
 
+  // Update tempTitle when section title changes
+  React.useEffect(() => {
+    setTempTitle(section.title || `Section ${(sectionIndex || index) + 1}`);
+  }, [section.title, sectionIndex, index]);
+
   // Ensure section has a valid _id - use stable ID generation
   const draggableId = useMemo(() => {
     return section._id || `section-${sectionIndex || index}`;
@@ -116,11 +121,18 @@ const Section = ({
 
   const handleTitleEdit = (e) => {
     // Prevent event from bubbling up to drag listeners
+    e.preventDefault();
     e.stopPropagation();
+    console.log("🔧 Section title edit clicked");
     setIsEditingTitle(true);
   };
 
   const handleTitleSave = () => {
+    console.log("🔧 Section title save clicked", {
+      tempTitle,
+      sectionIndex,
+      index,
+    });
     if (tempTitle.trim() === "") {
       Modal.error({
         title: "Validation Error",
@@ -132,6 +144,10 @@ const Section = ({
       ...section,
       title: tempTitle,
     };
+    console.log("🔧 Dispatching updateSection", {
+      sectionIndex: sectionIndex || index,
+      newSection: updatedSection,
+    });
     dispatch(
       updateSection({
         sectionIndex: sectionIndex || index,
@@ -154,14 +170,14 @@ const Section = ({
         className="section-container bg-white shadow-md rounded-lg p-4 mb-6"
       >
         <div className="section-header flex items-center justify-between mb-4 pb-2 border-b">
-          <div
-            {...listeners}
-            {...attributes}
-            className="flex items-center gap-2 flex-1 cursor-move"
-            style={{ position: "relative", zIndex: 50 }}
-          >
-            {/* Drag Handle Icon */}
-            <div className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600">
+          <div className="flex items-center gap-2 flex-1">
+            {/* Drag Handle Icon - only this part should be draggable */}
+            <div
+              {...listeners}
+              {...attributes}
+              className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 cursor-move"
+              style={{ position: "relative", zIndex: 50 }}
+            >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
               </svg>
@@ -195,13 +211,14 @@ const Section = ({
                   onClick={handleTitleEdit}
                   size="middle"
                   className="mavebutton"
+                  style={{ position: "relative", zIndex: 10 }}
                 />
               </div>
             )}
           </div>
           <div
             className="flex items-center gap-2"
-            style={{ position: "relative", zIndex: 100 }}
+            style={{ position: "relative", zIndex: 10 }}
           >
             {(onDuplicate || onSectionDuplicate) && (
               <Button

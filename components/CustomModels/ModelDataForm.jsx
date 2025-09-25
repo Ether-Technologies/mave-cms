@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import axios from "axios";
 import moment from "moment";
+import RichTextEditor from "../RichTextEditor";
 
 const { Option } = Select;
 
@@ -60,12 +61,13 @@ export default function ModelDataForm({
         );
       case "text":
         return (
-          <Input.TextArea
-            value={formData[field.name]}
-            onChange={(e) =>
-              setFormData({ ...formData, [field.name]: e.target.value })
+          <RichTextEditor
+            defaultValue={formData[field.name] || ""}
+            onChange={(html) =>
+              setFormData({ ...formData, [field.name]: html })
             }
-            rows={4}
+            editMode={true}
+            maxLength={2000}
           />
         );
       case "integer":
@@ -102,13 +104,13 @@ export default function ModelDataForm({
         );
       case "json":
         return (
-          <Input.TextArea
-            value={formData[field.name]}
-            onChange={(e) =>
-              setFormData({ ...formData, [field.name]: e.target.value })
+          <RichTextEditor
+            defaultValue={formData[field.name] || ""}
+            onChange={(html) =>
+              setFormData({ ...formData, [field.name]: html })
             }
-            rows={4}
-            placeholder="Enter valid JSON"
+            editMode={true}
+            maxLength={2000}
           />
         );
       case "array":

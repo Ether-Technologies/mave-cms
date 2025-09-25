@@ -460,7 +460,11 @@ const VideoComponent = ({
                       </div>
                       <div>
                         <strong>Alt Description:</strong>{" "}
-                        {videoData.altDescription || "Not set"}
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: videoData.altDescription || "Not set",
+                          }}
+                        />
                       </div>
                     </div>
                   </div>

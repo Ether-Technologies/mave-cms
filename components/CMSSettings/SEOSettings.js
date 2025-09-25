@@ -15,6 +15,7 @@ import {
 } from "antd";
 import instance from "../../axios";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import RichTextEditor from "../RichTextEditor";
 
 const { Title, Text } = Typography;
 
@@ -89,7 +90,12 @@ const SEOSettings = ({ config, id }) => {
                 </Text>
               }
             >
-              <Input.TextArea rows={4} placeholder="Enter meta description" />
+              <RichTextEditor
+                defaultValue={form.getFieldValue("metaDescription")}
+                onChange={(html) => form.setFieldValue("metaDescription", html)}
+                editMode={true}
+                maxLength={500}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -139,9 +145,11 @@ const SEOSettings = ({ config, id }) => {
                 </Text>
               }
             >
-              <Input.TextArea
-                rows={4}
-                placeholder="Enter Open Graph description"
+              <RichTextEditor
+                defaultValue={form.getFieldValue("ogDescription")}
+                onChange={(html) => form.setFieldValue("ogDescription", html)}
+                editMode={true}
+                maxLength={500}
               />
             </Form.Item>
           </Col>
@@ -216,9 +224,11 @@ const SEOSettings = ({ config, id }) => {
                 <Text type="secondary">Description for Twitter sharing</Text>
               }
             >
-              <Input.TextArea
-                rows={4}
-                placeholder="Enter Twitter description"
+              <RichTextEditor
+                defaultValue={form.getFieldValue("twitterDescription")}
+                onChange={(html) => form.setFieldValue("twitterDescription", html)}
+                editMode={true}
+                maxLength={500}
               />
             </Form.Item>
           </Col>

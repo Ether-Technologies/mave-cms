@@ -3,18 +3,16 @@
 import React from "react";
 import { Input, Button } from "antd";
 import { RobotOutlined } from "@ant-design/icons";
-
-const { TextArea } = Input;
+import RichTextEditor from "../RichTextEditor";
 
 const ChatInput = ({ prompt, setPrompt, onSend, loading }) => {
   return (
     <div className="flex items-center gap-2">
-      <TextArea
-        placeholder="Type your message..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        autoSize={{ minRows: 1, maxRows: 4 }}
-        className="flex-1"
+      <RichTextEditor
+        defaultValue={prompt}
+        onChange={setPrompt}
+        editMode={true}
+        maxLength={1000}
       />
       <Button
         type="primary"

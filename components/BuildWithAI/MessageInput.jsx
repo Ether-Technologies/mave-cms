@@ -3,8 +3,7 @@
 import React from "react";
 import { Input, Button, Tooltip } from "antd";
 import { SendOutlined } from "@ant-design/icons";
-
-const { TextArea } = Input;
+import RichTextEditor from "../RichTextEditor";
 
 const MessageInput = ({
   userInput,
@@ -14,16 +13,11 @@ const MessageInput = ({
 }) => {
   return (
     <div className="flex flex-col gap-4">
-      <TextArea
-        autoSize={{
-          minRows: 3,
-          maxRows: 6,
-        }}
-        allowClear
-        placeholder="Describe the page you want to create..."
-        value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
-        className="resize-none border rounded-md p-2"
+      <RichTextEditor
+        defaultValue={userInput}
+        onChange={setUserInput}
+        editMode={true}
+        maxLength={2000}
       />
       <div className="flex justify-end">
         <Tooltip title="Click to send your message">

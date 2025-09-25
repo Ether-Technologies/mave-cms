@@ -143,9 +143,12 @@ const MediaComponent = ({
             </div>
             {displayContent.description &&
               displayContent.description !== "No description available" && (
-                <div className="text-xs opacity-90 truncate">
-                  {displayContent.description}
-                </div>
+                <div
+                  className="text-xs opacity-90 truncate"
+                  dangerouslySetInnerHTML={{
+                    __html: displayContent.description,
+                  }}
+                />
               )}
           </div>
         </div>
@@ -177,9 +180,12 @@ const MediaComponent = ({
             </div>
             {displayContent.description &&
               displayContent.description !== "No description available" && (
-                <div className="text-xs opacity-90 truncate">
-                  {displayContent.description}
-                </div>
+                <div
+                  className="text-xs opacity-90 truncate"
+                  dangerouslySetInnerHTML={{
+                    __html: displayContent.description,
+                  }}
+                />
               )}
           </div>
         </div>
@@ -222,9 +228,12 @@ const MediaComponent = ({
             </div>
             {displayContent.description &&
               displayContent.description !== "No description available" && (
-                <div className="text-xs text-gray-600 truncate w-48">
-                  {displayContent.description}
-                </div>
+                <div
+                  className="text-xs text-gray-600 truncate w-48"
+                  dangerouslySetInnerHTML={{
+                    __html: displayContent.description,
+                  }}
+                />
               )}
           </div>
         </div>
@@ -258,9 +267,12 @@ const MediaComponent = ({
             </div>
             {displayContent.description &&
               displayContent.description !== "No description available" && (
-                <div className="text-xs text-gray-600 truncate w-48">
-                  {displayContent.description}
-                </div>
+                <div
+                  className="text-xs text-gray-600 truncate w-48"
+                  dangerouslySetInnerHTML={{
+                    __html: displayContent.description,
+                  }}
+                />
               )}
           </div>
         </div>
@@ -806,7 +818,12 @@ const MediaComponent = ({
                               </div>
                               <div>
                                 <strong>Alt Description:</strong>{" "}
-                                {media.altDescription || "Not set"}
+                                {/* {media.altDescription || "Not set"} */}
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: media.altDescription || "Not set",
+                                  }}
+                                />
                               </div>
                             </div>
                           </div>
@@ -836,7 +853,12 @@ const MediaComponent = ({
                             </div>
                             <div>
                               <strong>Alt Description:</strong>{" "}
-                              {mediaData.altDescription || "Not set"}
+                              {/* {mediaData.altDescription || "Not set"} */}
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: mediaData.altDescription || "Not set",
+                                }}
+                              />
                             </div>
                           </div>
                         </div>

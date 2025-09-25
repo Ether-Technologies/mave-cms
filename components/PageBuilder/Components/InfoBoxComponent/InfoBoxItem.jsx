@@ -7,6 +7,7 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import Image from "next/image";
+import RichTextEditor from "../../../RichTextEditor";
 import styles from "./InfoBoxItem.module.css";
 
 const InfoBoxItem = ({
@@ -117,7 +118,10 @@ const InfoBoxItem = ({
         </div>
       )}
       <h4 className={styles.title}>{displayContent.title}</h4>
-      <p className={styles.description}>{displayContent.description}</p>
+      <div
+        className={styles.description}
+        dangerouslySetInnerHTML={{ __html: displayContent.description }}
+      />
 
       {/* Alt Content Editing Section */}
       {!preview && isEditingAlt && (
@@ -137,12 +141,11 @@ const InfoBoxItem = ({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Alternative Description
             </label>
-            <Input.TextArea
-              value={tempAltDescription}
-              onChange={(e) => setTempAltDescription(e.target.value)}
-              placeholder="Enter alternative description"
-              rows={3}
-              size="small"
+            <RichTextEditor
+              defaultValue={tempAltDescription}
+              onChange={setTempAltDescription}
+              editMode={true}
+              maxLength={1000}
             />
           </div>
           <div className="flex justify-end gap-2">

@@ -12,9 +12,7 @@ export const useDragAndDrop = ({
     const dispatch = useDispatch();
     const pageData = useSelector((state) => state.page.pageData);
 
-    // Debug components
-    useEffect(() => {
-    }, [componentsState, sectionIndex]);
+    // Debug components - removed empty useEffect to prevent unnecessary re-renders
 
     const onDragEnd = useCallback(
         (event) => {

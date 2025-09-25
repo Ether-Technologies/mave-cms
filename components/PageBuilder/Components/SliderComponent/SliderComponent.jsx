@@ -6,6 +6,7 @@ import { useSliderRefresh } from "./SliderRefresh";
 import SliderConfig from "./SliderConfig";
 import SliderActions from "./SliderActions";
 import SliderSelectionModal from "../../Modals/SliderSelectionModal";
+import RichTextEditor from "../../../RichTextEditor";
 
 const { Panel } = Collapse;
 
@@ -318,13 +319,11 @@ const SliderComponent = ({
                         label="Alternative Description"
                         className="mb-3"
                       >
-                        <Input.TextArea
-                          rows={3}
-                          placeholder="Enter alternative description for the slider"
-                          value={tempSliderAltDescription}
-                          onChange={(e) =>
-                            setTempSliderAltDescription(e.target.value)
-                          }
+                        <RichTextEditor
+                          defaultValue={tempSliderAltDescription}
+                          onChange={setTempSliderAltDescription}
+                          editMode={true}
+                          maxLength={1000}
                         />
                       </Form.Item>
                     </Form>
@@ -431,15 +430,13 @@ const SliderComponent = ({
                               label="Alternative Description"
                               className="mb-3"
                             >
-                              <Input.TextArea
-                                rows={3}
-                                placeholder="Enter alternative description"
+                              <RichTextEditor
                                 defaultValue={media.altDescription || ""}
-                                onChange={(e) => {
+                                onChange={(html) => {
                                   const updatedMedias = [...sliderData.medias];
                                   updatedMedias[index] = {
                                     ...updatedMedias[index],
-                                    altDescription: e.target.value,
+                                    altDescription: html,
                                   };
                                   setSliderData({
                                     ...sliderData,
@@ -500,15 +497,13 @@ const SliderComponent = ({
                               label="Alternative Description"
                               className="mb-3"
                             >
-                              <Input.TextArea
-                                rows={3}
-                                placeholder="Enter alternative description"
+                              <RichTextEditor
                                 defaultValue={card.altDescription || ""}
-                                onChange={(e) => {
+                                onChange={(html) => {
                                   const updatedCards = [...sliderData.cards];
                                   updatedCards[index] = {
                                     ...updatedCards[index],
-                                    altDescription: e.target.value,
+                                    altDescription: html,
                                   };
                                   setSliderData({
                                     ...sliderData,
@@ -571,7 +566,11 @@ const SliderComponent = ({
                             </div>
                             <div>
                               <strong>Alt Description:</strong>{" "}
-                              {media.altDescription || "Not set"}
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: media.altDescription || "Not set",
+                                }}
+                              />
                             </div>
                           </div>
                         </div>
@@ -605,7 +604,11 @@ const SliderComponent = ({
                             </div>
                             <div>
                               <strong>Alt Description:</strong>{" "}
-                              {card.altDescription || "Not set"}
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: card.altDescription || "Not set",
+                                }}
+                              />
                             </div>
                           </div>
                         </div>

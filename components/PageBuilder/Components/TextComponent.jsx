@@ -353,9 +353,8 @@ const TextComponent = ({
                       color: tempSettings.primaryColor,
                       fontWeight: tempSettings.fontWeight,
                     }}
-                  >
-                    {formData.text}
-                  </span>
+                    dangerouslySetInnerHTML={{ __html: formData.text }}
+                  />
                   <span
                     className={getFontSizeClass(tempSettings.fontSize)}
                     style={{
@@ -373,9 +372,8 @@ const TextComponent = ({
                     color: tempSettings.primaryColor,
                     fontWeight: tempSettings.fontWeight,
                   }}
-                >
-                  {formData.text}
-                </div>
+                  dangerouslySetInnerHTML={{ __html: formData.text }}
+                />
               )}
             </div>
 
@@ -392,9 +390,8 @@ const TextComponent = ({
                         color: tempSettings.primaryColor,
                         fontWeight: tempSettings.fontWeight,
                       }}
-                    >
-                      {formData.altText}
-                    </span>
+                      dangerouslySetInnerHTML={{ __html: formData.altText }}
+                    />
                     <span
                       className={getFontSizeClass(tempSettings.fontSize)}
                       style={{
@@ -412,9 +409,8 @@ const TextComponent = ({
                       color: tempSettings.primaryColor,
                       fontWeight: tempSettings.fontWeight,
                     }}
-                  >
-                    {formData.altText}
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: formData.altText }}
+                  />
                 )}
               </div>
             )}
@@ -450,9 +446,8 @@ const TextComponent = ({
                     color: tempSettings.primaryColor,
                     fontWeight: tempSettings.fontWeight,
                   }}
-                >
-                  {formData.text}
-                </span>
+                  dangerouslySetInnerHTML={{ __html: formData.text }}
+                />
                 <span
                   className={getFontSizeClass(tempSettings.fontSize)}
                   style={{
@@ -470,9 +465,8 @@ const TextComponent = ({
                   color: tempSettings.primaryColor,
                   fontWeight: tempSettings.fontWeight,
                 }}
-              >
-                {formData.text}
-              </div>
+                dangerouslySetInnerHTML={{ __html: formData.text }}
+              />
             )}
           </div>
 
@@ -489,9 +483,8 @@ const TextComponent = ({
                       color: tempSettings.primaryColor,
                       fontWeight: tempSettings.fontWeight,
                     }}
-                  >
-                    {formData.altText}
-                  </span>
+                    dangerouslySetInnerHTML={{ __html: formData.altText }}
+                  />
                   <span
                     className={getFontSizeClass(tempSettings.fontSize)}
                     style={{
@@ -509,9 +502,8 @@ const TextComponent = ({
                     color: tempSettings.primaryColor,
                     fontWeight: tempSettings.fontWeight,
                   }}
-                >
-                  {formData.altText}
-                </div>
+                  dangerouslySetInnerHTML={{ __html: formData.altText }}
+                />
               )}
             </div>
           )}

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Input, Select, Space, message } from "antd";
 import { EditOutlined, CheckOutlined } from "@ant-design/icons";
-
-const { TextArea } = Input;
+import RichTextEditor from "../RichTextEditor";
 const { Option } = Select;
 
 const AIAssistantModal = ({ visible, setVisible, content, setContent }) => {
@@ -94,19 +93,17 @@ const AIAssistantModal = ({ visible, setVisible, content, setContent }) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h4 className="text-sm font-medium mb-2">Original Content</h4>
-            <TextArea
-              value={content}
-              readOnly
-              autoSize={{ minRows: 10, maxRows: 20 }}
-              className="bg-gray-50"
-            />
+            <div className="bg-gray-50 p-3 rounded border min-h-[200px]">
+              <RichTextEditor defaultValue={content} editMode={false} />
+            </div>
           </div>
           <div>
             <h4 className="text-sm font-medium mb-2">Improved Content</h4>
-            <TextArea
-              value={improvedContent}
-              onChange={(e) => setImprovedContent(e.target.value)}
-              autoSize={{ minRows: 10, maxRows: 20 }}
+            <RichTextEditor
+              defaultValue={improvedContent}
+              onChange={setImprovedContent}
+              editMode={true}
+              maxLength={5000}
             />
           </div>
         </div>

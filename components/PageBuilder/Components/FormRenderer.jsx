@@ -5,7 +5,6 @@ import instance from "../../../axios";
 import RichTextEditor from "../../RichTextEditor";
 
 const { Option } = Select;
-const { TextArea } = Input;
 
 const FormRenderer = ({ formData, preview = false }) => {
   const [form] = Form.useForm();
@@ -92,7 +91,7 @@ const FormRenderer = ({ formData, preview = false }) => {
           <RichTextEditor
             defaultValue={element.placeholder}
             onChange={() => {}}
-            editMode={false}
+            editMode={!preview}
             maxLength={2000}
           />
         );
@@ -143,9 +142,10 @@ const FormRenderer = ({ formData, preview = false }) => {
       case "guideline":
         return (
           <div className="bg-gray-50 p-4 rounded-md">
-            <p className="text-gray-700 text-sm leading-relaxed">
-              {element.content}
-            </p>
+            <p
+              className="text-gray-700 text-sm leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: element.content }}
+            />
           </div>
         );
 

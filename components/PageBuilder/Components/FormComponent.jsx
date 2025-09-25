@@ -360,7 +360,11 @@ const FormComponent = ({
                       </div>
                       <div>
                         <strong>Alt Description:</strong>{" "}
-                        {component.data?.altDescription || "Not set"}
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: component.data?.altDescription || "Not set",
+                          }}
+                        />
                       </div>
                     </div>
                   </div>

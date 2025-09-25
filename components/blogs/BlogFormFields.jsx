@@ -8,10 +8,10 @@ import {
   TagOutlined,
 } from "@ant-design/icons";
 import SEOFields from "./SEOFields";
+import RichTextEditor from "../RichTextEditor";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
-const { TextArea } = Input;
 
 const BlogFormFields = ({
   meta,
@@ -185,13 +185,13 @@ const BlogFormFields = ({
                     label="Structured Data"
                     tooltip="Add JSON-LD structured data for rich results"
                   >
-                    <TextArea
-                      rows={4}
-                      placeholder="Enter JSON-LD structured data"
-                      value={seo.structuredData}
-                      onChange={(e) =>
-                        handleSeoChange("structuredData", e.target.value)
+                    <RichTextEditor
+                      defaultValue={seo.structuredData}
+                      onChange={(html) =>
+                        handleSeoChange("structuredData", html)
                       }
+                      editMode={true}
+                      maxLength={2000}
                     />
                   </Form.Item>
                 </div>

@@ -10,8 +10,7 @@ import MessageInput from "../../components/BuildWithAI/MessageInput";
 import ActionButtons from "../../components/BuildWithAI/ActionButtons";
 import LoadingSpinner from "../../components/BuildWithAI/LoadingSpinner";
 import instance from "../../axios";
-
-const { TextArea } = Input;
+import RichTextEditor from "../../components/RichTextEditor";
 
 export default function BuildWithAI() {
   const [userInput, setUserInput] = useState("");
@@ -352,17 +351,11 @@ export default function BuildWithAI() {
         {/* Input Area */}
         {isModifying ? (
           <>
-            <TextArea
-              autoSize={{
-                minRows: 3,
-                maxRows: 9,
-              }}
-              allowClear
-              ref={modifyInput ? (ref) => ref?.focus() : (ref) => ref?.blur()}
-              placeholder="Modify the JSON..."
-              value={modifyInput}
-              onChange={(e) => setModifyInput(e.target.value)}
-              className="resize-none border rounded-md p-2"
+            <RichTextEditor
+              defaultValue={modifyInput}
+              onChange={setModifyInput}
+              editMode={true}
+              maxLength={5000}
             />
             <div className="flex justify-end gap-4">
               <Button

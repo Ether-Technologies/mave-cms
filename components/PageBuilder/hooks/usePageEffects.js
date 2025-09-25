@@ -48,7 +48,7 @@ export const usePageEffects = ({
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [isEditing, onSave, onUndo, onRedo]);
 
-    // Auto-save functionality
+    // Auto-save functionality - only trigger when isDirty changes, not on every render
     const debouncedSave = useCallback(
         debounce(() => {
             if (isDirty && isEditing) {
@@ -59,9 +59,11 @@ export const usePageEffects = ({
     );
 
     useEffect(() => {
-        debouncedSave();
+        if (isDirty && isEditing) {
+            debouncedSave();
+        }
         return () => debouncedSave.cancel();
-    }, [debouncedSave]);
+    }, [isDirty, isEditing, debouncedSave]);
 
     // Warn before leaving with unsaved changes
     useEffect(() => {
@@ -94,10 +96,10 @@ export const usePageEffects = ({
         return () => router.events.off("routeChangeStart", handleRouteChange);
     }, [isDirty, isEditing, router]);
 
-    // Initial data fetch
+    // Initial data fetch - only run once when pageId changes
     useEffect(() => {
         if (pageId) {
             onFetchData();
         }
-    }, [pageId, onFetchData]);
+    }, [pageId]); // Remove onFetchData from dependencies to prevent infinite loops
 }; 

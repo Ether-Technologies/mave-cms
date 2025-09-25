@@ -11,8 +11,7 @@ import {
 import { useState } from "react";
 import MediaSelectionModal from "../PageBuilder/Modals/MediaSelectionModal";
 import Image from "next/image";
-
-const { TextArea } = Input;
+import RichTextEditor from "../RichTextEditor";
 const { Option } = Select;
 
 const BasicDetails = ({ form }) => {
@@ -94,9 +93,11 @@ const BasicDetails = ({ form }) => {
           { max: 140, message: "Maximum 140 characters allowed" },
         ]}
       >
-        <TextArea
-          rows={4}
-          placeholder="Enter short description (max 140 characters)"
+        <RichTextEditor
+          defaultValue=""
+          onChange={() => {}}
+          editMode={true}
+          maxLength={140}
         />
       </Form.Item>
 

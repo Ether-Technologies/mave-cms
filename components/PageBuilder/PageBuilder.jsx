@@ -61,13 +61,6 @@ const PageBuilder = ({ pageId, editMode = false }) => {
     }
   }, [loading, pageData, dispatch]);
 
-  // Force loading to false if pageData exists
-  useEffect(() => {
-    if (pageData && loading) {
-      dispatch(setLoading(false));
-    }
-  }, [pageData, loading, dispatch]);
-
   // Add timeout to prevent infinite loading
   useEffect(() => {
     if (loading) {
