@@ -1,7 +1,7 @@
 // components/PageBuilder/hooks/usePageOperations.js
 
-import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { message } from "antd";
 import instance from "../../../axios";
 import {
@@ -19,11 +19,103 @@ import {
 
 export const usePageOperations = (pageId, pageData) => {
     const dispatch = useDispatch();
+    const isDirty = useSelector((state) => state.page.isDirty);
+    const [autoSaveSettings, setAutoSaveSettings] = useState({
+        autoSave: true,
+        autoSaveInterval: 300 // 5 minutes default
+    });
+    const autoSaveTimerRef = useRef(null);
+    const lastSaveTimeRef = useRef(null);
+
+    // Fetch auto-save settings from API
+    const fetchAutoSaveSettings = useCallback(async () => {
+        try {
+            const response = await instance.get('/settings');
+            const settings = response.data;
+
+            // Find content-settings configuration
+            const contentSettings = settings.find(setting => setting.type === 'content-settings');
+
+            if (contentSettings && contentSettings.config) {
+                const config = contentSettings.config;
+                setAutoSaveSettings({
+                    autoSave: config.autoSave !== null ? config.autoSave : true,
+                    autoSaveInterval: config.autoSaveInterval !== null ? config.autoSaveInterval : 300
+                });
+            } else {
+                // Use defaults if no content-settings found
+                setAutoSaveSettings({
+                    autoSave: false,
+                    autoSaveInterval: 300
+                });
+            }
+        } catch (err) {
+            console.error("❌ Error fetching auto-save settings:", err);
+            // Use defaults on error
+            setAutoSaveSettings({
+                autoSave: false,
+                autoSaveInterval: 300
+            });
+        }
+    }, []);
+
+    // Auto-save function
+    const performAutoSave = useCallback(async () => {
+        if (!isDirty || !pageData || !pageData.id) {
+            return;
+        }
+
+        try {
+            await instance.put(`/pages/${pageData.id}`, pageData);
+            dispatch(setIsDirty(false));
+            dispatch(setLastSaved(new Date().toISOString()));
+            lastSaveTimeRef.current = Date.now();
+            console.log("✅ Auto-save completed");
+        } catch (err) {
+            console.error("❌ Auto-save failed:", err);
+        }
+    }, [isDirty, pageData, dispatch]);
+
+    // Set up auto-save timer
+    useEffect(() => {
+        if (!autoSaveSettings.autoSave || !pageData || !pageData.id) {
+            return;
+        }
+
+        // Clear existing timer
+        if (autoSaveTimerRef.current) {
+            clearInterval(autoSaveTimerRef.current);
+        }
+
+        // Set up new timer
+        const intervalMs = autoSaveSettings.autoSaveInterval * 1000; // Convert seconds to milliseconds
+        autoSaveTimerRef.current = setInterval(() => {
+            performAutoSave();
+        }, intervalMs);
+
+        return () => {
+            if (autoSaveTimerRef.current) {
+                clearInterval(autoSaveTimerRef.current);
+            }
+        };
+    }, [autoSaveSettings, pageData, performAutoSave]);
+
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (autoSaveTimerRef.current) {
+                clearInterval(autoSaveTimerRef.current);
+            }
+        };
+    }, []);
 
     // Fetch page data from the backend with error handling
     const fetchPageData = useCallback(async () => {
         try {
             dispatch(setLoading(true));
+
+            // Fetch auto-save settings first
+            await fetchAutoSaveSettings();
 
             // Always fetch fresh data from server for editing
             const response = await instance.get(`/pages/${pageId}`);
@@ -298,5 +390,7 @@ export const usePageOperations = (pageId, pageData) => {
         handleSectionsUpdate,
         handleUndo,
         handleRedo,
+        autoSaveSettings,
+        performAutoSave,
     };
 }; 
