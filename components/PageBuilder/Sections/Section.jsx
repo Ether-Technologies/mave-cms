@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { Button, Modal, Input, Popconfirm } from "antd";
 import {
@@ -28,6 +29,7 @@ const Section = ({
   onSectionDuplicate,
   onSectionDelete,
   isEditing = false,
+  onCrossSectionDragEnd,
 }) => {
   const dispatch = useDispatch();
 
@@ -57,11 +59,25 @@ const Section = ({
     id: draggableId,
   });
 
+  // Add droppable functionality for cross-section component drops
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id: `section-drop-${sectionIndex || index}`,
+  });
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  // Combine refs for both sortable and droppable
+  const combinedRef = useCallback(
+    (node) => {
+      setNodeRef(node);
+      setDroppableRef(node);
+    },
+    [setNodeRef, setDroppableRef]
+  );
 
   // Handle editing state changes from components
   const handleComponentEditingStateChange = useCallback(
@@ -165,9 +181,11 @@ const Section = ({
   return (
     <>
       <div
-        ref={setNodeRef}
+        ref={combinedRef}
         style={style}
-        className="section-container bg-white shadow-md rounded-lg p-4 mb-6"
+        className={`section-container bg-white shadow-md rounded-lg p-4 mb-6 ${
+          isOver ? "ring-2 ring-blue-400 ring-opacity-50" : ""
+        }`}
       >
         <div className="section-header flex items-center justify-between mb-4 pb-2 border-b">
           <div className="flex items-center gap-2 flex-1">
@@ -260,6 +278,7 @@ const Section = ({
           onEditingStateChange={handleComponentEditingStateChange}
           sectionIndex={sectionIndex || index}
           isEditing={isEditing}
+          onCrossSectionDragEnd={onCrossSectionDragEnd}
         />
       </div>
     </>

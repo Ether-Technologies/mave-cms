@@ -3,7 +3,6 @@
 import React, { useCallback } from "react";
 import { Button, Typography, Empty } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -25,6 +24,7 @@ const SectionList = ({
   onSectionDelete,
   onAddSectionAtPosition,
   isEditing = false,
+  onCrossSectionDragEnd,
 }) => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
@@ -120,18 +120,6 @@ const SectionList = ({
     onSectionsUpdate: handleSectionsUpdate,
   });
 
-  // Add drag event handlers for debugging
-  const handleSectionDragStart = useCallback((event) => {
-    // Drag start handler
-  }, []);
-
-  const handleSectionDragEnd = useCallback(
-    (event) => {
-      onDragEnd(event);
-    },
-    [onDragEnd]
-  );
-
   if (section) {
     return (
       <Section
@@ -145,6 +133,7 @@ const SectionList = ({
         onSectionDuplicate={onSectionDuplicate}
         onSectionDelete={onSectionDelete}
         isEditing={isEditing}
+        onCrossSectionDragEnd={onCrossSectionDragEnd}
       />
     );
   }
@@ -155,79 +144,75 @@ const SectionList = ({
     );
 
     return (
-      <DndContext
-        onDragStart={handleSectionDragStart}
-        onDragEnd={handleSectionDragEnd}
+      <SortableContext
+        items={sortableItems}
+        strategy={verticalListSortingStrategy}
       >
-        <SortableContext
-          items={sortableItems}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="space-y-4">
-            {sections.map((section, index) => {
-              const currentSectionIndex = index;
-              return (
-                <React.Fragment
-                  key={section._id || `section-${currentSectionIndex}`}
-                >
-                  {/* Add Section Button at the top for first section */}
-                  {isEditing && index === 0 && (
-                    <div className="text-center">
-                      <Button
-                        icon={<PlusOutlined />}
-                        onClick={() => onAddSectionAtPosition(0)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+        <div className="space-y-4">
+          {sections.map((section, index) => {
+            const currentSectionIndex = index;
+            return (
+              <React.Fragment
+                key={section._id || `section-${currentSectionIndex}`}
+              >
+                {/* Add Section Button at the top for first section */}
+                {isEditing && index === 0 && (
+                  <div className="text-center">
+                    <Button
+                      icon={<PlusOutlined />}
+                      onClick={() => onAddSectionAtPosition(0)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
                         transition-all duration-200 px-2 py-1 text-sm group"
-                        size="small"
-                      >
-                        <span
-                          className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
+                      size="small"
+                    >
+                      <span
+                        className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
                         group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
-                        >
-                          Add Section
-                        </span>
-                      </Button>
-                    </div>
-                  )}
+                      >
+                        Add Section
+                      </span>
+                    </Button>
+                  </div>
+                )}
 
-                  <Section
-                    section={section}
-                    sectionIndex={currentSectionIndex}
-                    index={currentSectionIndex}
-                    onComponentUpdate={handleComponentUpdate}
-                    onComponentDelete={handleComponentDelete}
-                    onComponentDuplicate={handleComponentDuplicate}
-                    onEditingStateChange={handleEditingStateChange}
-                    onSectionDuplicate={onSectionDuplicate}
-                    onSectionDelete={onSectionDelete}
-                    isEditing={isEditing}
-                  />
+                <Section
+                  section={section}
+                  sectionIndex={currentSectionIndex}
+                  index={currentSectionIndex}
+                  onComponentUpdate={handleComponentUpdate}
+                  onComponentDelete={handleComponentDelete}
+                  onComponentDuplicate={handleComponentDuplicate}
+                  onEditingStateChange={handleEditingStateChange}
+                  onSectionDuplicate={onSectionDuplicate}
+                  onSectionDelete={onSectionDelete}
+                  isEditing={isEditing}
+                  onCrossSectionDragEnd={onCrossSectionDragEnd}
+                />
 
-                  {/* Add Section Button between sections */}
-                  {isEditing && index < sections.length - 1 && (
-                    <div className="text-center">
-                      <Button
-                        icon={<PlusOutlined />}
-                        onClick={() => onAddSectionAtPosition(index + 1)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                {/* Add Section Button between sections */}
+                {isEditing && index < sections.length - 1 && (
+                  <div className="text-center">
+                    <Button
+                      icon={<PlusOutlined />}
+                      onClick={() => onAddSectionAtPosition(index + 1)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
                         transition-all duration-200 px-2 py-1 text-sm group"
-                        size="small"
-                      >
-                        <span
-                          className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
+                      size="small"
+                    >
+                      <span
+                        className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
                         group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
-                        >
-                          Add Section
-                        </span>
-                      </Button>
-                    </div>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </SortableContext>
-      </DndContext>
+                      >
+                        Add Section
+                      </span>
+                    </Button>
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </SortableContext>
     );
   }
 
