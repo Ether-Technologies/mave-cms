@@ -25,6 +25,8 @@ const SectionList = ({
   onAddSectionAtPosition,
   isEditing = false,
   onCrossSectionDragEnd,
+  dragOverSection,
+  activeId,
 }) => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
@@ -134,6 +136,8 @@ const SectionList = ({
         onSectionDelete={onSectionDelete}
         isEditing={isEditing}
         onCrossSectionDragEnd={onCrossSectionDragEnd}
+        dragOverSection={dragOverSection}
+        activeId={activeId}
       />
     );
   }
@@ -187,6 +191,8 @@ const SectionList = ({
                   onSectionDelete={onSectionDelete}
                   isEditing={isEditing}
                   onCrossSectionDragEnd={onCrossSectionDragEnd}
+                  dragOverSection={dragOverSection}
+                  activeId={activeId}
                 />
 
                 {/* Add Section Button between sections */}

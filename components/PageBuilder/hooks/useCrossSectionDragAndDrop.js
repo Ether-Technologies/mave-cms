@@ -10,17 +10,13 @@ export const useCrossSectionDragAndDrop = () => {
 
     const onDragEnd = useCallback(
         (event) => {
-            console.log("🔧 Global drag ended:", event);
-
             const { active, over } = event;
 
             if (!over) {
-                console.log("🔧 No destination, returning");
                 return;
             }
 
             if (active.id === over.id) {
-                console.log("🔧 Same position, no change needed");
                 return;
             }
 
@@ -30,7 +26,6 @@ export const useCrossSectionDragAndDrop = () => {
 
             // If it's a section (your section ids are created as `section-...`), let section handler manage it
             if (String(activeId).startsWith('section-')) {
-                console.log("🔧 Section drag detected, delegating to section handler");
                 return;
             }
             // Otherwise treat it as a component drag, regardless of id format
@@ -58,6 +53,7 @@ export const useCrossSectionDragAndDrop = () => {
             // Find destination section
             if (String(overId).startsWith('section-drop-')) {
                 destinationSectionIndex = parseInt(String(overId).replace('section-drop-', ''), 10);
+
             } else {
                 // Find destination component and its section
                 for (let i = 0; i < pageData.body.length; i++) {
@@ -75,25 +71,15 @@ export const useCrossSectionDragAndDrop = () => {
             }
 
             if (sourceSectionIndex === -1) {
-                console.log("🔧 Could not find source component");
                 return;
             }
 
             if (destinationSectionIndex === -1) {
-                console.log("🔧 Could not find destination section");
                 return;
             }
 
-            console.log("🔧 Cross-section drag:", {
-                sourceSection: sourceSectionIndex,
-                destinationSection: destinationSectionIndex,
-                activeId,
-                overId
-            });
-
             // If same section, let the regular drag handler deal with it
             if (sourceSectionIndex === destinationSectionIndex) {
-                console.log("🔧 Same section drag, delegating to section handler");
                 return;
             }
 
@@ -102,7 +88,6 @@ export const useCrossSectionDragAndDrop = () => {
             const destinationSection = pageData.body[destinationSectionIndex];
 
             if (!sourceSection || !destinationSection) {
-                console.log("🔧 Invalid section indices");
                 return;
             }
 
@@ -129,17 +114,8 @@ export const useCrossSectionDragAndDrop = () => {
             }
 
             if (sourceComponentIndex === -1) {
-                console.log("🔧 Could not find source component");
                 return;
             }
-
-            console.log("🔧 Component indices:", {
-                sourceComponentIndex,
-                destinationComponentIndex,
-                sourceComponentsCount: sourceSection.data.length,
-                destinationComponentsCount: destinationSection.data.length,
-                isDroppingOnSection: overId.startsWith('section-drop-')
-            });
 
             // Get the component to move
             const componentToMove = sourceComponent;
@@ -173,14 +149,6 @@ export const useCrossSectionDragAndDrop = () => {
             updatedSections[destinationSectionIndex] = updatedDestinationSection;
 
             updatedPageData.body = updatedSections;
-
-            console.log("🔧 Cross-section drag completed:", {
-                movedComponent: componentToMove.type,
-                fromSection: sourceSectionIndex,
-                toSection: destinationSectionIndex,
-                newSourceComponentsCount: updatedSourceSection.data.length,
-                newDestinationComponentsCount: updatedDestinationSection.data.length
-            });
 
             dispatch(setPageData(updatedPageData));
             dispatch(setIsDirty(true));

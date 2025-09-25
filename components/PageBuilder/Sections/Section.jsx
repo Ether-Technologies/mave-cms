@@ -13,6 +13,7 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import ComponentListSimple from "../Components/ComponentListSimple";
+import InsertionIndicator from "../Components/InsertionIndicator";
 import { useDispatch } from "react-redux";
 import { updateSection, setIsDirty } from "../../../store/slices/pageSlice";
 
@@ -30,6 +31,8 @@ const Section = ({
   onSectionDelete,
   isEditing = false,
   onCrossSectionDragEnd,
+  dragOverSection,
+  activeId,
 }) => {
   const dispatch = useDispatch();
 
@@ -183,8 +186,10 @@ const Section = ({
       <div
         ref={combinedRef}
         style={style}
-        className={`section-container bg-white shadow-md rounded-lg p-4 mb-6 ${
-          isOver ? "ring-2 ring-blue-400 ring-opacity-50" : ""
+        className={`section-container bg-white shadow-md rounded-lg p-4 mb-6 transition-all duration-200 ${
+          isOver
+            ? "ring-2 ring-yellow-400 ring-opacity-70 bg-yellow-50 shadow-lg scale-[1.02]"
+            : ""
         }`}
       >
         <div className="section-header flex items-center justify-between mb-4 pb-2 border-b">
@@ -270,6 +275,18 @@ const Section = ({
           </div>
         </div>
 
+        {/* Insertion indicator at the top */}
+        <InsertionIndicator
+          isVisible={
+            isEditing &&
+            activeId &&
+            !String(activeId).startsWith("section-") &&
+            dragOverSection === (sectionIndex || index) &&
+            section.data.length === 0
+          }
+          position="top"
+        />
+
         <ComponentListSimple
           components={section.data}
           onComponentsUpdate={handleComponentsUpdate}
@@ -279,6 +296,18 @@ const Section = ({
           sectionIndex={sectionIndex || index}
           isEditing={isEditing}
           onCrossSectionDragEnd={onCrossSectionDragEnd}
+        />
+
+        {/* Insertion indicator at the bottom */}
+        <InsertionIndicator
+          isVisible={
+            isEditing &&
+            activeId &&
+            !String(activeId).startsWith("section-") &&
+            dragOverSection === (sectionIndex || index) &&
+            section.data.length > 0
+          }
+          position="bottom"
         />
       </div>
     </>
