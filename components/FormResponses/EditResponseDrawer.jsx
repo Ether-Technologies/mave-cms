@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { Drawer, Form, Button, Input, message, Empty } from "antd";
 import instance from "../../axios";
+import RichTextEditor from "../RichTextEditor";
 
 const EditResponseDrawer = ({ visible, onClose, data, onUpdate }) => {
   const [form] = Form.useForm();
@@ -75,14 +76,20 @@ const EditResponseDrawer = ({ visible, onClose, data, onUpdate }) => {
             ]}
           >
             {Array.isArray(value) ? (
-              <Input.TextArea
-                placeholder={`Enter ${key.replace(/_/g, " ")}`}
-                autoSize={{ minRows: 2, maxRows: 4 }}
+              <RichTextEditor
+                defaultValue={
+                  Array.isArray(value) ? JSON.stringify(value) : String(value)
+                }
+                onChange={(html) => form.setFieldValue(key, html)}
+                editMode={true}
+                maxLength={2000}
               />
             ) : typeof value === "object" && value !== null ? (
-              <Input.TextArea
-                placeholder={`Enter ${key.replace(/_/g, " ")}`}
-                autoSize={{ minRows: 2, maxRows: 4 }}
+              <RichTextEditor
+                defaultValue={JSON.stringify(value)}
+                onChange={(html) => form.setFieldValue(key, html)}
+                editMode={true}
+                maxLength={2000}
               />
             ) : (
               <Input placeholder={`Enter ${key.replace(/_/g, " ")}`} />

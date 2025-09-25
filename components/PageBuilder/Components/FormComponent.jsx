@@ -10,6 +10,7 @@ import {
   Collapse,
   Switch,
 } from "antd";
+import RichTextEditor from "../../RichTextEditor";
 import {
   EyeOutlined,
   CheckOutlined,
@@ -316,19 +317,19 @@ const FormComponent = ({
                     </Form.Item>
 
                     <Form.Item label="Alternative Description" className="mb-4">
-                      <Input.TextArea
-                        rows={3}
-                        placeholder="Enter alternative description"
+                      <RichTextEditor
                         defaultValue={component.data?.altDescription || ""}
-                        onChange={(e) => {
+                        onChange={(html) => {
                           updateComponent({
                             ...component,
                             data: {
                               ...component.data,
-                              altDescription: e.target.value,
+                              altDescription: html,
                             },
                           });
                         }}
+                        editMode={true}
+                        maxLength={2000}
                       />
                     </Form.Item>
 

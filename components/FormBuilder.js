@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Button } from "antd";
+import RichTextEditor from "./RichTextEditor";
 
 const FormBuilder = () => {
   const [fields, setFields] = useState([]);
@@ -40,10 +41,20 @@ const FormBuilder = () => {
         <Input placeholder="ফর্ম শিরোনাম" />
       </Form.Item>
       <Form.Item label="Description (English)" name="description_en">
-        <Input.TextArea placeholder="English description" />
+        <RichTextEditor
+          defaultValue=""
+          onChange={(html) => form.setFieldsValue({ description_en: html })}
+          editMode={true}
+          maxLength={2000}
+        />
       </Form.Item>
       <Form.Item label="Description (Bengali)" name="description_bn">
-        <Input.TextArea placeholder="বাংলা বর্ণনা" />
+        <RichTextEditor
+          defaultValue=""
+          onChange={(html) => form.setFieldsValue({ description_bn: html })}
+          editMode={true}
+          maxLength={2000}
+        />
       </Form.Item>
       {fields?.map((field, index) => (
         <div key={index}>

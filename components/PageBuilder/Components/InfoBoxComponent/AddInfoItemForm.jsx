@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Input, Button } from "antd";
 import Image from "next/image";
+import RichTextEditor from "../../../RichTextEditor";
 
 const AddInfoItemForm = ({ form, onFinish, onMediaSelect, selectedMedia }) => {
   return (
@@ -18,7 +19,12 @@ const AddInfoItemForm = ({ form, onFinish, onMediaSelect, selectedMedia }) => {
           name="description"
           rules={[{ required: true, message: "Please enter the description." }]}
         >
-          <Input.TextArea rows={4} placeholder="Enter description" />
+          <RichTextEditor
+            defaultValue=""
+            onChange={(html) => form.setFieldValue("description", html)}
+            editMode={true}
+            maxLength={2000}
+          />
         </Form.Item>
         <Form.Item
           label="Link"
@@ -31,9 +37,11 @@ const AddInfoItemForm = ({ form, onFinish, onMediaSelect, selectedMedia }) => {
           <Input placeholder="Enter alternative title (optional)" />
         </Form.Item>
         <Form.Item label="Alternative Description" name="altDescription">
-          <Input.TextArea
-            rows={3}
-            placeholder="Enter alternative description (optional)"
+          <RichTextEditor
+            defaultValue=""
+            onChange={(html) => form.setFieldValue("altDescription", html)}
+            editMode={true}
+            maxLength={2000}
           />
         </Form.Item>
         <Form.Item label="Media">

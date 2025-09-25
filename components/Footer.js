@@ -14,6 +14,7 @@ import {
   notification,
   Breadcrumb,
 } from "antd";
+import RichTextEditor from "./RichTextEditor";
 import {
   CloseCircleOutlined,
   CloseOutlined,
@@ -525,25 +526,21 @@ const Footer = () => {
                   <Col span={8}>
                     <div className="content">
                       <h3>Address1 Description English:</h3>
-                      <Input.TextArea
-                        rows={1}
-                        value={formData.address1_description_en}
-                        onChange={(e) =>
-                          handleChange(e, "address1_description_en")
-                        }
-                        style={{ marginTop: ".5rem" }}
+                      <RichTextEditor
+                        defaultValue={formData.address1_description_en}
+                        onChange={(html) => handleChange({ target: { value: html } }, "address1_description_en")}
+                        editMode={true}
+                        maxLength={1000}
                       />
                     </div>
                     <br />
                     <div className="content">
                       <h3>Address1 Description Bangla:</h3>
-                      <Input.TextArea
-                        rows={2}
-                        value={formData.address1_description_bn}
-                        onChange={(e) =>
-                          handleChange(e, "address1_description_bn")
-                        }
-                        style={{ marginTop: ".5rem" }}
+                      <RichTextEditor
+                        defaultValue={formData.address1_description_bn}
+                        onChange={(html) => handleChange({ target: { value: html } }, "address1_description_bn")}
+                        editMode={true}
+                        maxLength={1000}
                       />
                     </div>
                     <br />
@@ -567,25 +564,21 @@ const Footer = () => {
                     <br />
                     <div className="content">
                       <h3>Address2 Description English:</h3>
-                      <Input.TextArea
-                        rows={1}
-                        value={formData.address2_description_en}
-                        onChange={(e) =>
-                          handleChange(e, "address2_description_en")
-                        }
-                        style={{ marginTop: ".5rem" }}
+                      <RichTextEditor
+                        defaultValue={formData.address2_description_en}
+                        onChange={(html) => handleChange({ target: { value: html } }, "address2_description_en")}
+                        editMode={true}
+                        maxLength={1000}
                       />
                     </div>
                     <br />
                     <div className="content">
                       <h3>Address2 Description Bangla:</h3>
-                      <Input.TextArea
-                        rows={1}
-                        value={formData.address2_description_bn}
-                        onChange={(e) =>
-                          handleChange(e, "address2_description_bn")
-                        }
-                        style={{ marginTop: ".5rem" }}
+                      <RichTextEditor
+                        defaultValue={formData.address2_description_bn}
+                        onChange={(html) => handleChange({ target: { value: html } }, "address2_description_bn")}
+                        editMode={true}
+                        maxLength={1000}
                       />
                     </div>
                     <br />
@@ -690,28 +683,22 @@ const Footer = () => {
                     <br />
                     <div className="content">
                       <h3>Column4 Description English:</h3>
-                      <Input.TextArea
-                        rows={2}
-                        value={formData.column4_description_en}
-                        onChange={(e) =>
-                          handleChange(e, "column4_description_en")
-                        }
-                        style={{ marginTop: ".5rem" }}
-                        type="number"
+                      <RichTextEditor
+                        defaultValue={formData.column4_description_en}
+                        onChange={(html) => handleChange({ target: { value: html } }, "column4_description_en")}
+                        editMode={true}
+                        maxLength={1000}
                       />
                     </div>
                     <br />
 
                     <div className="content">
                       <h3>Column4 Description Bangla:</h3>
-                      <Input.TextArea
-                        rows={1}
-                        value={formData.column4_description_bn}
-                        onChange={(e) =>
-                          handleChange(e, "column4_description_bn")
-                        }
-                        style={{ marginTop: ".5rem" }}
-                        type="number"
+                      <RichTextEditor
+                        defaultValue={formData.column4_description_bn}
+                        onChange={(html) => handleChange({ target: { value: html } }, "column4_description_bn")}
+                        editMode={true}
+                        maxLength={1000}
                       />
                     </div>
                     <br />
@@ -1051,25 +1038,21 @@ const Footer = () => {
                       <Col span={8}>
                         <div className="content">
                           <h3>Address1 Description English:</h3>
-                          <Input.TextArea
-                            rows={1}
-                            value={formData.address1_description_en}
-                            onChange={(e) =>
-                              handleChange(e, "address1_description_en")
-                            }
-                            style={{ marginTop: ".5rem" }}
+                          <RichTextEditor
+                            defaultValue={formData.address1_description_en}
+                            onChange={(html) => handleChange({ target: { value: html } }, "address1_description_en")}
+                            editMode={true}
+                            maxLength={1000}
                           />
                         </div>
                         <br />
                         <div className="content">
                           <h3>Address1 Description Bangla:</h3>
-                          <Input.TextArea
-                            rows={2}
-                            value={formData.address1_description_bn}
-                            onChange={(e) =>
-                              handleChange(e, "address1_description_bn")
-                            }
-                            style={{ marginTop: ".5rem" }}
+                          <RichTextEditor
+                            defaultValue={formData.address1_description_bn}
+                            onChange={(html) => handleChange({ target: { value: html } }, "address1_description_bn")}
+                            editMode={true}
+                            maxLength={1000}
                           />
                         </div>
                         <br />
@@ -1097,25 +1080,21 @@ const Footer = () => {
                         <br />
                         <div className="content">
                           <h3>Address2 Description English:</h3>
-                          <Input.TextArea
-                            rows={1}
-                            value={formData.address2_description_en}
-                            onChange={(e) =>
-                              handleChange(e, "address2_description_en")
-                            }
-                            style={{ marginTop: ".5rem" }}
+                          <RichTextEditor
+                            defaultValue={formData.address2_description_en}
+                            onChange={(html) => handleChange({ target: { value: html } }, "address2_description_en")}
+                            editMode={true}
+                            maxLength={1000}
                           />
                         </div>
                         <br />
                         <div className="content">
                           <h3>Address2 Description Bangla:</h3>
-                          <Input.TextArea
-                            rows={1}
-                            value={formData.address2_description_bn}
-                            onChange={(e) =>
-                              handleChange(e, "address2_description_bn")
-                            }
-                            style={{ marginTop: ".5rem" }}
+                          <RichTextEditor
+                            defaultValue={formData.address2_description_bn}
+                            onChange={(html) => handleChange({ target: { value: html } }, "address2_description_bn")}
+                            editMode={true}
+                            maxLength={1000}
                           />
                         </div>
                         <br />
@@ -1235,28 +1214,22 @@ const Footer = () => {
                         <br />
                         <div className="content">
                           <h3>Column4 Description English:</h3>
-                          <Input.TextArea
-                            rows={2}
-                            value={formData.column4_description_en}
-                            onChange={(e) =>
-                              handleChange(e, "column4_description_en")
-                            }
-                            style={{ marginTop: ".5rem" }}
-                            type="number"
+                          <RichTextEditor
+                            defaultValue={formData.column4_description_en}
+                            onChange={(html) => handleChange({ target: { value: html } }, "column4_description_en")}
+                            editMode={true}
+                            maxLength={1000}
                           />
                         </div>
                         <br />
 
                         <div className="content">
                           <h3>Column4 Description Bangla:</h3>
-                          <Input.TextArea
-                            rows={1}
-                            value={formData.column4_description_bn}
-                            onChange={(e) =>
-                              handleChange(e, "column4_description_bn")
-                            }
-                            style={{ marginTop: ".5rem" }}
-                            type="number"
+                          <RichTextEditor
+                            defaultValue={formData.column4_description_bn}
+                            onChange={(html) => handleChange({ target: { value: html } }, "column4_description_bn")}
+                            editMode={true}
+                            maxLength={1000}
                           />
                         </div>
                         <br />

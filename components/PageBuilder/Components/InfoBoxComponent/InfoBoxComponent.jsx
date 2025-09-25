@@ -11,6 +11,7 @@ import {
   Switch,
   Collapse,
 } from "antd";
+import RichTextEditor from "../../../RichTextEditor";
 import {
   PlusOutlined,
   MinusOutlined,
@@ -522,9 +523,13 @@ const InfoBoxComponent = ({
                               },
                             ]}
                           >
-                            <Input.TextArea
-                              rows={4}
-                              placeholder="Description"
+                            <RichTextEditor
+                              defaultValue=""
+                              onChange={(html) =>
+                                editForm.setFieldValue("description", html)
+                              }
+                              editMode={true}
+                              maxLength={2000}
                             />
                           </Form.Item>
                           <Form.Item name="link">
@@ -534,9 +539,13 @@ const InfoBoxComponent = ({
                             <Input placeholder="Alternative Title (optional)" />
                           </Form.Item>
                           <Form.Item name="altDescription">
-                            <Input.TextArea
-                              rows={3}
-                              placeholder="Alternative Description (optional)"
+                            <RichTextEditor
+                              defaultValue=""
+                              onChange={(html) =>
+                                editForm.setFieldValue("altDescription", html)
+                              }
+                              editMode={true}
+                              maxLength={2000}
                             />
                           </Form.Item>
                           <Form.Item>
@@ -643,14 +652,11 @@ const InfoBoxComponent = ({
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Alternative Description
                         </label>
-                        <Input.TextArea
-                          value={tempAltDescription}
-                          onChange={(e) =>
-                            setTempAltDescription(e.target.value)
-                          }
-                          placeholder="Enter alternative description"
-                          rows={3}
-                          size="small"
+                        <RichTextEditor
+                          defaultValue={tempAltDescription}
+                          onChange={(html) => setTempAltDescription(html)}
+                          editMode={true}
+                          maxLength={2000}
                         />
                       </div>
                       <div className="flex justify-end gap-2">
@@ -821,15 +827,13 @@ const InfoBoxComponent = ({
                             label="Alternative Description"
                             className="mb-3"
                           >
-                            <Input.TextArea
-                              rows={3}
-                              placeholder="Enter alternative description"
+                            <RichTextEditor
                               defaultValue={item.altDescription || ""}
-                              onChange={(e) => {
+                              onChange={(html) => {
                                 const updatedItems = [...infoBox.infoItems];
                                 updatedItems[index] = {
                                   ...updatedItems[index],
-                                  altDescription: e.target.value,
+                                  altDescription: html,
                                 };
                                 const updatedInfoBox = {
                                   ...infoBox,
@@ -916,7 +920,14 @@ const InfoBoxComponent = ({
                           </div>
                           <div>
                             <strong>Alt Description:</strong>{" "}
-                            {item.altDescription || "Not set"}
+                            <div
+                              className="text-gray-600"
+                              dangerouslySetInnerHTML={{
+                                __html:
+                                  item.altDescription ||
+                                  "No alternative description set",
+                              }}
+                            />
                           </div>
                         </div>
                       </div>

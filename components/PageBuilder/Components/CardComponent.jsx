@@ -14,6 +14,7 @@ import {
   Collapse,
   Input,
 } from "antd";
+import RichTextEditor from "../../RichTextEditor";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -521,17 +522,16 @@ const CardComponent = ({
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Alternative Description
                   </label>
-                  <Input.TextArea
-                    value={altContentData.altDescription}
-                    onChange={(e) =>
+                  <RichTextEditor
+                    defaultValue={altContentData.altDescription}
+                    onChange={(html) =>
                       setAltContentData({
                         ...altContentData,
-                        altDescription: e.target.value,
+                        altDescription: html,
                       })
                     }
-                    placeholder="Enter alternative description"
-                    rows={4}
-                    className="w-full"
+                    editMode={true}
+                    maxLength={2000}
                   />
                 </div>
               </div>
@@ -549,10 +549,14 @@ const CardComponent = ({
                   <span className="text-sm font-medium text-gray-700">
                     Alternative Description:
                   </span>
-                  <p className="text-gray-600">
-                    {altContentData.altDescription ||
-                      "No alternative description set"}
-                  </p>
+                  <div
+                    className="text-gray-600"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        altContentData.altDescription ||
+                        "No alternative description set",
+                    }}
+                  />
                 </div>
               </div>
             )}

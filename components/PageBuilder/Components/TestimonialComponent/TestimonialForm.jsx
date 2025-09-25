@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Input, Rate, Button, Space } from "antd";
 import Image from "next/image";
+import RichTextEditor from "../../../RichTextEditor";
 
 const TestimonialForm = ({
   form,
@@ -44,7 +45,12 @@ const TestimonialForm = ({
         name="quote"
         rules={[{ required: true, message: "Please enter the quote." }]}
       >
-        <Input.TextArea rows={4} placeholder="Enter customer quote" />
+        <RichTextEditor
+          defaultValue=""
+          onChange={(html) => form.setFieldValue("quote", html)}
+          editMode={true}
+          maxLength={2000}
+        />
       </Form.Item>
       <Form.Item
         label="Author"
@@ -59,9 +65,11 @@ const TestimonialForm = ({
         name="altQuote"
         help="Enter the quote in another language for multilingual support"
       >
-        <Input.TextArea
-          rows={4}
-          placeholder="Enter alternative quote in another language"
+        <RichTextEditor
+          defaultValue=""
+          onChange={(html) => form.setFieldValue("altQuote", html)}
+          editMode={true}
+          maxLength={2000}
         />
       </Form.Item>
 

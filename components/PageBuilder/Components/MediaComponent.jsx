@@ -15,6 +15,7 @@ import {
   Form,
   Input,
 } from "antd";
+import RichTextEditor from "../../RichTextEditor";
 import {
   DeleteOutlined,
   CheckOutlined,
@@ -701,18 +702,18 @@ const MediaComponent = ({
                               label="Alternative Description"
                               className="mb-4"
                             >
-                              <Input.TextArea
-                                rows={3}
-                                placeholder="Enter alternative description"
+                              <RichTextEditor
                                 defaultValue={media.altDescription || ""}
-                                onChange={(e) => {
+                                onChange={(html) => {
                                   const updatedMedia = [...mediaData];
                                   updatedMedia[index] = {
                                     ...updatedMedia[index],
-                                    altDescription: e.target.value,
+                                    altDescription: html,
                                   };
                                   setMediaData(updatedMedia);
                                 }}
+                                editMode={true}
+                                maxLength={2000}
                               />
                             </Form.Item>
                           </Form>
@@ -760,17 +761,17 @@ const MediaComponent = ({
                           label="Alternative Description"
                           className="mb-4"
                         >
-                          <Input.TextArea
-                            rows={3}
-                            placeholder="Enter alternative description"
+                          <RichTextEditor
                             defaultValue={mediaData.altDescription || ""}
-                            onChange={(e) => {
+                            onChange={(html) => {
                               const updatedMedia = {
                                 ...mediaData,
-                                altDescription: e.target.value,
+                                altDescription: html,
                               };
                               setMediaData(updatedMedia);
                             }}
+                            editMode={true}
+                            maxLength={2000}
                           />
                         </Form.Item>
                       </Form>

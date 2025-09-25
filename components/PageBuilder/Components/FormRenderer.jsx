@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Button, message } from "antd";
 import instance from "../../../axios";
+import RichTextEditor from "../../RichTextEditor";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -88,11 +89,11 @@ const FormRenderer = ({ formData, preview = false }) => {
 
       case "textarea":
         return (
-          <TextArea
-            rows={4}
-            placeholder={element.placeholder}
-            disabled={preview}
-            className="w-full"
+          <RichTextEditor
+            defaultValue={element.placeholder}
+            onChange={() => {}}
+            editMode={false}
+            maxLength={2000}
           />
         );
 

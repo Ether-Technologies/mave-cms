@@ -4,8 +4,8 @@ import { Button, Radio, Select, Input, Popconfirm, Upload, Switch } from "antd";
 import { useDrag, useDrop } from "react-dnd";
 import ElementConfig from "./ElementConfig";
 import LocationFetcher from "../LocationFetcher";
+import RichTextEditor from "../../RichTextEditor";
 
-const { TextArea } = Input;
 const { Option } = Select;
 
 const FormElement = ({
@@ -96,11 +96,11 @@ const FormElement = ({
 
       case "textarea":
         return (
-          <TextArea
-            disabled
-            placeholder={element.placeholder}
-            rows={3}
-            addonafter={requiredStar}
+          <RichTextEditor
+            defaultValue={element.placeholder}
+            onChange={() => { }}
+            editMode={false}
+            maxLength={2000}
           />
         );
 

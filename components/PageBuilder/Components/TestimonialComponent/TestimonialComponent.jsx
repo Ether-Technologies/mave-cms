@@ -13,6 +13,7 @@ import {
   Collapse,
   Input,
 } from "antd";
+import RichTextEditor from "../../../RichTextEditor";
 import {
   PlusOutlined,
   CopyFilled,
@@ -515,18 +516,18 @@ const TestimonialComponent = ({
 
                         <Form layout="vertical" className="w-full">
                           <Form.Item label="Alternative Quote" className="mb-3">
-                            <Input.TextArea
-                              rows={3}
-                              placeholder="Enter alternative quote"
+                            <RichTextEditor
                               defaultValue={testimonial.altQuote || ""}
-                              onChange={(e) => {
+                              onChange={(html) => {
                                 const updatedTestimonials = [...testimonials];
                                 updatedTestimonials[index] = {
                                   ...updatedTestimonials[index],
-                                  altQuote: e.target.value,
+                                  altQuote: html,
                                 };
                                 setTestimonials(updatedTestimonials);
                               }}
+                              editMode={true}
+                              maxLength={2000}
                             />
                           </Form.Item>
 

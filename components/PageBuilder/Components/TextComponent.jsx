@@ -12,6 +12,7 @@ import {
   Radio,
   Select,
 } from "antd";
+import RichTextEditor from "../../RichTextEditor";
 import {
   PlusOutlined,
   EditOutlined,
@@ -138,15 +139,11 @@ const TextComponent = ({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Text Content
             </label>
-            <Input.TextArea
-              value={formData.text}
-              onChange={(e) =>
-                setFormData({ ...formData, text: e.target.value })
-              }
-              rows={4}
-              className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
-              placeholder="Enter your text here..."
-              autoFocus
+            <RichTextEditor
+              defaultValue={formData.text}
+              onChange={(html) => setFormData({ ...formData, text: html })}
+              editMode={true}
+              maxLength={2000}
             />
           </div>
 
@@ -257,17 +254,16 @@ const TextComponent = ({
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Second Part Text
                 </label>
-                <Input.TextArea
-                  value={tempSettings.secondPartText}
-                  onChange={(e) =>
+                <RichTextEditor
+                  defaultValue={tempSettings.secondPartText}
+                  onChange={(html) =>
                     setTempSettings({
                       ...tempSettings,
-                      secondPartText: e.target.value,
+                      secondPartText: html,
                     })
                   }
-                  rows={4}
-                  className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
-                  placeholder="Enter your second part text here..."
+                  editMode={true}
+                  maxLength={2000}
                 />
               </div>
 
@@ -312,14 +308,13 @@ const TextComponent = ({
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Alternative Text
                 </label>
-                <Input.TextArea
-                  value={formData.altText}
-                  onChange={(e) =>
-                    setFormData({ ...formData, altText: e.target.value })
+                <RichTextEditor
+                  defaultValue={formData.altText}
+                  onChange={(html) =>
+                    setFormData({ ...formData, altText: html })
                   }
-                  rows={4}
-                  className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
-                  placeholder="Enter alternative text here..."
+                  editMode={true}
+                  maxLength={2000}
                 />
               </div>
 
@@ -327,17 +322,16 @@ const TextComponent = ({
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Alternative Second Part Text
                 </label>
-                <Input.TextArea
-                  value={tempSettings.altSecondPartText}
-                  onChange={(e) =>
+                <RichTextEditor
+                  defaultValue={tempSettings.altSecondPartText}
+                  onChange={(html) =>
                     setTempSettings({
                       ...tempSettings,
-                      altSecondPartText: e.target.value,
+                      altSecondPartText: html,
                     })
                   }
-                  rows={4}
-                  className="w-full rounded-lg border-gray-200 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
-                  placeholder="Enter alternative second part text here..."
+                  editMode={true}
+                  maxLength={2000}
                 />
               </div>
             </div>

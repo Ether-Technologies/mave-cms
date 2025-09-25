@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import Image from "next/image";
 import MediaSelectionModal from "./Modals/MediaSelectionModal";
+import RichTextEditor from "../RichTextEditor";
 
 const { Option } = Select;
 
@@ -183,13 +184,11 @@ const PageEditForm = ({ page, onSubmit, onCancel }) => {
         />
 
         <label className="font-semibold">Page Meta Description:</label>
-        <Input.TextArea
-          value={formData.metaDescription}
-          onChange={(e) => handleChange("metaDescription", e.target.value)}
-          placeholder="Enter Meta Description"
-          allowClear
-          size="large"
-          rows={4}
+        <RichTextEditor
+          defaultValue={formData.metaDescription}
+          onChange={(html) => handleChange("metaDescription", html)}
+          editMode={true}
+          maxLength={500}
         />
 
         <label className="font-semibold">Page Meta Keywords:</label>

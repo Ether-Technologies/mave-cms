@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Button, Form, Input, Select } from "antd";
 import useForm from "./UseForm";
+import RichTextEditor from "./RichTextEditor";
 
 const FormComponent = ({ formData }) => {
   const [editMode, setEditMode] = useState(false);
@@ -47,19 +48,19 @@ const FormComponent = ({ formData }) => {
           />
         </Form.Item>
         <Form.Item label="Description (English)">
-          <Input.TextArea
-            name="description_en"
-            initialValue={form.description_en}
-            disabled={!editMode}
-            placeholder={form.description_en}
+          <RichTextEditor
+            defaultValue={form.description_en}
+            onChange={(html) => handleChange({ target: { value: html } }, "description_en")}
+            editMode={editMode}
+            maxLength={2000}
           />
         </Form.Item>
         <Form.Item label="Description (Bengali)">
-          <Input.TextArea
-            name="description_bn"
-            initialValue={form.description_bn}
-            disabled={!editMode}
-            placeholder={form.description_bn}
+          <RichTextEditor
+            defaultValue={form.description_bn}
+            onChange={(html) => handleChange({ target: { value: html } }, "description_bn")}
+            editMode={editMode}
+            maxLength={2000}
           />
         </Form.Item>
         <Form.Item label="Submit Direction">
@@ -76,7 +77,7 @@ const FormComponent = ({ formData }) => {
             name="status"
             // initialValue={form.status}
             disabled={!editMode}
-            // defaultValue={form.status}
+          // defaultValue={form.status}
           >
             <Select.Option value="1">Active</Select.Option>
             <Select.Option value="0">Inactive</Select.Option>

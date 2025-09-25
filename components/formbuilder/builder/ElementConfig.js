@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Input, Switch, Modal } from "antd";
 import MediaSelectionModal from "../../PageBuilder/Modals/MediaSelectionModal.jsx";
-
-const { TextArea } = Input;
+import RichTextEditor from "../../RichTextEditor";
 
 const ElementConfig = ({ element, onUpdate }) => {
   const [label, setLabel] = useState(element.label || "");
@@ -178,11 +177,11 @@ const ElementConfig = ({ element, onUpdate }) => {
       {element.element_type === "guideline" && (
         <>
           <label className="block font-semibold mb-1">Guideline Text</label>
-          <TextArea
-            rows={4}
-            className="mb-4"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+          <RichTextEditor
+            defaultValue={content}
+            onChange={(html) => setContent(html)}
+            editMode={true}
+            maxLength={2000}
           />
         </>
       )}

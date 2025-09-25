@@ -12,6 +12,7 @@ import {
   Switch,
   Collapse,
 } from "antd";
+import RichTextEditor from "../../../RichTextEditor";
 import { PlusOutlined, MinusOutlined, GlobalOutlined } from "@ant-design/icons";
 import instance from "../../../../axios";
 
@@ -238,9 +239,11 @@ const ButtonSelectionModal = ({
                   },
                 ]}
               >
-                <Input.TextArea
-                  placeholder="Enter your custom script here..."
-                  rows={4}
+                <RichTextEditor
+                  defaultValue=""
+                  onChange={(html) => form.setFieldValue("customScript", html)}
+                  editMode={true}
+                  maxLength={2000}
                 />
               </Form.Item>
             )}
