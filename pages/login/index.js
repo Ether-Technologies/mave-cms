@@ -65,7 +65,7 @@ export default function Login() {
     <div className="fixed inset-0 flex w-full h-screen overflow-hidden">
       {/* Left Panel - Login Form with Background */}
       <motion.div
-        className="relative w-full md:w-1/2 h-full flex items-center justify-center p-8 bg-cover bg-center bg-no-repeat"
+        className="relative w-full md:w-2/5 h-full flex items-center justify-center p-8 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/images/ui/lleftbg.png')" }}
         variants={containerVariants}
         initial="hidden"
@@ -241,7 +241,7 @@ export default function Login() {
       </motion.div>
 
       {/* Right Panel - Video Background */}
-      <div className="hidden md:block relative w-1/2 h-full overflow-hidden">
+      <div className="hidden md:block relative w-3/5 h-full overflow-hidden">
         <video
           autoPlay
           loop
