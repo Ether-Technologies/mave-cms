@@ -71,17 +71,17 @@ export default function Login() {
         initial="hidden"
         animate="visible"
       >
-        {/* Glassmorphism Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent backdrop-blur-[2px]"></div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/20"></div>
 
         {/* Glassmorphism Container */}
-        <div className="relative z-10 w-full max-w-md backdrop-blur-xl bg-white/80 rounded-3xl shadow-2xl border border-white/40 p-8 md:p-10">
+        <div className="relative z-10 w-full max-w-md backdrop-blur-md bg-white/80 rounded-3xl shadow-2xl border border-white/40 p-8 md:p-10">
           {/* Logo */}
-          <motion.div variants={itemVariants} className="flex justify-center mb-8">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+          <motion.div
+            variants={itemVariants}
+            className="flex justify-center mb-8"
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Image
                 src="/images/ui/mave_new_logo.png"
                 alt="Mave Logo"
@@ -98,7 +98,9 @@ export default function Login() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent mb-2">
               Welcome Back
             </h1>
-            <p className="text-gray-600 text-sm">Sign in to continue to your dashboard</p>
+            <p className="text-gray-600 text-sm">
+              Sign in to continue to your dashboard
+            </p>
           </motion.div>
 
           {/* Sign Up Link */}
@@ -106,7 +108,9 @@ export default function Login() {
             variants={itemVariants}
             className="flex justify-center items-center gap-2 mb-6"
           >
-            <span className="text-gray-600 text-sm">Don't have an account?</span>
+            <span className="text-gray-600 text-sm">
+              Don't have an account?
+            </span>
             <Link href="/signup">
               <motion.span
                 whileHover={{ scale: 1.05 }}
@@ -122,7 +126,7 @@ export default function Login() {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 block
-                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/50 backdrop-blur-sm hover:bg-white/80 hover:border-yellow-300 transition-all rounded-xl shadow-sm hover:shadow-md"
+                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/70 hover:bg-white/90 hover:border-yellow-300 transition-all rounded-xl shadow-sm hover:shadow-md"
                 onClick={() => message.info("Coming soon")}
               >
                 <Image
@@ -175,7 +179,7 @@ export default function Login() {
                       <MailOutlined className="text-lg text-gray-400 mr-2" />
                     }
                     placeholder="Email address"
-                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/50 backdrop-blur-sm"
+                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
                   />
                 </motion.div>
               </Form.Item>
@@ -191,8 +195,10 @@ export default function Login() {
                 <motion.div whileFocus={{ scale: 1.01 }}>
                   <Input.Password
                     placeholder="Password"
-                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/50 backdrop-blur-sm"
-                    prefix={<LockOutlined className="text-lg text-gray-400 mr-2" />}
+                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                    prefix={
+                      <LockOutlined className="text-lg text-gray-400 mr-2" />
+                    }
                     iconRender={(visible) =>
                       visible ? (
                         <EyeOutlined className="text-gray-400" />
@@ -204,7 +210,10 @@ export default function Login() {
                 </motion.div>
               </Form.Item>
               <Form.Item>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Button
                     block
                     className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
@@ -250,11 +259,11 @@ export default function Login() {
           className="w-full h-full object-cover"
         >
           <source
-            src="https://videos.pexels.com/video-files/18069786/18069786-uhd_1440_2560_30fps.mp4"
+            src="https://videos.pexels.com/video-files/18069233/18069233-uhd_1440_2560_24fps.mp4"
             type="video/mp4"
           />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/15 to-transparent"></div>
 
         {/* Content Overlay */}
         <div className="absolute inset-0 flex items-center justify-center p-12 z-10">
@@ -268,23 +277,33 @@ export default function Login() {
               variants={floatingVariants}
               initial="initial"
               animate="animate"
-              className="backdrop-blur-xl bg-white/10 rounded-3xl p-10 border border-white/20 shadow-2xl"
+              className="backdrop-blur-md bg-white/10 rounded-3xl p-10 border border-white/20 shadow-2xl"
             >
               <motion.h1
                 variants={itemVariants}
                 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight"
               >
                 Build. Manage. Scale.
-                <span className="block text-yellow-400 mt-2">With Mave CMS</span>
+                <span
+                  className="block text-yellow-400 mt-2"
+                  style={{ WebkitTextStroke: "1px rgba(75, 85, 99, 0.5)" }}
+                >
+                  With Mave CMS
+                </span>
               </motion.h1>
               <motion.p
                 variants={itemVariants}
                 className="text-lg text-gray-100 leading-relaxed mb-8"
               >
-                The most powerful and flexible content management system designed for modern businesses. Create stunning websites, manage content effortlessly, and scale with confidence.
+                The most powerful and flexible content management system
+                designed for modern businesses. Create stunning websites, manage
+                content effortlessly, and scale with confidence.
               </motion.p>
               <motion.div variants={itemVariants} className="flex gap-4">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Button
                     icon={<RocketOutlined />}
                     className="h-12 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
@@ -293,10 +312,13 @@ export default function Login() {
                     What's New
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Button
                     icon={<RadarChartOutlined />}
-                    className="h-12 px-6 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border border-white/30 hover:border-white/50 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+                    className="h-12 px-6 bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
                     onClick={() => router.push("/portfolio")}
                   >
                     Portfolio
