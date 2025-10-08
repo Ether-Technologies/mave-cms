@@ -5,13 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   EyeInvisibleOutlined,
+  EyeOutlined,
   LockOutlined,
   MailOutlined,
   RadarChartOutlined,
+  RocketOutlined,
 } from "@ant-design/icons";
 import Router, { useRouter } from "next/router";
 import { useAuth } from "../../src/context/AuthContext";
 import Loader from "../../components/Loader";
+import { motion } from "framer-motion";
 
 export default function Login() {
   const { login, loading } = useAuth();
@@ -29,70 +32,125 @@ export default function Login() {
 
   if (loading) return <Loader />;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.6, staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5 },
+    },
+  };
+
+  const floatingVariants = {
+    initial: { y: 0 },
+    animate: {
+      y: [-10, 10, -10],
+      transition: {
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   return (
-    <div className="flex flex-col justify-center items-center">
-      <div className="grid grid-cols-1 md:grid-cols-3 w-full">
-        {/* Left Panel */}
-        <div
-          className="flex flex-col justify-center gap-8 px-8 md:px-24 h-screen bg-cover bg-bottom bg-no-repeat col-span-1"
-          style={{ backgroundImage: "url('/images/ui/lleftbg.png')" }}
-        >
-          <Image
-            src="/images/ui/mave_new_logo.png"
-            alt="Mave Logo"
-            width={330}
-            height={100}
-            objectFit="contain"
-          />
-          <h1 className="text-xl md:text-2xl font-bold text-theme text-center">
-            Log in to your account
-          </h1>
-          <div className="flex justify-center items-center gap-2 text-[1.2rem]">
-            <h3 className="font-normal">Don't have an account?</h3>
-            <Link href="/signup">
-              <h3 className="font-semibold text-theme cursor-pointer">
-                Sign Up
-              </h3>
-            </Link>
-          </div>
-          <div className="flex flex-col gap-4">
-            <Button
-              block
-              className="flex justify-center items-center gap-4 py-8 border-2 border-[#C9C9C9] bg-white"
-              onClick={() => message.info("Coming soon")}
+    <div className="fixed inset-0 flex w-full h-screen overflow-hidden">
+      {/* Left Panel - Login Form with Background */}
+      <motion.div
+        className="relative w-full md:w-1/2 h-full flex items-center justify-center p-8 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/images/ui/lleftbg.png')" }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Glassmorphism Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent backdrop-blur-[2px]"></div>
+
+        {/* Glassmorphism Container */}
+        <div className="relative z-10 w-full max-w-md backdrop-blur-xl bg-white/80 rounded-3xl shadow-2xl border border-white/40 p-8 md:p-10">
+          {/* Logo */}
+          <motion.div variants={itemVariants} className="flex justify-center mb-8">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               <Image
-                src="/images/ui/google.png"
-                alt="Google Logo"
-                width={30}
-                height={30}
+                src="/images/ui/mave_new_logo.png"
+                alt="Mave Logo"
+                width={200}
+                height={60}
                 objectFit="contain"
+                className="drop-shadow-lg"
               />
-              <h3 className="google text-[#797B7E] text-[1.2rem] font-medium capitalize">
-                Continue with Google
-              </h3>
-            </Button>
-          </div>
-          <div className="flex justify-center items-center gap-2">
-            <Image
-              src="/images/ui/line.svg"
-              alt="Line"
-              width={80}
-              height={10}
-              objectFit="contain"
-            />
-            <p className="text-sm font-normal text-gray-500 text-center">
-              Or with email and password
-            </p>
-            <Image
-              src="/images/ui/line.svg"
-              alt="Line"
-              width={80}
-              height={10}
-              objectFit="contain"
-            />
-          </div>
-          <div>
+            </motion.div>
+          </motion.div>
+
+          {/* Welcome Text */}
+          <motion.div variants={itemVariants} className="text-center mb-8">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent mb-2">
+              Welcome Back
+            </h1>
+            <p className="text-gray-600 text-sm">Sign in to continue to your dashboard</p>
+          </motion.div>
+
+          {/* Sign Up Link */}
+          <motion.div
+            variants={itemVariants}
+            className="flex justify-center items-center gap-2 mb-6"
+          >
+            <span className="text-gray-600 text-sm">Don't have an account?</span>
+            <Link href="/signup">
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                className="font-semibold text-yellow-500 hover:text-yellow-600 cursor-pointer transition-colors"
+              >
+                Sign Up
+              </motion.span>
+            </Link>
+          </motion.div>
+
+          {/* Google Button */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                block
+                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/50 backdrop-blur-sm hover:bg-white/80 hover:border-yellow-300 transition-all rounded-xl shadow-sm hover:shadow-md"
+                onClick={() => message.info("Coming soon")}
+              >
+                <Image
+                  src="/images/ui/google.png"
+                  alt="Google Logo"
+                  width={24}
+                  height={24}
+                  objectFit="contain"
+                />
+                <span className="text-gray-700 text-sm font-semibold">
+                  Continue with Google
+                </span>
+              </Button>
+            </motion.div>
+          </motion.div>
+
+          {/* Divider */}
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-4 mb-6"
+          >
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            <span className="text-xs text-gray-500 font-medium">OR</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+          </motion.div>
+
+          {/* Login Form */}
+          <motion.div variants={itemVariants}>
             <Form
               name="login"
               initialValues={{
@@ -111,13 +169,15 @@ export default function Login() {
                   },
                 ]}
               >
-                <Input
-                  prefix={
-                    <MailOutlined className="text-[1.3rem] text-[#797B7E] mr-2 font-medium" />
-                  }
-                  placeholder="Email"
-                  className="input-field"
-                />
+                <motion.div whileFocus={{ scale: 1.01 }}>
+                  <Input
+                    prefix={
+                      <MailOutlined className="text-lg text-gray-400 mr-2" />
+                    }
+                    placeholder="Email address"
+                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/50 backdrop-blur-sm"
+                  />
+                </motion.div>
               </Form.Item>
               <Form.Item
                 name="password"
@@ -128,69 +188,165 @@ export default function Login() {
                   },
                 ]}
               >
-                <Input.Password
-                  placeholder="Password"
-                  className="input-field"
-                  prefix={
-                    <LockOutlined className="text-[1.3rem] text-[#797B7E] mr-2 font-medium" />
-                  }
-                  iconRender={(visible) =>
-                    visible ? (
-                      <EyeInvisibleOutlined />
-                    ) : (
-                      <EyeInvisibleOutlined />
-                    )
-                  }
-                />
+                <motion.div whileFocus={{ scale: 1.01 }}>
+                  <Input.Password
+                    placeholder="Password"
+                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/50 backdrop-blur-sm"
+                    prefix={<LockOutlined className="text-lg text-gray-400 mr-2" />}
+                    iconRender={(visible) =>
+                      visible ? (
+                        <EyeOutlined className="text-gray-400" />
+                      ) : (
+                        <EyeInvisibleOutlined className="text-gray-400" />
+                      )
+                    }
+                  />
+                </motion.div>
               </Form.Item>
               <Form.Item>
-                <Button
-                  block
-                  className="bg-theme text-white text-[1.2rem] font-medium py-6"
-                  htmlType="submit"
-                >
-                  Log in
-                </Button>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    block
+                    className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    htmlType="submit"
+                  >
+                    Sign In
+                  </Button>
+                </motion.div>
               </Form.Item>
             </Form>
-          </div>
-        </div>
-        {/* Right Panel */}
-        <div
-          className="h-screen bg-theme text-black flex flex-col justify-between gap-8 col-span-2
-          bg-right-bottom bg-no-repeat"
-          style={{
-            backgroundImage: "url('/images/ui/lrightbg.svg')",
-            backgroundSize: "80%",
-          }}
-        >
-          <div className="flex flex-col gap-8 pt-10 pl-8 md:pl-20">
-            <h1 className="text-3xl md:text-4xl font-bold">
-              Mave CMS is
-              <br />
-              launching in Bangladesh soon !!!
-            </h1>
-            <p className="text-lg md:text-xl font-normal md:w-lg leading-8 md:leading-[2.5rem]">
-              It is a long established fact that a reader will be distracted by
-              the readable content of a page when looking at its layout. The
-              point of using Lorem Ipsum is that it has a more-or-less normal
-              distribution of letters, as opposed to using
-            </p>
-          </div>
+          </motion.div>
 
-          {/* Changelogs */}
-          <Button
-            icon={<RadarChartOutlined />}
-            className="fixed bottom-0 right-0 m-4 bg-white text-theme z-20"
-            onClick={() => router.push("/usermanual/changelog")}
+          {/* Additional Info */}
+          <motion.div
+            variants={itemVariants}
+            className="mt-6 text-center space-y-4"
+          >
+            <p className="text-xs text-gray-500">
+              By signing in, you agree to our{" "}
+              <Link href="/terms">
+                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                  Terms
+                </span>
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy">
+                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                  Privacy Policy
+                </span>
+              </Link>
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Right Panel - Video Background */}
+      <div className="hidden md:block relative w-1/2 h-full overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source
+            src="https://videos.pexels.com/video-files/18069786/18069786-uhd_1440_2560_30fps.mp4"
+            type="video/mp4"
           />
-          <Button
-            icon={<RadarChartOutlined />}
-            className="fixed bottom-0 right-10 m-4 bg-white text-theme z-20"
-            onClick={() => router.push("/portfolio")}
-          />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/30 to-transparent"></div>
+
+        {/* Content Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center p-12 z-10">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="max-w-xl"
+          >
+            <motion.div
+              variants={floatingVariants}
+              initial="initial"
+              animate="animate"
+              className="backdrop-blur-xl bg-white/10 rounded-3xl p-10 border border-white/20 shadow-2xl"
+            >
+              <motion.h1
+                variants={itemVariants}
+                className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight"
+              >
+                Build. Manage. Scale.
+                <span className="block text-yellow-400 mt-2">With Mave CMS</span>
+              </motion.h1>
+              <motion.p
+                variants={itemVariants}
+                className="text-lg text-gray-100 leading-relaxed mb-8"
+              >
+                The most powerful and flexible content management system designed for modern businesses. Create stunning websites, manage content effortlessly, and scale with confidence.
+              </motion.p>
+              <motion.div variants={itemVariants} className="flex gap-4">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    icon={<RocketOutlined />}
+                    className="h-12 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+                    onClick={() => router.push("/usermanual/changelog")}
+                  >
+                    What's New
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    icon={<RadarChartOutlined />}
+                    className="h-12 px-6 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border border-white/30 hover:border-white/50 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+                    onClick={() => router.push("/portfolio")}
+                  >
+                    Portfolio
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
+
+      {/* Floating Elements */}
+      <motion.div
+        className="absolute top-10 left-20 w-20 h-20 bg-yellow-400/20 rounded-full blur-2xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="absolute bottom-20 left-40 w-32 h-32 bg-amber-400/20 rounded-full blur-3xl"
+        animate={{
+          scale: [1.2, 1, 1.2],
+          opacity: [0.4, 0.7, 0.4],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1,
+        }}
+      />
+      <motion.div
+        className="absolute top-1/2 right-20 w-24 h-24 bg-orange-400/20 rounded-full blur-3xl"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.2, 0.5, 0.2],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+      />
     </div>
   );
 }
