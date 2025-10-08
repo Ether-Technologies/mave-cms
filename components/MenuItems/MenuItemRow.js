@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Row,
-  Col,
   Input,
   Select,
   Button,
@@ -12,12 +10,18 @@ import {
   message,
   Checkbox,
   Tooltip,
+  Tag,
+  Badge,
 } from "antd";
 import {
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
   CloseCircleOutlined,
+  MenuOutlined,
+  LinkOutlined,
+  CheckCircleOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import instance from "../../axios";
 
@@ -33,6 +37,7 @@ const MenuItemRow = ({
   setEditingItemId,
   selectedItemIds,
   setSelectedItemIds,
+  index,
 }) => {
   const [editedTitleEn, setEditedTitleEn] = useState(menuItem.title);
   const [editedTitleBn, setEditedTitleBn] = useState(menuItem.title_bn);
@@ -171,145 +176,209 @@ const MenuItemRow = ({
   };
 
   return (
-    <Row className="border-b py-2 items-center">
-      <Col xs={2} md={1}>
-        <Checkbox checked={isSelected} onChange={handleCheckboxChange} />
-      </Col>
-      <Col xs={8} md={4}>
-        {isEditing ? (
-          <Input
-            value={editedTitleEn}
-            onChange={(e) => setEditedTitleEn(e.target.value)}
-            className="w-11/12"
-            placeholder="Item Name"
-          />
-        ) : (
-          <p>{menuItem.title}</p>
-        )}
-      </Col>
-      <Col xs={8} md={4}>
-        {isEditing ? (
-          <Input
-            value={editedTitleBn}
-            onChange={(e) => setEditedTitleBn(e.target.value)}
-            className="w-11/12"
-            placeholder="আইটেম নাম"
-          />
-        ) : (
-          <p>{menuItem.title_bn || "N/A"}</p>
-        )}
-      </Col>
-      <Col xs={8} md={4}>
-        {isEditing && allMenuItems ? (
-          <Select
-            showSearch
-            placeholder="Select a Parent Menu"
-            optionFilterProp="children"
-            onChange={(value) => setEditedParentId(value)}
-            className="w-11/12"
-            allowClear
-            // value={editedParentId || undefined}
-            value={getParentTitle(editedParentId)}
-          >
-            <Option value={null}>No Parent</Option>
-            {allMenuItems
-              .filter((item) => item.id !== menuItem.id)
-              .map((item) => (
-                <Option key={item.id} value={item.id}>
-                  {item.title}
-                </Option>
-              ))}
-          </Select>
-        ) : (
-          <p>{getParentTitle(menuItem.parent_id)}</p>
-        )}
-      </Col>
-      <Col xs={8} md={4}>
-        {isEditing ? (
-          <>
-            <Radio.Group
-              onChange={(e) => setLinkType(e.target.value)}
-              value={linkType}
-            >
-              <Radio value="independent">Independent</Radio>
-              <Radio value="page">Page</Radio>
-            </Radio.Group>
-            {linkType === "page" ? (
+    <div
+      className={`
+        bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border-2 
+        transition-all duration-300 hover:shadow-xl
+        ${isSelected ? 'border-yellow-400 ring-2 ring-yellow-200' : 'border-gray-200 hover:border-gray-300'}
+        ${isEditing ? 'ring-2 ring-blue-200 border-blue-300' : ''}
+      `}
+    >
+      <div className="p-4">
+        <div className="grid grid-cols-12 gap-4 items-center">
+          {/* Checkbox */}
+          <div className="col-span-1 flex items-center justify-center">
+            <Checkbox
+              checked={isSelected}
+              onChange={handleCheckboxChange}
+              className="transform scale-110"
+            />
+          </div>
+
+          {/* Item Name (English) */}
+          <div className="col-span-2">
+            {isEditing ? (
+              <Input
+                value={editedTitleEn}
+                onChange={(e) => setEditedTitleEn(e.target.value)}
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                placeholder="Item Name"
+                prefix={<MenuOutlined className="text-gray-400" />}
+              />
+            ) : (
+              <div className="flex items-center gap-2">
+                <MenuOutlined className="text-yellow-500" />
+                <span className="font-semibold text-gray-800 truncate">
+                  {menuItem.title}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Item Name (Bengali) */}
+          <div className="col-span-2">
+            {isEditing ? (
+              <Input
+                value={editedTitleBn}
+                onChange={(e) => setEditedTitleBn(e.target.value)}
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                placeholder="আইটেম নাম"
+                prefix={<GlobalOutlined className="text-gray-400" />}
+              />
+            ) : (
+              <div className="flex items-center gap-2">
+                <GlobalOutlined className="text-blue-500" />
+                <span className="font-medium text-gray-700 truncate">
+                  {menuItem.title_bn || <span className="text-gray-400 italic">N/A</span>}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Parent Menu */}
+          <div className="col-span-2">
+            {isEditing && allMenuItems ? (
               <Select
                 showSearch
-                placeholder="Select a page"
+                placeholder="Select a Parent Menu"
                 optionFilterProp="children"
-                onChange={(value) => setEditedLink(value)}
-                className="w-11/12 mt-2"
-                value={editedLink || undefined}
+                onChange={(value) => setEditedParentId(value)}
+                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                allowClear
+                value={getParentTitle(editedParentId)}
               >
-                {pages.map((page) => (
-                  <Option key={page.id} value={page.slug}>
-                    {page.page_name_en}
-                  </Option>
-                ))}
+                <Option value={null}>No Parent</Option>
+                {allMenuItems
+                  .filter((item) => item.id !== menuItem.id)
+                  .map((item) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.title}
+                    </Option>
+                  ))}
               </Select>
             ) : (
-              <Input
-                value={editedLink}
-                onChange={(e) => setEditedLink(e.target.value)}
-                className="mt-2 w-11/12"
-                placeholder="Enter custom link"
-              />
+              <Tag className="bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 text-purple-700 font-medium px-3 py-1 rounded-full">
+                {getParentTitle(menuItem.parent_id)}
+              </Tag>
             )}
-          </>
-        ) : (
-          <Tooltip title={menuItem.link}>
-            <p className="text-theme underline">
-              {menuItem.link.length > 30
-                ? menuItem.link.slice(0, 30) + "..."
-                : menuItem.link}
-            </p>
-          </Tooltip>
-        )}
-      </Col>
-      <Col xs={24} md={6} className="flex gap-2 mt-2 md:mt-0">
-        {isEditing ? (
-          <>
-            <Button
-              icon={<SyncOutlined />}
-              onClick={handleUpdate}
-              className="mavebutton"
-            >
-              Update
-            </Button>
-            <Button
-              icon={<CloseCircleOutlined />}
-              onClick={() => setEditingItemId(null)}
-              danger
-            >
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => setEditingItemId(menuItem.id)}
-              className="mavebutton"
-            >
-              Edit
-            </Button>
-            <Popconfirm
-              title="Are you sure you want to delete this menu item?"
-              onConfirm={handleDelete}
-              okText="Yes"
-              cancelText="No"
-              okButtonProps={{ danger: true }}
-            >
-              <Button danger icon={<DeleteOutlined />}>
-                Delete
-              </Button>
-            </Popconfirm>
-          </>
-        )}
-      </Col>
-    </Row>
+          </div>
+
+          {/* Item Link */}
+          <div className="col-span-2">
+            {isEditing ? (
+              <div className="space-y-2">
+                <Radio.Group
+                  onChange={(e) => setLinkType(e.target.value)}
+                  value={linkType}
+                  className="flex gap-2"
+                >
+                  <Radio value="independent" className="text-xs">Independent</Radio>
+                  <Radio value="page" className="text-xs">Page</Radio>
+                </Radio.Group>
+                {linkType === "page" ? (
+                  <Select
+                    showSearch
+                    placeholder="Select a page"
+                    optionFilterProp="children"
+                    onChange={(value) => setEditedLink(value)}
+                    className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                    value={editedLink || undefined}
+                  >
+                    {pages.map((page) => (
+                      <Option key={page.id} value={page.slug}>
+                        {page.page_name_en}
+                      </Option>
+                    ))}
+                  </Select>
+                ) : (
+                  <Input
+                    value={editedLink}
+                    onChange={(e) => setEditedLink(e.target.value)}
+                    className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                    placeholder="Enter custom link"
+                    prefix={<LinkOutlined className="text-gray-400" />}
+                  />
+                )}
+              </div>
+            ) : (
+              <Tooltip title={menuItem.link}>
+                <div className="flex items-center gap-2">
+                  <LinkOutlined className="text-blue-500 text-xs" />
+                  <a
+                    href={menuItem.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline text-sm truncate font-medium"
+                  >
+                    {menuItem.link.length > 25
+                      ? menuItem.link.slice(0, 25) + "..."
+                      : menuItem.link}
+                  </a>
+                </div>
+              </Tooltip>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="col-span-3 flex gap-2 justify-end">
+            {isEditing ? (
+              <>
+                <Tooltip title="Save changes">
+                  <Button
+                    icon={<CheckCircleOutlined />}
+                    onClick={handleUpdate}
+                    className="h-10 px-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                  >
+                    Update
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Cancel editing">
+                  <Button
+                    icon={<CloseCircleOutlined />}
+                    onClick={() => setEditingItemId(null)}
+                    className="h-10 px-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                  >
+                    Cancel
+                  </Button>
+                </Tooltip>
+              </>
+            ) : (
+              <>
+                <Tooltip title="Edit menu item">
+                  <Button
+                    icon={<EditOutlined />}
+                    onClick={() => setEditingItemId(menuItem.id)}
+                    className="h-10 px-4 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                  >
+                    Edit
+                  </Button>
+                </Tooltip>
+                <Popconfirm
+                  title="Delete Menu Item"
+                  description="Are you sure you want to delete this menu item?"
+                  onConfirm={handleDelete}
+                  okText="Yes, Delete"
+                  cancelText="Cancel"
+                  okButtonProps={{
+                    danger: true,
+                    className: "bg-red-500 hover:bg-red-600 border-red-500",
+                  }}
+                >
+                  <Tooltip title="Delete menu item">
+                    <Button
+                      icon={<DeleteOutlined />}
+                      className="h-10 px-4 bg-red-500 hover:bg-red-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    >
+                      Delete
+                    </Button>
+                  </Tooltip>
+                </Popconfirm>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

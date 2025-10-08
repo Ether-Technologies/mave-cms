@@ -67,6 +67,57 @@ const MainContentSection = ({
             maxLength={2000}
           />
         </Form.Item>
+        <Form.Item label="Second Title">
+          <Input
+            value={infoBox.secondTitle || ""}
+            onChange={(e) => {
+              const updatedInfoBox = {
+                ...infoBox,
+                secondTitle: e.target.value,
+              };
+              onInfoBoxChange(updatedInfoBox);
+              // Also update component immediately
+              updateComponent({
+                ...component,
+                _mave: {
+                  ...updatedInfoBox,
+                  layout,
+                  font,
+                  color,
+                  background,
+                  showAltContent,
+                },
+              });
+            }}
+            placeholder="Enter second title (optional)"
+          />
+        </Form.Item>
+        <Form.Item label="Second Description">
+          <RichTextEditor
+            defaultValue={infoBox.secondDescription || ""}
+            onChange={(html) => {
+              const updatedInfoBox = {
+                ...infoBox,
+                secondDescription: html,
+              };
+              onInfoBoxChange(updatedInfoBox);
+              // Also update component immediately
+              updateComponent({
+                ...component,
+                _mave: {
+                  ...updatedInfoBox,
+                  layout,
+                  font,
+                  color,
+                  background,
+                  showAltContent,
+                },
+              });
+            }}
+            editMode={true}
+            maxLength={2000}
+          />
+        </Form.Item>
         <Form.Item label="Alternative Title">
           <Input
             value={infoBox.altTitle || ""}

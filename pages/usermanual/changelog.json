@@ -1123,5 +1123,21 @@
                 "User can now add alternative content in pagebuilder widgets"
             ]
         }
+    },
+    {
+        "version": "3.3.70",
+        "type": "major",
+        "date": "2025-09-29",
+        "changes": {
+            "Features": [
+                "Slider component in pagebuilder got alternative content more explicitly",
+                "Video component in pagebuilder got alternative content more explicitly",
+                "User gets the option to send mail from form component"
+            ],
+            "Bug Fixes": [
+                "Fixed the issue of form submission in form component",
+                "Fixed the issue of alternative content in pagebuilder widgets"
+            ]
+        }
     }
 ]

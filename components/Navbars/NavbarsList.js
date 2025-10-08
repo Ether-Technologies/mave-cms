@@ -1,7 +1,8 @@
 // components/Navbars/NavbarsList.js
 
 import React from "react";
-import { Row, Col, Checkbox } from "antd";
+import { Checkbox, Badge, Empty } from "antd";
+import { InboxOutlined } from "@ant-design/icons";
 import NavbarRow from "./NavbarRow";
 
 const NavbarsList = ({
@@ -24,43 +25,85 @@ const NavbarsList = ({
       setSelectedNavbarIds([]);
     }
   };
+
   return (
-    <div className="bg-white p-4 shadow-md border-t-2 border-gray-300">
-      <Row className="font-semibold border-b pb-2 mb-2">
-        <Col xs={2} md={1}>
-          <Checkbox checked={allSelected} onChange={handleSelectAll} />
-        </Col>
-        <Col xs={8} md={5}>
-          Navbar Name
-        </Col>
-        <Col xs={8} md={4}>
-          Logo
-        </Col>
-        <Col xs={8} md={10}>
-          Menu Items
-        </Col>
-        <Col xs={24} md={4}>
-          Actions
-        </Col>
-      </Row>
+    <div className="space-y-4">
+      {/* Header Row */}
+      {navbars.length > 0 && (
+        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="grid grid-cols-12 gap-4 items-center">
+            <div className="col-span-1 flex items-center justify-center">
+              <Checkbox
+                checked={allSelected}
+                onChange={handleSelectAll}
+                className="transform scale-110"
+              />
+            </div>
+            <div className="col-span-3">
+              <span className="text-sm font-bold text-gray-700">Navbar Name</span>
+            </div>
+            <div className="col-span-2">
+              <span className="text-sm font-bold text-gray-700">Logo</span>
+            </div>
+            <div className="col-span-3">
+              <span className="text-sm font-bold text-gray-700">Menu Items</span>
+            </div>
+            <div className="col-span-3">
+              <span className="text-sm font-bold text-gray-700">Actions</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Navbar Rows */}
       {navbars.length > 0 ? (
-        navbars?.map((navbar) => (
-          <NavbarRow
-            key={navbar.id}
-            navbar={navbar}
-            menus={menus}
-            media={media}
-            setNavbars={setNavbars}
-            editingNavbarId={editingNavbarId}
-            setEditingNavbarId={setEditingNavbarId}
-            selectedNavbarIds={selectedNavbarIds}
-            setSelectedNavbarIds={setSelectedNavbarIds}
-            fetchNavbars={fetchNavbars}
-          />
-        ))
+        <div className="space-y-3">
+          {navbars?.map((navbar, index) => (
+            <NavbarRow
+              key={navbar.id}
+              navbar={navbar}
+              menus={menus}
+              media={media}
+              setNavbars={setNavbars}
+              editingNavbarId={editingNavbarId}
+              setEditingNavbarId={setEditingNavbarId}
+              selectedNavbarIds={selectedNavbarIds}
+              setSelectedNavbarIds={setSelectedNavbarIds}
+              fetchNavbars={fetchNavbars}
+              index={index}
+            />
+          ))}
+        </div>
       ) : (
-        <div className="text-center py-8">
-          <h2>No Navbars Found</h2>
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-md border-2 border-gray-200 p-12">
+          <Empty
+            image={<InboxOutlined className="text-6xl text-gray-300" />}
+            description={
+              <div className="mt-4">
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                  No Navbars Found
+                </h3>
+                <p className="text-gray-500">
+                  Create your first navbar to get started
+                </p>
+              </div>
+            }
+          />
+        </div>
+      )}
+
+      {/* Selection Summary */}
+      {selectedNavbarIds.length > 0 && (
+        <div className="fixed bottom-6 right-6 bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-6 py-3 rounded-xl shadow-2xl animate-in slide-in-from-bottom">
+          <div className="flex items-center gap-2">
+            <Badge
+              count={selectedNavbarIds.length}
+              className="[&_.ant-badge-count]:bg-white [&_.ant-badge-count]:text-yellow-600 [&_.ant-badge-count]:font-bold"
+            />
+            <span className="font-semibold">
+              {selectedNavbarIds.length === 1 ? 'navbar' : 'navbars'} selected
+            </span>
+          </div>
         </div>
       )}
     </div>

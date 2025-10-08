@@ -306,12 +306,10 @@ const SliderComponent = ({
                   <div className="space-y-4">
                     <Form layout="vertical" className="w-full">
                       <Form.Item label="Alternative Title" className="mb-3">
-                        <Input
-                          placeholder="Enter alternative title for the slider"
-                          value={tempSliderAltTitle}
-                          onChange={(e) =>
-                            setTempSliderAltTitle(e.target.value)
-                          }
+                        <RichTextEditor
+                          defaultValue={tempSliderAltTitle}
+                          editMode={true}
+                          onChange={(html) => setTempSliderAltTitle(html)}
                         />
                       </Form.Item>
 
@@ -353,11 +351,19 @@ const SliderComponent = ({
                     <div className="text-sm">
                       <div>
                         <strong>Alt Title:</strong>{" "}
-                        {sliderAltTitle || "Not set"}
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: sliderAltTitle || "Not set",
+                          }}
+                        />
                       </div>
                       <div>
                         <strong>Alt Description:</strong>{" "}
-                        {sliderAltDescription || "Not set"}
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: sliderAltDescription || "Not set",
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -409,14 +415,14 @@ const SliderComponent = ({
                               label="Alternative Title"
                               className="mb-3"
                             >
-                              <Input
-                                placeholder="Enter alternative title"
+                              <RichTextEditor
                                 defaultValue={media.altTitle || ""}
-                                onChange={(e) => {
+                                editMode={true}
+                                onChange={(html) => {
                                   const updatedMedias = [...sliderData.medias];
                                   updatedMedias[index] = {
                                     ...updatedMedias[index],
-                                    altTitle: e.target.value,
+                                    altTitle: html,
                                   };
                                   setSliderData({
                                     ...sliderData,
@@ -432,6 +438,7 @@ const SliderComponent = ({
                             >
                               <RichTextEditor
                                 defaultValue={media.altDescription || ""}
+                                editMode={true}
                                 onChange={(html) => {
                                   const updatedMedias = [...sliderData.medias];
                                   updatedMedias[index] = {
@@ -476,14 +483,14 @@ const SliderComponent = ({
                               label="Alternative Title"
                               className="mb-3"
                             >
-                              <Input
-                                placeholder="Enter alternative title"
+                              <RichTextEditor
                                 defaultValue={card.altTitle || ""}
-                                onChange={(e) => {
+                                editMode={true}
+                                onChange={(html) => {
                                   const updatedCards = [...sliderData.cards];
                                   updatedCards[index] = {
                                     ...updatedCards[index],
-                                    altTitle: e.target.value,
+                                    altTitle: html,
                                   };
                                   setSliderData({
                                     ...sliderData,
@@ -499,6 +506,7 @@ const SliderComponent = ({
                             >
                               <RichTextEditor
                                 defaultValue={card.altDescription || ""}
+                                editMode={true}
                                 onChange={(html) => {
                                   const updatedCards = [...sliderData.cards];
                                   updatedCards[index] = {
@@ -562,7 +570,11 @@ const SliderComponent = ({
                           <div className="text-sm">
                             <div>
                               <strong>Alt Title:</strong>{" "}
-                              {media.altTitle || "Not set"}
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: media.altTitle || "Not set",
+                                }}
+                              />
                             </div>
                             <div>
                               <strong>Alt Description:</strong>{" "}
@@ -600,7 +612,11 @@ const SliderComponent = ({
                           <div className="text-sm">
                             <div>
                               <strong>Alt Title:</strong>{" "}
-                              {card.altTitle || "Not set"}
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: card.altTitle || "Not set",
+                                }}
+                              />
                             </div>
                             <div>
                               <strong>Alt Description:</strong>{" "}

@@ -38,16 +38,18 @@ export const usePageOperations = (pageId, pageData) => {
 
             if (contentSettings && contentSettings.config) {
                 const config = contentSettings.config;
-                setAutoSaveSettings({
+                const newSettings = {
                     autoSave: config.autoSave !== null ? config.autoSave : true,
                     autoSaveInterval: config.autoSaveInterval !== null ? config.autoSaveInterval : 300
-                });
+                };
+                setAutoSaveSettings(newSettings);
             } else {
                 // Use defaults if no content-settings found
-                setAutoSaveSettings({
+                const defaultSettings = {
                     autoSave: false,
                     autoSaveInterval: 300
-                });
+                };
+                setAutoSaveSettings(defaultSettings);
             }
         } catch (err) {
             console.error("❌ Error fetching auto-save settings:", err);
@@ -61,7 +63,8 @@ export const usePageOperations = (pageId, pageData) => {
 
     // Auto-save function
     const performAutoSave = useCallback(async () => {
-        if (!isDirty || !pageData || !pageData.id) {
+        // Double-check auto-save is enabled before proceeding
+        if (!autoSaveSettings.autoSave || !isDirty || !pageData || !pageData.id) {
             return;
         }
 
@@ -70,15 +73,20 @@ export const usePageOperations = (pageId, pageData) => {
             dispatch(setIsDirty(false));
             dispatch(setLastSaved(new Date().toISOString()));
             lastSaveTimeRef.current = Date.now();
-            console.log("✅ Auto-save completed");
         } catch (err) {
             console.error("❌ Auto-save failed:", err);
         }
-    }, [isDirty, pageData, dispatch]);
+    }, [autoSaveSettings.autoSave, isDirty, pageData, dispatch]);
 
     // Set up auto-save timer
     useEffect(() => {
+        // Only set up auto-save if autoSave is enabled AND we have valid page data
         if (!autoSaveSettings.autoSave || !pageData || !pageData.id) {
+            // Clear existing timer if auto-save is disabled
+            if (autoSaveTimerRef.current) {
+                clearInterval(autoSaveTimerRef.current);
+                autoSaveTimerRef.current = null;
+            }
             return;
         }
 
@@ -87,7 +95,7 @@ export const usePageOperations = (pageId, pageData) => {
             clearInterval(autoSaveTimerRef.current);
         }
 
-        // Set up new timer
+        // Set up new timer only if auto-save is enabled
         const intervalMs = autoSaveSettings.autoSaveInterval * 1000; // Convert seconds to milliseconds
         autoSaveTimerRef.current = setInterval(() => {
             performAutoSave();
@@ -98,7 +106,7 @@ export const usePageOperations = (pageId, pageData) => {
                 clearInterval(autoSaveTimerRef.current);
             }
         };
-    }, [autoSaveSettings, pageData, performAutoSave]);
+    }, [autoSaveSettings.autoSave, autoSaveSettings.autoSaveInterval, pageData, performAutoSave]);
 
     // Cleanup timer on unmount
     useEffect(() => {

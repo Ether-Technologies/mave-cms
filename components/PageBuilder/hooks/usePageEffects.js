@@ -1,8 +1,9 @@
 // components/PageBuilder/hooks/usePageEffects.js
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import debounce from "lodash/debounce";
+import instance from "../../../axios";
 
 const AUTOSAVE_DELAY = 30000; // 30 seconds
 
@@ -16,6 +17,30 @@ export const usePageEffects = ({
     onFetchData,
 }) => {
     const router = useRouter();
+    const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
+
+    // Fetch auto-save settings
+    useEffect(() => {
+        const fetchAutoSaveSettings = async () => {
+            try {
+                const response = await instance.get('/settings');
+                const settings = response.data;
+                const contentSettings = settings.find(setting => setting.type === 'content-settings');
+
+                if (contentSettings && contentSettings.config) {
+                    const enabled = contentSettings.config.autoSave !== null ? contentSettings.config.autoSave : false;
+                    setAutoSaveEnabled(enabled);
+                } else {
+                    setAutoSaveEnabled(false);
+                }
+            } catch (err) {
+                console.error("❌ usePageEffects: Error fetching auto-save settings:", err);
+                setAutoSaveEnabled(false);
+            }
+        };
+
+        fetchAutoSaveSettings();
+    }, []);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -51,19 +76,19 @@ export const usePageEffects = ({
     // Auto-save functionality - only trigger when isDirty changes, not on every render
     const debouncedSave = useCallback(
         debounce(() => {
-            if (isDirty && isEditing) {
+            if (isDirty && isEditing && autoSaveEnabled) {
                 onSave(false);
             }
         }, AUTOSAVE_DELAY),
-        [isDirty, isEditing, onSave]
+        [isDirty, isEditing, onSave, autoSaveEnabled]
     );
 
     useEffect(() => {
-        if (isDirty && isEditing) {
+        if (isDirty && isEditing && autoSaveEnabled) {
             debouncedSave();
         }
         return () => debouncedSave.cancel();
-    }, [isDirty, isEditing, debouncedSave]);
+    }, [isDirty, isEditing, debouncedSave, autoSaveEnabled]);
 
     // Warn before leaving with unsaved changes
     useEffect(() => {

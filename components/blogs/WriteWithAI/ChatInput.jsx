@@ -3,7 +3,7 @@
 import React from "react";
 import { Input, Button } from "antd";
 import { RobotOutlined } from "@ant-design/icons";
-import RichTextEditor from "../../../RichTextEditor";
+import RichTextEditor from "../../RichTextEditor";
 
 const ChatInput = ({ prompt, setPrompt, onSend, loading }) => {
   return (

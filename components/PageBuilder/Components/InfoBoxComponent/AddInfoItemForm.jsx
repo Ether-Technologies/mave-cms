@@ -26,6 +26,17 @@ const AddInfoItemForm = ({ form, onFinish, onMediaSelect, selectedMedia }) => {
             maxLength={2000}
           />
         </Form.Item>
+        <Form.Item label="Second Title" name="secondTitle">
+          <Input placeholder="Enter second title (optional)" />
+        </Form.Item>
+        <Form.Item label="Second Description" name="secondDescription">
+          <RichTextEditor
+            defaultValue=""
+            onChange={(html) => form.setFieldValue("secondDescription", html)}
+            editMode={true}
+            maxLength={2000}
+          />
+        </Form.Item>
         <Form.Item
           label="Link"
           name="link"

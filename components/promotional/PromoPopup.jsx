@@ -2,12 +2,21 @@ import { Typography, Button } from "antd";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import changelog from "../../pages/usermanual/changelog.json";
+import { BugOutlined, GiftOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph } = Typography;
 
 export default function PromoPopup() {
   const [showPopup, setShowPopup] = useState(false);
   const [user, setUser] = useState();
+
+  // Helper function to get the latest changelog entry
+  const getLatestChangelogEntry = () => {
+    const sortedChangelog = [...changelog].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+    return sortedChangelog[0];
+  };
 
   useEffect(() => {
     const shown = sessionStorage.getItem("promoPopupShown");
@@ -20,6 +29,9 @@ export default function PromoPopup() {
   useEffect(() => {
     // Fetch user data from local storage
     setUser(JSON.parse(localStorage.getItem("user")));
+
+    // Debug changelog data
+    const latestEntry = getLatestChangelogEntry();
   }, []);
   const handleClose = () => setShowPopup(false);
   if (!showPopup) return null;
@@ -92,20 +104,55 @@ export default function PromoPopup() {
             <Title level={4} className="text-md font-semibold">
               Features
             </Title>
-            {changelog[0]?.changes?.Feature?.map((feat, i) => (
-              <Paragraph key={i} className="text-sm text-gray-500">
-                • {feat}
-              </Paragraph>
-            ))}
+            {(() => {
+              const latestEntry = getLatestChangelogEntry();
+              const features = latestEntry?.changes?.Features;
+              console.log("Debug - Latest entry:", latestEntry);
+              console.log("Debug - Features array:", features);
+              console.log("Debug - Features length:", features?.length);
+
+              if (features && features.length > 0) {
+                return features.map((feat, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <GiftOutlined className="text-violet-500" />
+                    <Paragraph key={i} className="text-sm text-gray-500">
+                      {feat}
+                    </Paragraph>
+                  </div>
+                ));
+              } else {
+                return (
+                  <Paragraph className="text-sm text-gray-500">
+                    No new features in this update
+                  </Paragraph>
+                );
+              }
+            })()}
 
             <Title level={4} className="text-md font-semibold mt-4">
               Bug Fixes
             </Title>
-            {changelog[0]?.changes?.BugFix?.map((fix, i) => (
-              <Paragraph key={i} className="text-sm text-gray-500">
-                • {fix}
-              </Paragraph>
-            ))}
+            {(() => {
+              const latestEntry = getLatestChangelogEntry();
+              const bugFixes = latestEntry?.changes?.["Bug Fixes"];
+
+              if (bugFixes && bugFixes.length > 0) {
+                return bugFixes.map((fix, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <BugOutlined className="text-red-500" />
+                    <Paragraph key={i} className="text-sm text-gray-500">
+                      {fix}
+                    </Paragraph>
+                  </div>
+                ));
+              } else {
+                return (
+                  <Paragraph className="text-sm text-gray-500">
+                    No bug fixes in this update
+                  </Paragraph>
+                );
+              }
+            })()}
 
             <Button
               className="mavebutton mt-4"

@@ -30,15 +30,19 @@ const AccordionSelectionModal = ({
   const [form] = Form.useForm();
   const [accordionItems, setAccordionItems] = useState(initialData);
   const [showStyleConfig, setShowStyleConfig] = useState({});
+  const [contentTypes, setContentTypes] = useState({});
 
   useEffect(() => {
     setAccordionItems(initialData);
     // Initialize showStyleConfig for each item
     const initialStyleConfig = {};
-    initialData.forEach((_, index) => {
+    const initialContentTypes = {};
+    initialData.forEach((item, index) => {
       initialStyleConfig[index] = false;
+      initialContentTypes[index] = item.contentType || "text";
     });
     setShowStyleConfig(initialStyleConfig);
+    setContentTypes(initialContentTypes);
   }, [initialData]);
 
   const handleAddItem = () => {
@@ -48,6 +52,7 @@ const AccordionSelectionModal = ({
       content: "",
       altContent: "",
       contentType: "text",
+      tags: [],
       style: {
         headerBg: "#ffffff",
         headerTextColor: "#000000",
@@ -59,6 +64,7 @@ const AccordionSelectionModal = ({
     };
     setAccordionItems([...accordionItems, newItem]);
     setShowStyleConfig({ ...showStyleConfig, [accordionItems.length]: false });
+    setContentTypes({ ...contentTypes, [accordionItems.length]: "text" });
   };
 
   const handleRemoveItem = (index) => {
@@ -79,6 +85,7 @@ const AccordionSelectionModal = ({
         content: item.content, // Keep the current content from RichTextEditor
         altContent: item.altContent || "", // Keep the current altContent from RichTextEditor
         contentType: values[`contentType_${index}`],
+        tags: item.tags || [], // Keep the current tags
         style: {
           headerBg: values[`headerBg_${index}`] || "#ffffff",
           headerTextColor: values[`headerTextColor_${index}`] || "#000000",
@@ -110,6 +117,20 @@ const AccordionSelectionModal = ({
       return item;
     });
     setAccordionItems(newItems);
+  };
+
+  const handleTagsChange = (tags, index) => {
+    const newItems = accordionItems.map((item, i) => {
+      if (i === index) {
+        return { ...item, tags };
+      }
+      return item;
+    });
+    setAccordionItems(newItems);
+  };
+
+  const handleContentTypeChange = (value, index) => {
+    setContentTypes({ ...contentTypes, [index]: value });
   };
 
   const toggleStyleConfig = (index) => {
@@ -182,27 +203,55 @@ const AccordionSelectionModal = ({
               name={`contentType_${index}`}
               initialValue={item.contentType}
             >
-              <Select>
+              <Select
+                onChange={(value) => handleContentTypeChange(value, index)}
+              >
                 <Option value="text">Text</Option>
+                <Option value="tags">Tags</Option>
                 <Option value="accordion">Nested Accordion</Option>
               </Select>
             </Form.Item>
 
-            <Form.Item label="Content">
-              <RichTextEditor
-                defaultValue={item.content}
-                onChange={(content) => handleContentChange(content, index)}
-                editMode={true}
-              />
-            </Form.Item>
+            {contentTypes[index] === "tags" ? (
+              <Form.Item label="Tags">
+                <Select
+                  mode="tags"
+                  value={item.tags || []}
+                  onChange={(value) => handleTagsChange(value, index)}
+                  placeholder="Enter tags (press Enter to add)"
+                  allowClear
+                  size="large"
+                  showSearch
+                  style={{ width: "100%" }}
+                >
+                  {(item.tags || []).map((tag) => (
+                    <Option key={tag} value={tag}>
+                      {tag}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            ) : (
+              <>
+                <Form.Item label="Content">
+                  <RichTextEditor
+                    defaultValue={item.content}
+                    onChange={(content) => handleContentChange(content, index)}
+                    editMode={true}
+                  />
+                </Form.Item>
 
-            <Form.Item label="Alternative Content">
-              <RichTextEditor
-                defaultValue={item.altContent || ""}
-                onChange={(content) => handleAltContentChange(content, index)}
-                editMode={true}
-              />
-            </Form.Item>
+                <Form.Item label="Alternative Content">
+                  <RichTextEditor
+                    defaultValue={item.altContent || ""}
+                    onChange={(content) =>
+                      handleAltContentChange(content, index)
+                    }
+                    editMode={true}
+                  />
+                </Form.Item>
+              </>
+            )}
 
             {showStyleConfig[index] && (
               <div className="mt-4">

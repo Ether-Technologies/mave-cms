@@ -28,6 +28,7 @@ import {
   getGoogleDriveEmbedUrl,
   isGoogleDriveUrl,
 } from "../../../utils/googleDrive";
+import RichTextEditor from "../../RichTextEditor";
 
 const { Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -403,7 +404,7 @@ const VideoComponent = ({
                 {showAltInputs ? (
                   <Form layout="vertical" className="w-full">
                     <Form.Item label="Alternative Title" className="mb-3">
-                      <Input
+                      {/* <Input
                         placeholder="Enter alternative title"
                         defaultValue={videoData.altTitle || ""}
                         onChange={(e) => {
@@ -412,18 +413,27 @@ const VideoComponent = ({
                             altTitle: e.target.value,
                           });
                         }}
+                      /> */}
+                      <RichTextEditor
+                        editMode={true}
+                        defaultValue={videoData.altTitle || ""}
+                        onChange={(html) => {
+                          setVideoData({
+                            ...videoData,
+                            altTitle: html,
+                          });
+                        }}
                       />
                     </Form.Item>
 
                     <Form.Item label="Alternative Description" className="mb-4">
-                      <Input.TextArea
-                        rows={3}
-                        placeholder="Enter alternative description"
+                      <RichTextEditor
+                        editMode={true}
                         defaultValue={videoData.altDescription || ""}
-                        onChange={(e) => {
+                        onChange={(html) => {
                           setVideoData({
                             ...videoData,
-                            altDescription: e.target.value,
+                            altDescription: html,
                           });
                         }}
                       />
@@ -456,7 +466,11 @@ const VideoComponent = ({
                     <div className="text-sm">
                       <div>
                         <strong>Alt Title:</strong>{" "}
-                        {videoData.altTitle || "Not set"}
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: videoData.altTitle || "Not set",
+                          }}
+                        />
                       </div>
                       <div>
                         <strong>Alt Description:</strong>{" "}

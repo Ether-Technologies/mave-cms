@@ -40,12 +40,6 @@
                 "icon": "/icons/mave/cards.svg",
                 "link": "/cards",
                 "title": "Cards"
-            },
-            {
-                "id": 10,
-                "icon": "/icons/mave/footer.svg",
-                "link": "/footers",
-                "title": "Footers"
             }
         ]
     },

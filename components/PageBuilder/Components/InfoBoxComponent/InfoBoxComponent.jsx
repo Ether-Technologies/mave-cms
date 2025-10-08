@@ -46,6 +46,8 @@ const InfoBoxComponent = ({
   const [infoBox, setInfoBox] = useState({
     title: component._mave?.title || "",
     description: component._mave?.description || "",
+    secondTitle: component._mave?.secondTitle || "",
+    secondDescription: component._mave?.secondDescription || "",
     altTitle: component._mave?.altTitle || "",
     altDescription: component._mave?.altDescription || "",
     media: component._mave?.media || [],
@@ -106,23 +108,31 @@ const InfoBoxComponent = ({
     message.success("Main media updated successfully.");
   };
 
+  // Handle closing media modal - reset states to prevent cross-contamination
+  const handleCloseMediaModal = () => {
+    setIsMediaModalVisible(false);
+    // Don't reset selectedMedia/editingItemMedia here to preserve selection
+  };
+
   // Handle add info item submit
   const handleAddSubmit = (values) => {
     const newInfoItem = {
       id: Date.now(),
       title: values.title,
       description: values.description,
+      secondTitle: values.secondTitle || "",
+      secondDescription: values.secondDescription || "",
       link: values.link,
       altTitle: values.altTitle || "",
       altDescription: values.altDescription || "",
-      media: selectedMedia,
+      media: [...selectedMedia], // Create a new array to avoid reference issues
     };
     setInfoBox({
       ...infoBox,
       infoItems: [...infoBox.infoItems, newInfoItem],
     });
     form.resetFields();
-    setSelectedMedia([]);
+    setSelectedMedia([]); // Clear selected media after adding
     setShowAddForm(false);
     message.success("Info item added successfully.");
   };
@@ -133,11 +143,13 @@ const InfoBoxComponent = ({
     editForm.setFieldsValue({
       title: item.title,
       description: item.description,
+      secondTitle: item.secondTitle || "",
+      secondDescription: item.secondDescription || "",
       link: item.link,
       altTitle: item.altTitle || "",
       altDescription: item.altDescription || "",
     });
-    setEditingItemMedia(item.media || []);
+    setEditingItemMedia([...(item.media || [])]); // Create a new array to avoid reference issues
   };
 
   // Handle edit submit
@@ -146,10 +158,12 @@ const InfoBoxComponent = ({
       id: editingItemId,
       title: values.title,
       description: values.description,
+      secondTitle: values.secondTitle || "",
+      secondDescription: values.secondDescription || "",
       link: values.link,
       altTitle: values.altTitle || "",
       altDescription: values.altDescription || "",
-      media: editingItemMedia,
+      media: [...editingItemMedia], // Create a new array to avoid reference issues
     };
     setInfoBox({
       ...infoBox,
@@ -158,7 +172,7 @@ const InfoBoxComponent = ({
       ),
     });
     setEditingItemId(null);
-    setEditingItemMedia([]);
+    setEditingItemMedia([]); // Clear editing media state
     message.success("Info item updated successfully.");
   };
 
@@ -223,6 +237,8 @@ const InfoBoxComponent = ({
     setInfoBox({
       title: component._mave?.title || "",
       description: component._mave?.description || "",
+      secondTitle: component._mave?.secondTitle || "",
+      secondDescription: component._mave?.secondDescription || "",
       altTitle: component._mave?.altTitle || "",
       altDescription: component._mave?.altDescription || "",
       media: component._mave?.media || [],
@@ -234,6 +250,9 @@ const InfoBoxComponent = ({
     setBackground(component._mave?.background || "#ffffff");
     setShowAltContent(component._mave?.showAltContent || false);
     setIsEditMode(false);
+    // Clear any lingering media selection states
+    setSelectedMedia([]);
+    setEditingItemMedia([]);
   };
 
   // Handle edit alt content for individual item
@@ -531,6 +550,25 @@ const InfoBoxComponent = ({
                               maxLength={2000}
                             />
                           </Form.Item>
+                          <Form.Item name="secondTitle" label="Second Title">
+                            <Input placeholder="Second Title (optional)" />
+                          </Form.Item>
+                          <Form.Item
+                            name="secondDescription"
+                            label="Second Description"
+                          >
+                            <RichTextEditor
+                              defaultValue=""
+                              onChange={(html) =>
+                                editForm.setFieldValue(
+                                  "secondDescription",
+                                  html
+                                )
+                              }
+                              editMode={true}
+                              maxLength={2000}
+                            />
+                          </Form.Item>
                           <Form.Item name="link">
                             <Input placeholder="Link URL (optional)" />
                           </Form.Item>
@@ -589,7 +627,7 @@ const InfoBoxComponent = ({
                             ? item.altTitle || item.title
                             : item.title}
                         </h3>
-                        <p
+                        <div
                           className="mb-2"
                           dangerouslySetInnerHTML={{
                             __html: showAltContent
@@ -597,6 +635,19 @@ const InfoBoxComponent = ({
                               : item.description,
                           }}
                         />
+                        {item.secondTitle && (
+                          <h4 className="text-md font-semibold mb-1 mt-3">
+                            {item.secondTitle}
+                          </h4>
+                        )}
+                        {item.secondDescription && (
+                          <div
+                            className="mb-2"
+                            dangerouslySetInnerHTML={{
+                              __html: item.secondDescription,
+                            }}
+                          />
+                        )}
                         {item.link && (
                           <a
                             href={item.link}
@@ -692,9 +743,7 @@ const InfoBoxComponent = ({
       {!preview && isEditMode && (
         <MediaSelectionModal
           isVisible={isMediaModalVisible}
-          onClose={() => {
-            setIsMediaModalVisible(false);
-          }}
+          onClose={handleCloseMediaModal}
           onSelectMedia={(media) => {
             if (mediaSelectionMode === "multiple") {
               if (editingItemId) {
