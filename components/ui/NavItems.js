@@ -1,7 +1,13 @@
 // components/ui/NavItems.js
 
-import { SearchOutlined, LoginOutlined } from "@ant-design/icons";
-import { Input, Space, Layout, Dropdown, Button, Menu } from "antd";
+import {
+  SearchOutlined,
+  LoginOutlined,
+  BellOutlined,
+  SettingOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Input, Layout, Dropdown, Button, Badge } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Changelog from "../../pages/usermanual/changelog.json";
@@ -24,7 +30,6 @@ export default function NavItems({
 
   useEffect(() => {
     setTopNavData(TopNavData);
-    // Sort changelog by date in descending order and set the state
     const sortedChangelog = Changelog.sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
@@ -34,20 +39,28 @@ export default function NavItems({
   const userItems = [
     {
       key: "1",
-      label: <Link href="/user/profile">Profile</Link>,
+      label: (
+        <Link href="/user/profile" className="text-base">
+          Profile
+        </Link>
+      ),
     },
     {
       key: "2",
-      label: <Link href="/dashboard">Dashboard</Link>,
+      label: (
+        <Link href="/dashboard" className="text-base">
+          Dashboard
+        </Link>
+      ),
     },
     {
       key: "3",
-      label: "Help",
+      label: <span className="text-base">Help</span>,
     },
     {
       key: "4",
       label: (
-        <div onClick={handleLogout} className="cursor-pointer">
+        <div onClick={handleLogout} className="cursor-pointer text-base">
           Logout
         </div>
       ),
@@ -56,117 +69,121 @@ export default function NavItems({
 
   return (
     <Layout.Header
-      className={`fixed w-full h-16 grid items-center bg-white z-50 ${
-        user ? "grid-cols-12" : "grid-cols-2"
-      }`}
+      className="fixed w-full h-16 flex items-center justify-between px-3 
+    md:px-4 lg:px-6 bg-white border-b border-gray-200 z-50"
     >
       {/* Logo and Version */}
-      <div
-        className={`flex items-center gap-2 cursor-pointer lg:pl-0 ${
-          user ? "col-span-2" : ""
-        }`}
-        onClick={() => router.push("/")}
-      >
-        <Image
-          src="/images/ui/mave_new_logo.png"
-          alt="Mave Logo"
-          width={120}
-          height={40}
-          objectFit="contain"
-        />
-        {/* Version */}
-        <Button
-          className="px-2 py-1 rounded-md text-white lg:text-xs md:text-xs font-bold bg-theme border-2 border-themedark"
-          onClick={() => router.push("/usermanual/changelog")}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => router.push("/")}
+        >
+          <Image
+            src="/images/ui/mave_new_logo.png"
+            alt="Mave Logo"
+            width={110}
+            height={36}
+            objectFit="contain"
+          />
+        </div>
+        <div
+          className="px-2 py-1 rounded-xl text-sm font-semibold text-white cursor-pointer 
+            bg-gradient-to-r from-yellow-500 to-orange-500 
+            hover:from-orange-500 hover:to-red-500 
+            transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push("/usermanual/changelog");
+          }}
         >
           {changeLogs && changeLogs.length > 0
             ? `v${changeLogs[0].version}`
-            : "v1.0.0"}
-        </Button>
+            : "v1.0"}
+        </div>
       </div>
 
       {user && token ? (
         <>
-          <Menu
-            mode="horizontal"
-            selectedKeys={[selectedMenuItem]}
-            className="flex flex-1 justify-center items-center md:space-x-2 lg:space-x-0 col-span-5 bg-transparent"
-          >
+          {/* Navigation Tabs */}
+          <div className="hidden lg:flex items-center gap-4 mx-2 flex-1 justify-center">
             {topNavData &&
               topNavData?.map((item) => (
-                <Menu.Item
-                  key={item.name}
-                  onClick={() => {
-                    setSelectedMenuItem(item.name);
-                  }}
-                  className="text-md font-semibold rounded-md cursor-pointer"
-                >
-                  <Link
-                    className="text-base font-semibold rounded-md cursor-pointer "
-                    href={item.link}
+                <Link key={item.name} href={item.link}>
+                  <div
+                    className={`px-3.5 py-1 rounded-lg text-base font-semibold cursor-pointer
+                      ${topNavData && item === topNavData[topNavData.length - 1] ? "bg-yellow-500 text-white" : ""}
+                      transition-all duration-300 transform hover:scale-105 ${
+                        selectedMenuItem === item.name
+                          ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+                          : "text-gray-600 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 hover:text-gray-900"
+                      }`}
+                    onClick={() => setSelectedMenuItem(item.name)}
                   >
                     {item.name}
-                  </Link>
-                </Menu.Item>
+                  </div>
+                </Link>
               ))}
-          </Menu>
-
-          {/* Search Bar */}
-          <div className="flex flex-1 justify-center items-center col-span-3 mr-6">
-            <Input
-              placeholder="Try searching «Headless CMS»"
-              suffix={<SearchOutlined />}
-              className="w-full max-w-md h-10 rounded-full shadow-inner"
-            />
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-4 col-span-2">
-            {/* Notification Bell */}
-            <div className="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 cursor-pointer">
-              <Image
-                src="/icons/mave_icons/bell-ring.svg"
-                alt="Notifications"
-                width={20}
-                height={20}
-                objectFit="contain"
+          <div className="flex items-center gap-4 flex-shrink-0">
+            {/* Search Bar - Desktop only on larger screens */}
+            <div className="hidden xl:block mr-2">
+              <Input
+                placeholder="Search..."
+                prefix={<SearchOutlined className="text-gray-400 text-base" />}
+                className="w-48 h-10 rounded-xl text-base"
               />
             </div>
 
+            {/* Notification Bell */}
+            <Badge count={3} size="default" color="#A259FF80">
+              <div
+                className="w-10 h-10 flex items-center justify-center rounded-lg 
+                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-yellow-50 hover:to-orange-50 
+                cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
+              >
+                <BellOutlined className="text-gray-600 hover:text-orange-500 text-lg transition-colors duration-300" />
+              </div>
+            </Badge>
+
             {/* Settings */}
             <div
-              className="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center rounded-lg 
+                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50
+                cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
               onClick={() => router.push("/settings/cms-settings")}
             >
-              <Image
-                src="/icons/mave_icons/wrench.svg"
-                alt="Settings"
-                width={20}
-                height={20}
-                objectFit="contain"
-              />
+              <SettingOutlined className="text-gray-600 hover:text-indigo-500 text-lg transition-colors duration-300" />
             </div>
 
             {/* User Dropdown */}
             <Dropdown menu={{ items: userItems }} placement="bottomRight">
-              <div className="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 cursor-pointer">
-                <Image
-                  src="/icons/mave_icons/user.svg"
-                  alt="User"
-                  width={20}
-                  height={20}
-                  objectFit="contain"
-                />
+              <div
+                className="w-10 h-10 flex items-center justify-center rounded-lg 
+                  bg-gradient-to-r from-yellow-500 to-orange-500 
+                  hover:from-orange-500 hover:to-red-500 
+                  cursor-pointer transition-all duration-300 transform hover:scale-110 
+                  shadow-md hover:shadow-xl mr-8"
+              >
+                <UserOutlined className="text-white text-lg" />
               </div>
             </Dropdown>
           </div>
         </>
       ) : (
-        <div className="flex justify-center">
+        <div className="flex justify-end flex-shrink-0">
           <Button
-            icon={<LoginOutlined />}
+            icon={<LoginOutlined className="text-base" />}
             onClick={() => router.push("/login")}
-            className="mavebutton w-fit"
+            className="h-10 px-6 text-white border-0 font-semibold rounded-lg text-base
+              bg-gradient-to-r from-yellow-500 to-orange-500 
+              hover:from-orange-500 hover:to-red-500 
+              transition-all duration-300 transform hover:scale-105 
+              shadow-md hover:shadow-xl"
+            style={{
+              background: "linear-gradient(to right, #eab308, #f97316)",
+            }}
           >
             Login
           </Button>

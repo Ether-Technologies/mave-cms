@@ -13,6 +13,7 @@ const { Sider, Content, Header } = Layout;
 const SiteContent = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [isMobile, setIsMobile] = useState(false);
   const { user, token, logout, loading } = useAuth();
   const router = useRouter();
   const currentRoute = router.pathname;
@@ -25,8 +26,28 @@ const SiteContent = ({ children }) => {
   const isPublicPage = publicPages.includes(currentRoute);
   const isProtected = isProtectedPage(currentRoute);
 
+  useEffect(() => {}, [allowSignup]);
+
+  // Handle responsive behavior
   useEffect(() => {
-  }, [allowSignup]);
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 1024);
+
+      // Auto-collapse sidebar on smaller screens
+      if (width < 1024) {
+        setCollapsed(true);
+      } else if (width >= 1440) {
+        setCollapsed(false);
+      }
+    };
+
+    // Initial check
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     // Theme initialization
@@ -91,7 +112,7 @@ const SiteContent = ({ children }) => {
   };
 
   // Don't show loader for page-builder pages
-  if (loading && !currentRoute.includes('/page-builder')) return <Loader />;
+  if (loading && !currentRoute.includes("/page-builder")) return <Loader />;
 
   if (isPublicPage) {
     // Render public pages without layout
@@ -101,10 +122,17 @@ const SiteContent = ({ children }) => {
   // Determine if the sidebar should be displayed
   const shouldShowSidebar = token && isProtected;
 
+  // Calculate dynamic widths for better responsiveness
+  const sidebarWidth = collapsed ? 80 : 260;
+  const contentMargin = shouldShowSidebar ? sidebarWidth : 0;
+
   return (
-    <Layout className="min-h-screen">
+    <Layout className="min-h-screen overflow-x-hidden">
       {/* Fixed Header */}
-      <Header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md flex items-center px-4 md:px-8">
+      <Header
+        className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md flex 
+      items-center px-3 sm:px-4 md:px-6 lg:px-8 h-16"
+      >
         <NavItems
           user={user}
           token={token}
@@ -117,26 +145,31 @@ const SiteContent = ({ children }) => {
       <Layout className="pt-16">
         {/* Conditionally render the Side Navigation */}
         {shouldShowSidebar && (
-          <div className="fixed">
+          <div className="fixed top-16 left-0 bottom-0 z-40">
             <Sider
               collapsible
               collapsed={collapsed}
               onCollapse={handleCollapse}
               theme={theme}
               width={260}
-              style={{ height: "80vh" }}
-              className="top-0 left-0 px-2 z-40 rounded-r-2xl mt-5
-                bg-white shadow-lg transition-all duration-300 overflow-y-auto"
+              style={{
+                height: "calc(100vh - 4rem)",
+                minHeight: "calc(100vh - 4rem)",
+                maxHeight: "calc(100vh - 4rem)",
+              }}
+              className="px-2 rounded-r-2xl
+                bg-white shadow-lg transition-all duration-300 overflow-y-auto overflow-x-hidden
+                scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
               breakpoint="lg"
               collapsedWidth={80}
               trigger={null}
             >
-              <div className="flex pt-10">
+              <div className="flex pt-6 pb-4">
                 <SideMenuItems
                   token={token}
                   user={user}
                   handleLogout={logout}
-                  setIsModalOpen={setIsModalOpen} // Pass the setter
+                  setIsModalOpen={setIsModalOpen}
                   collapsed={collapsed}
                   theme={theme}
                   setTheme={setTheme}
@@ -148,22 +181,25 @@ const SiteContent = ({ children }) => {
 
         {/* Main Content Area */}
         <Layout
-          className={`transition-all duration-300 ${shouldShowSidebar
-            ? collapsed
-              ? "lg:ml-[80px]" // Adjusted to match collapsedWidth
-              : "lg:ml-[260px]" // Match the width of Sider
-            : ""
-            }`}
+          className="transition-all duration-300 ease-in-out min-h-[calc(100vh-4rem)]"
+          style={{
+            marginLeft:
+              shouldShowSidebar && !isMobile ? `${contentMargin}px` : "0",
+            width:
+              shouldShowSidebar && !isMobile
+                ? `calc(100vw - ${contentMargin}px)`
+                : "100vw",
+            maxWidth: "100%",
+            boxSizing: "border-box",
+          }}
         >
-          {/* Conditionally render the Collapse Button only for protected pages and public with layout pages when authenticated */}
-          {shouldShowSidebar && (
+          {/* Conditionally render the Collapse Button */}
+          {shouldShowSidebar && !isMobile && (
             <div
-              className={`hidden lg:flex fixed lg:top-20 z-40
-                ${collapsed
-                  ? "left-[50px] lg:left-[52px]"
-                  : "left-[260px] lg:left-[235px]"
-                } transition-all duration-300
-                `}
+              className="hidden lg:flex fixed top-20 z-40 transition-all duration-300"
+              style={{
+                left: collapsed ? "52px" : "235px",
+              }}
             >
               <Image
                 src={
@@ -175,15 +211,27 @@ const SiteContent = ({ children }) => {
                 width={40}
                 height={40}
                 preview={false}
-                className="cursor-pointer collapse-button border-0 transition-all duration-300"
+                className="cursor-pointer collapse-button border-0 transition-all duration-300 hover:scale-110"
                 onClick={handleCollapse}
               />
             </div>
           )}
 
-          <Content className="flex-1 py-4 md:py-8 bg-gray-100">
-            {/* Responsive Container */}
-            <div className="mx-auto">{children}</div>
+          <Content
+            className="bg-gray-100 min-h-[calc(100vh-4rem)]"
+            style={{
+              width: "100%",
+              maxWidth: "100%",
+              padding: 0,
+              boxSizing: "border-box",
+            }}
+          >
+            {/* Content wrapper */}
+            <div
+              style={{ width: "100%", height: "100%", boxSizing: "border-box" }}
+            >
+              {children}
+            </div>
           </Content>
         </Layout>
       </Layout>
