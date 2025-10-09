@@ -6,6 +6,7 @@ import {
   BellOutlined,
   SettingOutlined,
   UserOutlined,
+  DeploymentUnitOutlined,
 } from "@ant-design/icons";
 import { Input, Layout, Dropdown, Button, Badge } from "antd";
 import { useEffect, useState } from "react";
@@ -111,15 +112,18 @@ export default function NavItems({
                 <Link key={item.name} href={item.link}>
                   <div
                     className={`px-3.5 py-1 rounded-lg text-base font-semibold cursor-pointer
-                      ${topNavData && item === topNavData[topNavData.length - 1] ? "bg-yellow-500 text-white" : ""}
-                      transition-all duration-300 transform hover:scale-105 ${
-                        selectedMenuItem === item.name
-                          ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
-                          : "text-gray-600 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 hover:text-gray-900"
+                      ${topNavData && item === topNavData[topNavData.length - 1] ? "flex gap-2 text-white maveaibutton" : "mavetopnavbutton"}
+                      transition-all duration-300 transform hover:scale-105 ${selectedMenuItem === item.name
+                        ? "underline decoration-yellow-500 decoration-2 underline-offset-8 text-gray-800"
+                        : "text-gray-400 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 hover:text-gray-900"
                       }`}
                     onClick={() => setSelectedMenuItem(item.name)}
                   >
                     {item.name}
+
+                    {topNavData && item === topNavData[topNavData.length - 1] ? (
+                      <DeploymentUnitOutlined />
+                    ) : ""}
                   </div>
                 </Link>
               ))}
@@ -160,7 +164,7 @@ export default function NavItems({
             {/* User Dropdown */}
             <Dropdown menu={{ items: userItems }} placement="bottomRight">
               <div
-                className="w-10 h-10 flex items-center justify-center rounded-lg 
+                className="w-10 h-10 flex items-center justify-center rounded-xl 
                   bg-gradient-to-r from-yellow-500 to-orange-500 
                   hover:from-orange-500 hover:to-red-500 
                   cursor-pointer transition-all duration-300 transform hover:scale-110 

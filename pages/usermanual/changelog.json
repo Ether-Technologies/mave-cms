@@ -1126,7 +1126,7 @@
     },
     {
         "version": "3.3.70",
-        "type": "major",
+        "type": "minor",
         "date": "2025-09-29",
         "changes": {
             "Features": [
@@ -1137,6 +1137,19 @@
             "Bug Fixes": [
                 "Fixed the issue of form submission in form component",
                 "Fixed the issue of alternative content in pagebuilder widgets"
+            ]
+        }
+    },
+    {
+        "version": "3.3.85",
+        "type": "major",
+        "date": "2025-10-09",
+        "changes": {
+            "Features": [
+                "Added Mave AI in the top navigation"
+            ],
+            "Bug Fixes": [
+                "Fixed the issue of top navigation"
             ]
         }
     }

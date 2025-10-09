@@ -1,8 +1,8 @@
 [
     {
         "id": 2,
-        "name": "Dashboard",
-        "link": "/"
+        "name": "Gallery",
+        "link": "/gallery"
     },
     {
         "id": 3,

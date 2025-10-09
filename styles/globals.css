@@ -943,3 +943,188 @@ a:hover {
   font-size: 18px;
   font-weight: 500;
 }
+
+/* AI Button Styles */
+.maveaibutton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #4facfe 75%,
+    #667eea 100%
+  );
+  background-size: 400% 400%;
+  animation: galaxyGradient 8s ease infinite;
+  box-shadow:
+    0 0 20px rgba(102, 126, 234, 0.4),
+    0 0 40px rgba(118, 75, 162, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.maveaibutton::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.4) 2px, transparent 2px);
+  background-size:
+    50px 50px,
+    80px 80px,
+    100px 100px;
+  background-position:
+    0 0,
+    20px 20px,
+    40px 40px;
+  animation: particleMove 20s linear infinite;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.maveaibutton::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  animation: pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.maveaibutton:hover {
+  transform: scale(1.05) !important;
+  color: #ffffff !important;
+  background: linear-gradient(
+    135deg,
+    #0a0a1e 0%,
+    #1a0a2e 25%,
+    #2d0f4e 50%,
+    #0d2847 75%,
+    #0a0a1e 100%
+  ) !important;
+  background-size: 400% 400%;
+  animation: galaxyGradient 6s ease infinite;
+  box-shadow:
+    0 0 30px rgba(102, 126, 234, 0.6),
+    0 0 60px rgba(118, 75, 162, 0.4),
+    inset 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.maveaibutton > * {
+  position: relative;
+  z-index: 1;
+}
+
+.maveaibutton svg,
+.maveaibutton .anticon {
+  animation: iconFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+}
+
+.maveaibutton:hover svg,
+.maveaibutton:hover .anticon {
+  animation:
+    iconSpin 2s linear infinite,
+    iconFloat 3s ease-in-out infinite,
+    iconGlow 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 1))
+    drop-shadow(0 0 20px rgba(102, 126, 234, 0.8));
+}
+
+@keyframes galaxyGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes particleMove {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(50px, 50px) rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes iconFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes iconSpin {
+  0% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  25% {
+    transform: rotate(90deg) translateY(-3px);
+  }
+  50% {
+    transform: rotate(180deg) translateY(-5px);
+  }
+  75% {
+    transform: rotate(270deg) translateY(-3px);
+  }
+  100% {
+    transform: rotate(360deg) translateY(0px);
+  }
+}
+
+@keyframes iconGlow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
