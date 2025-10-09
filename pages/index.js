@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import instance from "../axios";
 import { cachedApiCall } from "../utils/apiUtils";
-import CounterCards from "../components/dashboard/CounterCards";
+import WelcomeCard from "../components/dashboard/WelcomeCard";
+import StatsOverview from "../components/dashboard/StatsOverview";
+import PerformanceInsights from "../components/dashboard/PerformanceInsights";
+import TrendingContent from "../components/dashboard/TrendingContent";
+import SeoInsights from "../components/dashboard/SeoInsights";
+import ContentActivity from "../components/dashboard/ContentActivity";
+import ContentCalendar from "../components/dashboard/ContentCalendar";
 import UserStat from "../components/dashboard/UserStat";
 import SiteStat from "../components/dashboard/SiteStat";
 import LatestEvents from "../components/dashboard/LatestEvents";
@@ -66,21 +72,48 @@ const index = () => {
   // console.log("Data: ", data);
 
   return (
-    <div className="mavecontainer">
-      <CounterCards data={data} loading={loading} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <UserStat userData={userData} />
-        <SiteStat data={data} />
+    <main className="mavecontainer">
+      <div className="flex flex-col gap-6">
+        {/* Quick Actions */}
+        <WelcomeCard userData={userData} />
+
+        {/* Stats Overview */}
+        <StatsOverview data={data} loading={loading} />
+
+        {/* Performance and Trending Content */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PerformanceInsights />
+          <TrendingContent />
+        </div>
+
+        {/* SEO Insights */}
+        <SeoInsights />
+
+        {/* Content Activity and Calendar */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <ContentActivity />
+          </div>
+          <div>
+            <ContentCalendar />
+          </div>
+        </div>
+
+        {/* Additional Dashboard Components */}
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <UserStat userData={userData} />
+          <SiteStat data={data} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LatestEvents data={data} />
+          <SiteSpeed />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Storage data={data} />
+          <AverageRequests />
+        </div> */}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <LatestEvents data={data} />
-        <SiteSpeed />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <Storage data={data} />
-        <AverageRequests />
-      </div>
-    </div>
+    </main>
   );
 };
 
