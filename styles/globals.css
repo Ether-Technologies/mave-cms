@@ -944,6 +944,11 @@ a:hover {
   font-weight: 500;
 }
 
+/* Top Nav Button Styles */
+.mavetopnavbutton {
+  position: relative;
+}
+
 /* AI Button Styles */
 .maveaibutton {
   position: relative;
@@ -1127,4 +1132,71 @@ a:hover {
   50% {
     opacity: 0.7;
   }
+}
+
+/* Search Results Dropdown Animations */
+.search-results-dropdown {
+  animation: slideDownFadeIn 0.3s ease-out forwards;
+  transform-origin: top;
+}
+
+@keyframes slideDownFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.search-result-item {
+  animation: fadeInSlideRight 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+.search-result-item:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.search-result-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.search-result-item:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.search-result-item:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.search-result-item:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.search-result-item:nth-child(n + 6) {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInSlideRight {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Custom scrollbar for search results */
+.search-results-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #a78bfa, #60a5fa);
+  border-radius: 3px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
 }

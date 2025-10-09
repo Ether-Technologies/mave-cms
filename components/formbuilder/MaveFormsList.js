@@ -1,11 +1,15 @@
 // components/formbuilder/MaveFormsList.jsx
 import React, { useState, useEffect, useContext } from "react";
-import { Drawer, Popconfirm, Input, Switch, Spin, Button } from "antd";
+import { Drawer, Popconfirm, Input, Spin, Button, Badge } from "antd";
 import {
   SearchOutlined,
   EyeOutlined,
-  DockerOutlined,
+  FileTextOutlined,
   DeleteOutlined,
+  EditOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import instance from "../../axios";
@@ -17,6 +21,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
   const [loading, setLoading] = useState(false);
   const [changeFormsView, setChangeFormsView] = useState(false);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const { reset } = useContext(FormBuilderContext);
 
@@ -64,164 +69,365 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
     }
   };
 
+  const filteredForms = forms.filter(
+    (form) =>
+      form.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      form.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex flex-col justify-center items-center py-20">
         <Spin size="large" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-600 text-center">{error}</div>;
+    return (
+      <div className="p-8 text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+          <span className="text-2xl">⚠️</span>
+        </div>
+        <p className="text-red-600 text-lg font-medium">{error}</p>
+      </div>
+    );
   }
 
   if (!forms.length) {
-    return <div className="p-4 text-center text-gray-600">No forms found.</div>;
+    return (
+      <div className="text-center py-20">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-yellow-100 to-orange-100 mb-6">
+          <FileTextOutlined className="text-4xl text-[#fcb813]" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">No forms yet</h3>
+        <p className="text-gray-600 mb-6">Create your first form to get started</p>
+        <Button
+          type="primary"
+          size="large"
+          onClick={() => router.push("/formbuilder/create-form")}
+          className="bg-gradient-to-r from-[#fcb813] to-[#e3a611] border-0 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+        >
+          Create Your First Form
+        </Button>
+      </div>
+    );
   }
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
-        <Input
-          placeholder="Search for forms"
-          suffix={<SearchOutlined />}
-          className="w-full sm:w-1/2"
-        />
-        <div className="flex items-center space-x-2">
-          <span className="text-sm">View:</span>
-          <Switch
-            checkedChildren="List"
-            unCheckedChildren="Groups"
-            checked={changeFormsView}
-            onChange={() => setChangeFormsView(!changeFormsView)}
+      {/* Search and View Toggle */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div className="relative w-full sm:w-96 group">
+          <Input
+            placeholder="Search forms..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            prefix={<SearchOutlined className="text-gray-400 group-hover:text-[#fcb813] transition-colors duration-200" />}
+            className="rounded-lg border-gray-200 hover:border-[#fcb813] focus:border-[#fcb813] transition-all duration-200 shadow-sm hover:shadow-md"
+            size="large"
+            suffix={
+              searchQuery && (
+                <CloseOutlined
+                  className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors duration-200"
+                  onClick={() => setSearchQuery("")}
+                />
+              )
+            }
           />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setChangeFormsView(false)}
+            className={`p-2.5 rounded-lg transition-all duration-200 ${!changeFormsView
+              ? "bg-gradient-to-r from-[#fcb813] to-[#e3a611] text-white shadow-md"
+              : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+              }`}
+          >
+            <AppstoreOutlined className="text-lg" />
+          </button>
+          <button
+            onClick={() => setChangeFormsView(true)}
+            className={`p-2.5 rounded-lg transition-all duration-200 ${changeFormsView
+              ? "bg-gradient-to-r from-[#fcb813] to-[#e3a611] text-white shadow-md"
+              : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+              }`}
+          >
+            <UnorderedListOutlined className="text-lg" />
+          </button>
         </div>
       </div>
 
-      {changeFormsView ? (
-        <div className="flex flex-col space-y-4">
-          {forms.map((form) => (
-            <div
-              key={form.id}
-              className="border border-gray-200 rounded-lg shadow p-4 bg-white hover:shadow-md transition-shadow"
-            >
-              <div className="bg-theme text-white p-4 rounded mb-4 text-center">
-                <h3 className="text-lg font-bold">Form ID: {form.id}</h3>
-                <h4 className="text-md font-semibold">{form.title}</h4>
-              </div>
-              <p
-                className="text-gray-600 mb-4"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    form.description?.length > 100
-                      ? `${form.description.substring(0, 100)}...`
-                      : form.description,
-                }}
-              />
-              <div className="flex justify-end space-x-2">
-                <Button
-                  icon={<EyeOutlined className="text-theme" />}
-                  onClick={() => onSelectForm(form.id)}
-                />
-                <Button
-                  icon={<DockerOutlined className="text-theme" />}
-                  onClick={() =>
-                    router.push(`/formbuilder/form-responses/${form.id}`)
-                  }
-                />
-                <Popconfirm
-                  title="Are you sure you want to delete this form?"
-                  onConfirm={() => handleDeleteForm(form.id)}
-                  okText="Yes"
-                  cancelText="No"
-                  okButtonProps={{ danger: true }}
-                >
-                  <Button
-                    danger
-                    icon={<DeleteOutlined className="text-red-500" />}
-                  />
-                </Popconfirm>
-              </div>
-            </div>
-          ))}
+      {/* Results Count */}
+      {searchQuery && (
+        <div className="mb-4 text-sm text-gray-600 animate-fade-in">
+          Found {filteredForms.length} {filteredForms.length === 1 ? "form" : "forms"}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {forms.map((form) => (
+      )}
+
+      {/* No Results */}
+      {filteredForms.length === 0 && searchQuery && (
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+            <SearchOutlined className="text-3xl text-gray-400" />
+          </div>
+          <p className="text-gray-600">No forms match your search</p>
+        </div>
+      )}
+
+      {/* List View */}
+      {changeFormsView && filteredForms.length > 0 && (
+        <div className="space-y-4">
+          {filteredForms.map((form, index) => (
             <div
               key={form.id}
-              className="border border-gray-200 rounded-lg shadow p-4 bg-white hover:shadow-md transition-shadow flex flex-col justify-between"
+              className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-[#fcb813] transition-all duration-300 transform hover:-translate-y-1 animate-slide-in"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              <div>
-                <div className="bg-theme text-white p-4 rounded mb-4 text-center">
-                  <h3 className="text-lg font-bold">Form ID: {form.id}</h3>
-                  <h4 className="text-md font-semibold">{form.title}</h4>
-                </div>
-                <p
-                  className="text-gray-600 mb-4"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      form.description?.length > 100
-                        ? `${form.description.substring(0, 100)}...`
-                        : form.description,
-                  }}
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  icon={<EyeOutlined className="text-theme" />}
-                  onClick={() => onSelectForm(form.id)}
-                />
-                <Button
-                  icon={<DockerOutlined className="text-theme" />}
-                  onClick={() =>
-                    router.push(`/formbuilder/form-responses/${form.id}`)
-                  }
-                />
-                <Popconfirm
-                  title="Are you sure you want to delete this form?"
-                  onConfirm={() => handleDeleteForm(form.id)}
-                  okText="Yes"
-                  cancelText="No"
-                  okButtonProps={{ danger: true }}
-                >
-                  <Button
-                    danger
-                    icon={<DeleteOutlined className="text-red-500" />}
+              <div className="flex flex-col sm:flex-row justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#fcb813] to-[#e3a611] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                      <FileTextOutlined className="text-xl text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-1 group-hover:text-[#fcb813] transition-colors duration-200">
+                        {form.title || "Untitled Form"}
+                      </h3>
+                      <Badge
+                        count={`ID: ${form.id}`}
+                        style={{ backgroundColor: "#fcb813", color: "#ffffff", fontWeight: 500 }}
+                      />
+                    </div>
+                  </div>
+                  <p
+                    className="text-gray-600 text-sm line-clamp-2"
+                    dangerouslySetInnerHTML={{
+                      __html: form.description || "No description provided",
+                    }}
                   />
-                </Popconfirm>
+                </div>
+
+                <div className="flex sm:flex-col gap-2 flex-wrap">
+                  <button
+                    onClick={() => onSelectForm(form.id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#fcb813] text-white rounded-lg hover:bg-[#e3a611] transition-all duration-200 hover:scale-105 shadow-sm"
+                  >
+                    <EyeOutlined />
+                    <span className="hidden sm:inline text-sm font-medium">Preview</span>
+                  </button>
+                  <button
+                    onClick={() => router.push(`/formbuilder/edit-form?id=${form.id}`)}
+                    className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 hover:scale-105 shadow-sm"
+                  >
+                    <EditOutlined />
+                    <span className="hidden sm:inline text-sm font-medium">Edit</span>
+                  </button>
+                  <button
+                    onClick={() => router.push(`/formbuilder/form-responses/${form.id}`)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 hover:scale-105 shadow-sm"
+                  >
+                    <FileTextOutlined />
+                    <span className="hidden sm:inline text-sm font-medium">Responses</span>
+                  </button>
+                  <Popconfirm
+                    title="Delete this form?"
+                    description="This action cannot be undone."
+                    onConfirm={() => handleDeleteForm(form.id)}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    okButtonProps={{ danger: true }}
+                  >
+                    <button className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 hover:scale-105 shadow-sm">
+                      <DeleteOutlined />
+                      <span className="hidden sm:inline text-sm font-medium">Delete</span>
+                    </button>
+                  </Popconfirm>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
+      {/* Grid View */}
+      {!changeFormsView && filteredForms.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredForms.map((form, index) => (
+            <div
+              key={form.id}
+              className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#fcb813] transition-all duration-300 transform hover:-translate-y-2 animate-scale-in"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              {/* Card Header */}
+              <div className="h-32 bg-gradient-to-br from-[#fcb813] via-[#e3a611] to-orange-500 relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                <div className="absolute inset-0 bg-black/10"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <FileTextOutlined className="text-5xl text-white/20" />
+                </div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <Badge
+                    count={`ID: ${form.id}`}
+                    style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "white", backdropFilter: "blur(10px)" }}
+                  />
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-5">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-[#fcb813] transition-colors duration-200 line-clamp-1">
+                  {form.title || "Untitled Form"}
+                </h3>
+                <p
+                  className="text-gray-600 text-sm line-clamp-3 mb-4 min-h-[60px]"
+                  dangerouslySetInnerHTML={{
+                    __html: form.description || "No description provided",
+                  }}
+                />
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => onSelectForm(form.id)}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-[#fcb813] text-white rounded-lg hover:bg-[#e3a611] transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm"
+                  >
+                    <EyeOutlined />
+                    Preview
+                  </button>
+                  <button
+                    onClick={() => router.push(`/formbuilder/edit-form?id=${form.id}`)}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm"
+                  >
+                    <EditOutlined />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => router.push(`/formbuilder/form-responses/${form.id}`)}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm"
+                  >
+                    <FileTextOutlined />
+                    Responses
+                  </button>
+                  <Popconfirm
+                    title="Delete this form?"
+                    description="This action cannot be undone."
+                    onConfirm={() => handleDeleteForm(form.id)}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    okButtonProps={{ danger: true }}
+                  >
+                    <button className="flex items-center justify-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm">
+                      <DeleteOutlined />
+                      Delete
+                    </button>
+                  </Popconfirm>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Enhanced Drawer */}
       <Drawer
-        title={`Form ${selectedFormId} Elements`}
+        title={
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#fcb813] to-[#e3a611] rounded-lg flex items-center justify-center">
+              <FileTextOutlined className="text-white text-lg" />
+            </div>
+            <div>
+              <div className="font-semibold text-gray-800">Form Preview</div>
+              <div className="text-xs text-gray-500">ID: {selectedFormId}</div>
+            </div>
+          </div>
+        }
         placement="right"
         onClose={() => onSelectForm(null)}
         open={drawerVisible}
         width="60vw"
-      >
-        <div className="flex justify-end mb-4">
+        className="form-drawer"
+        extra={
           <Button
-            className="bg-theme text-white"
+            type="primary"
+            icon={<EditOutlined />}
             onClick={() => {
               router.push(`/formbuilder/edit-form?id=${selectedFormId}`);
               onSelectForm(null);
             }}
+            className="bg-gradient-to-r from-[#fcb813] to-[#e3a611] border-0 hover:shadow-lg transition-all duration-200"
           >
             Edit Form
           </Button>
-        </div>
+        }
+      >
         {selectedFormId && (
-          <MaveFormElements
-            formId={selectedFormId}
-            setDrawerVisible={setDrawerVisible}
-          />
+          <div className="animate-fade-in">
+            <MaveFormElements
+              formId={selectedFormId}
+              setDrawerVisible={setDrawerVisible}
+            />
+          </div>
         )}
       </Drawer>
+
+      <style jsx>{`
+        @keyframes slide-in {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes scale-in {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.4s ease-out backwards;
+        }
+        .animate-scale-in {
+          animation: scale-in 0.4s ease-out backwards;
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+        .line-clamp-1 {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </div>
   );
 };

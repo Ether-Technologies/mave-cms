@@ -12,17 +12,11 @@ const MaveFormsShowcase = () => {
 
   return (
     <FormBuilderProvider>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col lg:flex-row justify-between mb-10">
-          {/* Forms List */}
-          <div className="w-full">
-            <MaveFormsList
-              onSelectForm={handleSelectForm}
-              selectedFormId={selectedFormId}
-            />
-          </div>
-          {/* You can add a sidebar or additional content here if needed */}
-        </div>
+      <div className="w-full">
+        <MaveFormsList
+          onSelectForm={handleSelectForm}
+          selectedFormId={selectedFormId}
+        />
       </div>
     </FormBuilderProvider>
   );

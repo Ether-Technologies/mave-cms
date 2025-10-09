@@ -9,10 +9,11 @@ import {
   DeploymentUnitOutlined,
 } from "@ant-design/icons";
 import { Input, Layout, Dropdown, Button, Badge } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Changelog from "../../pages/usermanual/changelog.json";
 import TopNavData from "../../src/data/topnavdata.json";
+import AuthorisedMenus from "../../src/data/authorisedsidemenus.json";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -27,6 +28,10 @@ export default function NavItems({
   const [topNavData, setTopNavData] = useState([]);
   const [selectedMenuItem, setSelectedMenuItem] = useState("Home");
   const [changeLogs, setChangeLogs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,6 +41,56 @@ export default function NavItems({
     );
     setChangeLogs(sortedChangelog);
   }, []);
+
+  // Search functionality
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    const results = [];
+    const query = searchQuery.toLowerCase();
+
+    AuthorisedMenus.forEach((menu) => {
+      if (menu.submenu) {
+        menu.submenu.forEach((item) => {
+          if (
+            item.title.toLowerCase().includes(query) ||
+            menu.title.toLowerCase().includes(query)
+          ) {
+            results.push({
+              ...item,
+              category: menu.title,
+              categoryIcon: menu.icon,
+            });
+          }
+        });
+      }
+    });
+
+    setSearchResults(results);
+    setShowSearchResults(results.length > 0);
+  }, [searchQuery]);
+
+  // Click outside to close search results
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearchResultClick = (link) => {
+    router.push(link);
+    setSearchQuery("");
+    setShowSearchResults(false);
+  };
 
   const userItems = [
     {
@@ -132,12 +187,66 @@ export default function NavItems({
           {/* User Actions */}
           <div className="flex items-center gap-4 flex-shrink-0">
             {/* Search Bar - Desktop only on larger screens */}
-            <div className="hidden xl:block mr-2">
+            <div className="hidden xl:block mr-2 relative" ref={searchRef}>
               <Input
                 placeholder="Search..."
                 prefix={<SearchOutlined className="text-gray-400 text-base" />}
                 className="w-48 h-10 rounded-xl text-base"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery && setShowSearchResults(true)}
               />
+
+              {/* Search Results Dropdown */}
+              {showSearchResults && searchResults.length > 0 && (
+                <div className="absolute top-12 right-0 w-96 max-h-96 overflow-y-auto bg-white rounded-xl shadow-2xl border border-gray-200 search-results-dropdown z-50">
+                  <div className="p-3 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50">
+                    <p className="text-sm font-semibold text-gray-700">
+                      Quick Navigation ({searchResults.length} results)
+                    </p>
+                  </div>
+
+                  <div className="p-2">
+                    {searchResults.map((result, index) => (
+                      <div
+                        key={`${result.id}-${index}`}
+                        onClick={() => handleSearchResultClick(result.link)}
+                        className="search-result-item flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 transition-all duration-300 group mb-1"
+                      >
+                        <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gradient-to-br from-purple-100 to-blue-100 group-hover:from-purple-200 group-hover:to-blue-200 transition-all duration-300">
+                          <Image
+                            src={result.icon}
+                            alt={result.title}
+                            width={20}
+                            height={20}
+                            className="opacity-70 group-hover:opacity-100 transition-opacity"
+                          />
+                        </div>
+
+                        <div className="flex-1">
+                          <p className="text-base font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
+                            {result.title}
+                          </p>
+                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                            <Image
+                              src={result.categoryIcon}
+                              alt={result.category}
+                              width={12}
+                              height={12}
+                              className="opacity-60"
+                            />
+                            {result.category}
+                          </p>
+                        </div>
+
+                        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-purple-100 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-0 translate-x-2">
+                          <span className="text-purple-600 text-xs">→</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Notification Bell */}
