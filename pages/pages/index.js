@@ -83,7 +83,39 @@ const Pages = () => {
 
   const handleDuplicatePage = useCallback(async (pageId) => {
     try {
-      const response = await instance.post(`/pages/${pageId}/duplicate`);
+      // First, fetch the original page data
+      const originalPageResponse = await instance.get(`/pages/${pageId}`);
+      const originalPage = originalPageResponse.data;
+
+      // Create a new page with the same data but with modified names
+      const duplicatedPageData = {
+        page_name_en: `${originalPage.page_name_en} (Copy)`,
+        page_name_bn: `${originalPage.page_name_bn || originalPage.page_name_en} (Copy)`,
+        type: originalPage.type,
+        favicon_id: originalPage.favicon_id || 10,
+        slug: originalPage.slug ? `${originalPage.slug}-copy` : null,
+        head: originalPage.head || {
+          title: `${originalPage.page_name_en} (Copy)`,
+          description: "",
+          keywords: [],
+          image: "",
+          imageAlt: "",
+        },
+        additional: originalPage.additional || [
+          {
+            pageType: originalPage.type,
+            metaTitle: `${originalPage.page_name_en} (Copy)`,
+            metaDescription: "",
+            keywords: [],
+            metaImage: "",
+            metaImageAlt: "",
+          },
+        ],
+        body: originalPage.body || [],
+      };
+
+      const response = await instance.post("/pages", duplicatedPageData);
+
       if (response.status === 201) {
         message.success("Page duplicated successfully.");
         fetchPages();
