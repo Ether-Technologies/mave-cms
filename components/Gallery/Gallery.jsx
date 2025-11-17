@@ -132,6 +132,7 @@ const Gallery = () => {
         </div>
       ) : (
         <MediaTabs
+          allMedia={mediaAssets}
           images={mediaAssets.filter((m) => m.file_type?.startsWith("image/"))}
           videos={mediaAssets.filter((m) => m.file_type?.startsWith("video/"))}
           docs={mediaAssets.filter((m) => m.file_type === "application/pdf")}

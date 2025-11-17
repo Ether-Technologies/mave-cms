@@ -8,6 +8,7 @@ import Cloudinary from "./Cloudinary";
 const { TabPane } = Tabs;
 
 const MediaTabs = ({
+  allMedia,
   images,
   videos,
   docs,
@@ -32,7 +33,16 @@ const MediaTabs = ({
   );
 
   return (
-    <Tabs defaultActiveKey="1" centered animated type="card">
+    <Tabs defaultActiveKey="0" centered animated type="card">
+      <TabPane tab={`All (${allMedia.length})`} key="0">
+        <MediaGrid
+          mediaItems={allMedia}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+          handlePreview={handlePreview}
+          availableTags={availableTags}
+        />
+      </TabPane>
       <TabPane tab={`Images (${images.length})`} key="1">
         <MediaGrid
           mediaItems={images}

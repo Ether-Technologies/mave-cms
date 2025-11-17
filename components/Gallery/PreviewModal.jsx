@@ -90,19 +90,38 @@ const PreviewModal = ({
     }
   };
 
+  const isSvgImage =
+    media?.file_type === "image/svg+xml" ||
+    media?.file_name?.toLowerCase().endsWith(".svg");
+
+  const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`;
+
   const renderNonEditContent = () => (
     <>
       {/* Show preview differently based on mediaType */}
       {mediaType === "image" && (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
-          alt={media.file_name}
-          width={700}
-          height={400}
-          objectFit="contain"
-          objectPosition="center"
-          className="rounded-md"
-        />
+        <>
+          {isSvgImage ? (
+            <div className="w-full flex justify-center bg-white rounded-md p-6">
+              <img
+                src={mediaUrl}
+                alt={media.file_name}
+                className="max-w-full h-auto"
+                loading="lazy"
+                style={{ maxHeight: 400 }}
+              />
+            </div>
+          ) : (
+            <Image
+              src={mediaUrl}
+              alt={media.file_name}
+              width={700}
+              height={400}
+              style={{ objectFit: "contain" }}
+              className="rounded-md w-full h-full"
+            />
+          )}
+        </>
       )}
       {mediaType === "video" && (
         <video width="100%" height="400" controls className="rounded-md">

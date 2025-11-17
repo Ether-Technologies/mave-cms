@@ -1,7 +1,7 @@
 // components/ui/SideMenuItems.js
 
 import { LoginOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { Menu, Spin, Alert, Empty, Tooltip } from "antd";
+import { Menu, Spin, Empty, Tooltip } from "antd";
 import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/router";
 import AuthorizedSideMenuData from "../../src/data/authorisedsidemenus.json";
@@ -386,44 +386,6 @@ const SideMenuItems = ({
     return (
       <div className="flex justify-center items-center h-full">
         <Spin tip={CONSTANTS.LOADING_MESSAGES.MENU_INITIALIZATION} />
-      </div>
-    );
-  }
-
-  // Show loading state for custom models
-  if (isCustomModelsLoading) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <Spin tip={CONSTANTS.LOADING_MESSAGES.CUSTOM_MODELS} />
-      </div>
-    );
-  }
-
-  // Show error state for custom models
-  if (customModelsError) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full p-4">
-        <Alert
-          message="Custom Models Error"
-          description={customModelsError}
-          type="error"
-          showIcon
-          action={
-            <button
-              onClick={refetchCustomModels}
-              className="text-blue-500 hover:text-blue-600 underline"
-            >
-              Retry
-            </button>
-          }
-          className="mb-4"
-        />
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Reload Page
-        </button>
       </div>
     );
   }

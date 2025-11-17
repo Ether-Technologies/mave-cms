@@ -49,6 +49,14 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
   ];
 
   // Check if the media is an image and has a supported format
+  const resolvedMediaType = mediaType
+    ? mediaType
+    : media.file_type?.startsWith("image/")
+      ? "image"
+      : media.file_type?.startsWith("video/")
+        ? "video"
+        : "document";
+
   const isSupportedImageFormat = () => {
     const supportedFormats = [
       "image/png",
@@ -61,14 +69,38 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
     return supportedFormats.includes(media.file_type);
   };
 
+  const isSvgImage = () => {
+    if (!media?.file_type && !media?.file_name) return false;
+    return (
+      media?.file_type === "image/svg+xml" ||
+      media?.file_name?.toLowerCase().endsWith(".svg")
+    );
+  };
+
+  const getMediaUrl = () =>
+    `${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`;
+
   // Render media content based on type
   const renderMedia = () => {
-    if (mediaType === "image") {
+    if (resolvedMediaType === "image") {
       if (isSupportedImageFormat()) {
+        if (isSvgImage()) {
+          return (
+            <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-64 bg-white flex items-center justify-center">
+              <img
+                src={getMediaUrl()}
+                alt={media.file_name}
+                className="max-w-full max-h-full p-4"
+                loading="lazy"
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+          );
+        }
         return (
           <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-64">
             <Image
-              src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${media.file_path}`}
+              src={getMediaUrl()}
               alt={media.file_name}
               width={300}
               height={200}
@@ -110,7 +142,7 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
           </div>
         );
       }
-    } else if (mediaType === "video") {
+    } else if (resolvedMediaType === "video") {
       return (
         <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-64">
           <div className="absolute inset-0 bg-gray-900 rounded-t-md overflow-hidden">

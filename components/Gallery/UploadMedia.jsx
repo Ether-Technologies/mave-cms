@@ -22,7 +22,7 @@ const UploadMedia = ({
   const [uploading, setUploading] = useState(false);
 
   const handleBeforeUpload = (file) => {
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
     const isValidSize = file.size < maxSize;
     const isValidType = [
       "image/jpeg",
@@ -48,7 +48,7 @@ const UploadMedia = ({
 
     if (!isValidSize) {
       message.error(
-        `File size must be less than 2MB. Current size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`
+        `File size must be less than 1GB. Current size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`
       );
       return false;
     }
