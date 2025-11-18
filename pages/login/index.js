@@ -21,6 +21,9 @@ export default function Login() {
   const router = useRouter();
   const { callback } = router.query;
 
+  // Check if demo mode is enabled
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO === 'true';
+
   const handleLogin = (values) => {
     const { email, password } = values;
     if (!email || !password) {
@@ -28,6 +31,10 @@ export default function Login() {
       return;
     }
     login(email, password, callback);
+  };
+
+  const handleDemoLogin = () => {
+    login("demouser@mave.com", "Demo@Mave2025", callback);
   };
 
   if (loading) return <Loader />;
@@ -104,25 +111,27 @@ export default function Login() {
           </motion.div>
 
           {/* Sign Up Link */}
-          <motion.div
-            variants={itemVariants}
-            className="flex justify-center items-center gap-2 mb-6"
-          >
-            <span className="text-gray-600 text-sm">
-              Don't have an account?
-            </span>
-            <Link href="/signup">
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                className="font-semibold text-yellow-500 hover:text-yellow-600 cursor-pointer transition-colors"
-              >
-                Sign Up
-              </motion.span>
-            </Link>
-          </motion.div>
+          {!isDemoMode && (
+            <motion.div
+              variants={itemVariants}
+              className="flex justify-center items-center gap-2 mb-6"
+            >
+              <span className="text-gray-600 text-sm">
+                Don't have an account?
+              </span>
+              <Link href="/signup">
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                  className="font-semibold text-yellow-500 hover:text-yellow-600 cursor-pointer transition-colors"
+                >
+                  Sign Up
+                </motion.span>
+              </Link>
+            </motion.div>
+          )}
 
           {/* Google Button */}
-          <motion.div variants={itemVariants} className="mb-6">
+          <motion.div variants={itemVariants}>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 block
@@ -146,7 +155,7 @@ export default function Login() {
           {/* Divider */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center gap-4 mb-6"
+            className={`flex items-center gap-4 ${isDemoMode ? "my-14" : "mb-6"}`}
           >
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
             <span className="text-xs text-gray-500 font-medium">OR</span>
@@ -155,75 +164,90 @@ export default function Login() {
 
           {/* Login Form */}
           <motion.div variants={itemVariants}>
-            <Form
-              name="login"
-              initialValues={{
-                remember: true,
-                email: "demouser@mave.com",
-                password: "Demo@Mave2025",
-              }}
-              onFinish={handleLogin}
-            >
-              <Form.Item
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                ]}
+            {isDemoMode ? (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <motion.div whileFocus={{ scale: 1.01 }}>
-                  <Input
-                    prefix={
-                      <MailOutlined className="text-lg text-gray-400 mr-2" />
-                    }
-                    placeholder="Email address"
-                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
-                  />
-                </motion.div>
-              </Form.Item>
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                ]}
-              >
-                <motion.div whileFocus={{ scale: 1.01 }}>
-                  <Input.Password
-                    placeholder="Password"
-                    className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
-                    prefix={
-                      <LockOutlined className="text-lg text-gray-400 mr-2" />
-                    }
-                    iconRender={(visible) =>
-                      visible ? (
-                        <EyeOutlined className="text-gray-400" />
-                      ) : (
-                        <EyeInvisibleOutlined className="text-gray-400" />
-                      )
-                    }
-                  />
-                </motion.div>
-              </Form.Item>
-              <Form.Item>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <Button
+                  block
+                  className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  onClick={handleDemoLogin}
                 >
-                  <Button
-                    block
-                    className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                    htmlType="submit"
+                  Get In
+                </Button>
+              </motion.div>
+            ) : (
+              <Form
+                name="login"
+                initialValues={{
+                  remember: true,
+                  email: "",
+                  password: "",
+                }}
+                onFinish={handleLogin}
+              >
+                <Form.Item
+                  name="email"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your email!",
+                    },
+                  ]}
+                >
+                  <motion.div whileFocus={{ scale: 1.01 }}>
+                    <Input
+                      prefix={
+                        <MailOutlined className="text-lg text-gray-400 mr-2" />
+                      }
+                      placeholder="Email address"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                    />
+                  </motion.div>
+                </Form.Item>
+                <Form.Item
+                  name="password"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your password!",
+                    },
+                  ]}
+                >
+                  <motion.div whileFocus={{ scale: 1.01 }}>
+                    <Input.Password
+                      placeholder="Password"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      prefix={
+                        <LockOutlined className="text-lg text-gray-400 mr-2" />
+                      }
+                      iconRender={(visible) =>
+                        visible ? (
+                          <EyeOutlined className="text-gray-400" />
+                        ) : (
+                          <EyeInvisibleOutlined className="text-gray-400" />
+                        )
+                      }
+                    />
+                  </motion.div>
+                </Form.Item>
+                <Form.Item>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    Sign In
-                  </Button>
-                </motion.div>
-              </Form.Item>
-            </Form>
+                    <Button
+                      block
+                      className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      htmlType="submit"
+                    >
+                      Sign In
+                    </Button>
+                  </motion.div>
+                </Form.Item>
+              </Form>
+            )}
           </motion.div>
 
           {/* Additional Info */}
