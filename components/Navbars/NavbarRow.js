@@ -45,7 +45,7 @@ const NavbarRow = ({
     navbar.title_bn
   );
   const [editedLogoId, setEditedLogoId] = useState(navbar?.logo?.id || null);
-  const [editedMenuId, setEditedMenuId] = useState(navbar.menu.id || null);
+  const [editedMenuId, setEditedMenuId] = useState(navbar?.menu?.id || null);
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [selectedLogoMedia, setSelectedLogoMedia] = useState(null); // New state
 
@@ -252,7 +252,7 @@ const NavbarRow = ({
                 onChange={(value) => setEditedMenuId(value)}
                 className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
                 allowClear
-                defaultValue={navbar.menu.id}
+                defaultValue={navbar?.menu?.id || null}
               >
                 {menus?.map((menu) => (
                   <Select.Option key={menu.id} value={menu.id}>
@@ -264,7 +264,7 @@ const NavbarRow = ({
               <div className="space-y-2">
                 <div className="flex items-center gap-2 mb-2">
                   <Tag className="bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 text-purple-700 font-semibold px-3 py-1 rounded-full">
-                    {navbar.menu.name}
+                    {navbar?.menu?.name || "No Menu Assigned"}
                   </Tag>
                   <Badge
                     count={menuItemsCount}

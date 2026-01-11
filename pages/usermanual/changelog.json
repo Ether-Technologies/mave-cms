@@ -1152,5 +1152,18 @@
                 "Fixed the issue of top navigation"
             ]
         }
+    },
+    {
+        "version": "3.3.89",
+        "type": "major",
+        "date": "2025-01-11",
+        "changes": {
+            "Features": [
+                "Mave AI got a new look and more robust features"
+            ],
+            "Bug Fixes": [
+                "Fixed the issue of Navbar data absense checks handled by optimizer"
+            ]
+        }
     }
 ]
