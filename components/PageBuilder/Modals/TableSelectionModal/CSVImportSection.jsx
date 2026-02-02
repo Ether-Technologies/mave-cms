@@ -27,7 +27,7 @@ const CSVImportSection = ({ setHeaders, setRows }) => {
 
           // Update state
           setHeaders(csvHeaders);
-          setRows(csvRows);
+          setRows(csvRows.map((r) => ({ id: uuidv4(), data: r })));
 
           message.success("CSV imported successfully.");
         } else {

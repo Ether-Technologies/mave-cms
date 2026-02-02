@@ -25,10 +25,10 @@ const TableSelectionDrawer = ({
   const [headers, setHeaders] = useState(
     initialTable?.headers || [{ id: "default-1", name: "Column 1 Heading" }]
   );
-  // rows = array of arrays, e.g. [["foo","bar"], ["baz","qux"]]
+  // rows = array of objects, e.g. [{ id: "r1", data: ["foo","bar"] }, { id: "r2", data: ["baz","qux"] }]
   const [rows, setRows] = useState(
-    initialTable?.rows || [
-      [""], // match initial # of headers
+    initialTable?.rows?.map((r) => ({ id: uuidv4(), data: r })) || [
+      { id: uuidv4(), data: [""] }, // match initial # of headers
     ]
   );
 
@@ -36,7 +36,7 @@ const TableSelectionDrawer = ({
   // parallel array to headers; visibleColumns[i] belongs to headers[i]
   const [visibleColumns, setVisibleColumns] = useState(
     initialTable?.visibleColumns ||
-      Array(initialTable?.headers?.length || 1).fill(true)
+    Array(initialTable?.headers?.length || 1).fill(true)
   );
 
   // 3) filterColumns: array of header names that are filterable
@@ -52,10 +52,14 @@ const TableSelectionDrawer = ({
             ? initialTable.headers.map((name) => ({ id: uuidv4(), name }))
             : [{ id: "default-1", name: "Column 1 Heading" }]
         );
-        setRows(initialTable?.rows || [[""]]);
+        setRows(
+          initialTable?.rows?.map((r) => ({ id: uuidv4(), data: r })) || [
+            { id: uuidv4(), data: [""] },
+          ]
+        );
         setVisibleColumns(
           initialTable?.visibleColumns ||
-            Array(initialTable?.headers?.length || 1).fill(true)
+          Array(initialTable?.headers?.length || 1).fill(true)
         );
         setFilterColumns(initialTable?.filterColumns || []);
       }
@@ -67,15 +71,19 @@ const TableSelectionDrawer = ({
   // Keep each row length matched to # of headers
   useEffect(() => {
     setRows((prevRows) =>
-      prevRows?.map((r) => {
+      prevRows?.map((row) => {
+        let r = row.data;
         if (r?.length < headers?.length) {
           // add empty cells if needed
-          return [...r, ...Array(headers?.length - r?.length).fill("")];
+          return {
+            ...row,
+            data: [...r, ...Array(headers?.length - r?.length).fill("")],
+          };
         } else if (r?.length > headers?.length) {
           // remove extras
-          return r?.slice(0, headers?.length);
+          return { ...row, data: r?.slice(0, headers?.length) };
         }
-        return r;
+        return row;
       })
     );
   }, [headers]);
@@ -106,7 +114,7 @@ const TableSelectionDrawer = ({
       .then(() => {
         // Validate row lengths
         for (let i = 0; i < rows.length; i++) {
-          if (rows[i]?.length !== headers?.length) {
+          if (rows[i]?.data?.length !== headers?.length) {
             message.error(`Row ${i + 1} does not match the number of columns.`);
             return;
           }
@@ -114,7 +122,7 @@ const TableSelectionDrawer = ({
 
         onSelectTable({
           headers: headers?.map((h) => h.name), // array of strings
-          rows, // array of arrays
+          rows: rows.map((r) => r.data), // array of arrays
           visibleColumns, // array of booleans
           filterColumns, // array of header names
         });

@@ -26,10 +26,10 @@ const { Title } = Typography;
 /** Reorder columns in each row of the table data. */
 const reorderColumnsInRows = (rows, sourceIndex, destIndex) => {
   return rows.map((row) => {
-    const newRow = [...row];
-    const [removed] = newRow.splice(sourceIndex, 1);
-    newRow.splice(destIndex, 0, removed);
-    return newRow;
+    const newData = [...row.data];
+    const [removed] = newData.splice(sourceIndex, 1);
+    newData.splice(destIndex, 0, removed);
+    return { ...row, data: newData };
   });
 };
 
@@ -142,7 +142,7 @@ const HeadersSection = ({
     setVisibleColumns([...visibleColumns, true]);
 
     // 3) Also append an empty cell to every row
-    const updatedRows = rows.map((r) => [...r, ""]);
+    const updatedRows = rows.map((r) => ({ ...r, data: [...r.data, ""] }));
     setRows(updatedRows);
   };
 
@@ -154,9 +154,9 @@ const HeadersSection = ({
     const newVisible = visibleColumns.filter((_, i) => i !== index);
     // 3) Remove that column from each row
     const newRows = rows.map((r) => {
-      const rowCopy = [...r];
-      rowCopy.splice(index, 1);
-      return rowCopy;
+      const dataCopy = [...r.data];
+      dataCopy.splice(index, 1);
+      return { ...r, data: dataCopy };
     });
 
     setHeaders(newHeaders);

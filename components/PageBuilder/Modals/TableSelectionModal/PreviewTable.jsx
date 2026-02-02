@@ -98,9 +98,9 @@ const PreviewTable = ({ headers, visibleColumns, rows, filterColumns }) => {
 
   // Convert row arrays to object for antd
   const dataSource = useMemo(() => {
-    return rows.map((row, rowIndex) => {
-      const rowObj = { key: `row-${rowIndex}` };
-      row.forEach((cellVal, colIndex) => {
+    return rows.map((row) => {
+      const rowObj = { key: row.id };
+      row.data.forEach((cellVal, colIndex) => {
         rowObj[String(colIndex)] = cellVal;
       });
       return rowObj;
