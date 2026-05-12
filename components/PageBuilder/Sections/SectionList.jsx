@@ -39,58 +39,62 @@ const SectionList = ({
     [onEditingStateChange]
   );
 
-  // Handle component updates
+  const getSections = () => Object.values(pageData?.body?.data || {});
+
+  const buildSectionsObject = (arr) =>
+    arr.reduce((acc, s, i) => { acc[`section_${i + 1}`] = s; return acc; }, {});
+
+  // Handle component updates (single-section mode only)
   const handleComponentUpdate = useCallback(
     (updatedComponent, componentIndex) => {
       if (pageData && sectionIndex !== undefined) {
-        const updatedPageData = { ...pageData };
-        const updatedSection = { ...updatedPageData.body[sectionIndex] };
-        updatedSection.data[componentIndex] = updatedComponent;
-        updatedPageData.body[sectionIndex] = updatedSection;
-
-        dispatch(setPageData(updatedPageData));
+        const sectionArr = getSections();
+        const section = { ...sectionArr[sectionIndex] };
+        const comps = Object.values(section.components || {});
+        comps[componentIndex] = updatedComponent;
+        section.components = comps.reduce((acc, c, i) => {
+          acc[`${c.type || "component"}_${i + 1}`] = c; return acc;
+        }, {});
+        sectionArr[sectionIndex] = section;
+        dispatch(setPageData({ ...pageData, body: { ...pageData.body, data: buildSectionsObject(sectionArr) } }));
         dispatch(setIsDirty(true));
       }
     },
     [pageData, sectionIndex, dispatch]
   );
 
-  // Handle component deletion
+  // Handle component deletion (single-section mode only)
   const handleComponentDelete = useCallback(
     (componentIndex) => {
       if (pageData && sectionIndex !== undefined) {
-        const updatedPageData = { ...pageData };
-        const updatedSection = { ...updatedPageData.body[sectionIndex] };
-        updatedSection.data.splice(componentIndex, 1);
-        updatedPageData.body[sectionIndex] = updatedSection;
-
-        dispatch(setPageData(updatedPageData));
+        const sectionArr = getSections();
+        const section = { ...sectionArr[sectionIndex] };
+        const comps = Object.values(section.components || {}).filter((_, i) => i !== componentIndex);
+        section.components = comps.reduce((acc, c, i) => {
+          acc[`${c.type || "component"}_${i + 1}`] = c; return acc;
+        }, {});
+        sectionArr[sectionIndex] = section;
+        dispatch(setPageData({ ...pageData, body: { ...pageData.body, data: buildSectionsObject(sectionArr) } }));
         dispatch(setIsDirty(true));
-      } else {
-        console.error(
-          "❌ Cannot delete component - invalid sectionIndex:",
-          sectionIndex
-        );
       }
     },
     [pageData, sectionIndex, dispatch]
   );
 
-  // Handle component duplication
+  // Handle component duplication (single-section mode only)
   const handleComponentDuplicate = useCallback(
     (componentIndex) => {
       if (pageData && sectionIndex !== undefined) {
-        const updatedPageData = { ...pageData };
-        const updatedSection = { ...updatedPageData.body[sectionIndex] };
-        const componentToDuplicate = updatedSection.data[componentIndex];
-        const duplicatedComponent = {
-          ...componentToDuplicate,
-          _id: `${componentToDuplicate._id}_duplicate_${Math.random().toString(36).substr(2, 9)}`,
-        };
-        updatedSection.data.splice(componentIndex + 1, 0, duplicatedComponent);
-        updatedPageData.body[sectionIndex] = updatedSection;
-
-        dispatch(setPageData(updatedPageData));
+        const sectionArr = getSections();
+        const section = { ...sectionArr[sectionIndex] };
+        const comps = Object.values(section.components || {});
+        const dup = { ...comps[componentIndex], _id: `component-${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
+        comps.splice(componentIndex + 1, 0, dup);
+        section.components = comps.reduce((acc, c, i) => {
+          acc[`${c.type || "component"}_${i + 1}`] = c; return acc;
+        }, {});
+        sectionArr[sectionIndex] = section;
+        dispatch(setPageData({ ...pageData, body: { ...pageData.body, data: buildSectionsObject(sectionArr) } }));
         dispatch(setIsDirty(true));
       }
     },
@@ -103,11 +107,10 @@ const SectionList = ({
       if (setSections) {
         setSections(updatedSections);
       } else {
-        const updatedPageData = {
-          ...pageData,
-          body: updatedSections,
-        };
-        dispatch(setPageData(updatedPageData));
+        const data = Array.isArray(updatedSections)
+          ? buildSectionsObject(updatedSections)
+          : updatedSections;
+        dispatch(setPageData({ ...pageData, body: { ...pageData.body, data } }));
         dispatch(setIsDirty(true));
       }
     },
@@ -116,7 +119,7 @@ const SectionList = ({
 
   // Use section drag and drop hook
   const { onDragEnd } = useSectionDragAndDrop({
-    sections: sections || pageData?.body,
+    sections: sections || Object.values(pageData?.body?.data || {}),
     onSectionsUpdate: handleSectionsUpdate,
   });
 

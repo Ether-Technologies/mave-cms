@@ -15,13 +15,15 @@ const PageContent = ({
   onAddSection,
   onAddSectionAtPosition,
 }) => {
+  const sections = Object.values(pageData?.body?.data || {});
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="p-6">
-        {pageData?.body?.length > 0 ? (
+        {sections.length > 0 ? (
           <>
             <SectionList
-              sections={pageData.body}
+              sections={sections}
               setSections={onSectionsUpdate}
               onSectionDuplicate={onSectionDuplicate}
               onSectionDelete={onSectionDelete}
