@@ -246,7 +246,7 @@ const SideMenuItems = ({ token, user, handleLogout, setIsModalOpen, collapsed })
       key: "profile",
       label: (
         <Link href="/user/profile" style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0", color: "#374151" }}>
-          <UserOutlined style={{ color: "#9ca3af" }} /> Profile
+          <span style={{ display: "flex", alignItems: "center", gap: 8 }}><UserOutlined style={{ color: "#9ca3af" }} /> Profile</span>
         </Link>
       ),
     },
@@ -254,7 +254,7 @@ const SideMenuItems = ({ token, user, handleLogout, setIsModalOpen, collapsed })
       key: "dashboard",
       label: (
         <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0", color: "#374151" }}>
-          <DashboardOutlined style={{ color: "#9ca3af" }} /> Dashboard
+          <span style={{ display: "flex", alignItems: "center", gap: 8 }}><DashboardOutlined style={{ color: "#9ca3af" }} /> Dashboard</span>
         </Link>
       ),
     },
