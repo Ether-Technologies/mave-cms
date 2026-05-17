@@ -37,26 +37,6 @@ function MyApp({ Component, pageProps }) {
           </ThemeProvider>
         </MenuRefreshProvider>
       </AuthProvider>
-      <footer className="mave-footer">
-        <p>
-          © {new Date().getFullYear()}{" "}
-          <a
-            href="https://www.linkedin.com/in/atiq-israk/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            MAVE CMS
-          </a>{" "}
-          | All rights reserved | Powered by{" "}
-          <a
-            href="https://www.ethertech.ltd"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ether Technologies
-          </a>
-        </p>
-      </footer>
     </Provider>
   );
 }

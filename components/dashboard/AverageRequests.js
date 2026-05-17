@@ -1,164 +1,80 @@
-// components/AverageRequests.js
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { Tabs } from "antd";
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
+const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-// Function to generate random data for different time views
-const generateRandomData = (type) => {
-  const data = [];
-  const categories = [];
+const generateData = (type) => {
   const now = new Date();
-
   if (type === "day") {
-    // Generate data for each hour of a day
-    for (let i = 0; i < 24; i++) {
-      const date = new Date(now.getTime() + i * 60 * 60 * 1000);
-      categories.push(`${i}:00`);
-      data.push(Math.floor(Math.random() * 50) + 10); // Random hits between 10 to 60
-    }
-  } else if (type === "week") {
-    // Generate data for each day of a week
-    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
-      categories.push(weekdays[date.getDay()]);
-      data.push(Math.floor(Math.random() * 300) + 100); // Random hits between 100 to 400
-    }
-  } else {
-    // Generate data for each month
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    for (let i = 0; i < 12; i++) {
-      categories.push(months[i]);
-      data.push(Math.floor(Math.random() * 1000) + 500); // Random hits between 500 to 1500
-    }
+    return {
+      categories: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+      data: Array.from({ length: 24 }, () => Math.floor(Math.random() * 50) + 10),
+    };
   }
-
-  return { data, categories };
+  if (type === "week") {
+    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    return {
+      categories: Array.from({ length: 7 }, (_, i) => days[new Date(now.getTime() + i * 86400000).getDay()]),
+      data: Array.from({ length: 7 }, () => Math.floor(Math.random() * 300) + 100),
+    };
+  }
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return {
+    categories: months,
+    data: Array.from({ length: 12 }, () => Math.floor(Math.random() * 1000) + 500),
+  };
 };
 
+const TABS = [{ key: "day", label: "Day" }, { key: "week", label: "Week" }, { key: "month", label: "Month" }];
+
 export default function AverageRequests() {
-  const [chartOptions, setChartOptions] = useState({});
-  const [chartSeries, setChartSeries] = useState([]);
-  const [activeTab, setActiveTab] = useState("month");
+  const [options, setOptions] = useState({});
+  const [series, setSeries]   = useState([]);
+  const [tab, setTab]         = useState("month");
 
   useEffect(() => {
-    const seriesData = generateRandomData(activeTab);
-
-    setChartOptions({
-      chart: {
-        type: "bar",
-        toolbar: { show: false },
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        width: 2,
-        colors: ["#FCB813"],
-      },
-      fill: {
-        colors: ["#FCB813"],
-        opacity: 1,
-      },
+    const { categories, data } = generateData(tab);
+    setOptions({
+      chart: { type: "bar", toolbar: { show: false }, background: "transparent" },
+      dataLabels: { enabled: false },
+      plotOptions: { bar: { borderRadius: 5, columnWidth: "52%" } },
+      fill: { colors: ["#fcb813"] },
       xaxis: {
-        categories: seriesData.categories,
+        categories,
+        labels: { style: { fontSize: "10px", colors: "#9ca3af" } },
+        axisBorder: { color: "#e5e7eb" },
+        axisTicks: { color: "#e5e7eb" },
       },
-      yaxis: {
-        title: {
-          text: "API Hits",
-        },
-      },
-      tooltip: {
-        x: {
-          format:
-            activeTab === "day"
-              ? "HH:mm"
-              : activeTab === "week"
-              ? "dd/MM/yy"
-              : "MMM",
-        },
-      },
-      responsive: [
-        {
-          breakpoint: 768,
-          options: {
-            chart: {
-              height: 300,
-            },
-            xaxis: {
-              labels: {
-                rotate: -45,
-              },
-            },
-          },
-        },
-      ],
+      yaxis: { labels: { style: { colors: "#9ca3af", fontSize: "10px" } } },
+      grid: { borderColor: "#f3f4f6", strokeDashArray: 4, xaxis: { lines: { show: false } } },
+      tooltip: { y: { formatter: v => `${v} hits` } },
     });
-
-    setChartSeries([
-      {
-        name: "API Requests",
-        data: seriesData.data,
-      },
-    ]);
-  }, [activeTab]);
+    setSeries([{ name: "API Requests", data }]);
+  }, [tab]);
 
   return (
-    <div className="border-2 border-gray-300 rounded-xl flex flex-col justify-between bg-white">
-      <div className="flex justify-between items-center border-b-2 border-gray-300 p-3 mb-4">
-        <h3 className="text-lg font-semibold">Average Requests</h3>
-        <Image
-          src="/icons/mave_icons/threedots.svg"
-          alt="Three Dots"
-          width={40}
-          height={40}
-          className="transform rotate-90"
-        />
+    <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: "1.25rem 1.4rem", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", paddingBottom: "0.75rem", borderBottom: "1px solid #f3f4f6", marginBottom: "0.5rem" }}>
+        <div>
+          <h3 style={{ color: "#111827", fontSize: "0.95rem", fontWeight: 700, margin: 0 }}>API Requests</h3>
+          <p style={{ color: "#9ca3af", fontSize: "0.75rem", margin: "2px 0 0" }}>Average hits per period</p>
+        </div>
+        <div style={{ display: "flex", gap: 2, background: "#f3f4f6", borderRadius: 8, padding: 3 }}>
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)} style={{
+              background: tab === t.key ? "#fff" : "transparent",
+              border: "none", borderRadius: 6, padding: "4px 12px",
+              fontSize: "0.75rem", fontWeight: 600,
+              color: tab === t.key ? "#111827" : "#6b7280",
+              cursor: "pointer", boxShadow: tab === t.key ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              transition: "all 0.15s",
+            }}>{t.label}</button>
+          ))}
+        </div>
       </div>
-
-      {/* Tabs for Day, Week, and Month */}
-      <div className="px-4 mb-4">
-        <Tabs
-          type="card"
-          centered
-          activeKey={activeTab}
-          onChange={(key) => setActiveTab(key)}
-          className="ant-tabs-card ant-tabs-card-bordered"
-        >
-          <Tabs.TabPane tab="Day" key="day" />
-          <Tabs.TabPane tab="Week" key="week" />
-          <Tabs.TabPane tab="Month" key="month" />
-        </Tabs>
-      </div>
-
-      {chartOptions && chartSeries.length > 0 && (
-        <ReactApexChart
-          options={chartOptions}
-          series={chartSeries}
-          type="bar"
-          height={350}
-          className="w-full"
-        />
+      {options && series.length > 0 && (
+        <ReactApexChart options={options} series={series} type="bar" height={290} />
       )}
-      {/* {console.log("Chart Options: ", chartOptions)} */}
     </div>
   );
 }
