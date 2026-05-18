@@ -1,5 +1,6 @@
 // axios.js
 import axios from "axios";
+import { message } from "antd";
 
 // Rate limiting configuration
 const RATE_LIMIT_DELAY = 2000; // 2 seconds base delay
@@ -8,8 +9,30 @@ const MAX_RETRIES = 3;
 // Track request timestamps for rate limiting
 const requestTimestamps = new Map();
 
+const getTenantApiBaseUrl = () => {
+  if (typeof window === "undefined") {
+    // SSR: fallback to env
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+
+  const hostname = window.location.hostname;
+  const isLocalOrIP =
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
+
+  if (isLocalOrIP) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+
+  // subdomain detect: blacktitle.mave.com → blacktitle
+  const slug = hostname.split(".")[0];
+  const apiHost = process.env.NEXT_PUBLIC_API_HOST;
+  return `${apiHost}/${slug}/api`;
+};
+
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: getTenantApiBaseUrl(),
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
@@ -69,16 +92,17 @@ instance.interceptors.response.use(
     const { config, response } = error;
 
     if (error.response && error.response.status === 401) {
-      // Clear localStorage on unauthorized
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      // Only redirect if we're not already on the login page
       if (
         typeof window !== "undefined" &&
         !window.location.pathname.includes("/login")
       ) {
-        window.location.href = "/login";
+        message.error("Session expired. Please log in again.");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1500);
       }
     }
 

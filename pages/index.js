@@ -34,24 +34,37 @@ const Index = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const safe = (p) => p.catch(() => ({ data: [] }));
+
       const [
-        pages_response, media_response, menus_response, navbars_response,
-        sliders_response, cards_response, forms_response, footers_response,
+        pages_r, media_r, menus_r, navbars_r,
+        sliders_r, cards_r, forms_r, footers_r,
+        users_r,
       ] = await Promise.all([
-        cachedApiCall("pages",   () => instance.get("/pages")),
-        cachedApiCall("media",   () => instance.get("/media")),
-        cachedApiCall("menus",   () => instance.get("/menus")),
-        cachedApiCall("navbars", () => instance.get("/navbars")),
-        cachedApiCall("sliders", () => instance.get("/sliders")),
-        cachedApiCall("cards",   () => instance.get("/cards")),
-        cachedApiCall("forms",   () => instance.get("/forms")),
-        cachedApiCall("footers", () => instance.get("/footers")),
+        safe(cachedApiCall("pages",        () => instance.get("/pages"))),
+        safe(cachedApiCall("media",        () => instance.get("/media"))),
+        safe(cachedApiCall("menus",        () => instance.get("/menus"))),
+        safe(cachedApiCall("navbars",      () => instance.get("/navbars"))),
+        safe(cachedApiCall("sliders",      () => instance.get("/sliders"))),
+        safe(cachedApiCall("cards",        () => instance.get("/cards"))),
+        safe(cachedApiCall("forms",        () => instance.get("/forms"))),
+        safe(cachedApiCall("footers",      () => instance.get("/footers"))),
+        safe(cachedApiCall("admin-users",  () => instance.get("/admin/users"))),
       ]);
+
+      const allPages = Array.isArray(pages_r.data) ? pages_r.data : [];
+
       setData({
-        pages: pages_response.data, media: media_response.data,
-        menus: menus_response.data, navbars: navbars_response.data,
-        sliders: sliders_response.data, cards: cards_response.data,
-        forms: forms_response.data, footers: footers_response.data,
+        pages:   allPages.filter(p => p.type === "Page" || p.type === "Subpage"),
+        blogs:   allPages.filter(p => p.type === "Blog"),
+        media:   media_r.data,
+        menus:   menus_r.data,
+        navbars: navbars_r.data,
+        sliders: sliders_r.data,
+        cards:   cards_r.data,
+        forms:   forms_r.data,
+        footers: footers_r.data,
+        users:   users_r.data,
       });
       setLoading(false);
     } catch (error) {

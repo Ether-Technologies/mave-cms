@@ -279,6 +279,8 @@ const SideMenuItems = ({ token, user, handleLogout, setIsModalOpen, collapsed })
 
   const allMenuData = useMemo(() => [...sideMenuData, ...godfatherData], [sideMenuData, godfatherData]);
 
+  const isAdmin = user?.role_mave?.name === "admin";
+
   const finalMenuData = useMemo(() => {
     const data = JSON.parse(JSON.stringify(allMenuData));
     if (user?.email === "atiqisrak@niloy.com")
@@ -297,8 +299,16 @@ const SideMenuItems = ({ token, user, handleLogout, setIsModalOpen, collapsed })
         ];
       }
     }
+    // Hide Tenants menu from non-admin users
+    data.forEach(item => {
+      if (item.submenu) {
+        item.submenu = item.submenu.filter(
+          sub => sub.link !== "/tenants" || isAdmin
+        );
+      }
+    });
     return data;
-  }, [allMenuData, customModels, token, user]);
+  }, [allMenuData, customModels, token, user, isAdmin]);
 
   const navigate = (item) => item.link && router.push(item.link);
 

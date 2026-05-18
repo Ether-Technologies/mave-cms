@@ -107,16 +107,23 @@ export const AuthProvider = ({ children }) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
       const response = await instance.post("admin/login", { email, password });
-      const { token, user } = response.data;
+      const { token, access_token, user } = response.data;
+      const authToken = token || access_token;
+
+      if (!authToken) {
+        message.error("Login failed: no token received.");
+        dispatch({ type: "SET_LOADING", payload: false });
+        return;
+      }
 
       // Store token and user in localStorage
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", authToken);
       localStorage.setItem("user", JSON.stringify(user));
 
       // Dispatch login success
       dispatch({
         type: "LOGIN_SUCCESS",
-        payload: { token, user },
+        payload: { token: authToken, user },
       });
 
       message.success("Login successful!");

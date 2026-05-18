@@ -99,6 +99,10 @@ export const debouncedApiCall = (key, apiCall, delay = 2000) => {
 const apiCache = new Map();
 const CACHE_DURATION = 30000; // 30 seconds
 
+export const invalidateCache = (key) => {
+  apiCache.delete(key);
+};
+
 export const cachedApiCall = async (key, apiCall, duration = CACHE_DURATION) => {
   const now = Date.now();
   const cached = apiCache.get(key);
