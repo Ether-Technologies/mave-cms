@@ -257,7 +257,7 @@ const CardsPage = () => {
   };
 
   return (
-    <div className="mavecontainer bg-gray-50 rounded-xl p-4">
+    <div className="mavecontainer" style={{ paddingTop: 4 }}>
       <CardsHeader
         onAddCard={handleAddCard}
         sortType={sortType}
@@ -268,10 +268,12 @@ const CardsPage = () => {
         pages={pages}
         selectedPageFilter={selectedPageFilter}
         handlePageFilterChange={handlePageFilterChange}
-        // Add new props for tags
         uniqueTags={uniqueTags}
         selectedTag={selectedTag}
         handleTagFilterChange={handleTagFilterChange}
+        viewType={viewType}
+        setViewType={setViewType}
+        cardsData={cardsData}
       />
 
       {isCreateCardFormVisible && (
@@ -288,7 +290,7 @@ const CardsPage = () => {
       )}
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 260 }}>
           <Spin size="large" />
         </div>
       ) : filteredCards.length > 0 ? (
@@ -302,7 +304,19 @@ const CardsPage = () => {
           onPreviewCard={handlePreviewCard}
         />
       ) : (
-        <h2 className="text-center mt-8">No cards found</h2>
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", padding: "60px 0", gap: 12,
+        }}>
+          <div style={{
+            width: 60, height: 60, borderRadius: 16,
+            background: "#f9fafb", border: "1px solid #e5e7eb",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 24, color: "#d1d5db",
+          }}>🃏</div>
+          <p style={{ margin: 0, color: "#6b7280", fontWeight: 500 }}>No cards found</p>
+          <p style={{ margin: 0, fontSize: "0.8rem", color: "#9ca3af" }}>Create your first card to get started</p>
+        </div>
       )}
 
       <div className="flex justify-center mt-4">
