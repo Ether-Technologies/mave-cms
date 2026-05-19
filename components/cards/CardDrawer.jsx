@@ -445,11 +445,11 @@ const CardDrawer = ({ open, onClose, selectedCard, pages, media, uniqueTags, onS
               <div key={idx} style={{border:"1px solid #f3f4f6",borderRadius:10,padding:"14px 16px",marginBottom:10,background:"#fafafa"}}>
                 {previewItems.length>1&&<span style={{fontSize:"0.68rem",fontWeight:700,color:"#9ca3af",letterSpacing:"0.05em",display:"block",marginBottom:8}}>ITEM {idx+1}</span>}
                 <h3 style={{margin:"0 0 8px",fontSize:"1rem",fontWeight:800,color:"#111827",lineHeight:1.4}}>
-                  {langTab==="en"?(it.title_en||"—"):(it.title_bn||it.title_en||"—")}
+                  {langTab==="en"?(it.title_en||"—"):(it.title_bn||"—")}
                 </h3>
-                {(langTab==="en"?it.description_en:(it.description_bn||it.description_en))&&(
+                {(langTab==="en"?it.description_en:it.description_bn)&&(
                   <div style={{fontSize:"0.82rem",color:"#6b7280",lineHeight:1.65}}
-                    dangerouslySetInnerHTML={{__html:langTab==="en"?it.description_en:(it.description_bn||it.description_en)}} />
+                    dangerouslySetInnerHTML={{__html:langTab==="en"?it.description_en:it.description_bn}} />
                 )}
               </div>
             ))}
