@@ -13,7 +13,7 @@ export default function TenantTable({ tenants, loading, onRefresh }) {
   const [viewTenant, setViewTenant]     = useState(null);
   const [users, setUsers]               = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
-
+console.log("Rendering TenantTable with tenants:", users);
   const handleDelete = async (id) => {
     setDeletingId(id);
     try {
@@ -63,6 +63,12 @@ export default function TenantTable({ tenants, loading, onRefresh }) {
     },
     { title: "Name",  dataIndex: "name",  key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
+    {
+      title: "Password",
+      dataIndex: "password_plain",
+      key: "password_plain",
+      render: (pass) => pass ? <Tag color="volcano">{pass}</Tag> : <span style={{ color: "#ccc" }}>—</span>,
+    },
     {
       title: "Role",
       key: "role",
