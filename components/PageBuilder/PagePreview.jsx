@@ -1,11 +1,11 @@
 // components/PageBuilder/PagePreview.jsx
 
 import React, { useState, useEffect } from "react";
-import { Spin, message, Modal, Tag } from "antd";
+import { Spin, message, Modal } from "antd";
 import {
   ArrowLeftOutlined, EditOutlined, EyeOutlined,
-  LinkOutlined, LayoutOutlined, ReloadOutlined,
-  CodeOutlined, FullscreenOutlined,
+  LinkOutlined, CodeOutlined, WarningOutlined,
+  ApiOutlined, CopyOutlined, CheckOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import instance from "../../axios";
@@ -17,116 +17,216 @@ const TYPE_CFG = {
   Footer:  { color: "#b45309", bg: "#fef3c7" },
 };
 
-/* ── Browser chrome dots ── */
-const BrowserDots = () => (
-  <div style={{
-    display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
-    background: "#f3f4f6", borderBottom: "1px solid #e5e7eb",
-    borderRadius: "12px 12px 0 0",
-  }}>
-    {["#ef4444", "#f59e0b", "#22c55e"].map((c, i) => (
-      <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
-    ))}
-    <div style={{
-      flex: 1, marginLeft: 8, height: 22, borderRadius: 6,
-      background: "#e5e7eb", display: "flex", alignItems: "center",
-      padding: "0 10px",
-    }}>
-      <span style={{ fontSize: "0.68rem", color: "#9ca3af", fontFamily: "monospace" }}>
-        preview mode
-      </span>
+/* ── Tab chip ── */
+const Tab = ({ label, icon, active, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    style={{
+      display: "flex", alignItems: "center", gap: 5,
+      height: 30, padding: "0 14px", borderRadius: 7,
+      border: "none",
+      background: active ? "#fcb813" : "transparent",
+      color: active ? "#111827" : "#6b7280",
+      cursor: "pointer", fontSize: "0.75rem", fontWeight: 700,
+      transition: "all 0.15s",
+    }}
+  >
+    {icon} {label}
+  </button>
+);
+
+/* ── Copy button with flash ── */
+const CopyBtn = ({ text }) => {
+  const [copied, setCopied] = useState(false);
+  const handle = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      type="button"
+      onClick={handle}
+      style={{
+        display: "flex", alignItems: "center", gap: 5,
+        height: 28, padding: "0 12px", borderRadius: 6,
+        border: "1px solid #374151", background: "transparent",
+        color: copied ? "#4ade80" : "#9ca3af",
+        cursor: "pointer", fontSize: "0.7rem", fontWeight: 600,
+        transition: "all 0.15s",
+      }}
+    >
+      {copied ? <CheckOutlined /> : <CopyOutlined />}
+      {copied ? "Copied!" : "Copy JSON"}
+    </button>
+  );
+};
+
+/* ── JSON viewer ── */
+const JsonViewer = ({ data }) => {
+  const json = JSON.stringify(data, null, 2);
+  return (
+    <div style={{ position: "relative" }}>
+      {/* toolbar */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "10px 16px",
+        background: "#1e293b", borderBottom: "1px solid #334155",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <ApiOutlined style={{ color: "#fcb813", fontSize: "0.85rem" }} />
+          <span style={{ color: "#94a3b8", fontSize: "0.72rem", fontWeight: 600 }}>
+            API Response
+          </span>
+          <span style={{
+            padding: "1px 7px", borderRadius: 4,
+            background: "#0f172a", color: "#4ade80",
+            fontSize: "0.62rem", fontWeight: 700,
+          }}>200 OK</span>
+          <span style={{ fontSize: "0.65rem", color: "#475569" }}>
+            /api/pages/{data?.id}
+          </span>
+        </div>
+        <CopyBtn text={json} />
+      </div>
+
+      {/* JSON tree: top-level keys as collapsible sections */}
+      <div style={{
+        background: "#0f172a", fontFamily: "monospace",
+        fontSize: "0.78rem", lineHeight: 1.7,
+        overflowX: "auto",
+      }}>
+        <JsonTree data={data} />
+      </div>
     </div>
+  );
+};
+
+/* ── Recursive JSON tree with collapsible nodes ── */
+const JsonTree = ({ data, depth = 0, keyName = null, isLast = true }) => {
+  const [open, setOpen] = useState(depth < 2);
+  const indent = depth * 20;
+
+  if (data === null)     return <JsonLine depth={depth} keyName={keyName} value="null"      valueColor="#94a3b8" isLast={isLast} />;
+  if (data === undefined)return <JsonLine depth={depth} keyName={keyName} value="undefined" valueColor="#94a3b8" isLast={isLast} />;
+  if (typeof data === "boolean") return <JsonLine depth={depth} keyName={keyName} value={String(data)} valueColor="#f59e0b" isLast={isLast} />;
+  if (typeof data === "number")  return <JsonLine depth={depth} keyName={keyName} value={String(data)} valueColor="#60a5fa" isLast={isLast} />;
+  if (typeof data === "string")  return <JsonLine depth={depth} keyName={keyName} value={`"${data}"`}  valueColor="#4ade80" isLast={isLast} />;
+
+  const isArr = Array.isArray(data);
+  const entries = isArr ? data.map((v, i) => [i, v]) : Object.entries(data);
+  const bracket = isArr ? ["[", "]"] : ["{", "}"];
+
+  if (entries.length === 0) {
+    return (
+      <div style={{ paddingLeft: indent + 16, color: "#94a3b8" }}>
+        {keyName !== null && <span style={{ color: "#93c5fd" }}>"{keyName}": </span>}
+        <span>{bracket[0]}{bracket[1]}</span>
+        {!isLast && <span style={{ color: "#94a3b8" }}>,</span>}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div
+        onClick={() => setOpen(!open)}
+        style={{
+          paddingLeft: indent + 16, cursor: "pointer",
+          display: "flex", alignItems: "center", gap: 4,
+          userSelect: "none",
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
+        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+      >
+        <span style={{
+          fontSize: "0.6rem", color: "#475569",
+          marginLeft: -12, marginRight: 4, display: "inline-block", width: 8,
+        }}>{open ? "▾" : "▸"}</span>
+        {keyName !== null && <span style={{ color: "#93c5fd" }}>"{keyName}": </span>}
+        <span style={{ color: "#e2e8f0" }}>{bracket[0]}</span>
+        {!open && (
+          <span style={{ color: "#475569", fontSize: "0.7rem" }}>
+            {isArr ? ` ${entries.length} items` : ` ${entries.length} keys`}
+          </span>
+        )}
+        {!open && <span style={{ color: "#e2e8f0" }}>{bracket[1]}{!isLast ? "," : ""}</span>}
+      </div>
+      {open && (
+        <>
+          {entries.map(([k, v], i) => (
+            <JsonTree
+              key={k}
+              data={v}
+              depth={depth + 1}
+              keyName={isArr ? null : k}
+              isLast={i === entries.length - 1}
+            />
+          ))}
+          <div style={{ paddingLeft: indent + 16, color: "#e2e8f0" }}>
+            {bracket[1]}{!isLast ? "," : ""}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+const JsonLine = ({ depth, keyName, value, valueColor, isLast }) => (
+  <div style={{ paddingLeft: depth * 20 + 16, color: valueColor }}>
+    {keyName !== null && <span style={{ color: "#93c5fd" }}>"{keyName}": </span>}
+    <span>{value}</span>
+    {!isLast && <span style={{ color: "#94a3b8" }}>,</span>}
   </div>
 );
 
-/* ── Section header ── */
-const SectionHeader = ({ title, index, font }) => (
-  <div style={{
-    display: "flex", alignItems: "center", gap: 10,
-    marginBottom: 16, paddingBottom: 10,
-    borderBottom: "1px solid #f3f4f6",
-  }}>
-    <div style={{
-      width: 24, height: 24, borderRadius: 6, flexShrink: 0,
-      background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: "0.65rem", fontWeight: 800, color: "#fff",
-    }}>
-      {index + 1}
-    </div>
-    <span style={{ fontWeight: 700, color: "#111827", fontSize: "0.95rem", fontFamily: font || undefined }}>
-      {title}
-    </span>
-  </div>
-);
-
-/* ── Empty content state ── */
-const EmptyContent = () => (
-  <div style={{
-    display: "flex", flexDirection: "column", alignItems: "center",
-    justifyContent: "center", padding: "80px 0", gap: 14,
-  }}>
-    <div style={{
-      width: 64, height: 64, borderRadius: 18,
-      background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      boxShadow: "0 6px 20px rgba(252,184,19,0.35)",
-    }}>
-      <LayoutOutlined style={{ fontSize: 28, color: "#fff" }} />
-    </div>
-    <p style={{ margin: 0, color: "#374151", fontWeight: 700, fontSize: "1rem" }}>
-      No content yet
-    </p>
-    <p style={{ margin: 0, fontSize: "0.82rem", color: "#9ca3af" }}>
-      Open the Page Builder to add sections and components
-    </p>
-  </div>
-);
-
-/* ── Page content renderer (shared by standalone + modal) ── */
-const PageContent = ({ pageData }) => {
-  // body.data is { section_1: { title, components: { comp_1: {...} } }, ... }
+/* ── Renders all sections/components like a real website ── */
+const WebsiteContent = ({ pageData }) => {
   const sections = Object.values(pageData?.body?.data || {});
-  if (sections.length === 0) return <EmptyContent />;
+
+  if (sections.length === 0) {
+    return (
+      <div style={{
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", minHeight: 320, gap: 14,
+      }}>
+        <div style={{
+          width: 60, height: 60, borderRadius: 16,
+          background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 6px 20px rgba(252,184,19,0.35)",
+        }}>
+          <EyeOutlined style={{ fontSize: 26, color: "#fff" }} />
+        </div>
+        <p style={{ margin: 0, color: "#374151", fontWeight: 700, fontSize: "1rem" }}>
+          No content yet
+        </p>
+        <p style={{ margin: 0, fontSize: "0.82rem", color: "#9ca3af" }}>
+          Open the Page Builder to add sections and components
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
       {sections.map((section, sectionIndex) => {
-        const components = Object.values(section.components || {});
-        const title = section.title || section.sectionTitle;
+        const components = Array.isArray(section.data) ? section.data : [];
+        if (components.length === 0) return null;
         return (
-          <div
-            key={section._id || sectionIndex}
-            style={{
-              marginBottom: 32, padding: "20px 24px",
-              background: "#fff", borderRadius: 12,
-              border: "1px solid #f3f4f6",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-            }}
-          >
-            {title && (
-              <SectionHeader title={title} index={sectionIndex} font={section.font} />
-            )}
-            {components.length > 0 ? (
-              components.map((component, compIndex) => (
-                <div
-                  key={component?._id || compIndex}
-                  style={{ marginBottom: compIndex < components.length - 1 ? 16 : 0 }}
-                >
-                  <ComponentRenderer
-                    component={component}
-                    index={compIndex}
-                    components={components}
-                    sectionIndex={sectionIndex}
-                    preview={true}
-                  />
-                </div>
-              ))
-            ) : (
-              <p style={{ margin: 0, color: "#9ca3af", fontSize: "0.82rem", fontStyle: "italic" }}>
-                No components in this section.
-              </p>
-            )}
+          <div key={section._id || sectionIndex}>
+            {components.map((component, compIndex) => (
+              <div key={component?._id || compIndex}>
+                <ComponentRenderer
+                  component={component}
+                  index={compIndex}
+                  components={components}
+                  sectionIndex={sectionIndex}
+                  preview={true}
+                />
+              </div>
+            ))}
           </div>
         );
       })}
@@ -139,130 +239,144 @@ const PageContent = ({ pageData }) => {
 ══════════════════════════════════════════ */
 const PagePreview = ({ pageId, pageData: propPageData, open, setOpen }) => {
   const [pageData, setPageData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading,  setLoading]  = useState(true);
+  const [tab,      setTab]      = useState("preview"); // "preview" | "api"
   const router = useRouter();
 
   const finalPageData = propPageData || pageData;
   const type = finalPageData?.type || "Page";
   const cfg  = TYPE_CFG[type] || TYPE_CFG.Page;
-  // body.data is { section_1: {...}, section_2: {...}, ... }
   const bodySections = Object.values(finalPageData?.body?.data || {});
+  const totalComponents = bodySections.reduce(
+    (acc, s) => acc + (Array.isArray(s.data) ? s.data.length : 0), 0
+  );
 
   useEffect(() => {
-    const fetchPageData = async () => {
-      try {
-        setLoading(true);
-        const response = await instance.get(`/pages/${pageId}`);
-        setPageData(response.data);
-      } catch (error) {
-        console.error("Error fetching page data:", error);
-        message.error("Failed to load page preview");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (pageId && !propPageData) {
-      fetchPageData();
+      setLoading(true);
+      instance.get(`/pages/${pageId}`)
+        .then((r) => setPageData(r.data))
+        .catch(() => message.error("Failed to load page preview"))
+        .finally(() => setLoading(false));
     } else if (propPageData) {
       setLoading(false);
     }
   }, [pageId, propPageData]);
 
-  /* ── MODAL MODE ── */
+  /* ════════════════════
+     MODAL MODE
+  ════════════════════ */
   if (open !== undefined) {
     return (
       <Modal
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        width="90%"
-        style={{ top: 16 }}
+        width="92%"
+        style={{ top: 12 }}
         styles={{ body: { padding: 0 } }}
         closable={false}
       >
-        {/* Modal header */}
+        {/* Modal top bar */}
         <div style={{
-          display: "flex", alignItems: "center", gap: 12,
-          padding: "14px 20px",
-          background: "#111827", borderRadius: "8px 8px 0 0",
+          background: "#111827",
+          borderRadius: "8px 8px 0 0",
         }}>
+          {/* browser row */}
           <div style={{
-            width: 32, height: 32, borderRadius: 9,
-            background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "10px 16px",
+            borderBottom: "1px solid #1f2937",
           }}>
-            <EyeOutlined style={{ fontSize: 15, color: "#fff" }} />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ color: "#f9fafb", fontWeight: 700, fontSize: "0.95rem" }}>
-                {finalPageData?.page_name_en || "Page Preview"}
+            <div style={{ display: "flex", gap: 5 }}>
+              {["#ef4444","#f59e0b","#22c55e"].map((c,i) => (
+                <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
+              ))}
+            </div>
+            <div style={{
+              flex: 1, height: 26, borderRadius: 6, background: "#1f2937",
+              display: "flex", alignItems: "center", gap: 6, padding: "0 10px",
+            }}>
+              <LinkOutlined style={{ fontSize: "0.62rem", color: "#6b7280" }} />
+              <span style={{ fontSize: "0.68rem", color: "#9ca3af", fontFamily: "monospace" }}>
+                {finalPageData?.slug ? `/${finalPageData.slug}` : "preview"}
               </span>
               {finalPageData?.type && (
                 <span style={{
-                  padding: "1px 7px", borderRadius: 4,
+                  marginLeft: 4, padding: "1px 6px", borderRadius: 4,
                   background: cfg.bg, color: cfg.color,
-                  fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase",
-                }}>
-                  {finalPageData.type}
-                </span>
+                  fontSize: "0.58rem", fontWeight: 800, textTransform: "uppercase",
+                }}>{type}</span>
               )}
             </div>
-            {finalPageData?.slug && (
-              <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-                <LinkOutlined style={{ fontSize: "0.65rem", color: "#9ca3af" }} />
-                <span style={{ fontSize: "0.68rem", color: "#9ca3af", fontFamily: "monospace" }}>
-                  /{finalPageData.slug}
-                </span>
-              </div>
-            )}
+            <span style={{ color: "#9ca3af", fontSize: "0.72rem", fontWeight: 600, maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {finalPageData?.page_name_en || "Preview"}
+            </span>
+            <button
+              onClick={() => setOpen(false)}
+              style={{
+                width: 28, height: 28, borderRadius: 7,
+                border: "1px solid #374151", background: "transparent",
+                color: "#6b7280", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.8rem",
+              }}
+            >✕</button>
           </div>
-          <button
-            onClick={() => setOpen(false)}
-            style={{
-              width: 30, height: 30, borderRadius: 8, border: "1px solid #374151",
-              background: "transparent", color: "#9ca3af", cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "0.85rem", fontWeight: 700,
-            }}
-          >
-            ✕
-          </button>
+
+          {/* Tab row */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 4,
+            padding: "6px 16px",
+          }}>
+            <Tab
+              label="Preview"
+              icon={<EyeOutlined style={{ fontSize: "0.72rem" }} />}
+              active={tab === "preview"}
+              onClick={() => setTab("preview")}
+            />
+            <Tab
+              label="API Response"
+              icon={<ApiOutlined style={{ fontSize: "0.72rem" }} />}
+              active={tab === "api"}
+              onClick={() => setTab("api")}
+            />
+          </div>
         </div>
 
-        {/* Modal body */}
-        <div style={{ maxHeight: "80vh", overflowY: "auto", padding: 20, background: "#f9fafb" }}>
+        {/* Modal content */}
+        <div style={{ maxHeight: "80vh", overflowY: "auto", background: tab === "api" ? "#0f172a" : "#fff" }}>
           {loading ? (
             <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
               <Spin size="large" />
             </div>
-          ) : !finalPageData ? (
-            <EmptyContent />
+          ) : tab === "preview" ? (
+            <WebsiteContent pageData={finalPageData} />
           ) : (
-            <PageContent pageData={finalPageData} />
+            <JsonViewer data={finalPageData} />
           )}
         </div>
       </Modal>
     );
   }
 
-  /* ── STANDALONE PAGE MODE ── */
+  /* ════════════════════
+     STANDALONE PAGE
+  ════════════════════ */
   if (loading) {
     return (
       <div style={{
         display: "flex", flexDirection: "column", alignItems: "center",
-        justifyContent: "center", minHeight: "100vh", gap: 16,
-        background: "#f9fafb",
+        justifyContent: "center", minHeight: "100vh",
+        background: "#f8fafc", gap: 20,
       }}>
         <div style={{
-          width: 52, height: 52, borderRadius: 14,
+          width: 56, height: 56, borderRadius: 16,
           background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 6px 20px rgba(252,184,19,0.35)",
+          boxShadow: "0 6px 20px rgba(252,184,19,0.4)",
         }}>
-          <EyeOutlined style={{ fontSize: 24, color: "#fff" }} />
+          <EyeOutlined style={{ fontSize: 26, color: "#fff" }} />
         </div>
         <Spin size="large" />
         <p style={{ margin: 0, color: "#9ca3af", fontSize: "0.82rem" }}>Loading preview…</p>
@@ -274,9 +388,16 @@ const PagePreview = ({ pageId, pageData: propPageData, open, setOpen }) => {
     return (
       <div style={{
         display: "flex", flexDirection: "column", alignItems: "center",
-        justifyContent: "center", minHeight: "100vh", gap: 12, background: "#f9fafb",
+        justifyContent: "center", minHeight: "100vh", background: "#f8fafc", gap: 16,
       }}>
-        <p style={{ color: "#374151", fontWeight: 700, fontSize: "1rem" }}>Page not found</p>
+        <div style={{
+          width: 52, height: 52, borderRadius: 14,
+          background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <WarningOutlined style={{ fontSize: 24, color: "#fff" }} />
+        </div>
+        <p style={{ margin: 0, color: "#111827", fontWeight: 700 }}>Page not found</p>
         <button
           onClick={() => router.push("/pages")}
           style={{
@@ -293,25 +414,25 @@ const PagePreview = ({ pageId, pageData: propPageData, open, setOpen }) => {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f1f5f9" }}>
+    <div style={{ minHeight: "100vh", background: tab === "api" ? "#0f172a" : "#fff" }}>
 
       {/* ── Sticky top bar ── */}
       <div style={{
-        position: "sticky", top: 0, zIndex: 100,
-        background: "#111827",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000,
+        background: "rgba(17,24,39,0.97)",
+        backdropFilter: "blur(8px)",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
       }}>
+        {/* Browser bar row */}
         <div style={{
-          maxWidth: 1200, margin: "0 auto",
-          display: "flex", alignItems: "center", gap: 12,
-          padding: "0 24px", height: 58,
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "0 20px", height: 48,
         }}>
-          {/* Back */}
           <button
             onClick={() => router.push("/pages")}
             style={{
               display: "flex", alignItems: "center", justifyContent: "center",
-              width: 34, height: 34, borderRadius: 9,
+              width: 30, height: 30, borderRadius: 7,
               border: "1px solid #374151", background: "transparent",
               color: "#9ca3af", cursor: "pointer", flexShrink: 0,
               transition: "all 0.15s",
@@ -319,149 +440,106 @@ const PagePreview = ({ pageId, pageData: propPageData, open, setOpen }) => {
             onMouseEnter={e => { e.currentTarget.style.borderColor = "#fcb813"; e.currentTarget.style.color = "#fcb813"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "#374151"; e.currentTarget.style.color = "#9ca3af"; }}
           >
-            <ArrowLeftOutlined style={{ fontSize: "0.85rem" }} />
+            <ArrowLeftOutlined style={{ fontSize: "0.78rem" }} />
           </button>
 
-          {/* Icon */}
+          <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+            {["#ef4444","#f59e0b","#22c55e"].map((c,i) => (
+              <div key={i} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />
+            ))}
+          </div>
+
           <div style={{
-            width: 34, height: 34, borderRadius: 9, flexShrink: 0,
-            background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 3px 10px rgba(252,184,19,0.4)",
+            flex: 1, height: 26, borderRadius: 6,
+            background: "#1f2937", border: "1px solid #374151",
+            display: "flex", alignItems: "center", gap: 7, padding: "0 12px", minWidth: 0,
           }}>
-            <EyeOutlined style={{ fontSize: 16, color: "#fff" }} />
+            <LinkOutlined style={{ fontSize: "0.62rem", color: "#6b7280", flexShrink: 0 }} />
+            <span style={{ fontSize: "0.68rem", color: "#9ca3af", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {process.env.NEXT_PUBLIC_SITE_URL || "preview"}{finalPageData.slug ? `/${finalPageData.slug}` : ""}
+            </span>
           </div>
 
-          {/* Title block */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{
-                color: "#f9fafb", fontWeight: 800, fontSize: "0.95rem",
-                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-              }}>
-                {finalPageData.page_name_en || "Untitled Page"}
-              </span>
-              <span style={{
-                padding: "2px 8px", borderRadius: 5,
-                background: cfg.bg, color: cfg.color,
-                fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase",
-                flexShrink: 0,
-              }}>
-                {type}
-              </span>
-              <span style={{
-                padding: "2px 8px", borderRadius: 5,
-                background: "rgba(252,184,19,0.15)", color: "#fcb813",
-                fontSize: "0.6rem", fontWeight: 700, flexShrink: 0,
-              }}>
-                Preview Mode
-              </span>
-            </div>
-            {finalPageData.slug && (
-              <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-                <LinkOutlined style={{ fontSize: "0.65rem", color: "#6b7280" }} />
-                <span style={{ fontSize: "0.68rem", color: "#6b7280", fontFamily: "monospace" }}>
-                  /{finalPageData.slug}
-                </span>
-              </div>
-            )}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+            <span style={{ color: "#d1d5db", fontSize: "0.75rem", fontWeight: 600, maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {finalPageData.page_name_en}
+            </span>
+            <span style={{
+              padding: "1px 6px", borderRadius: 4,
+              background: cfg.bg, color: cfg.color,
+              fontSize: "0.58rem", fontWeight: 800, textTransform: "uppercase",
+            }}>{type}</span>
+            <span style={{
+              padding: "1px 6px", borderRadius: 4,
+              background: "rgba(252,184,19,0.12)", color: "#fcb813",
+              fontSize: "0.6rem", fontWeight: 700,
+            }}>
+              {bodySections.length}s · {totalComponents}c
+            </span>
           </div>
 
-          {/* Actions */}
-          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-            <button
-              onClick={() => router.push(`/page-builder/${pageId}`)}
-              style={{
-                display: "flex", alignItems: "center", gap: 6,
-                height: 34, padding: "0 14px", borderRadius: 8,
-                border: "1px solid #374151", background: "transparent",
-                color: "#d1d5db", cursor: "pointer", fontSize: "0.78rem", fontWeight: 600,
-                transition: "all 0.15s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "#6b7280"; e.currentTarget.style.color = "#f9fafb"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "#374151"; e.currentTarget.style.color = "#d1d5db"; }}
-            >
-              <CodeOutlined /> Builder
-            </button>
-            <button
-              onClick={() => router.push(`/page-builder/${pageId}?edit=true`)}
-              style={{
-                display: "flex", alignItems: "center", gap: 6,
-                height: 34, padding: "0 16px", borderRadius: 8,
-                border: "none",
-                background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
-                color: "#111827", cursor: "pointer", fontSize: "0.78rem", fontWeight: 800,
-                boxShadow: "0 2px 8px rgba(252,184,19,0.4)",
-                transition: "opacity 0.15s",
-              }}
-              onMouseEnter={e => e.currentTarget.style.opacity = "0.9"}
-              onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-            >
-              <EditOutlined /> Edit Page
-            </button>
-          </div>
+          <div style={{ width: 1, height: 18, background: "#374151" }} />
+
+          <button
+            onClick={() => router.push(`/page-builder/${pageId}`)}
+            style={{
+              display: "flex", alignItems: "center", gap: 5,
+              height: 28, padding: "0 11px", borderRadius: 6,
+              border: "1px solid #374151", background: "transparent",
+              color: "#9ca3af", cursor: "pointer", fontSize: "0.72rem", fontWeight: 600,
+              transition: "all 0.15s", flexShrink: 0,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#6b7280"; e.currentTarget.style.color = "#f9fafb"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "#374151"; e.currentTarget.style.color = "#9ca3af"; }}
+          >
+            <CodeOutlined style={{ fontSize: "0.7rem" }} /> Builder
+          </button>
+
+          <button
+            onClick={() => router.push(`/page-builder/${pageId}?edit=true`)}
+            style={{
+              display: "flex", alignItems: "center", gap: 5,
+              height: 28, padding: "0 13px", borderRadius: 6, border: "none",
+              background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
+              color: "#111827", cursor: "pointer", fontSize: "0.72rem", fontWeight: 800,
+              boxShadow: "0 2px 8px rgba(252,184,19,0.35)", flexShrink: 0,
+              transition: "opacity 0.15s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = "0.9"}
+            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+          >
+            <EditOutlined style={{ fontSize: "0.7rem" }} /> Edit
+          </button>
         </div>
 
-        {/* Section count sub-bar */}
+        {/* Tab row */}
         <div style={{
+          display: "flex", alignItems: "center", gap: 2,
+          padding: "4px 20px",
           borderTop: "1px solid #1f2937",
-          padding: "6px 24px",
-          maxWidth: 1200, margin: "0 auto",
-          display: "flex", alignItems: "center", gap: 16,
         }}>
-          <span style={{ fontSize: "0.7rem", color: "#6b7280" }}>
-            {bodySections.length} section{bodySections.length !== 1 ? "s" : ""}
-            {" · "}
-            {bodySections.reduce((acc, s) => acc + Object.values(s.components || {}).length, 0)} component{bodySections.reduce((acc, s) => acc + Object.values(s.components || {}).length, 0) !== 1 ? "s" : ""}
-          </span>
-          {finalPageData.page_name_bn && (
-            <span style={{ fontSize: "0.7rem", color: "#6b7280" }}>
-              · {finalPageData.page_name_bn}
-            </span>
-          )}
+          <Tab
+            label="Preview"
+            icon={<EyeOutlined style={{ fontSize: "0.7rem" }} />}
+            active={tab === "preview"}
+            onClick={() => setTab("preview")}
+          />
+          <Tab
+            label="API Response"
+            icon={<ApiOutlined style={{ fontSize: "0.7rem" }} />}
+            active={tab === "api"}
+            onClick={() => setTab("api")}
+          />
         </div>
       </div>
 
-      {/* ── Content area ── */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 24px 48px" }}>
-
-        {/* Browser frame wrapper */}
-        <div style={{
-          borderRadius: 14,
-          border: "1px solid #e2e8f0",
-          overflow: "hidden",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
-        }}>
-          <BrowserDots />
-
-          {/* Page content */}
-          <div style={{ background: "#fff", padding: "24px 28px", minHeight: 400 }}>
-            <PageContent pageData={finalPageData} />
-          </div>
-        </div>
-
-        {/* Footer info */}
-        <div style={{
-          marginTop: 20,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          gap: 16,
-        }}>
-          <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>
-            Page ID: #{pageId}
-          </span>
-          <span style={{ width: 3, height: 3, borderRadius: "50%", background: "#cbd5e1" }} />
-          <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>
-            Type: {type}
-          </span>
-          {finalPageData.slug && (
-            <>
-              <span style={{ width: 3, height: 3, borderRadius: "50%", background: "#cbd5e1" }} />
-              <span style={{ fontSize: "0.72rem", color: "#94a3b8", fontFamily: "monospace" }}>
-                /{finalPageData.slug}
-              </span>
-            </>
-          )}
-        </div>
+      {/* ── Content ── */}
+      <div style={{ paddingTop: 82 }}>
+        {tab === "preview" ? (
+          <WebsiteContent pageData={finalPageData} />
+        ) : (
+          <JsonViewer data={finalPageData} />
+        )}
       </div>
     </div>
   );
