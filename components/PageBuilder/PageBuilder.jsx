@@ -80,7 +80,7 @@ const PageBuilder = ({ pageId, editMode = false }) => {
   }, [loading, dispatch]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ minHeight: "100vh", background: "#f1f5f9" }}>
       {/* Loading, Error, and No Data States */}
       <PageLoadingStates
         loading={loading}
@@ -94,6 +94,7 @@ const PageBuilder = ({ pageId, editMode = false }) => {
         <>
           {/* Header */}
           <PageHeader
+            pageData={pageData}
             isEditing={isEditing}
             isDirty={isDirty}
             canUndo={canUndo}

@@ -1,38 +1,35 @@
-// components/Gallery/MediaGrid.jsx
-
 import React from "react";
-import { Row, Col } from "antd";
 import MediaCard from "./MediaCard";
 
 const MediaGrid = ({
   mediaItems,
   mediaType,
+  mediaTypeMap,
   handleEdit,
   handleDelete,
   handlePreview,
-  availableTags, // New prop for available tags
+  viewType = "grid",
 }) => {
+  const gridStyle = viewType === "grid"
+    ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }
+    : { display: "flex", flexDirection: "column", gap: 10 };
+
+  const getType = (media) => mediaTypeMap ? mediaTypeMap[media.id] : mediaType;
+
   return (
-    <Row gutter={[16, 16]}>
-      {mediaItems.length > 0 ? (
-        mediaItems.map((media) => (
-          <Col key={media.id} xs={24} sm={12} md={8} lg={6}>
-            <MediaCard
-              media={media}
-              mediaType={mediaType}
-              handleEdit={handleEdit}
-              handleDelete={handleDelete}
-              handlePreview={handlePreview}
-              availableTags={availableTags} // Pass availableTags
-            />
-          </Col>
-        ))
-      ) : (
-        <Col span={24}>
-          <p className="text-center text-gray-500">No media available.</p>
-        </Col>
-      )}
-    </Row>
+    <div style={gridStyle}>
+      {mediaItems.map(media => (
+        <MediaCard
+          key={media.id}
+          media={media}
+          mediaType={getType(media)}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+          handlePreview={handlePreview}
+          viewType={viewType}
+        />
+      ))}
+    </div>
   );
 };
 

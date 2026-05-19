@@ -13,13 +13,7 @@ const PageBuilderPage = () => {
     return <div>Loading...</div>;
   }
 
-  return (
-    <>
-      <div className="mavecontainer">
-        <PageBuilder pageId={id} editMode={edit === 'true'} />
-      </div>
-    </>
-  );
+  return <PageBuilder pageId={id} editMode={edit === 'true'} />;
 };
 
 export default PageBuilderPage;

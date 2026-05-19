@@ -1,111 +1,183 @@
 import React from "react";
-import { Input, Button, Tooltip, message, Select } from "antd";
+import { Input, Select, Button, Tooltip, message } from "antd";
 import {
-  CopyOutlined,
-  PlusCircleOutlined,
-  SearchOutlined,
+  PlusOutlined, SearchOutlined, CopyOutlined,
+  SortAscendingOutlined, SortDescendingOutlined,
+  AppstoreOutlined, BarsOutlined, SlidersOutlined,
 } from "@ant-design/icons";
-import Image from "next/image";
 
 const { Option } = Select;
 
+const Stat = ({ label, value, color }) => (
+  <div style={{
+    display: "flex", alignItems: "center", gap: 6,
+    background: "#f9fafb", border: "1px solid #e5e7eb",
+    borderRadius: 8, padding: "4px 12px",
+  }}>
+    <span style={{ width: 7, height: 7, borderRadius: "50%", background: color, flexShrink: 0 }} />
+    <span style={{ fontSize: "0.72rem", color: "#6b7280" }}>{label}</span>
+    <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#111827" }}>{value}</span>
+  </div>
+);
+
 const SlidersHeader = ({
   onAddSlider,
-  searchTerm,
-  onSearchChange,
-  sortType,
-  setSortType,
-  // NEW PROPS for tag filtering
-  allTags,
-  selectedTag,
-  setSelectedTag,
+  sortType, setSortType,
+  itemsPerPage, onItemsPerPageChange,
+  onSearch,
+  allTags, selectedTag, setSelectedTag,
+  viewType, setViewType,
+  slidersData = [],
 }) => {
+  const total  = slidersData.length;
+  const images = slidersData.filter(s => !s.type || s.type.toLowerCase() === "image").length;
+  const cards  = slidersData.filter(s => s.type?.toLowerCase() === "card").length;
+
   return (
-    <>
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 border-b-4 border-gray-300 px-6 pt-8 pb-4">
-        <div className="flex items-center gap-4">
-          <div className="border-2 border-gray-300 bg-white rounded-md py-2 px-3">
-            <Image
-              src="/icons/mave/slider.svg"
-              width={24}
-              height={24}
-              alt="Sliders"
-              className="w-6"
-            />
+    <div style={{ marginBottom: 24 }}>
+      {/* Top bar */}
+      <div style={{
+        display: "flex", alignItems: "flex-start",
+        justifyContent: "space-between", marginTop: 14, flexWrap: "wrap", gap: 12, marginBottom: 12,
+      }}>
+        {/* Left: title + stats */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 12px rgba(252,184,19,0.4)",
+              flexShrink: 0,
+            }}>
+              <SlidersOutlined style={{ fontSize: 20, color: "#fff" }} />
+            </div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#111827", letterSpacing: "-0.02em" }}>
+                Sliders
+              </h2>
+              <p style={{ margin: 0, fontSize: "0.72rem", color: "#9ca3af" }}>
+                Manage image and card sliders
+              </p>
+            </div>
           </div>
-          <h2 className="text-2xl font-semibold">Sliders</h2>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Stat label="Total"  value={total}  color="#6b7280" />
+            <Stat label="Image"  value={images} color="#3b82f6" />
+            <Stat label="Card"   value={cards}  color="#8b5cf6" />
+          </div>
         </div>
-        <div className="flex items-center gap-4 mt-4 md:mt-0">
+
+        {/* Right: actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Tooltip title="Copy API endpoint">
+            <Button
+              icon={<CopyOutlined />}
+              onClick={() => {
+                navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sliders`);
+                message.success("API endpoint copied");
+              }}
+              style={{ height: 38, borderRadius: 10, border: "1px solid #e5e7eb", color: "#6b7280" }}
+            />
+          </Tooltip>
           <Button
-            icon={<PlusCircleOutlined />}
+            icon={<PlusOutlined />}
             onClick={onAddSlider}
-            className="mavebutton"
+            style={{
+              height: 38, borderRadius: 10, fontWeight: 700,
+              background: "#111827", borderColor: "#111827", color: "#fcb813",
+              paddingInline: 20, fontSize: "0.85rem",
+              boxShadow: "0 2px 8px rgba(17,24,39,0.25)",
+            }}
           >
             Create Slider
           </Button>
-          <Tooltip title="Copy API Endpoint">
-            <Button
-              icon={<CopyOutlined />}
-              className="mavecancelbutton"
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  `${process.env.NEXT_PUBLIC_API_BASE_URL}/sliders`
-                );
-                message.success("API Endpoint copied to clipboard");
+        </div>
+      </div>
+
+      {/* Toolbar */}
+      <div style={{
+        display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8,
+        background: "#fff", border: "1px solid #e5e7eb",
+        borderRadius: 12, padding: "10px 14px",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      }}>
+        <Input
+          placeholder="Search sliders..."
+          prefix={<SearchOutlined style={{ color: "#9ca3af" }} />}
+          allowClear
+          onChange={(e) => onSearch(e.target.value)}
+          style={{ width: 200, borderRadius: 8, height: 34 }}
+        />
+
+        <div style={{ width: 1, height: 22, background: "#e5e7eb" }} />
+
+        <Select
+          placeholder="Filter by tag"
+          allowClear showSearch
+          style={{ width: 150 }}
+          value={selectedTag || undefined}
+          onChange={(v) => setSelectedTag(v || "")}
+        >
+          {allTags.map(t => <Option key={t} value={t}>{t}</Option>)}
+        </Select>
+
+        <div style={{ width: 1, height: 22, background: "#e5e7eb" }} />
+
+        <button
+          onClick={() => setSortType(s => s === "desc" ? "asc" : "desc")}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            height: 34, padding: "0 12px", borderRadius: 8,
+            border: "1px solid #e5e7eb", background: "#fff",
+            cursor: "pointer", fontSize: "0.78rem", color: "#374151", fontWeight: 500,
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = "#fcb813"}
+          onMouseLeave={e => e.currentTarget.style.borderColor = "#e5e7eb"}
+        >
+          {sortType === "desc"
+            ? <><SortDescendingOutlined /> Newest first</>
+            : <><SortAscendingOutlined /> Oldest first</>}
+        </button>
+
+        <div style={{ flex: 1 }} />
+
+        {/* View toggle */}
+        <div style={{ display: "flex", border: "1px solid #e5e7eb", borderRadius: 8, overflow: "hidden" }}>
+          {[
+            { val: "grid", icon: <AppstoreOutlined /> },
+            { val: "list", icon: <BarsOutlined /> },
+          ].map(({ val, icon }) => (
+            <button
+              key={val}
+              onClick={() => setViewType(val)}
+              style={{
+                width: 34, height: 34, border: "none", cursor: "pointer",
+                background: viewType === val ? "#111827" : "#fff",
+                color: viewType === val ? "#fcb813" : "#9ca3af",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.9rem", transition: "all 0.15s",
               }}
-            />
-          </Tooltip>
+            >
+              {icon}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Controls Section */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 px-3 py-1">
-        <div className="flex items-center gap-4">
-          {/* Sorting Controls */}
-          <h2 className="text-lg font-semibold text-gray-500">Sort By:</h2>
-          <Button
-            onClick={() => setSortType("asc")}
-            className={`${sortType === "asc" ? "mavebutton" : "mavecancelbutton"}`}
-          >
-            Newest
-          </Button>
-          <Button
-            onClick={() => setSortType("desc")}
-            className={`${sortType === "desc" ? "mavebutton" : "mavecancelbutton"}`}
-          >
-            Oldest
-          </Button>
-        </div>
-        <div className="flex flex-col md:flex-row items-center gap-5 mt-4 md:mt-0">
-          {/* NEW: Filter by Tags */}
-          <Select
-            allowClear
-            showSearch
-            placeholder="Filter by Tag"
-            style={{ width: 200 }}
-            value={selectedTag || undefined}
-            onChange={(value) => setSelectedTag(value || "")}
-          >
-            {allTags.map((tag) => (
-              <Option key={tag} value={tag}>
-                {tag}
-              </Option>
-            ))}
+        <div style={{ width: 1, height: 22, background: "#e5e7eb" }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>Show</span>
+          <Select value={itemsPerPage} onChange={onItemsPerPageChange} style={{ width: 72 }}>
+            <Option value={6}>6</Option>
+            <Option value={12}>12</Option>
+            <Option value={24}>24</Option>
+            <Option value={48}>48</Option>
           </Select>
-
-          {/* Search Input */}
-          <Input
-            placeholder="Search Sliders"
-            value={searchTerm}
-            onChange={onSearchChange}
-            className="w-48 md:w-72 h-11 border-2 border-gray-300 rounded-md"
-            allowClear
-            prefix={<SearchOutlined />}
-          />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

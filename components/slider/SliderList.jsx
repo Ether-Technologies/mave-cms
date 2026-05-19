@@ -1,127 +1,143 @@
-// components/slider/SliderList.jsx
-
-import React, { useState } from "react";
-import { Tabs, Pagination } from "antd";
+import React, { useState, useEffect } from "react";
+import { Pagination } from "antd";
+import { SlidersOutlined } from "@ant-design/icons";
 import ImageSlider from "./ImageSlider";
 import CardSlider from "./CardSlider";
 
-const { TabPane } = Tabs;
+const TypeChip = ({ label, count, active, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      display: "flex", alignItems: "center", gap: 6,
+      height: 32, padding: "0 14px", borderRadius: 20,
+      border: active ? "none" : "1px solid #e5e7eb",
+      background: active ? "#111827" : "#fff",
+      color: active ? "#fcb813" : "#374151",
+      cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+      transition: "all 0.15s",
+      boxShadow: active ? "0 2px 8px rgba(17,24,39,0.2)" : "none",
+    }}
+  >
+    {label}
+    <span style={{
+      display: "inline-flex", alignItems: "center", justifyContent: "center",
+      width: 18, height: 18, borderRadius: "50%",
+      background: active ? "rgba(252,184,19,0.2)" : "#f3f4f6",
+      color: active ? "#fcb813" : "#6b7280",
+      fontSize: "0.68rem", fontWeight: 700,
+    }}>{count}</span>
+  </button>
+);
 
 const SliderList = ({
-  imageSliders = [],
-  cardSliders = [],
-  CustomNextArrow,
-  CustomPrevArrow,
+  sliders = [],
+  viewType = "grid",
   MEDIA_URL,
   handleEditClick,
   handleDeleteSlider,
-  itemsPerPage = 6, // Default items per page
+  itemsPerPage = 12,
 }) => {
-  // Separate pagination states for each tab
-  const [imageCurrentPage, setImageCurrentPage] = useState(1);
-  const [cardCurrentPage, setCardCurrentPage] = useState(1);
+  const [activeType, setActiveType] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [imageItemsPerPage, setImageItemsPerPage] = useState(itemsPerPage);
-  const [cardItemsPerPage, setCardItemsPerPage] = useState(itemsPerPage);
+  useEffect(() => { setCurrentPage(1); }, [activeType, itemsPerPage]);
 
-  // Calculate paginated sliders for Image Sliders
-  const paginatedImageSliders = imageSliders.slice(
-    (imageCurrentPage - 1) * imageItemsPerPage,
-    imageCurrentPage * imageItemsPerPage
-  );
+  const imageCount = sliders.filter(s => !s.type || s.type.toLowerCase() === "image").length;
+  const cardCount  = sliders.filter(s => s.type?.toLowerCase() === "card").length;
 
-  // Calculate paginated sliders for Card Sliders
-  const paginatedCardSliders = cardSliders.slice(
-    (cardCurrentPage - 1) * cardItemsPerPage,
-    cardCurrentPage * cardItemsPerPage
-  );
+  const filtered = activeType === "all"
+    ? sliders
+    : sliders.filter(s =>
+        activeType === "image"
+          ? (!s.type || s.type.toLowerCase() === "image")
+          : s.type?.toLowerCase() === "card"
+      );
+
+  const indexOfLast  = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const paged = filtered.slice(indexOfFirst, indexOfLast);
+
+  const gridCols = viewType === "grid"
+    ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }
+    : { display: "flex", flexDirection: "column", gap: 12 };
+
+  if (sliders.length === 0) {
+    return (
+      <div style={{
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", padding: "60px 0", gap: 12,
+      }}>
+        <div style={{
+          width: 60, height: 60, borderRadius: 16,
+          background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 14px rgba(252,184,19,0.35)",
+        }}>
+          <SlidersOutlined style={{ fontSize: 26, color: "#fff" }} />
+        </div>
+        <p style={{ margin: 0, color: "#6b7280", fontWeight: 500 }}>No sliders found</p>
+        <p style={{ margin: 0, fontSize: "0.8rem", color: "#9ca3af" }}>Create your first slider to get started</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-      <Tabs defaultActiveKey="1" centered>
-        {/* <TabPane tab={`Image Sliders (${imageSliders.length})`} key="1"> */}
-        <TabPane tab={"Image Sliders"} key="1">
-          {paginatedImageSliders.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {paginatedImageSliders?.map((slider) => (
-                  <ImageSlider
-                    key={slider.id}
-                    slider={slider}
-                    CustomNextArrow={CustomNextArrow}
-                    CustomPrevArrow={CustomPrevArrow}
-                    MEDIA_URL={MEDIA_URL}
-                    handleEditClick={handleEditClick}
-                    handleDeleteSlider={handleDeleteSlider}
-                  />
-                ))}
-              </div>
-              {/* Pagination for Image Sliders */}
-              <Pagination
-                current={imageCurrentPage}
-                pageSize={imageItemsPerPage}
-                total={imageSliders.length}
-                onChange={(page, pageSize) => {
-                  setImageCurrentPage(page);
-                  setImageItemsPerPage(pageSize);
-                }}
-                showSizeChanger
-                onShowSizeChange={(current, size) => {
-                  setImageItemsPerPage(size);
-                  setImageCurrentPage(1);
-                }}
-                className="mt-4 flex justify-center"
-                showQuickJumper
+    <div>
+      {/* Type filter chips */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+        <TypeChip label="All"   count={sliders.length} active={activeType === "all"}   onClick={() => setActiveType("all")} />
+        <TypeChip label="Image" count={imageCount}      active={activeType === "image"} onClick={() => setActiveType("image")} />
+        <TypeChip label="Card"  count={cardCount}       active={activeType === "card"}  onClick={() => setActiveType("card")} />
+      </div>
+
+      {paged.length > 0 ? (
+        <div style={gridCols}>
+          {paged.map(slider =>
+            (!slider.type || slider.type.toLowerCase() === "image") ? (
+              <ImageSlider
+                key={slider.id}
+                slider={slider}
+                MEDIA_URL={MEDIA_URL}
+                handleEditClick={handleEditClick}
+                handleDeleteSlider={handleDeleteSlider}
+                viewType={viewType}
               />
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <h2>No Image Sliders Found</h2>
-            </div>
-          )}
-        </TabPane>
-        {/* <TabPane tab={`Card Sliders (${cardSliders.length})`} key="2"> */}
-        <TabPane tab={"Card Sliders"} key="2">
-          {paginatedCardSliders.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {paginatedCardSliders?.map((slider) => (
-                  <CardSlider
-                    key={slider.id}
-                    slider={slider}
-                    CustomNextArrow={CustomNextArrow}
-                    CustomPrevArrow={CustomPrevArrow}
-                    MEDIA_URL={MEDIA_URL}
-                    handleEditClick={handleEditClick}
-                    handleDeleteSlider={handleDeleteSlider}
-                  />
-                ))}
-              </div>
-              {/* Pagination for Card Sliders */}
-              <Pagination
-                current={cardCurrentPage}
-                pageSize={cardItemsPerPage}
-                total={cardSliders.length}
-                onChange={(page, pageSize) => {
-                  setCardCurrentPage(page);
-                  setCardItemsPerPage(pageSize);
-                }}
-                showSizeChanger
-                onShowSizeChange={(current, size) => {
-                  setCardItemsPerPage(size);
-                  setCardCurrentPage(1);
-                }}
-                className="mt-4 flex justify-center"
-                showQuickJumper
+            ) : (
+              <CardSlider
+                key={slider.id}
+                slider={slider}
+                MEDIA_URL={MEDIA_URL}
+                handleEditClick={handleEditClick}
+                handleDeleteSlider={handleDeleteSlider}
+                viewType={viewType}
               />
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <h2>No Card Sliders Found</h2>
-            </div>
+            )
           )}
-        </TabPane>
-      </Tabs>
+        </div>
+      ) : (
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", padding: "40px 0", gap: 8,
+        }}>
+          <p style={{ margin: 0, color: "#6b7280", fontWeight: 500 }}>
+            No {activeType === "all" ? "" : activeType} sliders found
+          </p>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {filtered.length > itemsPerPage && (
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 24 }}>
+          <Pagination
+            current={currentPage}
+            pageSize={itemsPerPage}
+            total={filtered.length}
+            onChange={setCurrentPage}
+            showSizeChanger={false}
+            showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+          />
+        </div>
+      )}
     </div>
   );
 };
