@@ -116,6 +116,19 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
+      // If role_mave is missing, fetch it from /roles
+      if (!user.role_mave && user.role_id) {
+        try {
+          const rolesRes = await instance.get("/roles", {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          const matchedRole = rolesRes.data?.find(
+            (r) => String(r.id) === String(user.role_id)
+          );
+          if (matchedRole) user.role_mave = matchedRole;
+        } catch (_) {}
+      }
+
       // Store token and user in localStorage
       localStorage.setItem("token", authToken);
       localStorage.setItem("user", JSON.stringify(user));

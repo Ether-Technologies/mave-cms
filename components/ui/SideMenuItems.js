@@ -279,7 +279,16 @@ const SideMenuItems = ({ token, user, handleLogout, setIsModalOpen, collapsed })
 
   const allMenuData = useMemo(() => [...sideMenuData, ...godfatherData], [sideMenuData, godfatherData]);
 
-  const isAdmin = user?.role_mave?.name === "admin";
+  const roleName = (
+    user?.role_mave?.name ||
+    user?.role_mave?.title ||
+    user?.role ||
+    ""
+  ).toLowerCase();
+  const isAdmin =
+    roleName === "admin" ||
+    user?.is_admin === true ||
+    String(user?.role_id) === "1";
 
   const finalMenuData = useMemo(() => {
     const data = JSON.parse(JSON.stringify(allMenuData));

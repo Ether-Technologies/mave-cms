@@ -15,7 +15,17 @@ export default function Tenants() {
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    if (user && user.role_mave?.name !== "admin") {
+    const roleName = (
+      user?.role_mave?.name ||
+      user?.role_mave?.title ||
+      user?.role ||
+      ""
+    ).toLowerCase();
+    const isAdmin =
+      roleName === "admin" ||
+      user?.is_admin === true ||
+      String(user?.role_id) === "1";
+    if (user && !isAdmin) {
       router.replace("/");
     }
   }, [user, router]);

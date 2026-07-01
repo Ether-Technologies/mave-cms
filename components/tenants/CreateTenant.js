@@ -56,7 +56,7 @@ export default function CreateTenant({ onSuccess }) {
 
       // Step 2: Create admin user in the new tenant DB
       const userRes = await fetch(
-        `${apiHost}/${values.slug}/api/admin/register`,
+        `${apiHost}/${values.slug}/tenants/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
