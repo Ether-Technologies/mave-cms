@@ -9,27 +9,60 @@ const MAX_RETRIES = 3;
 // Track request timestamps for rate limiting
 const requestTimestamps = new Map();
 
-const getTenantApiBaseUrl = () => {
+export const TENANT_SLUG_KEY = "mave_tenant_slug";
+
+export const isLocalHostname = (hostname) =>
+  hostname === "localhost" ||
+  hostname === "127.0.0.1" ||
+  /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
+
+export const getLocalTenantSlug = () => {
   if (typeof window === "undefined") {
-    // SSR: fallback to env
-    return process.env.NEXT_PUBLIC_API_BASE_URL;
+    return process.env.NEXT_PUBLIC_TENANT_SLUG || "";
+  }
+  return (
+    localStorage.getItem(TENANT_SLUG_KEY) ||
+    process.env.NEXT_PUBLIC_TENANT_SLUG ||
+    ""
+  );
+};
+
+export const setLocalTenantSlug = (slug) => {
+  if (typeof window === "undefined") return;
+  const value = (slug || "").trim();
+  if (value) {
+    localStorage.setItem(TENANT_SLUG_KEY, value);
+  } else {
+    localStorage.removeItem(TENANT_SLUG_KEY);
+  }
+};
+
+const getTenantApiBaseUrl = () => {
+  const apiHost = process.env.NEXT_PUBLIC_API_HOST;
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (typeof window === "undefined") {
+    const slug = process.env.NEXT_PUBLIC_TENANT_SLUG;
+    if (slug && apiHost) return `${apiHost}/${slug}/api`;
+    return baseUrl;
   }
 
   const hostname = window.location.hostname;
-  const isLocalOrIP =
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
 
-  if (isLocalOrIP) {
-    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!isLocalHostname(hostname)) {
+    const slug = hostname.split(".")[0];
+    return `${apiHost}/${slug}/api`;
   }
 
-  // subdomain detect: blacktitle.mave.com → blacktitle
-  const slug = hostname.split(".")[0];
-  const apiHost = process.env.NEXT_PUBLIC_API_HOST;
-  return `${apiHost}/${slug}/api`;
+  const slug = getLocalTenantSlug();
+  if (slug && apiHost) {
+    return `${apiHost}/${slug}/api`;
+  }
+
+  return baseUrl;
 };
+
+export { getTenantApiBaseUrl };
 
 const instance = axios.create({
   baseURL: getTenantApiBaseUrl(),
@@ -55,6 +88,8 @@ instance.interceptors.request.use(
     if (config.flyURL) {
       config.baseURL = config.flyURL;
       delete config.flyURL;
+    } else {
+      config.baseURL = getTenantApiBaseUrl();
     }
 
     // Rate limiting for API calls

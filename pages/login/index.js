@@ -1,5 +1,6 @@
 // pages/login.js
 
+import { useState, useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,23 +9,37 @@ import {
   LockOutlined,
   MailOutlined,
   RadarChartOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useAuth } from "../../src/context/AuthContext";
 import Loader from "../../components/Loader";
+import { getLocalTenantSlug, isLocalHostname } from "../../axios";
 
 export default function Login() {
   const { login, loading } = useAuth();
   const router = useRouter();
   const { callback } = router.query;
+  const [form] = Form.useForm();
+  const [showTenantSlug, setShowTenantSlug] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setShowTenantSlug(isLocalHostname(window.location.hostname));
+      const savedSlug = getLocalTenantSlug();
+      if (savedSlug) {
+        form.setFieldsValue({ tenant_slug: savedSlug });
+      }
+    }
+  }, [form]);
 
   const handleLogin = (values) => {
-    const { email, password } = values;
+    const { email, password, tenant_slug } = values;
     if (!email || !password) {
       message.error("Please fill in all fields");
       return;
     }
-    login(email, password, callback);
+    login(email, password, callback, tenant_slug);
   };
 
   if (loading) return <Loader />;
@@ -94,14 +109,36 @@ export default function Login() {
           </div>
           <div>
             <Form
+              form={form}
               name="login"
               initialValues={{
                 remember: true,
                 email: "demouser@mave.com",
                 password: "Demo@Mave2025",
+                tenant_slug: "",
               }}
               onFinish={handleLogin}
             >
+              {showTenantSlug && (
+                <Form.Item
+                  name="tenant_slug"
+                  rules={[
+                    {
+                      pattern: /^[a-z0-9_]*$/,
+                      message: "Lowercase letters, numbers and underscore only",
+                    },
+                  ]}
+                >
+                  <Input
+                    prefix={
+                      <ApartmentOutlined className="text-[1.3rem] text-[#797B7E] mr-2 font-medium" />
+                    }
+                    placeholder="Tenant slug (empty = super admin)"
+                    className="input-field"
+                    allowClear
+                  />
+                </Form.Item>
+              )}
               <Form.Item
                 name="email"
                 rules={[

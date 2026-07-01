@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, Input, Button, message, Divider } from "antd";
+import { Form, Input, Button, message, Divider, Collapse, Checkbox } from "antd";
 
 const getApiHost = () => {
   // Production: use NEXT_PUBLIC_API_HOST directly
@@ -12,22 +12,7 @@ const getApiHost = () => {
 };
 
 const getTenantRegisterUrl = () => {
-  if (typeof window === "undefined") {
-    return `${process.env.NEXT_PUBLIC_API_BASE_URL}/tenants/register`;
-  }
-  const hostname = window.location.hostname;
-  const isLocalOrIP =
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
-
-  if (isLocalOrIP) {
-    return `${process.env.NEXT_PUBLIC_API_BASE_URL}/tenants/register`;
-  }
-  // Production: use subdomain to build URL
-  const slug = hostname.split(".")[0];
-  const host = process.env.NEXT_PUBLIC_API_HOST;
-  return `${host}/${slug}/api/tenants/register`;
+  return `${process.env.NEXT_PUBLIC_API_BASE_URL}/tenants/register`;
 };
 
 export default function CreateTenant({ onSuccess }) {
@@ -39,11 +24,26 @@ export default function CreateTenant({ onSuccess }) {
     try {
       const apiHost = getApiHost();
 
+      const tenantPayload = {
+        name: values.name,
+        slug: values.slug,
+        create_database: values.create_database !== false,
+      };
+
+      if (values.db_name) {
+        tenantPayload.db_name = values.db_name;
+        tenantPayload.create_database = false;
+      }
+      if (values.db_host) tenantPayload.db_host = values.db_host;
+      if (values.db_port) tenantPayload.db_port = values.db_port;
+      if (values.db_username) tenantPayload.db_username = values.db_username;
+      if (values.db_password) tenantPayload.db_password = values.db_password;
+
       // Step 1: Create tenant + DB + migrate
       const tenantRes = await fetch(getTenantRegisterUrl(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: values.name, slug: values.slug }),
+        body: JSON.stringify(tenantPayload),
       });
       const tenantData = await tenantRes.json();
       if (!tenantRes.ok) {
@@ -56,7 +56,7 @@ export default function CreateTenant({ onSuccess }) {
 
       // Step 2: Create admin user in the new tenant DB
       const userRes = await fetch(
-        `${apiHost}/${values.slug}/tenants/register`,
+        `${apiHost}/${values.slug}/api/admin/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -110,6 +110,42 @@ export default function CreateTenant({ onSuccess }) {
       >
         <Input placeholder="e.g. xyz_company" allowClear />
       </Form.Item>
+
+      <Collapse
+        ghost
+        items={[
+          {
+            key: "db",
+            label: "Database settings (cPanel / shared hosting)",
+            children: (
+              <>
+                <Form.Item
+                  name="create_database"
+                  valuePropName="checked"
+                  initialValue={true}
+                >
+                  <Checkbox>Auto-create database (local only — disable on cPanel)</Checkbox>
+                </Form.Item>
+                <Form.Item label="Database Name" name="db_name">
+                  <Input placeholder="e.g. cpuser_mave_xyz_company" allowClear />
+                </Form.Item>
+                <Form.Item label="DB Host" name="db_host">
+                  <Input placeholder="localhost" allowClear />
+                </Form.Item>
+                <Form.Item label="DB Port" name="db_port">
+                  <Input placeholder="3306" allowClear />
+                </Form.Item>
+                <Form.Item label="DB Username" name="db_username">
+                  <Input placeholder="cPanel MySQL username" allowClear />
+                </Form.Item>
+                <Form.Item label="DB Password" name="db_password">
+                  <Input.Password placeholder="MySQL password" />
+                </Form.Item>
+              </>
+            ),
+          },
+        ]}
+      />
 
       <Divider orientation="left">Admin User</Divider>
 

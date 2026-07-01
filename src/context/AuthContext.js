@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { useRouter } from "next/router";
-import instance from "../../axios"; // Axios instance for API calls
+import instance, { setLocalTenantSlug, isLocalHostname, getTenantApiBaseUrl } from "../../axios";
 import { message } from "antd";
 
 const AuthContext = createContext();
@@ -103,9 +103,18 @@ export const AuthProvider = ({ children }) => {
     return () => clearTimeout(forceLoadingFalse);
   }, []);
 
-  const login = async (email, password, callback) => {
+  const login = async (email, password, callback, tenantSlug) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
+
+      if (
+        typeof window !== "undefined" &&
+        isLocalHostname(window.location.hostname)
+      ) {
+        setLocalTenantSlug(tenantSlug || "");
+        instance.defaults.baseURL = getTenantApiBaseUrl();
+      }
+
       const response = await instance.post("admin/login", { email, password });
       const { token, access_token, user } = response.data;
       const authToken = token || access_token;
