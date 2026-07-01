@@ -1,7 +1,7 @@
 // pages/login.js
 
 import { useState, useEffect } from "react";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, message, Switch } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -21,13 +21,16 @@ export default function Login() {
   const router = useRouter();
   const { callback } = router.query;
   const [form] = Form.useForm();
-  const [showTenantSlug, setShowTenantSlug] = useState(false);
+  const [isLocal, setIsLocal] = useState(false);
+  const [tenantLoginOn, setTenantLoginOn] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setShowTenantSlug(isLocalHostname(window.location.hostname));
+      const local = isLocalHostname(window.location.hostname);
+      setIsLocal(local);
       const savedSlug = getLocalTenantSlug();
-      if (savedSlug) {
+      if (local && savedSlug) {
+        setTenantLoginOn(true);
         form.setFieldsValue({ tenant_slug: savedSlug });
       }
     }
@@ -39,7 +42,23 @@ export default function Login() {
       message.error("Please fill in all fields");
       return;
     }
-    login(email, password, callback, tenant_slug);
+    if (isLocal && tenantLoginOn && !tenant_slug?.trim()) {
+      message.error("Please enter organization slug");
+      return;
+    }
+    login(
+      email,
+      password,
+      callback,
+      isLocal && tenantLoginOn ? tenant_slug : ""
+    );
+  };
+
+  const handleTenantSwitch = (checked) => {
+    setTenantLoginOn(checked);
+    if (!checked) {
+      form.setFieldsValue({ tenant_slug: "" });
+    }
   };
 
   if (loading) return <Loader />;
@@ -119,26 +138,6 @@ export default function Login() {
               }}
               onFinish={handleLogin}
             >
-              {showTenantSlug && (
-                <Form.Item
-                  name="tenant_slug"
-                  rules={[
-                    {
-                      pattern: /^[a-z0-9_]*$/,
-                      message: "Lowercase letters, numbers and underscore only",
-                    },
-                  ]}
-                >
-                  <Input
-                    prefix={
-                      <ApartmentOutlined className="text-[1.3rem] text-[#797B7E] mr-2 font-medium" />
-                    }
-                    placeholder="Tenant slug (empty = super admin)"
-                    className="input-field"
-                    allowClear
-                  />
-                </Form.Item>
-              )}
               <Form.Item
                 name="email"
                 rules={[
@@ -180,6 +179,40 @@ export default function Login() {
                   }
                 />
               </Form.Item>
+              {isLocal && (
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <div>
+                    <span className="text-[#383838] text-sm font-medium block">
+                      Organization Login
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      Sign in to a specific company workspace
+                    </span>
+                  </div>
+                  <Switch checked={tenantLoginOn} onChange={handleTenantSwitch} />
+                </div>
+              )}
+              {isLocal && tenantLoginOn && (
+                <Form.Item
+                  name="tenant_slug"
+                  rules={[
+                    { required: true, message: "Please enter organization slug" },
+                    {
+                      pattern: /^[a-z0-9_]+$/,
+                      message: "Lowercase letters, numbers and underscore only",
+                    },
+                  ]}
+                >
+                  <Input
+                    prefix={
+                      <ApartmentOutlined className="text-[1.3rem] text-[#797B7E] mr-2 font-medium" />
+                    }
+                    placeholder="Organization slug (e.g. xyz_company)"
+                    className="input-field"
+                    allowClear
+                  />
+                </Form.Item>
+              )}
               <Form.Item>
                 <Button
                   block
