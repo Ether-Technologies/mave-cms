@@ -1,6 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { pushToHistory } from "./historySlice";
 
+const getSectionsArray = (bodyData) => Object.values(bodyData || {});
+
+const buildSectionsObject = (arr) =>
+  arr.reduce((acc, s, i) => { acc[`section_${i + 1}`] = s; return acc; }, {});
+
+const getComponentsArray = (components) => Object.values(components || {});
+
+const buildComponentsObject = (arr) =>
+  arr.reduce((acc, c, i) => {
+    acc[`${c.type || "component"}_${i + 1}`] = c; return acc;
+  }, {});
+
 const initialState = {
   pageData: null,
   loading: false,
@@ -32,76 +44,54 @@ const pageSlice = createSlice({
     },
     updateSection: (state, action) => {
       const { sectionIndex, newSection } = action.payload;
-      console.log("🔧 updateSection called with:", { sectionIndex, newSection });
+      if (!state.pageData?.body?.data) return;
 
-      // Validate that pageData and body exist
-      if (!state.pageData || !state.pageData.body) {
-        console.error("❌ No pageData or body available for updateSection");
-        return;
-      }
+      const sections = getSectionsArray(state.pageData.body.data);
+      if (sectionIndex < 0 || sectionIndex >= sections.length) return;
 
-      // Validate that sectionIndex is within bounds
-      if (sectionIndex < 0 || sectionIndex >= state.pageData.body.length) {
-        console.error("❌ Section index out of bounds:", sectionIndex, "body length:", state.pageData.body.length);
-        return;
-      }
-
-      // Create a new array instead of mutating the existing one
-      state.pageData.body = [
-        ...state.pageData.body.slice(0, sectionIndex),
-        newSection,
-        ...state.pageData.body.slice(sectionIndex + 1)
-      ];
+      sections[sectionIndex] = newSection;
+      state.pageData.body.data = buildSectionsObject(sections);
       state.isDirty = true;
-      console.log("✅ Section updated successfully");
     },
     moveComponent: (state, action) => {
-      const { fromSectionIndex, toSectionIndex, fromIndex, toIndex } =
-        action.payload;
+      const { fromSectionIndex, toSectionIndex, fromIndex, toIndex } = action.payload;
+      const sections = getSectionsArray(state.pageData.body.data);
 
-      // Ensure data arrays exist
-      if (!state.pageData.body[fromSectionIndex].data) {
-        state.pageData.body[fromSectionIndex].data = [];
+      const fromComps = getComponentsArray(sections[fromSectionIndex]?.components);
+      const toComps = fromSectionIndex === toSectionIndex
+        ? fromComps
+        : getComponentsArray(sections[toSectionIndex]?.components);
+
+      const [component] = fromComps.splice(fromIndex, 1);
+      toComps.splice(toIndex, 0, component);
+
+      sections[fromSectionIndex] = {
+        ...sections[fromSectionIndex],
+        components: buildComponentsObject(fromComps),
+      };
+      if (fromSectionIndex !== toSectionIndex) {
+        sections[toSectionIndex] = {
+          ...sections[toSectionIndex],
+          components: buildComponentsObject(toComps),
+        };
       }
-      if (!state.pageData.body[toSectionIndex].data) {
-        state.pageData.body[toSectionIndex].data = [];
-      }
 
-      const component = state.pageData.body[fromSectionIndex].data[fromIndex];
-
-      // Remove from source - create new array
-      state.pageData.body[fromSectionIndex].data = [
-        ...state.pageData.body[fromSectionIndex].data.slice(0, fromIndex),
-        ...state.pageData.body[fromSectionIndex].data.slice(fromIndex + 1)
-      ];
-
-      // Add to destination - create new array
-      state.pageData.body[toSectionIndex].data = [
-        ...state.pageData.body[toSectionIndex].data.slice(0, toIndex),
-        component,
-        ...state.pageData.body[toSectionIndex].data.slice(toIndex)
-      ];
+      state.pageData.body.data = buildSectionsObject(sections);
       state.isDirty = true;
     },
     duplicateComponent: (state, action) => {
       const { sectionIndex, componentIndex } = action.payload;
+      const sections = getSectionsArray(state.pageData.body.data);
+      const comps = getComponentsArray(sections[sectionIndex]?.components);
 
-      // Ensure data array exists
-      if (!state.pageData.body[sectionIndex].data) {
-        state.pageData.body[sectionIndex].data = [];
-      }
+      const dup = { ...JSON.parse(JSON.stringify(comps[componentIndex])), _id: Date.now().toString() };
+      comps.splice(componentIndex + 1, 0, dup);
 
-      const component = JSON.parse(
-        JSON.stringify(state.pageData.body[sectionIndex].data[componentIndex])
-      );
-      component._id = Date.now().toString(); // Generate new ID for duplicate
-
-      // Create new array instead of using splice
-      state.pageData.body[sectionIndex].data = [
-        ...state.pageData.body[sectionIndex].data.slice(0, componentIndex + 1),
-        component,
-        ...state.pageData.body[sectionIndex].data.slice(componentIndex + 1)
-      ];
+      sections[sectionIndex] = {
+        ...sections[sectionIndex],
+        components: buildComponentsObject(comps),
+      };
+      state.pageData.body.data = buildSectionsObject(sections);
       state.isDirty = true;
     },
   },

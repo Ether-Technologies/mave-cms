@@ -3,6 +3,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Scrollbar ── */
+html, body, * {
+  scrollbar-width: thin;
+  scrollbar-color: #fcb813 #f1f1f1;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: #fcb813;
+  border-radius: 99px;
+}
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -447,15 +475,17 @@ a:hover {
 
 /* Footer Styles */
 .mave-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 300px !important;
+  right: 0 !important;
+  width: auto !important;
   background-color: #001529;
   color: rgb(219, 219, 219);
   font-size: clamp(0.6rem, 1vw, 0.9rem);
   text-align: center;
   padding: 10px 0;
-  z-index: 2;
+  z-index: 30;
 }
 
 .mave-footer a {

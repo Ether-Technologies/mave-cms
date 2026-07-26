@@ -1,5 +1,6 @@
 // axios.js
 import axios from "axios";
+import { message } from "antd";
 
 // Rate limiting configuration
 const RATE_LIMIT_DELAY = 2000; // 2 seconds base delay
@@ -8,8 +9,86 @@ const MAX_RETRIES = 3;
 // Track request timestamps for rate limiting
 const requestTimestamps = new Map();
 
+export const TENANT_SLUG_KEY = "mave_tenant_slug";
+export const TENANT_LOGIN_ENABLED_KEY = "mave_tenant_login_enabled";
+
+export const isLocalHostname = (hostname) =>
+  hostname === "localhost" ||
+  hostname === "127.0.0.1" ||
+  /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
+
+/** Local dev: when false, API uses NEXT_PUBLIC_API_BASE_URL (no /slug/ segment). */
+export const isTenantLoginEnabled = () => {
+  if (typeof window === "undefined") {
+    return true;
+  }
+  const stored = localStorage.getItem(TENANT_LOGIN_ENABLED_KEY);
+  if (stored === "false") return false;
+  if (stored === "true") return true;
+  return !!(
+    localStorage.getItem(TENANT_SLUG_KEY) ||
+    process.env.NEXT_PUBLIC_TENANT_SLUG
+  );
+};
+
+export const setTenantLoginEnabled = (enabled) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(TENANT_LOGIN_ENABLED_KEY, enabled ? "true" : "false");
+};
+
+export const getLocalTenantSlug = () => {
+  if (typeof window === "undefined") {
+    return process.env.NEXT_PUBLIC_TENANT_SLUG || "";
+  }
+  if (!isTenantLoginEnabled()) {
+    return "";
+  }
+  return (
+    localStorage.getItem(TENANT_SLUG_KEY) ||
+    process.env.NEXT_PUBLIC_TENANT_SLUG ||
+    ""
+  );
+};
+
+export const setLocalTenantSlug = (slug) => {
+  if (typeof window === "undefined") return;
+  const value = (slug || "").trim();
+  if (value) {
+    localStorage.setItem(TENANT_SLUG_KEY, value);
+  } else {
+    localStorage.removeItem(TENANT_SLUG_KEY);
+  }
+};
+
+const getTenantApiBaseUrl = () => {
+  const apiHost = process.env.NEXT_PUBLIC_API_HOST;
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (typeof window === "undefined") {
+    const slug = process.env.NEXT_PUBLIC_TENANT_SLUG;
+    if (slug && apiHost) return `${apiHost}/${slug}/api`;
+    return baseUrl;
+  }
+
+  const hostname = window.location.hostname;
+
+  if (!isLocalHostname(hostname)) {
+    const slug = hostname.split(".")[0];
+    return `${apiHost}/${slug}/api`;
+  }
+
+  const slug = getLocalTenantSlug();
+  if (slug && apiHost) {
+    return `${apiHost}/${slug}/api`;
+  }
+
+  return baseUrl;
+};
+
+export { getTenantApiBaseUrl };
+
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: getTenantApiBaseUrl(),
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
@@ -32,6 +111,8 @@ instance.interceptors.request.use(
     if (config.flyURL) {
       config.baseURL = config.flyURL;
       delete config.flyURL;
+    } else {
+      config.baseURL = getTenantApiBaseUrl();
     }
 
     // Rate limiting for API calls
@@ -69,16 +150,17 @@ instance.interceptors.response.use(
     const { config, response } = error;
 
     if (error.response && error.response.status === 401) {
-      // Clear localStorage on unauthorized
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      // Only redirect if we're not already on the login page
       if (
         typeof window !== "undefined" &&
         !window.location.pathname.includes("/login")
       ) {
-        window.location.href = "/login";
+        message.error("Session expired. Please log in again.");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1500);
       }
     }
 

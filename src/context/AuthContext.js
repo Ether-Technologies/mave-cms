@@ -2,7 +2,12 @@
 
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { useRouter } from "next/router";
-import instance from "../../axios"; // Axios instance for API calls
+import instance, {
+  setLocalTenantSlug,
+  setTenantLoginEnabled,
+  isLocalHostname,
+  getTenantApiBaseUrl,
+} from "../../axios";
 import { message } from "antd";
 
 const AuthContext = createContext();
@@ -103,20 +108,52 @@ export const AuthProvider = ({ children }) => {
     return () => clearTimeout(forceLoadingFalse);
   }, []);
 
-  const login = async (email, password, callback) => {
+  const login = async (email, password, callback, tenantSlug) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
+
+      if (
+        typeof window !== "undefined" &&
+        isLocalHostname(window.location.hostname)
+      ) {
+        const slug = (tenantSlug || "").trim();
+        const useTenantLogin = !!slug;
+        setTenantLoginEnabled(useTenantLogin);
+        setLocalTenantSlug(useTenantLogin ? slug : "");
+        instance.defaults.baseURL = getTenantApiBaseUrl();
+      }
+
       const response = await instance.post("admin/login", { email, password });
-      const { token, user } = response.data;
+      const { token, access_token, user } = response.data;
+      const authToken = token || access_token;
+
+      if (!authToken) {
+        message.error("Login failed: no token received.");
+        dispatch({ type: "SET_LOADING", payload: false });
+        return;
+      }
+
+      // If role_mave is missing, fetch it from /roles
+      if (!user.role_mave && user.role_id) {
+        try {
+          const rolesRes = await instance.get("/roles", {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          const matchedRole = rolesRes.data?.find(
+            (r) => String(r.id) === String(user.role_id)
+          );
+          if (matchedRole) user.role_mave = matchedRole;
+        } catch (_) {}
+      }
 
       // Store token and user in localStorage
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", authToken);
       localStorage.setItem("user", JSON.stringify(user));
 
       // Dispatch login success
       dispatch({
         type: "LOGIN_SUCCESS",
-        payload: { token, user },
+        payload: { token: authToken, user },
       });
 
       message.success("Login successful!");

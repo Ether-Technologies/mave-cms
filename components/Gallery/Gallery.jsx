@@ -34,6 +34,7 @@ const Gallery = () => {
   const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = React.useState(null);
   const [isUploadModalVisible, setIsUploadModalVisible] = React.useState(false);
+  const [viewType, setViewType] = useState("grid");
 
   // State for Unique Tags
   const [uniqueTags, setUniqueTags] = useState([]);
@@ -113,16 +114,21 @@ const Gallery = () => {
       {/* Gallery Header */}
       <GalleryHeader
         onCreate={handleAddMedia}
-        onFilter={() => {
-          /* Implement if needed */
-        }}
         onSearch={handleSearch}
         onTagFilterChange={handleTagFilterChange}
         onItemsPerPageChange={handleItemsPerPageChange}
         itemsPerPage={itemsPerPage}
         sortType={sortType}
         setSortType={handleSortTypeChange}
-        availableTags={uniqueTags} // Pass uniqueTags to GalleryHeader
+        availableTags={uniqueTags}
+        viewType={viewType}
+        setViewType={setViewType}
+        stats={{
+          total:  mediaAssets.length,
+          images: mediaAssets.filter(m => m.file_type?.startsWith("image/")).length,
+          videos: mediaAssets.filter(m => m.file_type?.startsWith("video/")).length,
+          docs:   mediaAssets.filter(m => m.file_type === "application/pdf" || m.file_type?.includes("word") || m.file_type?.includes("excel")).length,
+        }}
       />
 
       {/* Media Grid or Loading Spinner */}
@@ -134,10 +140,11 @@ const Gallery = () => {
         <MediaTabs
           images={mediaAssets.filter((m) => m.file_type?.startsWith("image/"))}
           videos={mediaAssets.filter((m) => m.file_type?.startsWith("video/"))}
-          docs={mediaAssets.filter((m) => m.file_type === "application/pdf")}
+          docs={mediaAssets.filter((m) => m.file_type === "application/pdf" || m.file_type?.includes("word") || m.file_type?.includes("excel") || m.file_type?.includes("powerpoint"))}
           handleEdit={editMedia}
           handleDelete={deleteMedia}
           handlePreview={handlePreview}
+          viewType={viewType}
         />
       )}
 

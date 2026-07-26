@@ -13,13 +13,7 @@ const PagePreviewPage = () => {
         return <div>Loading...</div>;
     }
 
-    return (
-        <>
-            <div className="mavecontainer">
-                <PagePreview pageId={id} />
-            </div>
-        </>
-    );
+    return <PagePreview pageId={id} />;
 };
 
 export default PagePreviewPage; 

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"h:\\\\mave-cms\\\\components\\\\PageBuilder\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Read(//h/mave-engine/**)"
+    ]
+  }
+}

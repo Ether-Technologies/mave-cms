@@ -1,66 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Image, Layout, Button, Modal, message } from "antd";
+import { Layout, message } from "antd";
 import { useRouter } from "next/router";
-import NavItems from "./ui/NavItems";
 import SideMenuItems from "./ui/SideMenuItems";
 import Loader from "./Loader";
 import { useAuth } from "../src/context/AuthContext";
 import { useMenuRefresh } from "../src/context/MenuRefreshContext";
 import { publicPages, allowSignup, isProtectedPage } from "../config/routes";
 
-const { Sider, Content, Header } = Layout;
+const { Sider, Content } = Layout;
 
 const SiteContent = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [theme, setTheme] = useState("light");
+  const collapsed = false;
   const { user, token, logout, loading } = useAuth();
   const router = useRouter();
   const currentRoute = router.pathname;
-  const { refreshMenu } = useMenuRefresh();
 
-  // State for login modal (optional, can be removed if not needed)
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Determine if the current page is public or protected
   const isPublicPage = publicPages.includes(currentRoute);
-  const isProtected = isProtectedPage(currentRoute);
+  const isProtected  = isProtectedPage(currentRoute);
 
   useEffect(() => {
-  }, [allowSignup]);
-
-  useEffect(() => {
-    // Theme initialization
-    try {
-      const storedTheme = localStorage.getItem("darkmode");
-      if (storedTheme) {
-        setTheme(storedTheme === "true" ? "dark" : "light");
-      }
-    } catch (error) {
-      console.warn("localStorage is not available. Using default theme.");
-    }
-
-    const handleThemeChange = () => {
-      try {
-        const updatedTheme = localStorage.getItem("darkmode");
-        if (updatedTheme) {
-          setTheme(updatedTheme === "true" ? "dark" : "light");
-        }
-      } catch (error) {
-        console.warn("localStorage is not available. Theme not updated.");
-      }
-    };
-
-    window.addEventListener("storage", handleThemeChange);
-    return () => window.removeEventListener("storage", handleThemeChange);
-  }, []);
-
-  useEffect(() => {
-    if (loading) {
-      return;
-    }
+    if (loading) return;
 
     if (isProtected && !token) {
-      // Redirect to login if the page is protected and the user is not authenticated
       router.push("/login");
     } else if (
       isPublicPage &&
@@ -68,121 +31,56 @@ const SiteContent = ({ children }) => {
       currentRoute !== "/usermanual/changelog" &&
       currentRoute !== "/portfolio"
     ) {
-      // Redirect to home if the user is authenticated and tries to access a public page
-      // EXCEPT for the changelog page
       router.push("/");
     } else if (currentRoute === "/signup" && !allowSignup) {
-      // Redirect to login if signup is not allowed
       router.push("/login");
       message.info("Signup is not allowed at this time.");
     }
-  }, [
-    token,
-    loading,
-    currentRoute,
-    router,
-    isProtected,
-    isPublicPage,
-    allowSignup,
-  ]);
+  }, [token, loading, currentRoute, router, isProtected, isPublicPage, allowSignup]);
 
-  const handleCollapse = () => {
-    setCollapsed(!collapsed);
-  };
-
-  // Don't show loader for page-builder pages
   if (loading && !currentRoute.includes('/page-builder')) return <Loader />;
 
   if (isPublicPage) {
-    // Render public pages without layout
     return <Content className="min-h-screen">{children}</Content>;
   }
 
-  // Determine if the sidebar should be displayed
   const shouldShowSidebar = token && isProtected;
 
   return (
     <Layout className="min-h-screen">
-      {/* Fixed Header */}
-      <Header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md flex items-center px-4 md:px-8">
-        <NavItems
-          user={user}
-          token={token}
-          handleLogout={logout}
-          theme={theme}
-          setTheme={setTheme}
-        />
-      </Header>
-
-      <Layout className="pt-16">
-        {/* Conditionally render the Side Navigation */}
+      <Layout>
+        {/* Sidebar */}
         {shouldShowSidebar && (
-          <div className="fixed">
+          <div className="fixed" style={{ top: 0, left: 0, bottom: 0, zIndex: 40 }}>
             <Sider
-              collapsible
-              collapsed={collapsed}
-              onCollapse={handleCollapse}
-              theme={theme}
-              width={260}
-              style={{ height: "80vh" }}
-              className="top-0 left-0 px-2 z-40 rounded-r-2xl mt-5
-                bg-white shadow-lg transition-all duration-300 overflow-y-auto"
-              breakpoint="lg"
-              collapsedWidth={80}
+              theme="light"
+              width={300}
               trigger={null}
+              style={{
+                height: "100%",
+                background: "#ffffff",
+                borderRight: "1px solid #e5e7eb",
+                overflow: "hidden",
+              }}
             >
-              <div className="flex pt-10">
-                <SideMenuItems
-                  token={token}
-                  user={user}
-                  handleLogout={logout}
-                  setIsModalOpen={setIsModalOpen} // Pass the setter
-                  collapsed={collapsed}
-                  theme={theme}
-                  setTheme={setTheme}
-                />
-              </div>
+              <SideMenuItems
+                token={token}
+                user={user}
+                handleLogout={logout}
+                setIsModalOpen={setIsModalOpen}
+                collapsed={false}
+              />
             </Sider>
           </div>
         )}
 
-        {/* Main Content Area */}
+        {/* Main Content */}
         <Layout
-          className={`transition-all duration-300 ${shouldShowSidebar
-            ? collapsed
-              ? "lg:ml-[80px]" // Adjusted to match collapsedWidth
-              : "lg:ml-[260px]" // Match the width of Sider
-            : ""
-            }`}
+          className={`transition-all duration-300 ${
+            shouldShowSidebar ? "lg:ml-[300px]" : ""
+          }`}
         >
-          {/* Conditionally render the Collapse Button only for protected pages and public with layout pages when authenticated */}
-          {shouldShowSidebar && (
-            <div
-              className={`hidden lg:flex fixed lg:top-20 z-40
-                ${collapsed
-                  ? "left-[50px] lg:left-[52px]"
-                  : "left-[260px] lg:left-[235px]"
-                } transition-all duration-300
-                `}
-            >
-              <Image
-                src={
-                  collapsed
-                    ? "/icons/mave_icons/expand.svg"
-                    : "/icons/mave_icons/collapse.svg"
-                }
-                alt={collapsed ? "Expand" : "Collapse"}
-                width={40}
-                height={40}
-                preview={false}
-                className="cursor-pointer collapse-button border-0 transition-all duration-300"
-                onClick={handleCollapse}
-              />
-            </div>
-          )}
-
-          <Content className="flex-1 py-4 md:py-8 bg-gray-100">
-            {/* Responsive Container */}
+          <Content className="flex-1 bg-white">
             <div className="mx-auto">{children}</div>
           </Content>
         </Layout>

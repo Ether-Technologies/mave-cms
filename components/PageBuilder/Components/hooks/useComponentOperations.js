@@ -5,6 +5,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsDirty, setPageData } from "../../../../store/slices/pageSlice";
 import { message } from "antd";
 
+const getSectionsArray = (bodyData) => Object.values(bodyData || {});
+
+const buildSectionsObject = (arr) =>
+    arr.reduce((acc, section, i) => {
+        acc[`section_${i + 1}`] = section;
+        return acc;
+    }, {});
+
+// components is { media_1: {...}, text_1: {...}, ... } — rebuild as keyed object
+const buildComponentsObject = (arr) =>
+    arr.reduce((acc, comp, i) => {
+        const prefix = typeof comp.type === "string" ? comp.type : "component";
+        acc[`${prefix}_${i + 1}`] = comp;
+        return acc;
+    }, {});
+
 export const useComponentOperations = ({
     componentsState,
     sectionIndex,
@@ -57,49 +73,33 @@ export const useComponentOperations = ({
                 onComponentsUpdate(updatedComponents);
             } else {
                 // Fallback to old system
-                if (!pageData || !pageData.body) {
-                    console.error("❌ Cannot add component: pageData or body is null");
+                if (!pageData?.body?.data) {
                     message.error("Cannot add component - page data is not available");
                     return;
                 }
 
-                if (sectionIndex < 0 || sectionIndex >= pageData.body.length) {
-                    console.error(
-                        "❌ Section index out of bounds:",
-                        sectionIndex,
-                        "body length:",
-                        pageData.body.length
-                    );
+                const sections = getSectionsArray(pageData.body.data);
+                if (sectionIndex < 0 || sectionIndex >= sections.length) {
                     message.error("Cannot add component - invalid section");
                     return;
                 }
 
-                const updatedPageData = {
-                    ...pageData,
-                    body: pageData.body.map((section, idx) => {
-                        if (idx === sectionIndex) {
-                            let updatedData;
-                            if (position !== null && position >= 0 && position <= (section.data || []).length) {
-                                // Insert at specific position
-                                updatedData = [
-                                    ...(section.data || []).slice(0, position),
-                                    newComponent,
-                                    ...(section.data || []).slice(position)
-                                ];
-                            } else {
-                                // Add to end
-                                updatedData = [...(section.data || []), newComponent];
-                            }
-                            return {
-                                ...section,
-                                data: updatedData,
-                            };
-                        }
-                        return section;
-                    }),
+                const section = sections[sectionIndex];
+                const comps = Object.values(section.components || {});
+                const updatedComps =
+                    position !== null && position >= 0 && position <= comps.length
+                        ? [...comps.slice(0, position), newComponent, ...comps.slice(position)]
+                        : [...comps, newComponent];
+
+                sections[sectionIndex] = {
+                    ...section,
+                    components: buildComponentsObject(updatedComps),
                 };
 
-                dispatch(setPageData(updatedPageData));
+                dispatch(setPageData({
+                    ...pageData,
+                    body: { ...pageData.body, data: buildSectionsObject(sections) },
+                }));
                 dispatch(setIsDirty(true));
             }
 
@@ -117,20 +117,15 @@ export const useComponentOperations = ({
                 onComponentsUpdate(updatedComponents);
             } else {
                 // Fallback to old system
-                const updatedPageData = {
-                    ...pageData,
-                    body: pageData.body.map((section, idx) => {
-                        if (idx === sectionIndex) {
-                            return {
-                                ...section,
-                                data: updatedComponents,
-                            };
-                        }
-                        return section;
-                    }),
+                const sections = getSectionsArray(pageData.body?.data);
+                sections[sectionIndex] = {
+                    ...sections[sectionIndex],
+                    components: buildComponentsObject(updatedComponents),
                 };
-
-                dispatch(setPageData(updatedPageData));
+                dispatch(setPageData({
+                    ...pageData,
+                    body: { ...pageData.body, data: buildSectionsObject(sections) },
+                }));
                 dispatch(setIsDirty(true));
             }
         },
@@ -155,20 +150,15 @@ export const useComponentOperations = ({
                 onComponentDelete(componentIndex);
             } else {
                 // Fallback to old system
-                const updatedPageData = {
-                    ...pageData,
-                    body: pageData.body.map((section, idx) => {
-                        if (idx === sectionIndex) {
-                            return {
-                                ...section,
-                                data: updatedComponents,
-                            };
-                        }
-                        return section;
-                    }),
+                const sections = getSectionsArray(pageData.body?.data);
+                sections[sectionIndex] = {
+                    ...sections[sectionIndex],
+                    components: buildComponentsObject(updatedComponents),
                 };
-
-                dispatch(setPageData(updatedPageData));
+                dispatch(setPageData({
+                    ...pageData,
+                    body: { ...pageData.body, data: buildSectionsObject(sections) },
+                }));
                 dispatch(setIsDirty(true));
             }
         },
@@ -190,7 +180,6 @@ export const useComponentOperations = ({
                 _id: `component-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             };
 
-            // Create new array without mutating
             const updatedComponents = [
                 ...componentsState.slice(0, componentIndex + 1),
                 duplicatedComponent,
@@ -203,20 +192,15 @@ export const useComponentOperations = ({
                 onComponentDuplicate(componentIndex);
             } else {
                 // Fallback to old system
-                const updatedPageData = {
-                    ...pageData,
-                    body: pageData.body.map((section, idx) => {
-                        if (idx === sectionIndex) {
-                            return {
-                                ...section,
-                                data: updatedComponents,
-                            };
-                        }
-                        return section;
-                    }),
+                const sections = getSectionsArray(pageData.body?.data);
+                sections[sectionIndex] = {
+                    ...sections[sectionIndex],
+                    components: buildComponentsObject(updatedComponents),
                 };
-
-                dispatch(setPageData(updatedPageData));
+                dispatch(setPageData({
+                    ...pageData,
+                    body: { ...pageData.body, data: buildSectionsObject(sections) },
+                }));
                 dispatch(setIsDirty(true));
             }
         },

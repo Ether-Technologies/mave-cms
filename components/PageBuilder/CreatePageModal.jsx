@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Input, Button, Row, Col, message } from "antd";
 import { PlusCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import instance from "../../axios";
+import { invalidateCache } from "../../utils/apiUtils";
 
 const CreatePageModal = ({
   visible,
@@ -51,7 +52,6 @@ const CreatePageModal = ({
         page_name_en: newPageTitleEn,
         page_name_bn: newPageTitleBn,
         type: type,
-        favicon_id: 10,
         slug: type !== "Footer" ? newSlug : null,
         head: {
           title: newPageTitleEn,
@@ -74,6 +74,7 @@ const CreatePageModal = ({
 
       if (response.status === 201) {
         message.success(`${type} created successfully.`);
+        invalidateCache("pages");
         onPageCreated(response.data);
         setNewPageTitleEn("");
         setNewPageTitleBn("");
@@ -86,9 +87,13 @@ const CreatePageModal = ({
       }
     } catch (error) {
       console.error(`Error creating ${type.toLowerCase()}:`, error);
-      message.error(
-        `An error occurred while creating the ${type.toLowerCase()}.`
-      );
+      if (error?.response?.status !== 401) {
+        const errMsg =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          `An error occurred while creating the ${type.toLowerCase()}.`;
+        message.error(errMsg);
+      }
     } finally {
       setLoading(false);
     }

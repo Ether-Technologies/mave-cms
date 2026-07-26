@@ -1,135 +1,152 @@
-// components/PageBuilder/PagesHeader.jsx
-
-import {
-  CloseCircleFilled,
-  CopyOutlined,
-  FilterOutlined,
-  PlusCircleOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import { Button, Input, Switch, Select, Tooltip, message } from "antd";
 import React from "react";
-import { useRouter } from "next/router";
-import Image from "next/image";
+import { Input, Select, Button, Tooltip, message } from "antd";
+import {
+  PlusOutlined, SearchOutlined, CopyOutlined,
+  SortAscendingOutlined, SortDescendingOutlined,
+  LayoutOutlined, FileAddOutlined,
+} from "@ant-design/icons";
+
+const { Option } = Select;
+
+const Stat = ({ label, value, color }) => (
+  <div style={{
+    display: "flex", alignItems: "center", gap: 6,
+    background: "#f9fafb", border: "1px solid #e5e7eb",
+    borderRadius: 8, padding: "4px 12px",
+  }}>
+    <span style={{ width: 7, height: 7, borderRadius: "50%", background: color, flexShrink: 0 }} />
+    <span style={{ fontSize: "0.72rem", color: "#6b7280" }}>{label}</span>
+    <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#111827" }}>{value}</span>
+  </div>
+);
 
 const PagesHeader = ({
-  onSearch,
-  onCreate,
-  onFooterCreate,
-  createMode,
-  onCancelCreate,
-  sortType,
-  setSortType,
-  onShowChange,
-  handleFilter,
-  title = "Pages",
+  onSearch, onCreate, onFooterCreate,
+  sortType, setSortType,
+  onShowChange, itemsPerPage = 10,
+  stats = {},
 }) => {
-  const router = useRouter();
-
   return (
-    <>
-      {/* Top Header with Logo and Create/Cancel Button */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border-b-2 border-gray-200 px-4 md:px-6 pt-6 pb-4">
-        <div className="flex items-center gap-4">
-          <div
-            className="border-2 border-gray-200 bg-white rounded-lg p-2 hover:bg-theme hover:border-theme transition-colors cursor-pointer"
-            onClick={() => router.push("/build-with-ai")}
-          >
-            <Image
-              src="/icons/mave/forms.svg"
-              width={24}
-              height={24}
-              alt={title}
-              className="w-6 h-6"
-            />
-          </div>
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-800">
-            {title}
-          </h2>
-        </div>
-        <div className="flex items-center gap-2">
-          {createMode ? (
-            <Button
-              icon={<CloseCircleFilled />}
-              onClick={onCancelCreate}
-              className="h-9 px-4 mavecancelbutton"
-            >
-              Cancel Create
-            </Button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button
-                icon={<PlusCircleOutlined />}
-                className="h-9 px-4 mavebutton"
-                onClick={onCreate}
-              >
-                Create {title.slice(0, -1)}
-              </Button>
-              <Tooltip title={`Copy ${title} API Endpoint`}>
-                <Button
-                  icon={<CopyOutlined />}
-                  className="h-9 px-4 mavecancelbutton"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${process.env.NEXT_PUBLIC_API_BASE_URL}/pages?type=${title.slice(
-                        0,
-                        -1
-                      )}`
-                    );
-                    message.success("API Endpoint copied to clipboard");
-                  }}
-                />
-              </Tooltip>
+    <div style={{ marginBottom: 24 }}>
+      {/* ── Top bar ── */}
+      <div style={{
+        display: "flex", alignItems: "flex-start",
+        justifyContent: "space-between", marginTop: 14,
+        flexWrap: "wrap", gap: 12, marginBottom: 12,
+      }}>
+        {/* Left */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: "linear-gradient(135deg, #fcb813 0%, #f97316 100%)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 12px rgba(252,184,19,0.4)", flexShrink: 0,
+            }}>
+              <LayoutOutlined style={{ fontSize: 20, color: "#fff" }} />
             </div>
-          )}
+            <div>
+              <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#111827", letterSpacing: "-0.02em" }}>
+                Pages
+              </h2>
+              <p style={{ margin: 0, fontSize: "0.72rem", color: "#9ca3af" }}>
+                Manage pages, subpages and footers
+              </p>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Stat label="Total"    value={stats.total    ?? 0} color="#6b7280" />
+            <Stat label="Pages"    value={stats.pages    ?? 0} color="#3b82f6" />
+            <Stat label="Subpages" value={stats.subpages ?? 0} color="#8b5cf6" />
+            <Stat label="Footers"  value={stats.footers  ?? 0} color="#f59e0b" />
+          </div>
         </div>
-      </div>
 
-      {/* Sorting, Filtering, Search */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 px-4 md:px-6 py-3 bg-gray-50 rounded-lg">
-        {/* Sorting */}
-        <div className="flex items-center gap-3">
-          <h2 className="text-base font-medium text-gray-600">Sort By:</h2>
-          <Switch
-            checkedChildren="Last"
-            unCheckedChildren="First"
-            checked={sortType === "asc"}
-            onChange={(checked) => setSortType(checked ? "asc" : "desc")}
-            className="bg-gray-200"
-          />
-        </div>
-
-        {/* Actions: Select, Filter, Search */}
-        <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
-          <Select
-            defaultValue="10"
-            className="w-full md:w-32 h-9 border-2 border-gray-200 rounded-lg"
-            onChange={onShowChange}
-            showSearch
-          >
-            <Select.Option value="10">10</Select.Option>
-            <Select.Option value="20">20</Select.Option>
-            <Select.Option value="50">50</Select.Option>
-            <Select.Option value="100">100</Select.Option>
-            <Select.Option value="200">200</Select.Option>
-          </Select>
+        {/* Right: actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <Tooltip title="Copy Pages API endpoint">
+            <Button
+              icon={<CopyOutlined />}
+              onClick={() => {
+                navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_API_BASE_URL}/pages`);
+                message.success("API endpoint copied");
+              }}
+              style={{ height: 38, borderRadius: 10, border: "1px solid #e5e7eb", color: "#6b7280" }}
+            />
+          </Tooltip>
           <Button
-            icon={<FilterOutlined />}
-            className="h-9 px-4 bg-white text-gray-600 font-medium border-2 border-gray-200 rounded-lg hover:border-theme hover:text-theme transition-colors"
-            onClick={handleFilter}
+            icon={<FileAddOutlined />}
+            onClick={onFooterCreate}
+            style={{
+              height: 38, borderRadius: 10, fontWeight: 700,
+              border: "1px solid #fde68a", background: "#fffbeb", color: "#b45309",
+              paddingInline: 16, fontSize: "0.85rem",
+            }}
           >
-            Filter
+            Add Footer
           </Button>
-          <Input
-            placeholder={`Search ${title.slice(0, -1)}...`}
-            className="w-full md:w-72 h-9 border-2 border-gray-200 rounded-lg"
-            allowClear
-            prefix={<SearchOutlined className="text-gray-400" />}
-            onChange={(e) => onSearch(e.target.value)}
-          />
+          <Button
+            icon={<PlusOutlined />}
+            onClick={onCreate}
+            style={{
+              height: 38, borderRadius: 10, fontWeight: 700,
+              background: "#111827", borderColor: "#111827", color: "#fcb813",
+              paddingInline: 20, fontSize: "0.85rem",
+              boxShadow: "0 2px 8px rgba(17,24,39,0.25)",
+            }}
+          >
+            Create Page
+          </Button>
         </div>
       </div>
-    </>
+
+      {/* ── Toolbar ── */}
+      <div style={{
+        display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8,
+        background: "#fff", border: "1px solid #e5e7eb",
+        borderRadius: 12, padding: "10px 14px",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      }}>
+        <Input
+          placeholder="Search pages..."
+          prefix={<SearchOutlined style={{ color: "#9ca3af" }} />}
+          allowClear
+          onChange={(e) => onSearch(e.target.value)}
+          style={{ width: 220, borderRadius: 8, height: 34 }}
+        />
+
+        <div style={{ width: 1, height: 22, background: "#e5e7eb" }} />
+
+        <button
+          onClick={() => setSortType(sortType === "desc" ? "asc" : "desc")}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            height: 34, padding: "0 12px", borderRadius: 8,
+            border: "1px solid #e5e7eb", background: "#fff",
+            cursor: "pointer", fontSize: "0.78rem", color: "#374151", fontWeight: 500,
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = "#fcb813"}
+          onMouseLeave={e => e.currentTarget.style.borderColor = "#e5e7eb"}
+        >
+          {sortType === "desc"
+            ? <><SortDescendingOutlined /> Newest first</>
+            : <><SortAscendingOutlined /> Oldest first</>}
+        </button>
+
+        <div style={{ flex: 1 }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>Show</span>
+          <Select value={itemsPerPage} onChange={onShowChange} style={{ width: 72 }}>
+            <Option value={10}>10</Option>
+            <Option value={20}>20</Option>
+            <Option value={50}>50</Option>
+            <Option value={100}>100</Option>
+          </Select>
+        </div>
+      </div>
+    </div>
   );
 };
 

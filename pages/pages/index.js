@@ -227,28 +227,23 @@ const Pages = () => {
     message.info("Filter functionality is not implemented yet.");
   };
 
-  // Loading State
-  if (loading) {
-    return (
-      <div className="mavecontainer flex items-center justify-center h-screen">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
   return (
-    <div className="mavecontainer bg-gray-50 rounded-xl p-4">
+    <div className="mavecontainer" style={{ paddingTop: 4 }}>
       {/* Header */}
       <PagesHeader
         onSearch={handlePageSearch}
         onCreate={openCreateModal}
         onFooterCreate={openFooterCreateModal}
-        createMode={createModalVisible || createFooterModalVisible} // Updated
-        onCancelCreate={closeCreateModal}
         sortType={sortType}
         setSortType={setSortType}
         onShowChange={handleShowChange}
-        handleFilter={handleFilter}
+        itemsPerPage={itemsPerPage}
+        stats={{
+          total:    allPages.length,
+          pages:    typePages.length,
+          subpages: typeSubpages.length,
+          footers:  typeFooters.length,
+        }}
       />
 
       {/* Create Page Modal */}

@@ -125,6 +125,12 @@
                 "icon": "/icons/mave/user-settings.svg",
                 "link": "/settings/users-settings",
                 "title": "User Settings"
+            },
+            {
+                "id": 30,
+                "icon": "/icons/mave/component.svg",
+                "link": "/tenants",
+                "title": "Tenants"
             }
         ]
     },

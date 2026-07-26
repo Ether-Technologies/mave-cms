@@ -16,7 +16,7 @@ const CardsList = ({
   return (
     <>
       {viewType === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" style={{ gap: 16, marginTop: 4 }}>
           {cards?.map((card) => (
             <CardItem
               key={card.id}

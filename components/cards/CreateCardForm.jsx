@@ -1,136 +1,189 @@
-// components/cards/CreateCardForm.jsx
-
 import React, { useState } from "react";
 import {
-  Form,
-  Input,
-  Select,
-  Button,
-  message,
-  Radio,
-  Switch,
-  Drawer,
+  Form, Input, Select,
+  Radio, Switch, Drawer, message,
 } from "antd";
+import {
+  PlusOutlined, TranslationOutlined,
+  SettingOutlined, PictureOutlined, CheckCircleOutlined,
+  MinusCircleOutlined,
+} from "@ant-design/icons";
 import MediaSelectionModal from "../PageBuilder/Modals/MediaSelectionModal";
 import RichTextEditor from "../RichTextEditor";
 import instance from "../../axios";
 import Image from "next/image";
 
 const { Option } = Select;
+const PLACEHOLDER = "/images/Image_Placeholder.png";
+
+/* ── Section heading ── */
+const Section = ({ icon, title, children }) => (
+  <div style={{ marginBottom: 24 }}>
+    <div style={{
+      display: "flex", alignItems: "center", gap: 8,
+      marginBottom: 14, paddingBottom: 10,
+      borderBottom: "1px solid #f3f4f6",
+    }}>
+      <span style={{ color: "#fcb813", fontSize: 15 }}>{icon}</span>
+      <span style={{ fontWeight: 700, fontSize: "0.88rem", color: "#111827" }}>{title}</span>
+    </div>
+    {children}
+  </div>
+);
+
+/* ── Selected image thumb ── */
+const MediaThumb = ({ item, onRemove }) => {
+  const url = item?.file_path
+    ? `${process.env.NEXT_PUBLIC_MEDIA_URL}/${item.file_path}`
+    : PLACEHOLDER;
+  return (
+    <div style={{
+      position: "relative", width: 90, height: 70,
+      borderRadius: 8, overflow: "hidden",
+      border: "2px solid #fcb813", flexShrink: 0,
+    }}>
+      <Image src={url} alt="media" layout="fill" objectFit="cover"
+        onError={(e) => { e.target.src = PLACEHOLDER; }} />
+      <button
+        onClick={() => onRemove(item.id)}
+        style={{
+          position: "absolute", top: 3, right: 3,
+          width: 18, height: 18, borderRadius: "50%",
+          background: "#dc2626", border: "none",
+          color: "#fff", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 9, fontWeight: 700,
+        }}
+      >✕</button>
+    </div>
+  );
+};
+
+/* ── Add-field button ── */
+const AddFieldBtn = ({ label, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    style={{
+      display: "flex", alignItems: "center", gap: 6,
+      height: 32, padding: "0 14px", borderRadius: 8,
+      border: "1.5px dashed #d1d5db", background: "#f9fafb",
+      color: "#6b7280", cursor: "pointer",
+      fontSize: "0.78rem", fontWeight: 600,
+      transition: "all 0.15s", marginTop: 8,
+    }}
+    onMouseEnter={e => {
+      e.currentTarget.style.borderColor = "#fcb813";
+      e.currentTarget.style.color = "#d97706";
+      e.currentTarget.style.background = "#fffbeb";
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.borderColor = "#d1d5db";
+      e.currentTarget.style.color = "#6b7280";
+      e.currentTarget.style.background = "#f9fafb";
+    }}
+  >
+    <PlusOutlined style={{ fontSize: 11 }} /> {label}
+  </button>
+);
+
+const newItem = () => ({ id: Date.now() + Math.random(), title_en: "", title_bn: "", description_en: "", description_bn: "" });
 
 const CreateCardForm = ({ onSuccess, onCancel, pages, media, uniqueTags }) => {
-  const [form] = Form.useForm();
-  const [submitting, setSubmitting] = useState(false);
-  const [isMediaModalVisible, setIsMediaModalVisible] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState(null);
-  const [linkType, setLinkType] = useState("independent");
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [form]            = Form.useForm();
+  const [submitting, setSubmitting]         = useState(false);
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia]   = useState([]);
+  const [linkType, setLinkType]             = useState("independent");
+  const [showAdvanced, setShowAdvanced]     = useState(false);
+  const [langTab, setLangTab]               = useState("en");
 
-  // Placeholder image path
-  const PLACEHOLDER_IMAGE = "/images/Image_Placeholder.png";
+  /* ── Dynamic content items (title + description pairs) ── */
+  const [contentItems, setContentItems] = useState([newItem()]);
 
-  // Handle title change to auto-fill alternate title
-  const handleTitleChange = (e) => {
-    const value = e.target.value;
-    form.setFieldsValue({
-      title_en: value,
-      title_bn: value, // Auto-fill alternate title
+  const updateItem = (id, field, val) =>
+    setContentItems(prev => prev.map(it => it.id === id ? { ...it, [field]: val } : it));
+
+  const addItem = () => setContentItems(prev => [...prev, newItem()]);
+
+  const removeItem = (id) => setContentItems(prev => prev.filter(it => it.id !== id));
+
+  /* ── Auto-sync BN title from EN on first item ── */
+  const handleEnTitleChange = (id, val) => {
+    updateItem(id, "title_en", val);
+    const item = contentItems.find(it => it.id === id);
+    if (item && !item.title_bn) updateItem(id, "title_bn", val);
+  };
+
+  /* ── Media ── */
+  const handleMediaSelect = (items) => {
+    const list = Array.isArray(items) ? items : [items];
+    setSelectedMedia(prev => {
+      const ids = new Set(prev.map(m => m.id));
+      return [...prev, ...list.filter(m => !ids.has(m.id))];
     });
+    setMediaModalOpen(false);
   };
+  const removeMedia = (id) => setSelectedMedia(prev => prev.filter(m => m.id !== id));
 
-  // Handle description change to auto-fill alternate description
-  const handleDescriptionChange = (value) => {
-    form.setFieldsValue({
-      description_en: value,
-      description_bn: value, // Auto-fill alternate description
-    });
-  };
-
-  // Media selection
-  const handleMediaSelect = (mediaItem) => {
-    setSelectedMedia(mediaItem);
-    form.setFieldsValue({ media_ids: mediaItem.id });
-    setIsMediaModalVisible(false);
-  };
-
-  // Link type change
+  /* ── Link type ── */
   const handleLinkTypeChange = (e) => {
     setLinkType(e.target.value);
-    if (e.target.value === "page") {
-      form.setFieldsValue({
-        link_url: undefined,
-        media_link_path: undefined,
-        internal_link_path: undefined,
-      });
-    } else if (e.target.value === "media") {
-      form.setFieldsValue({
-        link_url: undefined,
-        link_page_id: undefined,
-        internal_link_path: undefined,
-      });
-    } else if (e.target.value === "internal") {
-      form.setFieldsValue({
-        link_url: undefined,
-        link_page_id: undefined,
-        media_link_path: undefined,
-      });
-    } else {
-      form.setFieldsValue({
-        link_page_id: undefined,
-        media_link_path: undefined,
-        internal_link_path: undefined,
-      });
-    }
+    form.setFieldsValue({ link_url: undefined, link_page_id: undefined, media_link_path: undefined, internal_link_path: undefined });
   };
 
-  // Build final link
-  const buildLink = (values, pages) => {
+  const buildLink = (values) => {
     if (values.link_type === "page" && values.link_page_id) {
-      const selectedPage = pages.find((p) => p.id === values.link_page_id);
-      if (!selectedPage) {
-        throw new Error("Selected page not found.");
-      }
-      return `/${selectedPage.slug}?page_id=${selectedPage.id}&pageName=${selectedPage.page_name_en}`;
-    } else if (values.link_type === "media" && values.media_link_path) {
-      return `${process.env.NEXT_PUBLIC_MEDIA_URL}${values.media_link_path}`;
-    } else if (values.link_type === "internal" && values.internal_link_path) {
-      return `${process.env.NEXT_PUBLIC_APP_URL}${values.internal_link_path}`;
+      const p = pages.find(p => p.id === values.link_page_id);
+      if (!p) throw new Error("Selected page not found.");
+      return `/${p.slug}?page_id=${p.id}&pageName=${p.page_name_en}`;
     }
+    if (values.link_type === "media" && values.media_link_path)
+      return `${process.env.NEXT_PUBLIC_MEDIA_URL}${values.media_link_path}`;
+    if (values.link_type === "internal" && values.internal_link_path)
+      return `${process.env.NEXT_PUBLIC_APP_URL}${values.internal_link_path}`;
     return values.link_url;
   };
 
-  // Submit
+  /* ── Submit ── */
   const handleSubmit = async (values) => {
-    if (!selectedMedia) {
-      message.error("Please select a media item.");
+    const firstItem = contentItems[0];
+    if (!firstItem?.title_en?.trim()) {
+      message.error("English title is required.");
+      setLangTab("en");
+      return;
+    }
+    if (selectedMedia.length === 0) {
+      message.error("Please select at least one image.");
       return;
     }
     setSubmitting(true);
-
     try {
-      const finalLink = buildLink(values, pages);
-      const additional = { tags: values.tags || [] };
-
+      const finalLink = buildLink(values);
       const payload = {
-        title_en: values.title_en,
-        title_bn: values.title_bn || "",
-        description_en: values.description_en,
-        description_bn: values.description_bn || "",
-        media_ids: selectedMedia.id,
-        page_name: values.page_name || "",
-        link_url: finalLink,
-        status: values.status ? 1 : 0,
-        additional,
+        title_en:       firstItem.title_en,
+        title_bn:       firstItem.title_bn || firstItem.title_en,
+        description_en: firstItem.description_en || "",
+        description_bn: firstItem.description_bn || firstItem.description_en || "",
+        media_ids:      selectedMedia.map(m => m.id),
+        page_name:      values.page_name || "",
+        link_url:       finalLink || "",
+        status:         values.status ? 1 : 0,
+        additional: {
+          tags:          values.tags || [],
+          content_items: contentItems,
+        },
       };
-
       await instance.post("/cards", payload);
       message.success("Card created successfully.");
       form.resetFields();
-      setSelectedMedia(null);
+      setSelectedMedia([]);
+      setContentItems([newItem()]);
       setLinkType("independent");
+      setLangTab("en");
       onSuccess();
-    } catch (error) {
-      console.error("Create Card Error:", error);
+    } catch (err) {
+      console.error(err);
       message.error("Failed to create card.");
     } finally {
       setSubmitting(false);
@@ -139,251 +192,334 @@ const CreateCardForm = ({ onSuccess, onCancel, pages, media, uniqueTags }) => {
 
   return (
     <Drawer
-      title="Create Card"
+      title={
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: "linear-gradient(135deg,#fcb813,#f97316)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 15,
+          }}>🎴</div>
+          <span style={{ fontWeight: 700, fontSize: "1rem" }}>Create Card</span>
+        </div>
+      }
       open={true}
       onClose={onCancel}
-      width={`50%`}
+      width={560}
       destroyOnClose
+      footer={
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "12px 0 4px" }}>
+          <button
+            onClick={onCancel}
+            style={{
+              height: 38, padding: "0 20px", borderRadius: 9,
+              border: "1px solid #e5e7eb", background: "#fff",
+              color: "#6b7280", fontWeight: 600, cursor: "pointer",
+              fontSize: "0.85rem",
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "#d1d5db"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "#e5e7eb"}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => form.submit()}
+            disabled={submitting}
+            style={{
+              height: 38, padding: "0 24px", borderRadius: 9,
+              border: "none",
+              background: submitting ? "#9ca3af" : "#111827",
+              color: "#fcb813", fontWeight: 700,
+              cursor: submitting ? "not-allowed" : "pointer",
+              fontSize: "0.85rem",
+              display: "flex", alignItems: "center", gap: 7,
+            }}
+          >
+            {submitting ? "Creating..." : <><CheckCircleOutlined /> Create Card</>}
+          </button>
+        </div>
+      }
     >
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={{
-          link_type: "independent",
-          status: true,
-        }}
+        initialValues={{ link_type: "independent", status: true }}
+        style={{ paddingBottom: 24 }}
       >
-        {/* Hidden Field for media_ids */}
-        <Form.Item name="media_ids" hidden>
-          <Input type="hidden" />
-        </Form.Item>
 
-        {/* Basic Settings */}
-        <div className="space-y-4">
-          {/* Title (English) */}
-          <Form.Item
-            label="Title (English)"
-            name="title_en"
-            rules={[
-              { required: true, message: "Please enter the title in English" },
-            ]}
-          >
-            <Input
-              placeholder="Enter title in English"
-              onChange={handleTitleChange}
-            />
-          </Form.Item>
-
-          {/* Description (English) */}
-          <Form.Item
-            label="Description (English)"
-            name="description_en"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the description in English",
-              },
-            ]}
-          >
-            <RichTextEditor
-              placeholder="Enter description in English"
-              onChange={handleDescriptionChange}
-              value={form.getFieldValue("description_en")}
-              editMode={true}
-            />
-          </Form.Item>
-
-          {/* Media Selection */}
-          <Form.Item label="Media" required>
-            <div className="flex flex-col">
-              <Button
-                onClick={() => setIsMediaModalVisible(true)}
-                className="mavebutton"
-              >
-                Select Media
-              </Button>
-              <div className="flex justify-between mt-4">
-                {/* Selected Media */}
-                {selectedMedia ? (
-                  <div className="flex flex-col items-center">
-                    <h3 className="my-2 font-bold">Selected Media</h3>
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${selectedMedia.file_path}`}
-                      alt="Selected Media"
-                      width={200}
-                      height={150}
-                      objectFit="cover"
-                      className="rounded-lg"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = PLACEHOLDER_IMAGE;
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <h3 className="my-2 font-bold">No Media Selected</h3>
-                    <Image
-                      src={PLACEHOLDER_IMAGE}
-                      alt="Placeholder"
-                      width={200}
-                      height={150}
-                      objectFit="cover"
-                      className="rounded-lg"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </Form.Item>
+        {/* ── Language tab selector ── */}
+        <div style={{
+          display: "flex", borderRadius: 10, overflow: "hidden",
+          border: "1px solid #e5e7eb", marginBottom: 20,
+        }}>
+          {[
+            { key: "en", label: "English", flag: "🇬🇧" },
+            { key: "bn", label: "বাংলা",   flag: "🇧🇩" },
+          ].map(({ key, label, flag }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setLangTab(key)}
+              style={{
+                flex: 1, height: 42, border: "none",
+                background: langTab === key ? "#111827" : "#f9fafb",
+                color: langTab === key ? "#fcb813" : "#6b7280",
+                fontWeight: langTab === key ? 700 : 500,
+                fontSize: "0.83rem", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                gap: 7, transition: "all 0.15s",
+                borderRight: key === "en" ? "1px solid #e5e7eb" : "none",
+              }}
+            >
+              <span>{flag}</span> {label}
+            </button>
+          ))}
         </div>
 
-        {/* Advanced Settings */}
-        <div className="mt-4">
-          <Button
-            type="link"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="p-0"
+        {/* ── Content items ── */}
+        <Section icon={<TranslationOutlined />} title="Content">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {contentItems.map((item, idx) => (
+              <div
+                key={item.id}
+                style={{
+                  border: "1px solid #e5e7eb", borderRadius: 10,
+                  overflow: "hidden",
+                }}
+              >
+                {/* Item header */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "8px 14px",
+                  background: "#f9fafb", borderBottom: "1px solid #f3f4f6",
+                }}>
+                  <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#9ca3af", letterSpacing: "0.05em" }}>
+                    ITEM {idx + 1}
+                  </span>
+                  {contentItems.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(item.id)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 4,
+                        height: 24, padding: "0 10px", borderRadius: 6,
+                        border: "1px solid #fecaca", background: "#fff5f5",
+                        color: "#dc2626", cursor: "pointer",
+                        fontSize: "0.72rem", fontWeight: 600,
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "#dc2626"; e.currentTarget.style.color = "#fff"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.color = "#dc2626"; }}
+                    >
+                      <MinusCircleOutlined style={{ fontSize: 10 }} /> Remove
+                    </button>
+                  )}
+                </div>
+
+                {/* EN fields */}
+                <div style={{ display: langTab === "en" ? "block" : "none", padding: "14px 14px 4px" }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={{ display: "block", fontWeight: 600, fontSize: "0.8rem", marginBottom: 6, color: "#374151" }}>
+                      Title {idx === 0 && <span style={{ color: "#dc2626" }}>*</span>}
+                    </label>
+                    <Input
+                      value={item.title_en}
+                      onChange={e => handleEnTitleChange(item.id, e.target.value)}
+                      placeholder="Enter title in English"
+                      style={{ borderRadius: 8, height: 38 }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={{ display: "block", fontWeight: 600, fontSize: "0.8rem", marginBottom: 6, color: "#374151" }}>
+                      Description
+                    </label>
+                    <RichTextEditor
+                      placeholder="Enter description in English"
+                      editMode
+                      value={item.description_en}
+                      onChange={(val) => updateItem(item.id, "description_en", val)}
+                    />
+                  </div>
+                </div>
+
+                {/* BN fields */}
+                <div style={{ display: langTab === "bn" ? "block" : "none", padding: "14px 14px 4px" }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={{ display: "block", fontWeight: 600, fontSize: "0.8rem", marginBottom: 6, color: "#374151" }}>
+                      শিরোনাম (Title)
+                    </label>
+                    <Input
+                      value={item.title_bn}
+                      onChange={e => updateItem(item.id, "title_bn", e.target.value)}
+                      placeholder="বাংলায় শিরোনাম লিখুন"
+                      style={{ borderRadius: 8, height: 38 }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={{ display: "block", fontWeight: 600, fontSize: "0.8rem", marginBottom: 6, color: "#374151" }}>
+                      বিবরণ (Description)
+                    </label>
+                    <RichTextEditor
+                      placeholder="বাংলায় বিবরণ লিখুন"
+                      editMode
+                      value={item.description_bn}
+                      onChange={(val) => updateItem(item.id, "description_bn", val)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <AddFieldBtn label="Add another item" onClick={addItem} />
+          </div>
+        </Section>
+
+        {/* ── Media ── */}
+        <Section icon={<PictureOutlined />} title="Images">
+          {selectedMedia.length > 0 && (
+            <div style={{
+              display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 12,
+              padding: 12, background: "#f9fafb",
+              border: "1px dashed #e5e7eb", borderRadius: 10,
+            }}>
+              {selectedMedia.map(item => (
+                <MediaThumb key={item.id} item={item} onRemove={removeMedia} />
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setMediaModalOpen(true)}
+            style={{
+              width: "100%", height: 44, borderRadius: 10,
+              border: "1.5px dashed #d1d5db", background: "#f9fafb",
+              color: "#6b7280", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              gap: 8, fontWeight: 600, fontSize: "0.83rem",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "#fcb813";
+              e.currentTarget.style.color = "#d97706";
+              e.currentTarget.style.background = "#fffbeb";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "#d1d5db";
+              e.currentTarget.style.color = "#6b7280";
+              e.currentTarget.style.background = "#f9fafb";
+            }}
           >
-            {showAdvanced ? "Hide Advanced Settings" : "Show Advanced Settings"}
-          </Button>
+            <PlusOutlined />
+            {selectedMedia.length > 0 ? `Add more images (${selectedMedia.length} selected)` : "Select images"}
+          </button>
+          {selectedMedia.length === 0 && (
+            <p style={{ margin: "6px 0 0", fontSize: "0.72rem", color: "#9ca3af" }}>
+              You can select multiple images
+            </p>
+          )}
+        </Section>
+
+        {/* ── Advanced ── */}
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, overflow: "hidden", marginBottom: 4 }}>
+          <button
+            type="button"
+            onClick={() => setShowAdvanced(v => !v)}
+            style={{
+              width: "100%", height: 42, border: "none",
+              background: showAdvanced ? "#111827" : "#f9fafb",
+              color: showAdvanced ? "#fcb813" : "#6b7280",
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "0 16px", cursor: "pointer",
+              fontWeight: 600, fontSize: "0.83rem",
+            }}
+          >
+            <SettingOutlined />
+            Advanced Settings
+            <span style={{ marginLeft: "auto", fontSize: "0.7rem" }}>
+              {showAdvanced ? "▲" : "▼"}
+            </span>
+          </button>
+
           {showAdvanced && (
-            <div className="mt-4 space-y-4">
-              {/* Title (Alternate) */}
-              <Form.Item label="Title (Alternate)" name="title_bn">
-                <Input placeholder="Enter title in Alternate" />
-              </Form.Item>
-
-              {/* Description (Alternate) */}
-              <Form.Item label="Description (Alternate)" name="description_bn">
-                <RichTextEditor
-                  placeholder="Enter description in Alternate"
-                  onChange={(value) =>
-                    form.setFieldsValue({ description_bn: value })
-                  }
-                  value={form.getFieldValue("description_bn")}
-                  editMode={true}
-                />
-              </Form.Item>
-
-              {/* Page Association */}
-              <Form.Item label="Page" name="page_name">
-                <Select placeholder="Select Page" allowClear showSearch>
-                  {pages
-                    ?.filter((p) => p.page_name_en)
-                    ?.map((p) => (
-                      <Option key={p.id} value={p.page_name_en}>
-                        {p.page_name_en}
-                      </Option>
-                    ))}
-                </Select>
-              </Form.Item>
-
-              {/* Link Type */}
-              <Form.Item label="Link Type" name="link_type">
-                <Radio.Group onChange={handleLinkTypeChange}>
-                  <Radio value="page">Page Link</Radio>
-                  <Radio value="independent">Independent Link</Radio>
-                  <Radio value="media">Link to a Media</Radio>
-                  <Radio value="internal">Internal Link</Radio>
-                </Radio.Group>
-              </Form.Item>
-
-              {/* Link Fields */}
-              {linkType === "page" && (
-                <Form.Item label="Select the page to link" name="link_page_id">
-                  <Select
-                    placeholder="Select a Page to link"
-                    allowClear
-                    showSearch
-                  >
-                    {pages?.map((p) => (
-                      <Option key={p.id} value={p.id}>
-                        {p.page_name_en}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              )}
-              {linkType === "independent" && (
-                <Form.Item label="Link URL" name="link_url">
-                  <Input placeholder="Enter URL or path (e.g., /about or https://example.com)" />
-                </Form.Item>
-              )}
-              {linkType === "media" && (
-                <Form.Item
-                  label="Media Path"
-                  name="media_link_path"
-                  extra={`The full URL will be: ${process.env.NEXT_PUBLIC_MEDIA_URL}/<your-path>`}
-                >
-                  <Input
-                    addonBefore={process.env.NEXT_PUBLIC_MEDIA_URL}
-                    placeholder="Enter media path (e.g., media/example.pdf)"
-                  />
-                </Form.Item>
-              )}
-              {linkType === "internal" && (
-                <Form.Item
-                  label="Internal Path"
-                  name="internal_link_path"
-                  extra={`The full URL will be: ${process.env.NEXT_PUBLIC_APP_URL}/<your-path>`}
-                >
-                  <Input
-                    addonBefore={process.env.NEXT_PUBLIC_APP_URL}
-                    placeholder="Enter internal path (e.g., /about-us)"
-                  />
-                </Form.Item>
-              )}
-
-              {/* Tags */}
-              <Form.Item label="Tags" name="tags">
-                <Select
-                  mode="tags"
-                  placeholder="Add or select tags"
-                  style={{ width: "100%" }}
-                  showSearch
-                >
-                  {uniqueTags?.map((tag) => (
-                    <Option key={tag} value={tag}>
-                      {tag}
-                    </Option>
+            <div style={{ padding: "16px 16px 4px" }}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: "0.82rem" }}>Page Association</span>}
+                name="page_name"
+                style={{ marginBottom: 14 }}
+              >
+                <Select placeholder="Select page" allowClear showSearch style={{ borderRadius: 8 }}>
+                  {pages?.filter(p => p.page_name_en).map(p => (
+                    <Option key={p.id} value={p.page_name_en}>{p.page_name_en}</Option>
                   ))}
                 </Select>
               </Form.Item>
 
-              {/* Status */}
-              <Form.Item label="Status" name="status" valuePropName="checked">
-                <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: "0.82rem" }}>Link Type</span>}
+                name="link_type"
+                style={{ marginBottom: 10 }}
+              >
+                <Radio.Group onChange={handleLinkTypeChange} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {["page","independent","media","internal"].map(v => (
+                    <Radio key={v} value={v} style={{ fontSize: "0.8rem" }}>
+                      {v === "page" ? "Page" : v === "independent" ? "External URL" : v === "media" ? "Media File" : "Internal Path"}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+
+              {linkType === "page" && (
+                <Form.Item name="link_page_id" label={<span style={{ fontSize: "0.82rem" }}>Link to page</span>} style={{ marginBottom: 14 }}>
+                  <Select placeholder="Select a page" allowClear showSearch>
+                    {pages?.map(p => <Option key={p.id} value={p.id}>{p.page_name_en}</Option>)}
+                  </Select>
+                </Form.Item>
+              )}
+              {linkType === "independent" && (
+                <Form.Item name="link_url" label={<span style={{ fontSize: "0.82rem" }}>URL</span>} style={{ marginBottom: 14 }}>
+                  <Input placeholder="https://example.com or /about" style={{ borderRadius: 8 }} />
+                </Form.Item>
+              )}
+              {linkType === "media" && (
+                <Form.Item name="media_link_path" label={<span style={{ fontSize: "0.82rem" }}>Media path</span>} style={{ marginBottom: 14 }}>
+                  <Input addonBefore={process.env.NEXT_PUBLIC_MEDIA_URL} placeholder="media/file.pdf" style={{ borderRadius: 8 }} />
+                </Form.Item>
+              )}
+              {linkType === "internal" && (
+                <Form.Item name="internal_link_path" label={<span style={{ fontSize: "0.82rem" }}>Internal path</span>} style={{ marginBottom: 14 }}>
+                  <Input addonBefore={process.env.NEXT_PUBLIC_APP_URL} placeholder="/about-us" style={{ borderRadius: 8 }} />
+                </Form.Item>
+              )}
+
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: "0.82rem" }}>Tags</span>}
+                name="tags"
+                style={{ marginBottom: 14 }}
+              >
+                <Select mode="tags" placeholder="Add or select tags" showSearch style={{ width: "100%" }}>
+                  {uniqueTags?.map(t => <Option key={t} value={t}>{t}</Option>)}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: "0.82rem" }}>Status</span>}
+                name="status"
+                valuePropName="checked"
+                style={{ marginBottom: 14 }}
+              >
+                <Switch checkedChildren="Active" unCheckedChildren="Draft" style={{ background: "#22c55e" }} />
               </Form.Item>
             </div>
           )}
         </div>
-
-        {/* Form Actions */}
-        <Form.Item>
-          <div className="flex justify-end gap-2">
-            <Button onClick={onCancel} className="mavecancelbutton">
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={submitting}
-              className="mavebutton"
-            >
-              Submit
-            </Button>
-          </div>
-        </Form.Item>
       </Form>
 
-      {/* Media Selection Modal */}
       <MediaSelectionModal
-        isVisible={isMediaModalVisible}
-        onClose={() => setIsMediaModalVisible(false)}
+        isVisible={mediaModalOpen}
+        onClose={() => setMediaModalOpen(false)}
         onSelectMedia={handleMediaSelect}
-        selectionMode="single"
+        selectionMode="multiple"
+        initialSelectedMedia={selectedMedia}
       />
     </Drawer>
   );

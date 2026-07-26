@@ -31,7 +31,7 @@ export const useSectionDragAndDrop = ({
                 return;
             }
 
-            const items = Array.from(sections || pageData?.body || []);
+            const items = Array.from(sections || Object.values(pageData?.body?.data || {}));
 
             // Find the indices
             const activeIndex = items.findIndex(
@@ -94,12 +94,14 @@ export const useSectionDragAndDrop = ({
                 onSectionsUpdate(finalItems);
             } else {
                 // Fallback to old system
-                const updatedPageData = {
+                const data = finalItems.reduce((acc, section, i) => {
+                    acc[`section_${i + 1}`] = section;
+                    return acc;
+                }, {});
+                dispatch(setPageData({
                     ...pageData,
-                    body: finalItems,
-                };
-
-                dispatch(setPageData(updatedPageData));
+                    body: { ...pageData.body, data },
+                }));
                 dispatch(setIsDirty(true));
             }
         },

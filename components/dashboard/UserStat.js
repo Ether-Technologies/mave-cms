@@ -1,131 +1,61 @@
-// components/UserStat.js
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
+const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export const generateRandomActiveUsersData = () => {
-  const data = [];
   const now = new Date();
-
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(now.getTime() + i * 60 * 60 * 1000); // Increment by 1 hour
-    data.push({
-      x: date, // Use Date objects for datetime
-      y: Math.floor(Math.random() * 1000) + 200, // Random value between 200 and 1200
-    });
-  }
-
-  return data;
+  return Array.from({ length: 7 }, (_, i) => ({
+    x: new Date(now.getTime() + i * 3600000),
+    y: Math.floor(Math.random() * 1000) + 200,
+  }));
 };
 
 export default function UserStat() {
-  const [chartOptions, setChartOptions] = useState({});
-  const [chartSeries, setChartSeries] = useState([]);
+  const [options, setOptions] = useState({});
+  const [series, setSeries]   = useState([]);
 
   useEffect(() => {
-    const seriesData = generateRandomActiveUsersData();
-
-    setChartOptions({
-      chart: {
-        type: "area",
-        toolbar: { show: false },
-        height: 350,
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        curve: "smooth",
-        width: 2,
-        colors: ["#fcb813"],
-      },
+    setOptions({
+      chart: { type: "area", toolbar: { show: false }, background: "transparent" },
+      dataLabels: { enabled: false },
+      stroke: { curve: "smooth", width: 2, colors: ["#fcb813"] },
       fill: {
         type: "gradient",
         gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.25,
-          opacityTo: 0,
-          stops: [25, 100],
           colorStops: [
-            {
-              offset: 0,
-              color: "#fcb813",
-              opacity: 1,
-            },
-            {
-              offset: 100,
-              color: "#fcb813",
-              opacity: 0.25,
-            },
+            { offset: 0,   color: "#fcb813", opacity: 0.2 },
+            { offset: 100, color: "#fcb813", opacity: 0   },
           ],
         },
       },
       xaxis: {
         type: "datetime",
-        labels: {
-          rotate: -45,
-        },
-        tickAmount: 7,
-        tooltip: {
-          enabled: true,
-        },
+        labels: { rotate: -30, style: { fontSize: "10px", colors: "#9ca3af" } },
+        axisBorder: { color: "#e5e7eb" },
+        axisTicks: { color: "#e5e7eb" },
       },
-      tooltip: {
-        x: {
-          format: "yyyy-MM-dd HH:mm",
-        },
-      },
-      responsive: [
-        {
-          breakpoint: 768,
-          options: {
-            chart: {
-              height: 300,
-            },
-            xaxis: {
-              labels: {
-                rotate: -45,
-              },
-            },
-          },
-        },
-      ],
+      yaxis: { labels: { style: { colors: "#9ca3af", fontSize: "10px" } } },
+      grid: { borderColor: "#f3f4f6", strokeDashArray: 4, xaxis: { lines: { show: false } } },
+      tooltip: { x: { format: "HH:mm" } },
     });
-
-    setChartSeries([
-      {
-        name: "Concurrent Active Users",
-        data: seriesData,
-      },
-    ]);
+    setSeries([{ name: "Active Users", data: generateRandomActiveUsersData() }]);
   }, []);
 
   return (
-    <div className="border-2 border-gray-300 rounded-xl bg-white p-4">
-      <div className="flex justify-between items-center border-b-2 border-gray-300 p-3 mb-4">
-        <h3 className="text-lg font-semibold">Concurrent Active Users</h3>
-        <Image
-          src="/icons/mave_icons/threedots.svg"
-          alt="Three Dots"
-          width={40}
-          height={40}
-          className="transform rotate-90"
-        />
+    <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: "1.25rem 1.4rem", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", paddingBottom: "0.75rem", borderBottom: "1px solid #f3f4f6", marginBottom: "0.5rem" }}>
+        <div>
+          <h3 style={{ color: "#111827", fontSize: "0.95rem", fontWeight: 700, margin: 0 }}>Active Users</h3>
+          <p style={{ color: "#9ca3af", fontSize: "0.75rem", margin: "2px 0 0" }}>Concurrent sessions · last 7h</p>
+        </div>
+        <span style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 6, padding: "3px 10px", fontSize: "0.72rem", color: "#16a34a", fontWeight: 600 }}>
+          ● Live
+        </span>
       </div>
-      {chartSeries.length > 0 && (
-        <ReactApexChart
-          options={chartOptions}
-          series={chartSeries}
-          type="area"
-          height={350}
-          className="w-full"
-        />
+      {series.length > 0 && (
+        <ReactApexChart options={options} series={series} type="area" height={260} />
       )}
-      {/* {console.log("Chart Series: ", chartSeries)} */}
     </div>
   );
 }

@@ -17,34 +17,36 @@ import {
     redo,
 } from "../../../store/slices/historySlice";
 
+// body.data is { section_1: {...}, section_2: {...}, ... }
+const getSectionsArray = (bodyData) => Object.values(bodyData || {});
+
+const buildSectionsObject = (arr) =>
+    arr.reduce((acc, section, i) => {
+        acc[`section_${i + 1}`] = section;
+        return acc;
+    }, {});
+
 export const usePageOperations = (pageId, pageData) => {
     const dispatch = useDispatch();
 
-    // Fetch page data from the backend with error handling
     const fetchPageData = useCallback(async () => {
         try {
             dispatch(setLoading(true));
-
-            // Always fetch fresh data from server for editing
             const response = await instance.get(`/pages/${pageId}`);
             const data = response.data;
 
-            // Normalize component types in the data
-            if (data.body) {
-                data.body = data.body.map((section) => ({
-                    ...section,
-                    data: section.data.map((component) => ({
-                        ...component,
-                        type:
-                            typeof component.type === "object"
-                                ? component.type.type
-                                : component.type,
-                    })),
-                }));
+            if (data.body?.data) {
+                Object.values(data.body.data).forEach((section) => {
+                    Object.values(section.components || {}).forEach((comp) => {
+                        if (typeof comp.type === "object") {
+                            comp.type = comp.type.type;
+                        }
+                    });
+                });
             }
 
             dispatch(setPageData(data));
-            dispatch(pushToHistory(data)); // Add initial state to history
+            dispatch(pushToHistory(data));
             dispatch(setError(null));
         } catch (err) {
             console.error("❌ Error fetching page data:", err);
@@ -54,32 +56,22 @@ export const usePageOperations = (pageId, pageData) => {
         }
     }, [pageId, dispatch]);
 
-    // Save the page data to the backend with error handling
     const savePageData = useCallback(async (showMessage = true) => {
         if (!pageData) {
-            console.error("❌ No pageData available for saving");
             message.error("No page data to save.");
             return;
         }
-
         if (!pageData.id) {
-            console.error("❌ No page ID available for saving");
             message.error("No page ID to save.");
             return;
         }
-
         try {
             dispatch(setLoading(true));
-
             const response = await instance.put(`/pages/${pageData.id}`, pageData);
-
-            // Handle axios response directly
             if (response.status === 200) {
                 dispatch(setIsDirty(false));
                 dispatch(setLastSaved(new Date().toISOString()));
-                if (showMessage) {
-                    message.success("Page saved successfully!");
-                }
+                if (showMessage) message.success("Page saved successfully!");
             } else {
                 throw new Error("Failed to save page");
             }
@@ -91,27 +83,36 @@ export const usePageOperations = (pageId, pageData) => {
         }
     }, [pageData, dispatch]);
 
-    // Handle section operations
     const handleSectionDuplicate = useCallback(
         (sectionIndex) => {
-            const sectionToDuplicate = pageData.body[sectionIndex];
+            const sections = getSectionsArray(pageData.body?.data);
+            const sectionToDuplicate = sections[sectionIndex];
+            if (!sectionToDuplicate) return;
+
             const duplicatedSection = {
                 ...sectionToDuplicate,
                 _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 title: `${sectionToDuplicate.title || `Section ${sectionIndex + 1}`} (Copy)`,
-                data: sectionToDuplicate.data.map((component) => ({
-                    ...component,
-                    _id: `component-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                })),
+                components: Object.fromEntries(
+                    Object.entries(sectionToDuplicate.components || {}).map(([key, comp]) => [
+                        key,
+                        {
+                            ...comp,
+                            _id: `component-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        },
+                    ])
+                ),
             };
+
+            const newSections = [
+                ...sections.slice(0, sectionIndex + 1),
+                duplicatedSection,
+                ...sections.slice(sectionIndex + 1),
+            ];
 
             const updatedPageData = {
                 ...pageData,
-                body: [
-                    ...pageData.body.slice(0, sectionIndex + 1),
-                    duplicatedSection,
-                    ...pageData.body.slice(sectionIndex + 1),
-                ],
+                body: { ...pageData.body, data: buildSectionsObject(newSections) },
             };
 
             dispatch(setPageData(updatedPageData));
@@ -124,27 +125,18 @@ export const usePageOperations = (pageId, pageData) => {
 
     const handleSectionDelete = useCallback(
         (sectionIndex) => {
-            if (!pageData || !pageData.body) {
-                console.error("❌ No pageData or pageData.body available for deletion");
-                message.error("No page data available for deletion.");
-                return;
-            }
-
-            if (sectionIndex === undefined || sectionIndex === null) {
-                console.error("❌ Section index is undefined or null:", sectionIndex);
-                message.error("Invalid section index.");
-                return;
-            }
-
-            if (sectionIndex < 0 || sectionIndex >= pageData.body.length) {
-                console.error("❌ Invalid section index:", sectionIndex);
+            const sections = getSectionsArray(pageData.body?.data);
+            if (sectionIndex < 0 || sectionIndex >= sections.length) {
                 message.error("Invalid section index.");
                 return;
             }
 
             const updatedPageData = {
                 ...pageData,
-                body: pageData.body.filter((_, idx) => idx !== sectionIndex),
+                body: {
+                    ...pageData.body,
+                    data: buildSectionsObject(sections.filter((_, idx) => idx !== sectionIndex)),
+                },
             };
 
             dispatch(setPageData(updatedPageData));
@@ -155,17 +147,20 @@ export const usePageOperations = (pageId, pageData) => {
         [pageData, dispatch]
     );
 
-    // Handle adding new section
     const handleAddSection = useCallback(() => {
+        const sections = getSectionsArray(pageData.body?.data);
         const newSection = {
             _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            title: `Section ${pageData.body.length + 1}`,
-            data: [],
+            title: `Section ${sections.length + 1}`,
+            components: {},
         };
 
         const updatedPageData = {
             ...pageData,
-            body: [...pageData.body, newSection],
+            body: {
+                ...pageData.body,
+                data: buildSectionsObject([...sections, newSection]),
+            },
         };
 
         dispatch(setPageData(updatedPageData));
@@ -174,41 +169,44 @@ export const usePageOperations = (pageId, pageData) => {
         message.success("New section added successfully!");
     }, [pageData, dispatch]);
 
-    // Handle adding new section at specific position
     const handleAddSectionAtPosition = useCallback((position) => {
+        const sections = getSectionsArray(pageData.body?.data);
         const newSection = {
             _id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             title: `Section ${position + 1}`,
-            data: [],
+            components: {},
         };
 
-        const updatedPageData = {
-            ...pageData,
-            body: [
-                ...pageData.body.slice(0, position),
-                newSection,
-                ...pageData.body.slice(position),
-            ],
-        };
-
-        // Update section titles to reflect new positions
-        updatedPageData.body = updatedPageData.body.map((section, index) => ({
+        const newSections = [
+            ...sections.slice(0, position),
+            newSection,
+            ...sections.slice(position),
+        ].map((section, index) => ({
             ...section,
             title: section.title || `Section ${index + 1}`,
         }));
 
+        const updatedPageData = {
+            ...pageData,
+            body: { ...pageData.body, data: buildSectionsObject(newSections) },
+        };
+
         dispatch(setPageData(updatedPageData));
         dispatch(setIsDirty(true));
         dispatch(pushToHistory(updatedPageData));
         message.success("New section added successfully!");
     }, [pageData, dispatch]);
 
-    // Handle sections update (for drag and drop)
+    // updatedSections can be array (from drag-and-drop) or object
     const handleSectionsUpdate = useCallback(
         (updatedSections) => {
+            const data = Array.isArray(updatedSections)
+                ? buildSectionsObject(updatedSections)
+                : updatedSections;
+
             const updatedPageData = {
                 ...pageData,
-                body: updatedSections,
+                body: { ...pageData.body, data },
             };
 
             dispatch(setPageData(updatedPageData));
@@ -218,14 +216,8 @@ export const usePageOperations = (pageId, pageData) => {
         [pageData, dispatch]
     );
 
-    // Handle undo/redo
-    const handleUndo = useCallback(() => {
-        dispatch(undo());
-    }, [dispatch]);
-
-    const handleRedo = useCallback(() => {
-        dispatch(redo());
-    }, [dispatch]);
+    const handleUndo = useCallback(() => dispatch(undo()), [dispatch]);
+    const handleRedo = useCallback(() => dispatch(redo()), [dispatch]);
 
     return {
         fetchPageData,
@@ -238,4 +230,4 @@ export const usePageOperations = (pageId, pageData) => {
         handleUndo,
         handleRedo,
     };
-}; 
+};
