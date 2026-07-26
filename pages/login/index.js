@@ -14,7 +14,13 @@ import {
 import { useRouter } from "next/router";
 import { useAuth } from "../../src/context/AuthContext";
 import Loader from "../../components/Loader";
-import { getLocalTenantSlug, isLocalHostname } from "../../axios";
+import {
+  isLocalHostname,
+  isTenantLoginEnabled,
+  setLocalTenantSlug,
+  setTenantLoginEnabled,
+  TENANT_SLUG_KEY,
+} from "../../axios";
 
 export default function Login() {
   const { login, loading } = useAuth();
@@ -28,10 +34,18 @@ export default function Login() {
     if (typeof window !== "undefined") {
       const local = isLocalHostname(window.location.hostname);
       setIsLocal(local);
-      const savedSlug = getLocalTenantSlug();
-      if (local && savedSlug) {
-        setTenantLoginOn(true);
-        form.setFieldsValue({ tenant_slug: savedSlug });
+      if (local) {
+        const enabled = isTenantLoginEnabled();
+        setTenantLoginOn(enabled);
+        if (enabled) {
+          const savedSlug =
+            localStorage.getItem(TENANT_SLUG_KEY) ||
+            process.env.NEXT_PUBLIC_TENANT_SLUG ||
+            "";
+          if (savedSlug) {
+            form.setFieldsValue({ tenant_slug: savedSlug });
+          }
+        }
       }
     }
   }, [form]);
@@ -56,8 +70,10 @@ export default function Login() {
 
   const handleTenantSwitch = (checked) => {
     setTenantLoginOn(checked);
+    setTenantLoginEnabled(checked);
     if (!checked) {
       form.setFieldsValue({ tenant_slug: "" });
+      setLocalTenantSlug("");
     }
   };
 

@@ -10,15 +10,38 @@ const MAX_RETRIES = 3;
 const requestTimestamps = new Map();
 
 export const TENANT_SLUG_KEY = "mave_tenant_slug";
+export const TENANT_LOGIN_ENABLED_KEY = "mave_tenant_login_enabled";
 
 export const isLocalHostname = (hostname) =>
   hostname === "localhost" ||
   hostname === "127.0.0.1" ||
   /^\d+\.\d+\.\d+\.\d+$/.test(hostname);
 
+/** Local dev: when false, API uses NEXT_PUBLIC_API_BASE_URL (no /slug/ segment). */
+export const isTenantLoginEnabled = () => {
+  if (typeof window === "undefined") {
+    return true;
+  }
+  const stored = localStorage.getItem(TENANT_LOGIN_ENABLED_KEY);
+  if (stored === "false") return false;
+  if (stored === "true") return true;
+  return !!(
+    localStorage.getItem(TENANT_SLUG_KEY) ||
+    process.env.NEXT_PUBLIC_TENANT_SLUG
+  );
+};
+
+export const setTenantLoginEnabled = (enabled) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(TENANT_LOGIN_ENABLED_KEY, enabled ? "true" : "false");
+};
+
 export const getLocalTenantSlug = () => {
   if (typeof window === "undefined") {
     return process.env.NEXT_PUBLIC_TENANT_SLUG || "";
+  }
+  if (!isTenantLoginEnabled()) {
+    return "";
   }
   return (
     localStorage.getItem(TENANT_SLUG_KEY) ||

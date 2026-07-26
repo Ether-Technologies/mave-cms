@@ -2,7 +2,12 @@
 
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { useRouter } from "next/router";
-import instance, { setLocalTenantSlug, isLocalHostname, getTenantApiBaseUrl } from "../../axios";
+import instance, {
+  setLocalTenantSlug,
+  setTenantLoginEnabled,
+  isLocalHostname,
+  getTenantApiBaseUrl,
+} from "../../axios";
 import { message } from "antd";
 
 const AuthContext = createContext();
@@ -111,7 +116,10 @@ export const AuthProvider = ({ children }) => {
         typeof window !== "undefined" &&
         isLocalHostname(window.location.hostname)
       ) {
-        setLocalTenantSlug(tenantSlug || "");
+        const slug = (tenantSlug || "").trim();
+        const useTenantLogin = !!slug;
+        setTenantLoginEnabled(useTenantLogin);
+        setLocalTenantSlug(useTenantLogin ? slug : "");
         instance.defaults.baseURL = getTenantApiBaseUrl();
       }
 
