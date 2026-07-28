@@ -1,44 +1,51 @@
 // context/ThemeContext.js
 
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useCallback, useState, useEffect } from "react";
 import instance from "../../axios";
-import { setThemeColors } from "../../utils/themeUtils";
+import { applyThemeFromSettings } from "../../utils/themeUtils";
 
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState({
-    themecolor: "#fcb813", // Default theme color
-    themeaccent: "#e3a611", // Default theme accent
+    themecolor: null,
+    themeaccent: null,
   });
+  const [themeRevision, setThemeRevision] = useState(0);
+
+  const applyAndBump = useCallback((themecolor, themeaccent) => {
+    applyThemeFromSettings(themecolor, themeaccent);
+    setThemeRevision((n) => n + 1);
+  }, []);
 
   useEffect(() => {
     const fetchTheme = async () => {
       try {
-        const response = await instance.get("/settings/general"); // Adjust the endpoint as needed
-
-        if (response.data && response.data.config) {
+        const response = await instance.get("/settings/general");
+        if (response.data?.config) {
           const { themecolor, themeaccent } = response.data.config;
-          if (themecolor && themeaccent) {
-            setTheme({ themecolor, themeaccent });
-            setThemeColors(themecolor, themeaccent);
+          if (themecolor) {
+            setTheme({ themecolor, themeaccent: themeaccent || themecolor });
+            applyAndBump(themecolor, themeaccent);
+            return;
           }
         }
       } catch (error) {
         console.error("Failed to fetch theme settings:", error);
       }
+      applyAndBump(null, null);
     };
 
     fetchTheme();
-  }, []);
+  }, [applyAndBump]);
 
   const updateTheme = (themecolor, themeaccent) => {
     setTheme({ themecolor, themeaccent });
-    setThemeColors(themecolor, themeaccent);
+    applyAndBump(themecolor, themeaccent);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, updateTheme }}>
+    <ThemeContext.Provider value={{ theme, updateTheme, themeRevision }}>
       {children}
     </ThemeContext.Provider>
   );

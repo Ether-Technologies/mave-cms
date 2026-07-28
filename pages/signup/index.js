@@ -133,7 +133,7 @@ export default function Signup() {
               >
                 Build. Manage. Scale.
                 <span
-                  className="block text-yellow-400 mt-2"
+                  className="block text-white mt-2"
                   style={{ WebkitTextStroke: "1px rgba(75, 85, 99, 0.5)" }}
                 >
                   With Mave CMS
@@ -154,7 +154,7 @@ export default function Signup() {
                 >
                   <Button
                     icon={<RocketOutlined />}
-                    className="h-12 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+                    className="h-12 px-6 bg-black hover:bg-gray-800 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
                     onClick={() => router.push("/usermanual/changelog")}
                   >
                     What's New
@@ -210,7 +210,7 @@ export default function Signup() {
 
           {/* Welcome Text */}
           <motion.div variants={itemVariants} className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-bold text-black mb-2">
               Create Account
             </h1>
             <p className="text-gray-600 text-sm">
@@ -229,7 +229,7 @@ export default function Signup() {
             <Link href="/login">
               <motion.span
                 whileHover={{ scale: 1.05 }}
-                className="font-semibold text-yellow-500 hover:text-yellow-600 cursor-pointer transition-colors"
+                className="font-semibold text-black hover:text-gray-700 cursor-pointer transition-colors"
               >
                 Log In
               </motion.span>
@@ -241,7 +241,7 @@ export default function Signup() {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 block
-                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/70 hover:bg-white/90 hover:border-yellow-300 transition-all rounded-xl shadow-sm hover:shadow-md"
+                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/70 hover:bg-white/90 hover:border-gray-400 transition-all rounded-xl shadow-sm hover:shadow-md"
                 onClick={() => message.info("Coming soon")}
               >
                 <Image
@@ -292,7 +292,7 @@ export default function Signup() {
                         <MailOutlined className="text-lg text-gray-400 mr-2" />
                       }
                       placeholder="Email address"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-gray-400 focus:border-black transition-all bg-white/70"
                     />
                   </motion.div>
                 </Form.Item>
@@ -312,7 +312,7 @@ export default function Signup() {
                         <UserOutlined className="text-lg text-gray-400 mr-2" />
                       }
                       placeholder="Full name"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-gray-400 focus:border-black transition-all bg-white/70"
                     />
                   </motion.div>
                 </Form.Item>
@@ -334,7 +334,7 @@ export default function Signup() {
                         <PhoneOutlined className="text-lg text-gray-400 mr-2" />
                       }
                       placeholder="Phone number"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-gray-400 focus:border-black transition-all bg-white/70"
                     />
                   </motion.div>
                 </Form.Item>
@@ -345,7 +345,7 @@ export default function Signup() {
                         <InsertRowLeftOutlined className="text-lg text-gray-400 mr-2" />
                       }
                       placeholder="Company (optional)"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-gray-400 focus:border-black transition-all bg-white/70"
                     />
                   </motion.div>
                 </Form.Item>
@@ -364,7 +364,7 @@ export default function Signup() {
                   <motion.div whileFocus={{ scale: 1.01 }}>
                     <Input.Password
                       placeholder="Password"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-gray-400 focus:border-black transition-all bg-white/70"
                       prefix={
                         <LockOutlined className="text-lg text-gray-400 mr-2" />
                       }
@@ -403,7 +403,7 @@ export default function Signup() {
                   <motion.div whileFocus={{ scale: 1.01 }}>
                     <Input.Password
                       placeholder="Confirm password"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-gray-400 focus:border-black transition-all bg-white/70"
                       prefix={
                         <LockOutlined className="text-lg text-gray-400 mr-2" />
                       }
@@ -425,7 +425,7 @@ export default function Signup() {
                 >
                   <Button
                     block
-                    className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    className="h-12 bg-black hover:bg-gray-800 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
                     htmlType="submit"
                   >
                     Sign Up
@@ -440,13 +440,13 @@ export default function Signup() {
             <p className="text-xs text-gray-500">
               By signing up, you agree to our{" "}
               <Link href="/terms">
-                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                <span className="text-black hover:text-gray-700 font-medium cursor-pointer">
                   Terms
                 </span>
               </Link>{" "}
               and{" "}
               <Link href="/privacy">
-                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                <span className="text-black hover:text-gray-700 font-medium cursor-pointer">
                   Privacy Policy
                 </span>
               </Link>
@@ -457,7 +457,7 @@ export default function Signup() {
 
       {/* Floating Elements */}
       <motion.div
-        className="absolute top-10 right-20 w-20 h-20 bg-yellow-400/20 rounded-full blur-2xl"
+        className="absolute top-10 right-20 w-20 h-20 bg-white/10 rounded-full blur-2xl"
         animate={{
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.6, 0.3],
@@ -469,7 +469,7 @@ export default function Signup() {
         }}
       />
       <motion.div
-        className="absolute bottom-20 right-40 w-32 h-32 bg-amber-400/20 rounded-full blur-3xl"
+        className="absolute bottom-20 right-40 w-32 h-32 bg-white/10 rounded-full blur-3xl"
         animate={{
           scale: [1.2, 1, 1.2],
           opacity: [0.4, 0.7, 0.4],
@@ -482,7 +482,7 @@ export default function Signup() {
         }}
       />
       <motion.div
-        className="absolute top-1/2 left-20 w-24 h-24 bg-orange-400/20 rounded-full blur-3xl"
+        className="absolute top-1/2 left-20 w-24 h-24 bg-white/10 rounded-full blur-3xl"
         animate={{
           scale: [1, 1.3, 1],
           opacity: [0.2, 0.5, 0.2],
@@ -521,7 +521,7 @@ export default function Signup() {
           </p>
           <Button
             key="login"
-            className="h-12 px-8 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+            className="h-12 px-8 bg-black hover:bg-gray-800 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
             onClick={handleOk}
           >
             Go to Login

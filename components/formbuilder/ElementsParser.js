@@ -15,7 +15,7 @@ function DisplayField({ element, register, errors }) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {element.label}
-              {element.required && <span className="text-red-500 ml-1">*</span>}
+              {element.required && <span className="text-gray-800 ml-1">*</span>}
             </label>
             <div className="space-y-2">
               {element.options?.map((opt, idx) => (
@@ -31,7 +31,7 @@ function DisplayField({ element, register, errors }) {
               ))}
             </div>
             {errors[fieldName] && (
-              <p className="text-red-500 text-sm mt-1">{errors[fieldName].message}</p>
+              <p className="text-gray-800 text-sm mt-1">{errors[fieldName].message}</p>
             )}
           </div>
         );
@@ -40,7 +40,7 @@ function DisplayField({ element, register, errors }) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {element.label}
-            {element.required && <span className="text-red-500 ml-1">*</span>}
+            {element.required && <span className="text-gray-800 ml-1">*</span>}
           </label>
           <input
             type={element.input_type}
@@ -48,10 +48,10 @@ function DisplayField({ element, register, errors }) {
             {...register(fieldName, {
               required: element.required ? `${element.label} is required` : false
             })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
           />
           {errors[fieldName] && (
-            <p className="text-red-500 text-sm mt-1">{errors[fieldName].message}</p>
+            <p className="text-gray-800 text-sm mt-1">{errors[fieldName].message}</p>
           )}
         </div>
       );
@@ -60,7 +60,7 @@ function DisplayField({ element, register, errors }) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {element.label}
-            {element.required && <span className="text-red-500 ml-1">*</span>}
+            {element.required && <span className="text-gray-800 ml-1">*</span>}
           </label>
           <textarea
             rows={3}
@@ -68,10 +68,10 @@ function DisplayField({ element, register, errors }) {
             {...register(fieldName, {
               required: element.required ? `${element.label} is required` : false
             })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
           />
           {errors[fieldName] && (
-            <p className="text-red-500 text-sm mt-1">{errors[fieldName].message}</p>
+            <p className="text-gray-800 text-sm mt-1">{errors[fieldName].message}</p>
           )}
         </div>
       );
@@ -80,13 +80,13 @@ function DisplayField({ element, register, errors }) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {element.label}
-            {element.required && <span className="text-red-500 ml-1">*</span>}
+            {element.required && <span className="text-gray-800 ml-1">*</span>}
           </label>
           <select
             {...register(fieldName, {
               required: element.required ? `${element.label} is required` : false
             })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
           >
             <option value="">{element.placeholder || "Select an option"}</option>
             {element.options?.map((opt, idx) => (
@@ -96,7 +96,7 @@ function DisplayField({ element, register, errors }) {
             ))}
           </select>
           {errors[fieldName] && (
-            <p className="text-red-500 text-sm mt-1">{errors[fieldName].message}</p>
+            <p className="text-gray-800 text-sm mt-1">{errors[fieldName].message}</p>
           )}
         </div>
       );
@@ -105,7 +105,7 @@ function DisplayField({ element, register, errors }) {
         return (
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-200 text-white px-6 py-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
           >
             {element.placeholder || element.label || "Submit"}
           </button>
@@ -191,8 +191,8 @@ export default function ElementsParser({ form, setDrawerVisible }) {
         </div>
 
         {Object.keys(errors).length > 0 && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-red-600 text-sm font-medium">
+          <div className="mt-4 p-4 bg-gray-200 border border-gray-400 rounded-md">
+            <p className="text-gray-800 text-sm font-medium">
               Please fix the validation errors above.
             </p>
           </div>
@@ -208,7 +208,7 @@ export default function ElementsParser({ form, setDrawerVisible }) {
           </button>
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-200 text-white px-6 py-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
           >
             Submit Form
           </button>

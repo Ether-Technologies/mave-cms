@@ -27,14 +27,14 @@ const PageHeader = ({
             {isEditing ? "Page Builder" : "Page Preview"}
           </h1>
           {isDirty && isEditing && (
-            <div className="flex items-center gap-2 text-yellow-500">
+            <div className="flex items-center gap-2 text-black">
               <ExclamationCircleOutlined />
               <span className="text-sm">Unsaved changes</span>
             </div>
           )}
 
           {!isEditing && (
-            <div className="flex items-center gap-2 text-green-500">
+            <div className="flex items-center gap-2 text-gray-800">
               <span className="text-sm">
                 Preview Mode - Auto-refresh enabled
               </span>

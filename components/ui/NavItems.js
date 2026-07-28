@@ -125,8 +125,8 @@ export default function NavItems({
 
   return (
     <Layout.Header
-      className="fixed w-full h-16 flex items-center justify-between px-3 
-    md:px-4 lg:px-6 bg-white border-b border-gray-200 z-50"
+      className="fixed w-full h-14 flex items-center justify-between px-3 
+    md:px-4 lg:px-6 mave-shell-header z-50"
     >
       {/* Logo and Version */}
       <div className="flex items-center gap-2 flex-shrink-0">
@@ -143,10 +143,9 @@ export default function NavItems({
           />
         </div>
         <div
-          className="px-2 py-1 rounded-xl text-sm font-semibold text-white cursor-pointer 
-            bg-gradient-to-r from-yellow-500 to-orange-500 
-            hover:from-orange-500 hover:to-red-500 
-            transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+          className="px-2 py-0.5 rounded-md text-xs font-medium text-zinc-600 cursor-pointer 
+            bg-zinc-100 border border-zinc-200 hover:bg-zinc-200 hover:text-zinc-900
+            transition-colors duration-150"
           onClick={(e) => {
             e.stopPropagation();
             router.push("/usermanual/changelog");
@@ -161,17 +160,14 @@ export default function NavItems({
       {user && token ? (
         <>
           {/* Navigation Tabs */}
-          <div className="hidden lg:flex items-center gap-4 mx-2 flex-1 justify-center">
+          <div className="hidden lg:flex items-center gap-1 mx-2 flex-1 justify-center">
             {topNavData &&
               topNavData?.map((item) => (
                 <Link key={item.name} href={item.link}>
                   <div
-                    className={`px-3.5 py-1 rounded-lg text-base font-semibold cursor-pointer
-                      ${topNavData && item === topNavData[topNavData.length - 1] ? "flex gap-2 text-white maveaibutton" : "mavetopnavbutton"}
-                      transition-all duration-300 transform hover:scale-105 ${selectedMenuItem === item.name
-                        ? "underline decoration-yellow-500 decoration-2 underline-offset-8 text-gray-800"
-                        : "text-gray-400 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 hover:text-gray-900"
-                      }`}
+                    className={`mave-nav-pill cursor-pointer inline-flex items-center gap-2
+                      ${topNavData && item === topNavData[topNavData.length - 1] ? "maveaibutton !text-white !px-3.5 !py-1.5" : "mavetopnavbutton"}
+                      ${selectedMenuItem === item.name ? "mave-nav-pill--active" : ""}`}
                     onClick={() => setSelectedMenuItem(item.name)}
                   >
                     {item.name}
@@ -190,8 +186,8 @@ export default function NavItems({
             <div className="hidden xl:block mr-2 relative" ref={searchRef}>
               <Input
                 placeholder="Search..."
-                prefix={<SearchOutlined className="text-gray-400 text-base" />}
-                className="w-48 h-10 rounded-xl text-base"
+                prefix={<SearchOutlined className="text-zinc-400 text-base" />}
+                className="w-52 h-10 rounded-lg text-sm bg-zinc-50 border-zinc-200"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery && setShowSearchResults(true)}
@@ -199,9 +195,9 @@ export default function NavItems({
 
               {/* Search Results Dropdown */}
               {showSearchResults && searchResults.length > 0 && (
-                <div className="absolute top-12 right-0 w-96 max-h-96 overflow-y-auto bg-white rounded-xl shadow-2xl border border-gray-200 search-results-dropdown z-50">
-                  <div className="p-3 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50">
-                    <p className="text-sm font-semibold text-gray-700">
+                <div className="absolute top-12 right-0 w-96 max-h-96 overflow-y-auto bg-white rounded-lg shadow-lg border border-zinc-200 search-results-dropdown z-50">
+                  <div className="p-3 border-b border-zinc-100 bg-zinc-50">
+                    <p className="text-sm font-medium text-zinc-700">
                       Quick Navigation ({searchResults.length} results)
                     </p>
                   </div>
@@ -211,9 +207,9 @@ export default function NavItems({
                       <div
                         key={`${result.id}-${index}`}
                         onClick={() => handleSearchResultClick(result.link)}
-                        className="search-result-item flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 transition-all duration-300 group mb-1"
+                        className="search-result-item flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-zinc-50 transition-colors duration-150 group mb-1"
                       >
-                        <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gradient-to-br from-purple-100 to-blue-100 group-hover:from-purple-200 group-hover:to-blue-200 transition-all duration-300">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-zinc-100 group-hover:bg-zinc-200 transition-colors duration-150">
                           <Image
                             src={result.icon}
                             alt={result.title}
@@ -224,7 +220,7 @@ export default function NavItems({
                         </div>
 
                         <div className="flex-1">
-                          <p className="text-base font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
+                          <p className="text-sm font-medium text-zinc-800 group-hover:text-zinc-900 transition-colors">
                             {result.title}
                           </p>
                           <p className="text-xs text-gray-500 flex items-center gap-1">
@@ -239,8 +235,8 @@ export default function NavItems({
                           </p>
                         </div>
 
-                        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-purple-100 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-0 translate-x-2">
-                          <span className="text-purple-600 text-xs">→</span>
+                        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                          <span className="text-zinc-700 text-xs">→</span>
                         </div>
                       </div>
                     ))}
@@ -250,36 +246,22 @@ export default function NavItems({
             </div>
 
             {/* Notification Bell */}
-            <Badge count={3} size="default" color="#A259FF80">
-              <div
-                className="w-10 h-10 flex items-center justify-center rounded-lg 
-                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-yellow-50 hover:to-orange-50 
-                cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
-              >
-                <BellOutlined className="text-gray-600 hover:text-orange-500 text-lg transition-colors duration-300" />
+            <Badge count={3} size="default" color="#a1a1aa">
+              <div className="mave-icon-btn cursor-pointer">
+                <BellOutlined className="text-lg" />
               </div>
             </Badge>
 
-            {/* Settings */}
             <div
-              className="w-10 h-10 flex items-center justify-center rounded-lg 
-                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50
-                cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
+              className="mave-icon-btn cursor-pointer"
               onClick={() => router.push("/settings/cms-settings")}
             >
-              <SettingOutlined className="text-gray-600 hover:text-indigo-500 text-lg transition-colors duration-300" />
+              <SettingOutlined className="text-lg" />
             </div>
 
-            {/* User Dropdown */}
             <Dropdown menu={{ items: userItems }} placement="bottomRight">
-              <div
-                className="w-10 h-10 flex items-center justify-center rounded-xl 
-                  bg-gradient-to-r from-yellow-500 to-orange-500 
-                  hover:from-orange-500 hover:to-red-500 
-                  cursor-pointer transition-all duration-300 transform hover:scale-110 
-                  shadow-md hover:shadow-xl mr-8"
-              >
-                <UserOutlined className="text-white text-lg" />
+              <div className="mave-icon-btn !bg-zinc-900 !border-zinc-900 !text-white hover:!bg-zinc-800 cursor-pointer mr-6 md:mr-8">
+                <UserOutlined className="text-lg" />
               </div>
             </Dropdown>
           </div>
@@ -287,16 +269,10 @@ export default function NavItems({
       ) : (
         <div className="flex justify-end flex-shrink-0">
           <Button
+            type="primary"
             icon={<LoginOutlined className="text-base" />}
             onClick={() => router.push("/login")}
-            className="h-10 px-6 text-white border-0 font-semibold rounded-lg text-base
-              bg-gradient-to-r from-yellow-500 to-orange-500 
-              hover:from-orange-500 hover:to-red-500 
-              transition-all duration-300 transform hover:scale-105 
-              shadow-md hover:shadow-xl"
-            style={{
-              background: "linear-gradient(to right, #eab308, #f97316)",
-            }}
+            className="h-10 px-5 font-medium rounded-lg text-sm mr-2 md:mr-0"
           >
             Login
           </Button>

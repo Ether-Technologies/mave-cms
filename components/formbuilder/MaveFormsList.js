@@ -86,10 +86,10 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
   if (error) {
     return (
       <div className="p-8 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-200 mb-4">
           <span className="text-2xl">⚠️</span>
         </div>
-        <p className="text-red-600 text-lg font-medium">{error}</p>
+        <p className="text-gray-800 text-lg font-medium">{error}</p>
       </div>
     );
   }
@@ -97,8 +97,8 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
   if (!forms.length) {
     return (
       <div className="text-center py-20">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-yellow-100 to-orange-100 mb-6">
-          <FileTextOutlined className="text-4xl text-[#fcb813]" />
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 mb-6">
+          <FileTextOutlined className="text-4xl text-[#000000]" />
         </div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">No forms yet</h3>
         <p className="text-gray-600 mb-6">Create your first form to get started</p>
@@ -106,7 +106,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
           type="primary"
           size="large"
           onClick={() => router.push("/formbuilder/create-form")}
-          className="bg-gradient-to-r from-[#fcb813] to-[#e3a611] border-0 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+          className="bg-gradient-to-r from-[#000000] to-[#525252] border-0 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
         >
           Create Your First Form
         </Button>
@@ -123,8 +123,8 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
             placeholder="Search forms..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            prefix={<SearchOutlined className="text-gray-400 group-hover:text-[#fcb813] transition-colors duration-200" />}
-            className="rounded-lg border-gray-200 hover:border-[#fcb813] focus:border-[#fcb813] transition-all duration-200 shadow-sm hover:shadow-md"
+            prefix={<SearchOutlined className="text-gray-400 group-hover:text-[#000000] transition-colors duration-200" />}
+            className="rounded-lg border-gray-200 hover:border-[#000000] focus:border-[#000000] transition-all duration-200 shadow-sm hover:shadow-md"
             size="large"
             suffix={
               searchQuery && (
@@ -141,7 +141,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
           <button
             onClick={() => setChangeFormsView(false)}
             className={`p-2.5 rounded-lg transition-all duration-200 ${!changeFormsView
-              ? "bg-gradient-to-r from-[#fcb813] to-[#e3a611] text-white shadow-md"
+              ? "bg-gradient-to-r from-[#000000] to-[#525252] text-white shadow-md"
               : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
               }`}
           >
@@ -150,7 +150,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
           <button
             onClick={() => setChangeFormsView(true)}
             className={`p-2.5 rounded-lg transition-all duration-200 ${changeFormsView
-              ? "bg-gradient-to-r from-[#fcb813] to-[#e3a611] text-white shadow-md"
+              ? "bg-gradient-to-r from-[#000000] to-[#525252] text-white shadow-md"
               : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
               }`}
           >
@@ -182,22 +182,22 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
           {filteredForms.map((form, index) => (
             <div
               key={form.id}
-              className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-[#fcb813] transition-all duration-300 transform hover:-translate-y-1 animate-slide-in"
+              className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-[#000000] transition-all duration-300 transform hover:-translate-y-1 animate-slide-in"
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#fcb813] to-[#e3a611] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#000000] to-[#525252] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
                       <FileTextOutlined className="text-xl text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-1 group-hover:text-[#fcb813] transition-colors duration-200">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-1 group-hover:text-[#000000] transition-colors duration-200">
                         {form.title || "Untitled Form"}
                       </h3>
                       <Badge
                         count={`ID: ${form.id}`}
-                        style={{ backgroundColor: "#fcb813", color: "#ffffff", fontWeight: 500 }}
+                        style={{ backgroundColor: "#000000", color: "#ffffff", fontWeight: 500 }}
                       />
                     </div>
                   </div>
@@ -212,14 +212,14 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
                 <div className="flex sm:flex-col gap-2 flex-wrap">
                   <button
                     onClick={() => onSelectForm(form.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#fcb813] text-white rounded-lg hover:bg-[#e3a611] transition-all duration-200 hover:scale-105 shadow-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#000000] text-white rounded-lg hover:bg-[#525252] transition-all duration-200 hover:scale-105 shadow-sm"
                   >
                     <EyeOutlined />
                     <span className="hidden sm:inline text-sm font-medium">Preview</span>
                   </button>
                   <button
                     onClick={() => router.push(`/formbuilder/edit-form?id=${form.id}`)}
-                    className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 hover:scale-105 shadow-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 hover:scale-105 shadow-sm"
                   >
                     <EditOutlined />
                     <span className="hidden sm:inline text-sm font-medium">Edit</span>
@@ -239,7 +239,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
                     cancelText="Cancel"
                     okButtonProps={{ danger: true }}
                   >
-                    <button className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 hover:scale-105 shadow-sm">
+                    <button className="mave-delete-button flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-150 shadow-sm">
                       <DeleteOutlined />
                       <span className="hidden sm:inline text-sm font-medium">Delete</span>
                     </button>
@@ -257,11 +257,11 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
           {filteredForms.map((form, index) => (
             <div
               key={form.id}
-              className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#fcb813] transition-all duration-300 transform hover:-translate-y-2 animate-scale-in"
+              className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#000000] transition-all duration-300 transform hover:-translate-y-2 animate-scale-in"
               style={{ animationDelay: `${index * 50}ms` }}
             >
               {/* Card Header */}
-              <div className="h-32 bg-gradient-to-br from-[#fcb813] via-[#e3a611] to-orange-500 relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+              <div className="h-32 bg-gradient-to-br from-[#000000] via-[#525252] to-gray-300 relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <FileTextOutlined className="text-5xl text-white/20" />
@@ -276,7 +276,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
 
               {/* Card Body */}
               <div className="p-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-[#fcb813] transition-colors duration-200 line-clamp-1">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-[#000000] transition-colors duration-200 line-clamp-1">
                   {form.title || "Untitled Form"}
                 </h3>
                 <p
@@ -290,14 +290,14 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => onSelectForm(form.id)}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-[#fcb813] text-white rounded-lg hover:bg-[#e3a611] transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm"
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-[#000000] text-white rounded-lg hover:bg-[#525252] transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm"
                   >
                     <EyeOutlined />
                     Preview
                   </button>
                   <button
                     onClick={() => router.push(`/formbuilder/edit-form?id=${form.id}`)}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm"
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm"
                   >
                     <EditOutlined />
                     Edit
@@ -317,7 +317,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
                     cancelText="Cancel"
                     okButtonProps={{ danger: true }}
                   >
-                    <button className="flex items-center justify-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 hover:scale-105 text-sm font-medium shadow-sm">
+                    <button className="mave-delete-button flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors duration-150 text-sm font-medium shadow-sm">
                       <DeleteOutlined />
                       Delete
                     </button>
@@ -333,7 +333,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
       <Drawer
         title={
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#fcb813] to-[#e3a611] rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#000000] to-[#525252] rounded-lg flex items-center justify-center">
               <FileTextOutlined className="text-white text-lg" />
             </div>
             <div>
@@ -355,7 +355,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
               router.push(`/formbuilder/edit-form?id=${selectedFormId}`);
               onSelectForm(null);
             }}
-            className="bg-gradient-to-r from-[#fcb813] to-[#e3a611] border-0 hover:shadow-lg transition-all duration-200"
+            className="bg-gradient-to-r from-[#000000] to-[#525252] border-0 hover:shadow-lg transition-all duration-200"
           >
             Edit Form
           </Button>

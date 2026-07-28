@@ -213,7 +213,7 @@ const FormRenderer = ({ formData, preview = false }) => {
                   <span className="text-gray-700 font-medium">
                     {element.label}
                     {element.required && (
-                      <span className="text-red-500 ml-1">*</span>
+                      <span className="text-gray-800 ml-1">*</span>
                     )}
                   </span>
                 ) : null
@@ -241,8 +241,8 @@ const FormRenderer = ({ formData, preview = false }) => {
         })}
 
         {preview && (
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-            <p className="text-blue-800 text-sm">
+          <div className="bg-gray-200 border border-gray-300 rounded-md p-4">
+            <p className="text-gray-800 text-sm">
               🔍 This is a preview. Form submission is disabled.
             </p>
           </div>

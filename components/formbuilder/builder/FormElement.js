@@ -137,7 +137,7 @@ const FormElement = ({
       // New: "guideline" => just render a paragraph
       case "guideline":
         return (
-          <div className="p-2 bg-gray-50 border-l-4 border-yellow-400">
+          <div className="p-2 bg-gray-50 border-l-4 border-gray-300">
             <p className="text-gray-600 whitespace-pre-line">
               {element.content}
             </p>
@@ -169,7 +169,7 @@ const FormElement = ({
       <div className="flex justify-between items-center mb-2">
         <h4 className="font-semibold text-lg">
           {element.label}
-          {element.required && <span className="text-red-500 ml-1">*</span>}
+          {element.required && <span className="text-gray-800 ml-1">*</span>}
         </h4>
 
         {/* Hide these buttons in preview mode */}

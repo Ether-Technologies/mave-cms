@@ -58,7 +58,7 @@ export default function TrendingContent() {
                         transition={{ delay: 0.4 + index * 0.1 }}
                         className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0"
                     >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#fcb813]/10 text-[#fcb813] font-semibold text-sm">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#000000]/10 text-[#000000] font-semibold text-sm">
                             {index + 1}
                         </div>
                         <div className="flex-1 min-w-0">

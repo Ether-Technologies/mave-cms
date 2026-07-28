@@ -335,7 +335,7 @@ const CardComponent = ({
                 title="Refresh card data"
               />
               {autoPolling && (
-                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                <span className="text-xs text-gray-800 bg-gray-200 px-2 py-1 rounded">
                   Auto-refresh active
                 </span>
               )}

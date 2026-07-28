@@ -37,7 +37,7 @@ const MediaSelector = ({
             />
             <Button
               type="text"
-              icon={<CloseCircleOutlined className="text-red-500" />}
+              icon={<CloseCircleOutlined className="text-gray-800" />}
               onClick={() =>
                 setSelectedMedia(selectedMedia.filter((m) => m.id !== media.id))
               }

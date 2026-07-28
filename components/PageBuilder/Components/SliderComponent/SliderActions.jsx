@@ -45,7 +45,7 @@ const SliderActions = React.memo(
                 />
               </Tooltip>
               {pollingError && (
-                <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
+                <span className="text-xs text-gray-800 bg-gray-200 px-2 py-1 rounded">
                   {pollingError}
                 </span>
               )}

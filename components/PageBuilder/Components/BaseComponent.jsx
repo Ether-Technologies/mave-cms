@@ -60,7 +60,7 @@ const BaseComponent = ({
                   <Button
                     icon={<ExportOutlined />}
                     onClick={onEdit}
-                    className="action-button bg-yellow-50 text-yellow-600 border-yellow-100 hover:bg-yellow-100 hover:text-yellow-700 hover:border-yellow-200 transition-colors duration-200"
+                    className="action-button bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-200 hover:text-gray-700 hover:border-gray-300 transition-colors duration-200"
                   >
                     Change
                   </Button>
@@ -78,11 +78,11 @@ const BaseComponent = ({
                     onConfirm={handleDelete}
                     okText="Yes"
                     cancelText="No"
-                    okButtonProps={{ className: "bg-red-500 hover:bg-red-600" }}
+                    okButtonProps={{ className: "bg-gray-200 hover:bg-gray-200" }}
                   >
                     <Button
                       icon={<DeleteOutlined />}
-                      className="action-button bg-red-50 text-red-600 border-red-100 hover:bg-red-100 hover:text-red-700 hover:border-red-200 transition-colors duration-200"
+                      className="action-button bg-gray-200 text-gray-800 border-gray-400 hover:bg-gray-200 hover:text-gray-800 hover:border-gray-400 transition-colors duration-200"
                     />
                   </Popconfirm>
                 )}

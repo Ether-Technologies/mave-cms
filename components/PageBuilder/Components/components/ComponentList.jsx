@@ -32,7 +32,7 @@ const ComponentList = ({
             <Button
               icon={<PlusOutlined />}
               onClick={() => onAddComponent && onAddComponent(0)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+              className="mave-delete-button bg-white text-zinc-800 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 
                 transition-all duration-200 px-6 py-3 text-base font-semibold"
               size="large"
             >
@@ -53,7 +53,7 @@ const ComponentList = ({
                 <Button
                   icon={<PlusOutlined />}
                   onClick={() => onAddComponent && onAddComponent(index)}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                  className="mave-delete-button bg-white text-zinc-800 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 
                   transition-all duration-200 px-2 py-1 text-sm group"
                   size="small"
                 >
@@ -86,7 +86,7 @@ const ComponentList = ({
                 <Button
                   icon={<PlusOutlined />}
                   onClick={() => onAddComponent && onAddComponent(index + 1)}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                  className="mave-delete-button bg-white text-zinc-800 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 
                   transition-all duration-200 px-2 py-1 text-sm group"
                   size="small"
                 >
@@ -110,7 +110,7 @@ const ComponentList = ({
             onClick={() =>
               onAddComponent && onAddComponent(componentsState.length)
             }
-            className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+            className="mave-delete-button bg-white text-zinc-800 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 
               transition-all duration-200 px-2 py-1 text-sm group"
             size="small"
           >

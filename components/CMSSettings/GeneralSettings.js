@@ -1,6 +1,6 @@
 // components/CMSSettings/GeneralSettings.js
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Form,
   Input,
@@ -16,7 +16,7 @@ import {
   Col,
 } from "antd";
 import instance from "../../axios";
-import { setThemeColors } from "../../utils/themeUtils";
+import { ThemeContext } from "../../src/context/ThemeContext";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import RichTextEditor from "../RichTextEditor";
 
@@ -26,49 +26,23 @@ const { Title, Text } = Typography;
 const GeneralSettings = ({ config, id }) => {
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
+  const { updateTheme } = useContext(ThemeContext);
 
   // Define theme options with theme and accent colors
   const theme_options = [
-    {
-      name: "Default",
-      theme: "#fcb813",
-      accent: "#e3a611",
-    },
-    {
-      name: "Orange",
-      theme: "#fb5607",
-      accent: "#f27059",
-    },
-    {
-      name: "Red",
-      theme: "#ff006e",
-      accent: "#9d0208",
-    },
-    {
-      name: "Violet",
-      theme: "#8338ec",
-      accent: "#7209b7",
-    },
-    {
-      name: "Blue",
-      theme: "#fcb813",
-      accent: "#e3a611",
-    },
-    {
-      name: "Green",
-      theme: "#7ae582",
-      accent: "#25a18e",
-    },
+    { name: "Default (tokens file)", theme: null, accent: null },
+    { name: "Monochrome", theme: "#18181b", accent: "#27272a" },
+    { name: "Charcoal", theme: "#27272a", accent: "#3f3f46" },
+    { name: "Black", theme: "#000000", accent: "#262626" },
   ];
 
   useEffect(() => {
     // Assuming config prop has 'type', 'config', 'media_list', 'created_by'
-    form.setFieldsValue(config); // Set form fields with config
-    // Apply the initial theme
-    if (config.themecolor && config.themeaccent) {
-      setThemeColors(config.themecolor, config.themeaccent);
+    form.setFieldsValue(config);
+    if (config.themecolor) {
+      updateTheme(config.themecolor, config.themeaccent);
     }
-  }, [config, form]);
+  }, [config, form, updateTheme]);
 
   const onFinish = async (values) => {
     setSaving(true);
@@ -88,10 +62,7 @@ const GeneralSettings = ({ config, id }) => {
       await instance.put(`/settings/${id}`, payload);
       message.success("General Settings updated successfully!");
 
-      // Apply the updated theme
-      if (values.themecolor && values.themeaccent) {
-        setThemeColors(values.themecolor, values.themeaccent);
-      }
+      updateTheme(values.themecolor || null, values.themeaccent || null);
     } catch (error) {
       console.error("Error updating General Settings:", error);
       message.error("Failed to update General Settings.");
@@ -108,8 +79,7 @@ const GeneralSettings = ({ config, id }) => {
         themecolor: selectedTheme.theme,
         themeaccent: selectedTheme.accent,
       });
-      // Apply the theme colors immediately
-      setThemeColors(selectedTheme.theme, selectedTheme.accent);
+      updateTheme(selectedTheme.theme, selectedTheme.accent);
     }
   };
 
@@ -199,19 +169,38 @@ const GeneralSettings = ({ config, id }) => {
             {theme_options.map((theme) => (
               <Option key={theme.name} value={theme.name}>
                 <Space>
-                  <div
-                    style={{
-                      width: "16px",
-                      height: "16px",
-                      backgroundColor: theme.theme,
-                      borderRadius: "50%",
-                    }}
-                  />
+                  {theme.theme ? (
+                    <div
+                      style={{
+                        width: "16px",
+                        height: "16px",
+                        backgroundColor: theme.theme,
+                        borderRadius: "50%",
+                        border: "1px solid var(--border-default, #e4e4e7)",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: "16px",
+                        height: "16px",
+                        borderRadius: "50%",
+                        border: "2px dashed #a1a1aa",
+                      }}
+                    />
+                  )}
                   {theme.name}
                 </Space>
               </Option>
             ))}
           </Select>
+        </Form.Item>
+
+        <Form.Item name="themecolor" hidden>
+          <Input />
+        </Form.Item>
+        <Form.Item name="themeaccent" hidden>
+          <Input />
         </Form.Item>
 
         <Form.Item>

@@ -6,7 +6,7 @@ const TechnicalCapabilities = () => {
         {
             title: "Frontend Technologies",
             icon: "🎨",
-            gradient: "from-yellow-400 to-orange-400",
+            gradient: "from-gray-200 to-gray-300",
             items: [
                 { name: "React", version: "18.2.0", features: ["Hooks", "Context API", "Suspense"] },
                 { name: "Next.js", version: "12.3.4", features: ["SSR", "SSG", "API Routes"] },
@@ -24,7 +24,7 @@ const TechnicalCapabilities = () => {
         {
             title: "Backend Infrastructure",
             icon: "⚙️",
-            gradient: "from-orange-400 to-yellow-500",
+            gradient: "from-gray-300 to-gray-300",
             items: [
                 { name: "Laravel", version: "Latest", features: ["Eloquent", "Blade", "Artisan"] },
                 { name: "MySQL Database", version: "8.0+", features: ["Transactions", "Indexing", "Replication"] },
@@ -35,7 +35,7 @@ const TechnicalCapabilities = () => {
         {
             title: "Development Tools",
             icon: "🛠️",
-            gradient: "from-yellow-500 to-orange-500",
+            gradient: "from-gray-200 to-gray-300",
             items: [
                 { name: "Jenkins CI/CD", version: "Latest", features: ["Pipelines", "Plugins", "Automation"] },
                 { name: "Docker", version: "Latest", features: ["Containers", "Images", "Networks"] },
@@ -46,7 +46,7 @@ const TechnicalCapabilities = () => {
         {
             title: "Security Features",
             icon: "🔒",
-            gradient: "from-orange-500 to-yellow-400",
+            gradient: "from-gray-300 to-gray-300",
             items: [
                 { name: "SSL/TLS Encryption", version: "Latest", features: ["HTTPS", "Certificates", "Ciphers"] },
                 { name: "Role-Based Access Control", version: "Latest", features: ["Permissions", "Roles", "Policies"] },
@@ -81,16 +81,16 @@ const TechnicalCapabilities = () => {
     return (
         <div className="relative py-20 overflow-hidden">
             {/* Background Elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-50 via-white to-orange-50"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-white to-gray-300"></div>
             <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-200/20 via-transparent to-transparent"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-200/20 via-transparent to-transparent"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
                 <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-600 to-orange-500 bg-clip-text text-transparent text-center mb-16"
+                    className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-200 to-gray-300 bg-clip-text text-transparent text-center mb-16"
                 >
                     Technical Capabilities
                 </motion.h2>
@@ -106,7 +106,7 @@ const TechnicalCapabilities = () => {
                         <motion.div
                             key={index}
                             variants={itemVariants}
-                            className="group relative p-6 md:p-8 rounded-2xl bg-white/80 backdrop-blur-lg border border-gray-200/50 hover:border-yellow-200/50 transition-all duration-300 shadow-lg hover:shadow-xl"
+                            className="group relative p-6 md:p-8 rounded-2xl bg-white/80 backdrop-blur-lg border border-gray-200/50 hover:border-gray-300/50 transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
                             {/* Background Gradient */}
                             <div className={`absolute inset-0 bg-gradient-to-br ${capability.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl`}></div>
@@ -115,7 +115,7 @@ const TechnicalCapabilities = () => {
                             <div className="relative z-10">
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="text-4xl md:text-5xl">{capability.icon}</div>
-                                    <h3 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent group-hover:from-yellow-600 group-hover:to-orange-500 transition-all duration-300">
+                                    <h3 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent group-hover:from-gray-200 group-hover:to-gray-300 transition-all duration-300">
                                         {capability.title}
                                     </h3>
                                 </div>
@@ -128,7 +128,7 @@ const TechnicalCapabilities = () => {
                                             whileInView={{ opacity: 1, x: 0 }}
                                             transition={{ delay: idx * 0.1 }}
                                             viewport={{ once: true }}
-                                            className="p-4 md:p-5 rounded-xl bg-gradient-to-r from-yellow-50/50 to-orange-50/50 hover:from-yellow-100/50 hover:to-orange-100/50 transition-all duration-300"
+                                            className="p-4 md:p-5 rounded-xl bg-gradient-to-r from-gray-200/50 to-gray-300/50 hover:from-gray-200/50 hover:to-gray-300/50 transition-all duration-300"
                                         >
                                             <div className="flex justify-between items-center mb-3">
                                                 <span className="text-lg md:text-xl font-medium text-gray-800">{item.name}</span>
@@ -164,7 +164,7 @@ const TechnicalCapabilities = () => {
                                                 {sub.items.map((item, itemIdx) => (
                                                     <span
                                                         key={itemIdx}
-                                                        className="px-3 py-1.5 text-sm md:text-base rounded-full bg-gradient-to-r from-yellow-50 to-orange-50 text-gray-600 border border-gray-200/50"
+                                                        className="px-3 py-1.5 text-sm md:text-base rounded-full bg-gradient-to-r from-gray-200 to-gray-300 text-gray-600 border border-gray-200/50"
                                                     >
                                                         {item}
                                                     </span>

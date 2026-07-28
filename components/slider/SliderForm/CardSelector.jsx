@@ -56,7 +56,7 @@ const CardSelector = ({
               />
               <Button
                 type="text"
-                icon={<CloseCircleOutlined className="text-red-500" />}
+                icon={<CloseCircleOutlined className="text-gray-800" />}
                 onClick={() =>
                   setSelectedCards(selectedCards.filter((id) => id !== cardId))
                 }

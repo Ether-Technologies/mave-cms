@@ -1,9 +1,6 @@
-// pages/_app.js
-
-import React from "react";
-import Site from "../components/SiteContent"; // Adjust the import path if necessary
+import React, { useContext } from "react";
+import Site from "../components/SiteContent";
 import "../styles/globals.css";
-// Import React Quill CSS here
 import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.bubble.css";
 import "react-quill/dist/quill.core.css";
@@ -15,68 +12,63 @@ import Head from "next/head";
 import Image from "next/image";
 import { AuthProvider } from "../src/context/AuthContext";
 import { MenuRefreshProvider } from "../src/context/MenuRefreshContext";
-import { ThemeProvider } from "../src/context/ThemeContext";
+import { ThemeProvider, ThemeContext } from "../src/context/ThemeContext";
 import PromoPopup from "../components/promotional/PromoPopup";
+import MaveConfigProvider from "../components/MaveConfigProvider";
 import { Provider } from "react-redux";
 import store from "../store";
 
-function MyApp({ Component, pageProps }) {
+function AppContent({ Component, pageProps }) {
+  const { themeRevision } = useContext(ThemeContext);
+
   return (
-    <Provider store={store}>
+    <MaveConfigProvider themeRevision={themeRevision}>
       <Head>
         <title>Mave CMS</title>
       </Head>
       <AuthProvider>
         <MenuRefreshProvider>
-          <ThemeProvider>
-            {" "}
-            {/* Wrap with ThemeProvider */}
-            <Site>
-              <PromoPopup />
-              <Component {...pageProps} />
-            </Site>
-          </ThemeProvider>
+          <Site>
+            <PromoPopup />
+            <Component {...pageProps} />
+          </Site>
         </MenuRefreshProvider>
       </AuthProvider>
-      <footer className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/60 border-t border-yellow-500/30 shadow-lg shadow-yellow-500/10">
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-amber-500/5 to-orange-500/5"></div>
-        <div className="relative max-w-7xl mx-auto px-6 py-2">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* Left Section - Copyright */}
-            <div className="flex items-center gap-2 text-white/80">
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 animate-pulse"></div>
-              <span className="text-sm">
+      <footer className="mave-shell-footer fixed bottom-0 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-2.5">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm text-mave-muted">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--border-strong)]" />
+              <span>
                 © {new Date().getFullYear()}{" "}
                 <a
                   href="https://www.linkedin.com/in/atiq-israk/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 bg-clip-text text-transparent hover:from-yellow-300 hover:via-amber-300 hover:to-orange-300 transition-all duration-300"
+                  className="font-medium text-mave-secondary hover:text-mave-primary transition-colors"
                 >
                   MAVE CMS
                 </a>
               </span>
             </div>
 
-            {/* Center Section - Divider */}
-            <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-yellow-500/60 to-transparent"></div>
+            <div className="hidden md:block w-px h-6 bg-[var(--border-default)]" />
 
-            {/* Right Section - Powered By */}
-            <div className="flex items-center gap-3 text-white/80 text-sm">
-              <span className="font-light">All rights reserved</span>
-              <span className="text-yellow-500/50">•</span>
-              <span className="font-light">Powered by</span>
+            <div className="flex items-center gap-3 text-sm text-mave-muted">
+              <span>All rights reserved</span>
+              <span className="text-[var(--border-strong)]">·</span>
+              <span>Powered by</span>
               <a
                 href="https://www.ethertech.ltd"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-opacity hover:opacity-80"
+                className="opacity-80 hover:opacity-100 transition-opacity"
               >
                 <Image
                   src="/ethertech-logo.svg"
                   alt="Ether Technologies"
-                  width={128}
-                  height={24}
+                  width={120}
+                  height={22}
                   objectFit="contain"
                 />
               </a>
@@ -84,6 +76,16 @@ function MyApp({ Component, pageProps }) {
           </div>
         </div>
       </footer>
+    </MaveConfigProvider>
+  );
+}
+
+function MyApp(props) {
+  return (
+    <Provider store={store}>
+      <ThemeProvider>
+        <AppContent {...props} />
+      </ThemeProvider>
     </Provider>
   );
 }

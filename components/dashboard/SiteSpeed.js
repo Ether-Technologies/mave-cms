@@ -41,7 +41,7 @@ export default function SiteSpeed() {
       stroke: {
         curve: "smooth",
         width: 2,
-        colors: ["#fcb813"],
+        colors: ["#000000"],
       },
       fill: {
         type: "gradient",
@@ -53,12 +53,12 @@ export default function SiteSpeed() {
           colorStops: [
             {
               offset: 0,
-              color: "#fcb813",
+              color: "#000000",
               opacity: 1,
             },
             {
               offset: 100,
-              color: "#fcb813",
+              color: "#000000",
               opacity: 0.25,
             },
           ],

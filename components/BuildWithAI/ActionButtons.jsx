@@ -17,20 +17,20 @@ const ActionButtons = ({
     <div className="flex justify-end gap-4 mt-6">
       <Button
         onClick={handleClearConversation}
-        className="bg-red-500 hover:bg-red-600 text-white"
+        className="bg-gray-200 hover:bg-gray-200 text-white"
       >
         Clear Conversation
       </Button>
       {/* <Button
         onClick={handleModify}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white"
+        className="bg-gray-200 hover:bg-gray-200 text-white"
       >
         Modify
       </Button> */}
       <Button
         type="primary"
         onClick={handleCreatePage}
-        className="bg-green-500 hover:bg-green-600 text-white"
+        className="bg-gray-200 hover:bg-gray-200 text-white"
         // disabled={!validJson}
       >
         Create Page

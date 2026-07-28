@@ -36,15 +36,15 @@ export default function CounterCards({ data, loading }) {
 
   const getGradient = (index) => {
     const gradients = [
-      "from-[#fcb813] to-[#e3a611]",
-      "from-orange-500 to-orange-600",
+      "from-[#000000] to-[#525252]",
+      "from-gray-300 to-gray-300",
       "from-gray-600 to-gray-700",
-      "from-[#fcb813] to-orange-500",
-      "from-orange-600 to-gray-600",
+      "from-[#000000] to-gray-300",
+      "from-gray-300 to-gray-600",
       "from-gray-700 to-gray-800",
-      "from-blue-500 to-blue-600",
-      "from-green-500 to-green-600",
-      "from-purple-500 to-purple-600",
+      "from-gray-100 to-gray-200",
+      "from-gray-600 to-gray-700",
+      "from-gray-100 to-gray-200",
     ];
     return gradients[index % gradients.length];
   };
@@ -202,7 +202,7 @@ export default function CounterCards({ data, loading }) {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + index * 0.1 }}
-                  className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${card.trend === "up" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${card.trend === "up" ? "bg-gray-200 text-gray-800" : "bg-gray-200 text-gray-800"
                     }`}
                 >
                   {card.trend === "up" ? (

@@ -88,13 +88,13 @@ export default function PromoPopup() {
 
           {/* Example tags */}
           <div className="flex items-center gap-2 mt-2">
-            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs">
+            <span className="bg-gray-200 text-gray-800 px-2 py-1 rounded-lg text-xs">
               New
             </span>
-            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs">
+            <span className="bg-gray-200 text-gray-800 px-2 py-1 rounded-lg text-xs">
               Update
             </span>
-            <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg text-xs">
+            <span className="bg-gray-200 text-gray-800 px-2 py-1 rounded-lg text-xs">
               BugFix
             </span>
           </div>
@@ -139,7 +139,7 @@ export default function PromoPopup() {
               if (bugFixes && bugFixes.length > 0) {
                 return bugFixes.map((fix, i) => (
                   <div key={i} className="flex items-start gap-2">
-                    <BugOutlined className="text-red-500" />
+                    <BugOutlined className="text-gray-800" />
                     <Paragraph key={i} className="text-sm text-gray-500">
                       {fix}
                     </Paragraph>

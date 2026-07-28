@@ -89,7 +89,7 @@ const IconListItem = ({
           <label className="block text-xs text-gray-500 mb-1">
             Alt Text{" "}
             {showAltContent && (
-              <span className="text-green-500">(Displayed)</span>
+              <span className="text-gray-800">(Displayed)</span>
             )}
           </label>
           <Input
@@ -98,7 +98,7 @@ const IconListItem = ({
             placeholder="Enter alt text"
             readOnly={preview}
             size="small"
-            className={showAltContent ? "ring-2 ring-green-200" : ""}
+            className={showAltContent ? "ring-2 ring-gray-300" : ""}
           />
         </div>
       </div>

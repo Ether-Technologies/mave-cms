@@ -118,8 +118,8 @@ const NavbarRow = ({
       className={`
         bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border-2 
         transition-all duration-300 hover:shadow-xl
-        ${isSelected ? 'border-yellow-400 ring-2 ring-yellow-200' : 'border-gray-200 hover:border-gray-300'}
-        ${isEditing ? 'ring-2 ring-blue-200 border-blue-300' : ''}
+        ${isSelected ? 'border-gray-300 ring-2 ring-gray-300' : 'border-gray-200 hover:border-gray-300'}
+        ${isEditing ? 'ring-2 ring-gray-400 border-gray-300' : ''}
       `}
     >
       <div className="p-4">
@@ -140,7 +140,7 @@ const NavbarRow = ({
                 <Input
                   value={editedNavbarTitleEn}
                   onChange={(e) => setEditedNavbarTitleEn(e.target.value)}
-                  className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                  className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-gray-400 focus:border-black transition-all"
                   placeholder="Title (English)"
                   prefix={<MenuOutlined className="text-gray-400" />}
                   allowClear
@@ -148,7 +148,7 @@ const NavbarRow = ({
                 <Input
                   value={editedNavbarTitleBn}
                   onChange={(e) => setEditedNavbarTitleBn(e.target.value)}
-                  className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                  className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-gray-400 focus:border-black transition-all"
                   placeholder="শিরোনাম (বাংলা)"
                   prefix={<GlobalOutlined className="text-gray-400" />}
                   allowClear
@@ -157,14 +157,14 @@ const NavbarRow = ({
             ) : (
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <MenuOutlined className="text-yellow-500" />
+                  <MenuOutlined className="text-black" />
                   <span className="font-semibold text-gray-800 truncate">
                     {navbar.title_en}
                   </span>
                 </div>
                 {navbar.title_bn && (
                   <div className="flex items-center gap-2 ml-5">
-                    <GlobalOutlined className="text-blue-500 text-xs" />
+                    <GlobalOutlined className="text-gray-800 text-xs" />
                     <span className="text-sm text-gray-600 truncate">
                       {navbar.title_bn}
                     </span>
@@ -200,7 +200,7 @@ const NavbarRow = ({
                 <Button
                   icon={<FileImageFilled />}
                   onClick={() => setMediaModalVisible(true)}
-                  className="w-full h-9 text-xs bg-gradient-to-r from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-yellow-300 rounded-lg transition-all"
+                  className="w-full h-9 text-xs bg-gradient-to-r from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-gray-400 rounded-lg transition-all"
                   size="small"
                 >
                   Change
@@ -227,7 +227,7 @@ const NavbarRow = ({
                   alt={
                     navbar?.logo?.file_name ? navbar.logo.file_name : "Navbar Logo"
                   }
-                  className="w-16 h-16 object-contain rounded-xl cursor-pointer hover:scale-110 transition-transform border-2 border-gray-200 hover:border-yellow-300 shadow-sm hover:shadow-md"
+                  className="w-16 h-16 object-contain rounded-xl cursor-pointer hover:scale-110 transition-transform border-2 border-gray-200 hover:border-gray-400 shadow-sm hover:shadow-md"
                   width={64}
                   height={64}
                   onClick={() =>
@@ -250,7 +250,7 @@ const NavbarRow = ({
                 placeholder="Select a Menu"
                 optionFilterProp="children"
                 onChange={(value) => setEditedMenuId(value)}
-                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-gray-300"
                 allowClear
                 defaultValue={navbar?.menu?.id || null}
               >
@@ -263,12 +263,12 @@ const NavbarRow = ({
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 mb-2">
-                  <Tag className="bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 text-purple-700 font-semibold px-3 py-1 rounded-full">
+                  <Tag className="mave-tag-pill font-medium px-3 py-1">
                     {navbar?.menu?.name || "No Menu Assigned"}
                   </Tag>
                   <Badge
                     count={menuItemsCount}
-                    className="[&_.ant-badge-count]:bg-yellow-500 [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs"
+                    className="mave-item-count-badge"
                     showZero
                   />
                 </div>
@@ -277,7 +277,7 @@ const NavbarRow = ({
                     {displayedItems?.map((item) => (
                       <Tag
                         key={item.id}
-                        className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 text-gray-700 font-medium px-2 py-0.5 rounded-full text-xs"
+                        className="mave-tag-pill text-xs px-2 py-0.5"
                       >
                         {item.title}
                       </Tag>
@@ -287,7 +287,7 @@ const NavbarRow = ({
                         type="link"
                         size="small"
                         onClick={() => setShowAllItems(true)}
-                        className="text-yellow-600 hover:text-yellow-700 font-medium text-xs px-1 h-auto"
+                        className="text-gray-700 hover:text-gray-700 font-medium text-xs px-1 h-auto"
                       >
                         +{menuItemsCount - 3} more
                       </Button>
@@ -297,7 +297,7 @@ const NavbarRow = ({
                         type="link"
                         size="small"
                         onClick={() => setShowAllItems(false)}
-                        className="text-yellow-600 hover:text-yellow-700 font-medium text-xs px-1 h-auto"
+                        className="text-gray-700 hover:text-gray-700 font-medium text-xs px-1 h-auto"
                       >
                         Show less
                       </Button>
@@ -318,7 +318,7 @@ const NavbarRow = ({
                   <Button
                     icon={<CheckCircleOutlined />}
                     onClick={handleUpdate}
-                    className="h-10 px-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-gradient-to-r from-gray-600 to-emerald-500 hover:from-gray-600 hover:to-emerald-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Update
                   </Button>
@@ -342,7 +342,7 @@ const NavbarRow = ({
                   <Button
                     icon={<EditOutlined />}
                     onClick={() => setEditingNavbarId(navbar.id)}
-                    className="h-10 px-4 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-black hover:bg-gray-800 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Edit
                   </Button>
@@ -355,13 +355,13 @@ const NavbarRow = ({
                   cancelText="Cancel"
                   okButtonProps={{
                     danger: true,
-                    className: "bg-red-500 hover:bg-red-600 border-red-500",
+                    className: "bg-gray-200 hover:bg-gray-200 border-gray-400",
                   }}
                 >
                   <Tooltip title="Delete navbar">
                     <Button
                       icon={<DeleteOutlined />}
-                      className="h-10 px-4 bg-red-500 hover:bg-red-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                      className="h-10 px-4 mave-delete-button"
                     >
                       Delete
                     </Button>

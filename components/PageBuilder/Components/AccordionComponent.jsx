@@ -341,7 +341,7 @@ const AccordionComponent = ({
                 {(item.tags || []).map((tag, tagIndex) => (
                   <span
                     key={tagIndex}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                    className="px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm font-medium"
                   >
                     {tag}
                   </span>

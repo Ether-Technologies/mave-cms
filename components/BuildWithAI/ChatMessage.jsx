@@ -52,7 +52,7 @@ const ChatMessage = ({ message, onResend, onRegenerate }) => {
 
             {/* Render Validation Errors and Buttons */}
             {!message.isValid && message.validationErrors && (
-              <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              <div className="mt-4 p-4 bg-gray-200 border border-gray-400 text-gray-800 rounded">
                 <p className="font-semibold">Validation Errors:</p>
                 <ul className="list-disc list-inside">
                   {message.validationErrors.map((err, index) => (
@@ -65,7 +65,7 @@ const ChatMessage = ({ message, onResend, onRegenerate }) => {
                   <Button
                     type="primary"
                     onClick={onResend}
-                    className="bg-theme hover:bg-yellow-600 text-white"
+                    className="bg-theme hover:bg-gray-200 text-white"
                   >
                     Resend
                   </Button>

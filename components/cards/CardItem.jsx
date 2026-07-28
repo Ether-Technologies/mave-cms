@@ -162,7 +162,7 @@ const CardItem = ({ card, viewType, onDeleteCard, onPreviewCard }) => {
       cancelText="No"
       okButtonProps={{ danger: true }}
     >
-      <Button className="mavecancelbutton" icon={<DeleteOutlined />}>
+      <Button className="mavecancelbutton mave-delete-button" icon={<DeleteOutlined />}>
         Delete
       </Button>
     </Popconfirm>,

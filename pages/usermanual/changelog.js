@@ -53,36 +53,36 @@ const Changelog = () => {
       case "BugFix":
         return {
           color: "#ff4d4f",
-          bgColor: "bg-red-50/70",
-          borderColor: "border-red-200",
-          hoverBorder: "hover:border-red-400",
-          icon: <BugOutlined className="text-red-500" />,
+          bgColor: "bg-gray-200/70",
+          borderColor: "border-gray-400",
+          hoverBorder: "hover:border-gray-400",
+          icon: <BugOutlined className="text-gray-800" />,
           title: "Bug Fix",
-          titleIcon: <ToolOutlined className="text-red-500" />,
-          className: "hover:shadow-red-100",
+          titleIcon: <ToolOutlined className="text-gray-800" />,
+          className: "hover:shadow-gray-200",
         };
       case "Features":
       case "Feature":
         return {
           color: "#52c41a",
-          bgColor: "bg-green-50/70",
-          borderColor: "border-green-200",
-          hoverBorder: "hover:border-green-400",
-          icon: <StarOutlined className="text-green-500" />,
+          bgColor: "bg-gray-200/70",
+          borderColor: "border-gray-300",
+          hoverBorder: "hover:border-gray-300",
+          icon: <StarOutlined className="text-gray-800" />,
           title: "New Feature",
-          titleIcon: <ThunderboltOutlined className="text-green-500" />,
-          className: "hover:shadow-green-100",
+          titleIcon: <ThunderboltOutlined className="text-gray-800" />,
+          className: "hover:shadow-gray-200",
         };
       default:
         return {
           color: "#1890ff",
-          bgColor: "bg-yellow-50/70",
-          borderColor: "border-yellow-200",
-          hoverBorder: "hover:border-yellow-400",
-          icon: <PlusCircleOutlined className="text-yellow-500" />,
+          bgColor: "bg-gray-200/70",
+          borderColor: "border-gray-300",
+          hoverBorder: "hover:border-gray-300",
+          icon: <PlusCircleOutlined className="text-black" />,
           title: "Update",
-          titleIcon: <CheckCircleOutlined className="text-yellow-500" />,
-          className: "hover:shadow-yellow-100",
+          titleIcon: <CheckCircleOutlined className="text-black" />,
+          className: "hover:shadow-gray-200",
         };
     }
   };

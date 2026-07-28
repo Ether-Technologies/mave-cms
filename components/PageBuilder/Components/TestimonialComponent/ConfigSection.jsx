@@ -39,7 +39,7 @@ function ConfigSection({
           type="text"
           onClick={toggleAdvanced}
           icon={showAdvanced ? <UpOutlined /> : <DownOutlined />}
-          className="flex items-center text-yellow-500"
+          className="flex items-center text-black"
         >
           {showAdvanced ? "Hide Advanced" : "Show Advanced"}
         </Button>

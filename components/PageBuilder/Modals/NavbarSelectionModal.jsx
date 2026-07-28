@@ -55,7 +55,7 @@ const NavbarSelectionModal = ({ onSelectNavbar, selectedNavbar }) => {
             <List.Item
               className={`p-4 border rounded-md cursor-pointer hover:bg-gray-50 ${
                 selectedNavbar?.id === navbar.id
-                  ? "bg-yellow-50 border-yellow-200"
+                  ? "bg-gray-200 border-gray-300"
                   : ""
               }`}
               onClick={() => onSelectNavbar(navbar)}

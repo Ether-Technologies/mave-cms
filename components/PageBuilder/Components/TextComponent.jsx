@@ -239,7 +239,7 @@ const TextComponent = ({
                     isDualColor: !tempSettings.isDualColor,
                   })
                 }
-                className="text-yellow-600 hover:text-yellow-700"
+                className="text-gray-700 hover:text-gray-700"
               >
                 {tempSettings.isDualColor
                   ? "Disable Dual Color"
@@ -423,7 +423,7 @@ const TextComponent = ({
               setIsEditing(true);
               setFormData({ ...formData, text: "" });
             }}
-            className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-yellow-500 transition-colors"
+            className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-gray-300 transition-colors"
           >
             <span className="text-lg font-medium text-gray-600">Add Text</span>
           </Button>

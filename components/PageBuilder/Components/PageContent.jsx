@@ -245,7 +245,7 @@ const PageContent = ({
                   <Button
                     icon={<PlusOutlined />}
                     onClick={onAddSection}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-6 py-2 font-semibold"
+                    className="mave-delete-button bg-white text-zinc-800 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 px-6 py-2 font-semibold"
                     size="large"
                   >
                     Add Section
@@ -264,7 +264,7 @@ const PageContent = ({
                   <Button
                     icon={<PlusOutlined />}
                     onClick={onAddSection}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 px-6 py-2 font-semibold"
+                    className="mave-delete-button bg-white text-zinc-800 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 px-6 py-2 font-semibold"
                     size="large"
                   >
                     Add Section

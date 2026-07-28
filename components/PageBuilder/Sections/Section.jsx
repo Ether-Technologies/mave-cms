@@ -188,7 +188,7 @@ const Section = ({
         style={style}
         className={`section-container bg-white shadow-md rounded-lg p-4 mb-6 transition-all duration-200 ${
           isOver
-            ? "ring-2 ring-yellow-400 ring-opacity-70 bg-yellow-50 shadow-lg scale-[1.02]"
+            ? "ring-2 ring-gray-300 ring-opacity-70 bg-gray-200 shadow-lg scale-[1.02]"
             : ""
         }`}
       >
@@ -248,7 +248,7 @@ const Section = ({
                 icon={<CopyOutlined />}
                 onClick={handleDuplicateClick}
                 size="middle"
-                className="mavebutton hover:bg-yellow-600"
+                className="mavebutton hover:bg-gray-200"
                 title="Duplicate Section"
                 style={{ zIndex: 10, position: "relative" }}
               />
@@ -266,7 +266,7 @@ const Section = ({
                   icon={<DeleteOutlined />}
                   onClick={handleDeleteClick}
                   size="small"
-                  className="mavecancelbutton hover:bg-red-600"
+                  className="mavecancelbutton hover:bg-gray-200"
                   title="Delete Section"
                   style={{ zIndex: 10, position: "relative" }}
                 />

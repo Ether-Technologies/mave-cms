@@ -276,8 +276,8 @@ const SliderComponent = ({
               </div>
 
               {showAltContent && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <div className="text-sm text-blue-800">
+                <div className="mt-4 p-3 bg-gray-200 rounded-lg">
+                  <div className="text-sm text-gray-800">
                     <strong>Alternative Content Mode:</strong> Slider items will
                     display alternative titles and descriptions when available.
                   </div>
@@ -346,7 +346,7 @@ const SliderComponent = ({
                   </div>
                 ) : (
                   /* Display Current Main Slider Alternative Content */
-                  <div className="border rounded-lg p-3 bg-blue-50">
+                  <div className="border rounded-lg p-3 bg-gray-200">
                     <div className="font-medium text-sm mb-2">Main Slider</div>
                     <div className="text-sm">
                       <div>

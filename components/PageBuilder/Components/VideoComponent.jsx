@@ -177,8 +177,8 @@ const VideoComponent = ({
     const embedUrl = getEmbedUrl(videoData.url);
     if (!embedUrl) {
       return (
-        <div className="p-4 bg-red-50 rounded-lg border border-red-100">
-          <Paragraph className="text-red-600">
+        <div className="p-4 bg-gray-200 rounded-lg border border-gray-400">
+          <Paragraph className="text-gray-800">
             Invalid video URL. Please select a valid YouTube, Vimeo, Google
             Drive, or direct video link.
           </Paragraph>
@@ -220,7 +220,7 @@ const VideoComponent = ({
               />
             </div>
             {googleDriveFallbackIndex > 0 && (
-              <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs">
+              <div className="absolute top-2 right-2 bg-gray-200 text-white px-2 py-1 rounded text-xs">
                 Using fallback {googleDriveFallbackIndex + 1}
               </div>
             )}
@@ -375,8 +375,8 @@ const VideoComponent = ({
               </div>
 
               {showAltContent && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <div className="text-sm text-blue-800">
+                <div className="mt-4 p-3 bg-gray-200 rounded-lg">
+                  <div className="text-sm text-gray-800">
                     <strong>Alternative Content Mode:</strong> Video will
                     display alternative title and description when available.
                   </div>

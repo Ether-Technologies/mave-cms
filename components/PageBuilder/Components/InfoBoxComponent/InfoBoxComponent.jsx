@@ -653,7 +653,7 @@ const InfoBoxComponent = ({
                             href={item.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-yellow-600 hover:underline"
+                            className="text-gray-700 hover:underline"
                           >
                             {item.link}
                           </a>
@@ -686,8 +686,8 @@ const InfoBoxComponent = ({
 
                   {/* Alt Content Editing Form */}
                   {!preview && isEditMode && editingAltItemId === item.id && (
-                    <div className="mt-4 p-3 bg-blue-50 rounded border-2 border-blue-300">
-                      <div className="mb-2 text-sm text-blue-600 font-medium">
+                    <div className="mt-4 p-3 bg-gray-200 rounded border-2 border-gray-300">
+                      <div className="mb-2 text-sm text-gray-800 font-medium">
                         ✏️ Editing Alt Content for: {item.title}
                       </div>
                       <div className="mb-3">
@@ -791,8 +791,8 @@ const InfoBoxComponent = ({
               </div>
 
               {showAltContent && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <div className="text-sm text-blue-800">
+                <div className="mt-4 p-3 bg-gray-200 rounded-lg">
+                  <div className="text-sm text-gray-800">
                     <strong>Alternative Content Mode:</strong> Info items will
                     display alternative titles and descriptions when available.
                   </div>

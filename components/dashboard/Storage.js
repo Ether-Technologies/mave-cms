@@ -13,7 +13,7 @@ export default function Storage() {
       type: "donut",
     },
     labels: ["Image", "Video", "Documents", "Others", "Empty"],
-    colors: ["#FCB813", "#E3A611", "#FEE9B6", "#FFF4DC", "#FFFFFF"],
+    colors: ["#000000", "#525252", "#FEE9B6", "#FFF4DC", "#FFFFFF"],
     responsive: [
       {
         breakpoint: 480,

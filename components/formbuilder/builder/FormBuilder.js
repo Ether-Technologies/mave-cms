@@ -319,15 +319,15 @@ const FormBuilder = () => {
                 </p>
 
                 {!createdFormId ? (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
-                    <p className="text-yellow-800">
+                  <div className="bg-gray-200 border border-gray-300 rounded-md p-4 mb-4">
+                    <p className="text-gray-700">
                       ⚠️ Please save the form first before testing. The form needs to be created to get a form ID.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                      <p className="text-green-800">
+                    <div className="bg-gray-200 border border-gray-300 rounded-md p-4">
+                      <p className="text-gray-800">
                         ✅ Form is ready for testing! Form ID: <strong>{createdFormId}</strong>
                       </p>
                     </div>
@@ -337,7 +337,7 @@ const FormBuilder = () => {
                         type="primary"
                         onClick={testFormSubmission}
                         loading={testLoading}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-gray-200 hover:bg-gray-200"
                       >
                         Test Form Submission
                       </Button>

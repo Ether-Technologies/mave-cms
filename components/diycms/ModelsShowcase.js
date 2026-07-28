@@ -69,7 +69,7 @@ export default function ModelsShowcase() {
           <Spin />
         </div>
       ) : error ? (
-        <div className="text-center text-red-500">
+        <div className="text-center text-gray-800">
           <p>{error}</p>
         </div>
       ) : dynamicModels.length > 0 ? (
@@ -85,7 +85,7 @@ export default function ModelsShowcase() {
                 </h2>
                 <div className="flex gap-4 justify-center mb-4">
                   {model.status ? (
-                    <CheckCircleFilled className="text-green-500 text-xl" />
+                    <CheckCircleFilled className="text-gray-800 text-xl" />
                   ) : (
                     <CheckCircleFilled className="text-gray-500 text-xl" />
                   )}
@@ -106,7 +106,7 @@ export default function ModelsShowcase() {
                     }}
                     okButtonProps={{ danger: true }}
                   >
-                    <DeleteOutlined className="text-red-500 cursor-pointer" />
+                    <DeleteOutlined className="text-gray-800 cursor-pointer" />
                   </Popconfirm>
                 </div>
                 <Table

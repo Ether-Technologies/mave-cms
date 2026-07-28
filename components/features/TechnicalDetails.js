@@ -58,7 +58,7 @@ const TechnicalDetails = ({ technical }) => {
                     <h4 className="text-2xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                         Storage
                     </h4>
-                    <div className="p-5 rounded-xl bg-gradient-to-r from-yellow-50/50 to-orange-50/50">
+                    <div className="p-5 rounded-xl bg-gradient-to-r from-gray-200/50 to-gray-300/50">
                         <div className="text-xl font-medium text-gray-800 mb-3">{technical.storage.type}</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {technical.storage.features?.map((feature, idx) => (
@@ -66,7 +66,7 @@ const TechnicalDetails = ({ technical }) => {
                                     key={idx}
                                     className="flex items-center gap-3 text-lg text-gray-600"
                                 >
-                                    <span className="w-2 h-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400"></span>
+                                    <span className="w-2 h-2 rounded-full bg-gradient-to-r from-gray-200 to-gray-300"></span>
                                     {feature}
                                 </div>
                             ))}

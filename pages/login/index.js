@@ -72,17 +72,12 @@ export default function Login() {
     <div className="fixed inset-0 flex w-full h-screen overflow-hidden">
       {/* Left Panel - Login Form with Background */}
       <motion.div
-        className="relative w-full md:w-2/5 h-full flex items-center justify-center p-8 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/ui/lleftbg.png')" }}
+        className="relative w-full md:w-[42%] h-full flex items-center justify-center p-8 bg-zinc-50"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/20"></div>
-
-        {/* Glassmorphism Container */}
-        <div className="relative z-10 w-full max-w-md backdrop-blur-md bg-white/80 rounded-3xl shadow-2xl border border-white/40 p-8 md:p-10">
+        <div className="relative z-10 w-full max-w-md bg-white rounded-xl shadow-sm border border-zinc-200 p-8 md:p-10">
           {/* Logo */}
           <motion.div
             variants={itemVariants}
@@ -102,10 +97,10 @@ export default function Login() {
 
           {/* Welcome Text */}
           <motion.div variants={itemVariants} className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent mb-2">
-              Welcome Back
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 mb-2">
+              Welcome back
             </h1>
-            <p className="text-gray-600 text-sm">
+            <p className="text-zinc-500 text-sm">
               Sign in to continue to your dashboard
             </p>
           </motion.div>
@@ -122,7 +117,7 @@ export default function Login() {
               <Link href="/signup">
                 <motion.span
                   whileHover={{ scale: 1.05 }}
-                  className="font-semibold text-yellow-500 hover:text-yellow-600 cursor-pointer transition-colors"
+                  className="font-medium text-zinc-900 hover:text-zinc-600 cursor-pointer transition-colors"
                 >
                   Sign Up
                 </motion.span>
@@ -135,7 +130,7 @@ export default function Login() {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 block
-                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/70 hover:bg-white/90 hover:border-yellow-300 transition-all rounded-xl shadow-sm hover:shadow-md"
+                className="flex justify-center items-center gap-3 h-11 border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-zinc-300 transition-colors rounded-lg"
                 onClick={() => message.info("Coming soon")}
               >
                 <Image
@@ -171,7 +166,7 @@ export default function Login() {
               >
                 <Button
                   block
-                  className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  className="h-11 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-medium border-0 rounded-lg transition-colors"
                   onClick={handleDemoLogin}
                 >
                   Get In
@@ -202,7 +197,7 @@ export default function Login() {
                         <MailOutlined className="text-lg text-gray-400 mr-2" />
                       }
                       placeholder="Email address"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-11 rounded-lg border border-zinc-200 hover:border-zinc-300 focus:border-zinc-900 transition-colors bg-white"
                     />
                   </motion.div>
                 </Form.Item>
@@ -218,7 +213,7 @@ export default function Login() {
                   <motion.div whileFocus={{ scale: 1.01 }}>
                     <Input.Password
                       placeholder="Password"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-11 rounded-lg border border-zinc-200 hover:border-zinc-300 focus:border-zinc-900 transition-colors bg-white"
                       prefix={
                         <LockOutlined className="text-lg text-gray-400 mr-2" />
                       }
@@ -239,7 +234,7 @@ export default function Login() {
                   >
                     <Button
                       block
-                      className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      className="h-11 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-medium border-0 rounded-lg transition-colors"
                       htmlType="submit"
                     >
                       Sign In
@@ -258,13 +253,13 @@ export default function Login() {
             <p className="text-xs text-gray-500">
               By signing in, you agree to our{" "}
               <Link href="/terms">
-                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                <span className="text-zinc-700 hover:text-zinc-900 font-medium cursor-pointer">
                   Terms
                 </span>
               </Link>{" "}
               and{" "}
               <Link href="/privacy">
-                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                <span className="text-zinc-700 hover:text-zinc-900 font-medium cursor-pointer">
                   Privacy Policy
                 </span>
               </Link>
@@ -309,8 +304,8 @@ export default function Login() {
               >
                 Build. Manage. Scale.
                 <span
-                  className="block text-yellow-400 mt-2"
-                  style={{ WebkitTextStroke: "1px rgba(75, 85, 99, 0.5)" }}
+                  className="block text-zinc-200 mt-2 font-medium"
+                  style={{ WebkitTextStroke: "0" }}
                 >
                   With Mave CMS
                 </span>
@@ -329,20 +324,21 @@ export default function Login() {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button
+                    type="primary"
                     icon={<RocketOutlined />}
-                    className="h-12 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+                    className="h-11 px-5 font-medium rounded-lg"
                     onClick={() => router.push("/usermanual/changelog")}
                   >
                     What's New
                   </Button>
                 </motion.div>
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <Button
                     icon={<RadarChartOutlined />}
-                    className="h-12 px-6 bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+                    className="h-11 px-5 bg-white/10 hover:bg-white/15 text-white border border-white/25 hover:border-white/40 font-medium rounded-lg transition-colors"
                     onClick={() => router.push("/portfolio")}
                   >
                     Portfolio
@@ -353,46 +349,6 @@ export default function Login() {
           </motion.div>
         </div>
       </div>
-
-      {/* Floating Elements */}
-      <motion.div
-        className="absolute top-10 left-20 w-20 h-20 bg-yellow-400/20 rounded-full blur-2xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-20 left-40 w-32 h-32 bg-amber-400/20 rounded-full blur-3xl"
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.4, 0.7, 0.4],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1,
-        }}
-      />
-      <motion.div
-        className="absolute top-1/2 right-20 w-24 h-24 bg-orange-400/20 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.2, 0.5, 0.2],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2,
-        }}
-      />
     </div>
   );
 }

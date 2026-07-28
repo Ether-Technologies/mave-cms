@@ -108,8 +108,8 @@ export default function TextToApi() {
           <Divider orientation="left" plain>
             Validation Errors
           </Divider>
-          <div className="bg-red-100 p-4 rounded mb-6">
-            <ul className="list-disc list-inside text-red-700">
+          <div className="bg-gray-200 p-4 rounded mb-6">
+            <ul className="list-disc list-inside text-gray-800">
               {validationErrors?.map((err, index) => (
                 <li key={index}>{err}</li>
               ))}

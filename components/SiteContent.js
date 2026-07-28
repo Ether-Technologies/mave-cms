@@ -130,8 +130,8 @@ const SiteContent = ({ children }) => {
     <Layout className="min-h-screen overflow-x-hidden">
       {/* Fixed Header */}
       <Header
-        className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md flex 
-      items-center px-3 sm:px-4 md:px-6 lg:px-8 h-16"
+        className="mave-shell-header fixed top-0 left-0 right-0 z-50 flex 
+      items-center px-3 sm:px-4 md:px-6 lg:px-8 h-14 border-0 shadow-none"
       >
         <NavItems
           user={user}
@@ -142,10 +142,10 @@ const SiteContent = ({ children }) => {
         />
       </Header>
 
-      <Layout className="pt-16">
+      <Layout className="pt-14">
         {/* Conditionally render the Side Navigation */}
         {shouldShowSidebar && (
-          <div className="fixed top-16 left-0 bottom-0 z-40">
+          <div className="fixed top-14 left-0 bottom-0 z-40">
             <Sider
               collapsible
               collapsed={collapsed}
@@ -153,12 +153,12 @@ const SiteContent = ({ children }) => {
               theme={theme}
               width={260}
               style={{
-                height: "calc(100vh - 4rem)",
-                minHeight: "calc(100vh - 4rem)",
-                maxHeight: "calc(100vh - 4rem)",
+                height: "calc(100vh - 3.5rem)",
+                minHeight: "calc(100vh - 3.5rem)",
+                maxHeight: "calc(100vh - 3.5rem)",
               }}
-              className="px-2 rounded-r-2xl
-                bg-white shadow-lg transition-all duration-300 overflow-y-auto overflow-x-hidden
+              className="mave-shell-sider px-2 rounded-none
+                transition-all duration-300 overflow-y-auto overflow-x-hidden
                 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
               breakpoint="lg"
               collapsedWidth={80}
@@ -181,7 +181,7 @@ const SiteContent = ({ children }) => {
 
         {/* Main Content Area */}
         <Layout
-          className="transition-all duration-300 ease-in-out min-h-[calc(100vh-4rem)]"
+          className="transition-all duration-300 ease-in-out min-h-[calc(100vh-3.5rem)]"
           style={{
             marginLeft:
               shouldShowSidebar && !isMobile ? `${contentMargin}px` : "0",
@@ -218,7 +218,7 @@ const SiteContent = ({ children }) => {
           )}
 
           <Content
-            className="bg-gray-100 min-h-[calc(100vh-4rem)]"
+            className="mave-shell-content min-h-[calc(100vh-3.5rem)]"
             style={{
               width: "100%",
               maxWidth: "100%",

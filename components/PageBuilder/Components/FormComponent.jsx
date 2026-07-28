@@ -272,8 +272,8 @@ const FormComponent = ({
               </div>
 
               {showAltContent && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <div className="text-sm text-blue-800">
+                <div className="mt-4 p-3 bg-gray-200 rounded-lg">
+                  <div className="text-sm text-gray-800">
                     <strong>Alternative Content Mode:</strong> Form will display
                     alternative title and description when available.
                   </div>

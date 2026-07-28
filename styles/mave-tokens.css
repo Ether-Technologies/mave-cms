@@ -1,0 +1,69 @@
+/**
+ * MAVE CMS — global design tokens (single source of truth for colors)
+ *
+ * Change values here to update the entire admin UI: Ant Design, Tailwind
+ * (theme/accent/surface/*), component classes (.mavebutton, .mave-tag-pill, etc.),
+ * and layout shell styles.
+ *
+ * Optional runtime override: CMS Settings → General → Theme preset
+ * (sets --accent / --accent-hover via themeUtils.applyBrandColors).
+ */
+
+:root {
+  --max-width: 1100px;
+  --border-radius: 8px;
+  --radius-lg: 12px;
+
+  /* Surfaces */
+  --surface-base: #fafafa;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f4f4f5;
+  --surface-overlay: rgba(255, 255, 255, 0.92);
+
+  /* Borders */
+  --border-default: #e4e4e7;
+  --border-muted: #f4f4f5;
+  --border-strong: #d4d4d8;
+
+  /* Typography */
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --text-inverse: #fafafa;
+
+  /* Brand / actions (primary control: change these two for a new look) */
+  --accent: #18181b;
+  --accent-hover: #27272a;
+  --accent-active: #09090b;
+  --accent-subtle: #f4f4f5;
+  --accent-muted: #e4e4e7;
+
+  /* Legacy aliases — keep components working; map to tokens above */
+  --white: #ffffff;
+  --black: var(--text-primary);
+  --gray: var(--surface-sunken);
+  --gray-dark: var(--text-muted);
+  --theme: var(--accent);
+  --theme-dark: var(--accent-hover);
+  --themelite: color-mix(in srgb, var(--accent) 15%, transparent);
+  --theme-transparent: var(--accent-subtle);
+  --themes: var(--accent);
+  --maveyellow: var(--accent);
+  --themes-transparent: var(--border-muted);
+  --themes-light: color-mix(in srgb, var(--accent) 6%, transparent);
+  --success: #3f3f46;
+  --lightorange: color-mix(in srgb, var(--accent) 6%, transparent);
+  --lightblue: color-mix(in srgb, var(--accent) 4%, transparent);
+  --transparentwhite: rgba(255, 255, 255, 0.85);
+  --notwhite: var(--surface-base);
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06),
+    0 4px 6px -4px rgba(0, 0, 0, 0.04);
+
+  /* Focus ring (uses accent) */
+  --focus-ring: color-mix(in srgb, var(--accent) 12%, transparent);
+}

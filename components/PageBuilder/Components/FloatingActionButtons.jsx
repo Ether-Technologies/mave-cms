@@ -21,7 +21,7 @@ const FloatingActionButtons = ({
         <div className="flex items-center gap-2">
           <div
             className={`w-2 h-2 rounded-full ${
-              isDirty ? "bg-orange-500" : "bg-green-500"
+              isDirty ? "bg-gray-800" : "bg-gray-200"
             }`}
           ></div>
           <span>{isDirty ? "Unsaved changes" : "All changes saved"}</span>
@@ -44,8 +44,8 @@ const FloatingActionButtons = ({
           loading={loading}
           className={`shadow-lg hover:shadow-xl transition-all duration-300 ${
             isDirty
-              ? "bg-yellow-500 hover:bg-yellow-600 border-yellow-500 hover:border-yellow-600"
-              : "bg-green-500 hover:bg-green-600 border-green-500 hover:border-green-600"
+              ? "bg-gray-200 hover:bg-gray-200 border-gray-300 hover:border-gray-300"
+              : "bg-gray-200 hover:bg-gray-200 border-gray-300 hover:border-gray-300"
           }`}
           style={{
             width: "40px",
@@ -62,7 +62,7 @@ const FloatingActionButtons = ({
           }
         />
         {isDirty && (
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center">
             <div className="w-2 h-2 bg-white rounded-full"></div>
           </div>
         )}
@@ -74,7 +74,7 @@ const FloatingActionButtons = ({
         icon={<EyeOutlined />}
         size="large"
         onClick={onPreview}
-        className="shadow-lg hover:shadow-xl transition-all duration-300 bg-yellow-500 hover:bg-yellow-600 border-yellow-500 hover:border-yellow-600"
+        className="shadow-lg hover:shadow-xl transition-all duration-300 bg-gray-200 hover:bg-gray-200 border-gray-300 hover:border-gray-300"
         style={{
           width: "40px",
           height: "40px",

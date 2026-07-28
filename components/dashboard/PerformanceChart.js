@@ -31,12 +31,12 @@ export default function PerformanceChart() {
                     <AreaChart data={data}>
                         <defs>
                             <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#fcb813" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#fcb813" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#000000" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#000000" stopOpacity={0} />
                             </linearGradient>
                             <linearGradient id="colorEngagement" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#e3a611" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#e3a611" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#525252" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#525252" stopOpacity={0} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -63,7 +63,7 @@ export default function PerformanceChart() {
                         <Area
                             type="monotone"
                             dataKey="views"
-                            stroke="#fcb813"
+                            stroke="#000000"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorViews)"
@@ -71,7 +71,7 @@ export default function PerformanceChart() {
                         <Area
                             type="monotone"
                             dataKey="engagement"
-                            stroke="#e3a611"
+                            stroke="#525252"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorEngagement)"
@@ -82,11 +82,11 @@ export default function PerformanceChart() {
 
             <div className="flex justify-center gap-6 mt-4">
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-[#fcb813] rounded-full"></div>
+                    <div className="w-3 h-3 bg-[#000000] rounded-full"></div>
                     <span className="text-sm text-gray-600">Views</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-[#e3a611] rounded-full"></div>
+                    <div className="w-3 h-3 bg-[#525252] rounded-full"></div>
                     <span className="text-sm text-gray-600">Engagement</span>
                 </div>
             </div>

@@ -210,7 +210,7 @@ const UploadMedia = ({
               </div>
               <Button
                 type="text"
-                icon={<DeleteOutlined className="text-red-500" />}
+                icon={<DeleteOutlined className="text-gray-800" />}
                 onClick={() => handleRemove(file)}
               />
             </div>

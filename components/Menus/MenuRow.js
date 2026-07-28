@@ -99,8 +99,8 @@ const MenuRow = ({
       className={`
         bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border-2 
         transition-all duration-300 hover:shadow-xl
-        ${isSelected ? 'border-yellow-400 ring-2 ring-yellow-200' : 'border-gray-200 hover:border-gray-300'}
-        ${isEditing ? 'ring-2 ring-blue-200 border-blue-300' : ''}
+        ${isSelected ? 'border-gray-300 ring-2 ring-gray-300' : 'border-gray-200 hover:border-gray-300'}
+        ${isEditing ? 'ring-2 ring-gray-400 border-gray-300' : ''}
       `}
     >
       <div className="p-4">
@@ -120,13 +120,13 @@ const MenuRow = ({
               <Input
                 value={editedMenuName}
                 onChange={(e) => setEditedMenuName(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-gray-400 focus:border-black transition-all"
                 placeholder="Menu name"
                 prefix={<MenuOutlined className="text-gray-400" />}
               />
             ) : (
               <div className="flex items-center gap-2">
-                <MenuOutlined className="text-yellow-500" />
+                <MenuOutlined className="text-black" />
                 <span className="font-semibold text-gray-800 truncate">
                   {menu.name}
                 </span>
@@ -144,7 +144,7 @@ const MenuRow = ({
                 placeholder="Select menu items"
                 value={editedMenuItemsIds}
                 onChange={(values) => setEditedMenuItemsIds(values)}
-                className="w-full [&_.ant-select-selector]:min-h-[40px] [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                className="w-full [&_.ant-select-selector]:min-h-[40px] [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-gray-300"
                 optionFilterProp="children"
                 maxTagCount="responsive"
               >
@@ -159,7 +159,7 @@ const MenuRow = ({
                 <div className="flex items-center gap-2 mb-2">
                   <Badge
                     count={menuItemsCount}
-                    className="[&_.ant-badge-count]:bg-yellow-500 [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs"
+                    className="mave-item-count-badge"
                     showZero
                   />
                   <span className="text-xs text-gray-500 font-medium">
@@ -171,7 +171,7 @@ const MenuRow = ({
                     {displayedItems?.map((menuItem) => (
                       <Tag
                         key={menuItem.id}
-                        className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 text-gray-700 font-medium px-3 py-1 rounded-full text-xs"
+                        className="mave-tag-pill text-xs px-2.5 py-0.5"
                       >
                         {menuItem.title}
                       </Tag>
@@ -181,7 +181,7 @@ const MenuRow = ({
                         type="link"
                         size="small"
                         onClick={() => setShowAllItems(true)}
-                        className="text-yellow-600 hover:text-yellow-700 font-medium text-xs px-2"
+                        className="text-gray-700 hover:text-gray-700 font-medium text-xs px-2"
                       >
                         +{menuItemsCount - 3} more
                       </Button>
@@ -191,7 +191,7 @@ const MenuRow = ({
                         type="link"
                         size="small"
                         onClick={() => setShowAllItems(false)}
-                        className="text-yellow-600 hover:text-yellow-700 font-medium text-xs px-2"
+                        className="text-gray-700 hover:text-gray-700 font-medium text-xs px-2"
                       >
                         Show less
                       </Button>
@@ -212,7 +212,7 @@ const MenuRow = ({
                   <Button
                     icon={<CheckCircleOutlined />}
                     onClick={handleUpdate}
-                    className="h-10 px-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-gradient-to-r from-gray-600 to-emerald-500 hover:from-gray-600 hover:to-emerald-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Update
                   </Button>
@@ -233,7 +233,7 @@ const MenuRow = ({
                   <Button
                     icon={<EditOutlined />}
                     onClick={() => setEditingMenuId(menu.id)}
-                    className="h-10 px-4 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-black hover:bg-gray-800 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Edit
                   </Button>
@@ -246,13 +246,13 @@ const MenuRow = ({
                   cancelText="Cancel"
                   okButtonProps={{
                     danger: true,
-                    className: "bg-red-500 hover:bg-red-600 border-red-500"
+                    className: "bg-gray-200 hover:bg-gray-200 border-gray-400"
                   }}
                 >
                   <Tooltip title="Delete menu">
                     <Button
                       icon={<DeleteOutlined />}
-                      className="h-10 px-4 bg-red-500 hover:bg-red-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                      className="h-10 px-4 mave-delete-button"
                     >
                       Delete
                     </Button>

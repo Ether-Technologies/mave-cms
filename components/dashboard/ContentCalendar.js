@@ -55,10 +55,10 @@ export default function ContentCalendar() {
                         <div className="flex items-start justify-between gap-2 mb-2">
                             <h4 className="font-medium text-sm leading-tight text-gray-800">{content.title}</h4>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${content.status === "scheduled"
-                                ? "bg-[#fcb813] text-white"
+                                ? "bg-[#000000] text-white"
                                 : content.status === "draft"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : "bg-blue-100 text-blue-700"
+                                    ? "bg-gray-200 text-gray-700"
+                                    : "bg-gray-200 text-gray-800"
                                 }`}>
                                 {content.status}
                             </span>

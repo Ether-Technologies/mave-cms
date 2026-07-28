@@ -82,7 +82,7 @@ const TopPosts = ({ blogs }) => {
         {/* Top Posts List */}
         <div className="space-y-4">
           <Title level={4} className="flex items-center gap-2">
-            <FireOutlined className="text-orange-500" />
+            <FireOutlined className="text-gray-800" />
             Top Posts
           </Title>
           {filteredBlogs.map((blog) => (

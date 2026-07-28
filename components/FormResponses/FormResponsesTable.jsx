@@ -287,7 +287,7 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg border border-gray-300 overflow-hidden">
         <div className="p-0">
           <Table
             dataSource={responses}
@@ -304,7 +304,7 @@ const FormResponsesTable = ({ responses, refreshData, currentUser }) => {
             scroll={{ x: 800 }}
             size="middle"
             className="modern-table"
-            rowClassName="hover:bg-orange-50 transition-colors duration-200"
+            rowClassName="hover:bg-gray-800 transition-colors duration-200"
           />
         </div>
       </div>

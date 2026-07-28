@@ -24,13 +24,13 @@ export default function WelcomeCard({ userData }) {
             title: "New Post",
             icon: <PlusOutlined />,
             link: "/blogs",
-            gradient: "from-[#fcb813] to-[#e3a611]",
+            gradient: "from-[#000000] to-[#525252]",
         },
         {
             title: "New Page",
             icon: <FileAddOutlined />,
             link: "/page-builder",
-            gradient: "from-orange-500 to-orange-600",
+            gradient: "from-gray-300 to-gray-300",
         },
         {
             title: "Upload Media",

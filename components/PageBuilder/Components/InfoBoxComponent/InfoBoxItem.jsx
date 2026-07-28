@@ -125,7 +125,7 @@ const InfoBoxItem = ({
 
       {/* Alt Content Editing Section */}
       {!preview && isEditingAlt && (
-        <div className="mt-4 p-3 bg-blue-50 rounded border">
+        <div className="mt-4 p-3 bg-gray-200 rounded border">
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Alternative Title

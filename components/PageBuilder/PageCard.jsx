@@ -90,14 +90,14 @@ const PageCard = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-xl transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 bg-gradient-to-r from-gray-100/50 to-gray-200/50 rounded-xl transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
       />
 
       <Card
         className={`relative w-full transition-all duration-300 ease-in-out rounded-xl overflow-hidden ${
           isExpanded
-            ? "shadow-xl border-2 border-blue-200 bg-gradient-to-br from-white to-blue-50/30"
-            : "shadow-md hover:shadow-xl border border-gray-100 hover:border-blue-200"
+            ? "shadow-xl border-2 border-gray-300 bg-gradient-to-br from-white to-gray-200/30"
+            : "shadow-md hover:shadow-xl border border-gray-100 hover:border-gray-300"
         } ${isHovered ? "transform scale-[1.02]" : "transform scale-100"}`}
         bodyStyle={{ padding: 0 }}
       >
@@ -129,7 +129,7 @@ const PageCard = ({
 
               <div className="flex flex-col">
                 <Tooltip title={page.page_name_en} placement="top">
-                  <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors cursor-pointer">
+                  <h3 className="text-lg font-semibold text-gray-800 hover:text-gray-800 transition-colors cursor-pointer">
                     {truncateText(page.page_name_en, 30)}
                   </h3>
                 </Tooltip>
@@ -147,7 +147,7 @@ const PageCard = ({
                   type="text"
                   icon={<EyeOutlined />}
                   onClick={() => handlePreviewPage(page.id)}
-                  className="h-10 w-10 flex items-center justify-center rounded-full hover:bg-blue-50 hover:text-blue-600 transition-all duration-200"
+                  className="h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 hover:text-gray-800 transition-all duration-200"
                   style={{ border: "1px solid #e5e7eb" }}
                 />
               </Tooltip>
@@ -164,7 +164,7 @@ const PageCard = ({
                   onClick={() => handleExpand(page.id)}
                   className={`h-10 w-10 flex items-center justify-center rounded-full transition-all duration-200 ${
                     isExpanded
-                      ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                      ? "bg-gray-200 text-gray-800 hover:bg-gray-200"
                       : "hover:bg-gray-100 hover:text-gray-600"
                   }`}
                   style={{ border: "1px solid #e5e7eb" }}
@@ -211,7 +211,7 @@ const PageCard = ({
                     okText="Yes, Delete"
                     cancelText="Cancel"
                     okButtonProps={{
-                      className: "bg-red-500 hover:bg-red-600 border-red-500",
+                      className: "bg-gray-200 hover:bg-gray-200 border-gray-400",
                       danger: true,
                     }}
                     cancelButtonProps={{ className: "border-gray-300" }}
@@ -220,7 +220,7 @@ const PageCard = ({
                       <Button
                         icon={<DeleteFilled />}
                         danger
-                        className="h-10 px-6 rounded-lg font-medium transition-all duration-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 border-red-200"
+                        className="h-10 px-6 rounded-lg font-medium transition-all duration-200 bg-gray-200 text-gray-800 hover:bg-gray-200 hover:text-gray-800 border-gray-400"
                       >
                         Delete
                       </Button>

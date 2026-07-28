@@ -89,7 +89,7 @@ const PagesHeader = ({
           <div className="flex items-center gap-4">
             <div className="relative group">
               <div
-                className="border-2 border-gray-200 bg-gradient-to-br from-yellow-50 via-purple-50 to-teal-50 rounded-2xl p-3.5 hover:bg-gradient-to-br hover:from-yellow-100 hover:via-purple-100 hover:to-teal-100 transition-all duration-300 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transform"
+                className="border-2 border-gray-200 bg-gradient-to-br from-gray-200 via-purple-50 to-teal-50 rounded-2xl p-3.5 hover:bg-gradient-to-br hover:from-gray-200 hover:via-purple-100 hover:to-teal-100 transition-all duration-300 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transform"
                 onClick={() => router.push("/build-with-ai")}
               >
                 <Image
@@ -108,25 +108,25 @@ const PagesHeader = ({
                 {title}
               </h1>
               <div className="flex items-center gap-3 mt-2">
-                <div className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-50 to-amber-50 px-3 py-1.5 rounded-full border border-yellow-200 hover:shadow-sm transition-all">
-                  <FileTextOutlined className="text-yellow-600 text-xs" />
+                <div className="flex items-center gap-1.5 bg-zinc-100 px-3 py-1.5 rounded-full border border-zinc-200 text-zinc-700 hover:bg-zinc-50 transition-colors">
+                  <FileTextOutlined className="text-gray-700 text-xs" />
                   <Badge
                     count={totalPages}
                     showZero
-                    className="[&_.ant-badge-count]:bg-yellow-500 [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:min-w-[20px] [&_.ant-badge-count]:h-5 [&_.ant-badge-count]:leading-5 [&_.ant-badge-count]:shadow-sm"
+                    className="mave-item-count-badge [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:min-w-[20px] [&_.ant-badge-count]:h-5 [&_.ant-badge-count]:leading-5 [&_.ant-badge-count]:shadow-sm"
                   />
-                  <span className="text-xs font-medium text-yellow-700 ml-1">
+                  <span className="text-xs font-medium text-gray-700 ml-1">
                     Pages
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-50 to-violet-50 px-3 py-1.5 rounded-full border border-purple-200 hover:shadow-sm transition-all">
-                  <AppstoreOutlined className="text-purple-600 text-xs" />
+                <div className="flex items-center gap-1.5 mave-tag-pill px-3 py-1.5">
+                  <AppstoreOutlined className="text-gray-800 text-xs" />
                   <Badge
                     count={totalSubpages}
                     showZero
-                    className="[&_.ant-badge-count]:bg-purple-500 [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:min-w-[20px] [&_.ant-badge-count]:h-5 [&_.ant-badge-count]:leading-5 [&_.ant-badge-count]:shadow-sm"
+                    className="mave-item-count-badge [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:min-w-[20px] [&_.ant-badge-count]:h-5 [&_.ant-badge-count]:leading-5 [&_.ant-badge-count]:shadow-sm"
                   />
-                  <span className="text-xs font-medium text-purple-700 ml-1">
+                  <span className="text-xs font-medium text-gray-800 ml-1">
                     Subpages
                   </span>
                 </div>
@@ -151,7 +151,7 @@ const PagesHeader = ({
               <Button
                 icon={<CloseCircleFilled />}
                 onClick={onCancelCreate}
-                className="h-11 px-6 bg-gradient-to-r from-red-50 to-rose-50 text-red-600 hover:from-red-100 hover:to-rose-100 hover:text-red-700 border-2 border-red-200 hover:border-red-300 font-semibold shadow-sm hover:shadow-md transition-all rounded-xl"
+                className="h-11 px-6 bg-gradient-to-r from-red-50 to-rose-50 text-gray-800 hover:from-red-100 hover:to-rose-100 hover:text-gray-800 border-2 border-gray-400 hover:border-gray-400 font-semibold shadow-sm hover:shadow-md transition-all rounded-xl"
                 size="large"
               >
                 Cancel Create
@@ -160,7 +160,7 @@ const PagesHeader = ({
               <div className="flex items-center gap-3">
                 <Button
                   icon={<PlusCircleOutlined />}
-                  className="h-11 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
+                  className="h-11 px-6 bg-black hover:bg-gray-800 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
                   onClick={onCreate}
                   size="large"
                 >
@@ -216,7 +216,7 @@ const PagesHeader = ({
                   onClick={() => setSortType("desc")}
                   className={`px-4 py-1.5 rounded-lg font-medium transition-all ${
                     sortType === "desc"
-                      ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-md"
+                      ? "bg-black text-white shadow-md"
                       : "text-gray-600 hover:text-gray-800 hover:bg-white"
                   }`}
                 >
@@ -228,7 +228,7 @@ const PagesHeader = ({
                   onClick={() => setSortType("asc")}
                   className={`px-4 py-1.5 rounded-lg font-medium transition-all ${
                     sortType === "asc"
-                      ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-md"
+                      ? "bg-black text-white shadow-md"
                       : "text-gray-600 hover:text-gray-800 hover:bg-white"
                   }`}
                 >
@@ -251,7 +251,7 @@ const PagesHeader = ({
               >
                 <Button
                   icon={<FilterOutlined />}
-                  className="h-10 px-5 bg-gradient-to-r from-white to-gray-50 text-gray-700 hover:text-yellow-600 font-semibold border-2 border-gray-200 rounded-xl hover:border-yellow-300 hover:shadow-md transition-all"
+                  className="h-10 px-5 bg-gradient-to-r from-white to-gray-50 text-gray-700 hover:text-gray-700 font-semibold border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-md transition-all"
                 >
                   Filter
                 </Button>
@@ -281,7 +281,7 @@ const PagesHeader = ({
             <div className="flex-1 lg:flex-none">
               <Input
                 placeholder="Search pages, subpages, footers..."
-                className="w-full lg:w-80 h-10 border-2 border-gray-200 rounded-xl shadow-sm bg-gradient-to-r from-white to-gray-50 hover:border-gray-300 focus:border-yellow-400 transition-all [&_.ant-input]:bg-transparent [&_.ant-input]:font-medium [&_.ant-input]:placeholder:text-gray-400"
+                className="w-full lg:w-80 h-10 border-2 border-gray-200 rounded-xl shadow-sm bg-gradient-to-r from-white to-gray-50 hover:border-gray-300 focus:border-black transition-all [&_.ant-input]:bg-transparent [&_.ant-input]:font-medium [&_.ant-input]:placeholder:text-gray-400"
                 allowClear
                 value={searchValue}
                 onChange={(e) => handleSearch(e.target.value)}

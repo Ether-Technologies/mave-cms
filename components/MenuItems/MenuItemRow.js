@@ -180,8 +180,8 @@ const MenuItemRow = ({
       className={`
         bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border-2 
         transition-all duration-300 hover:shadow-xl
-        ${isSelected ? 'border-yellow-400 ring-2 ring-yellow-200' : 'border-gray-200 hover:border-gray-300'}
-        ${isEditing ? 'ring-2 ring-blue-200 border-blue-300' : ''}
+        ${isSelected ? 'border-gray-300 ring-2 ring-gray-300' : 'border-gray-200 hover:border-gray-300'}
+        ${isEditing ? 'ring-2 ring-gray-400 border-gray-300' : ''}
       `}
     >
       <div className="p-4">
@@ -201,13 +201,13 @@ const MenuItemRow = ({
               <Input
                 value={editedTitleEn}
                 onChange={(e) => setEditedTitleEn(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-gray-400 focus:border-black transition-all"
                 placeholder="Item Name"
                 prefix={<MenuOutlined className="text-gray-400" />}
               />
             ) : (
               <div className="flex items-center gap-2">
-                <MenuOutlined className="text-yellow-500" />
+                <MenuOutlined className="text-black" />
                 <span className="font-semibold text-gray-800 truncate">
                   {menuItem.title}
                 </span>
@@ -221,13 +221,13 @@ const MenuItemRow = ({
               <Input
                 value={editedTitleBn}
                 onChange={(e) => setEditedTitleBn(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-gray-400 focus:border-black transition-all"
                 placeholder="আইটেম নাম"
                 prefix={<GlobalOutlined className="text-gray-400" />}
               />
             ) : (
               <div className="flex items-center gap-2">
-                <GlobalOutlined className="text-blue-500" />
+                <GlobalOutlined className="text-gray-800" />
                 <span className="font-medium text-gray-700 truncate">
                   {menuItem.title_bn || <span className="text-gray-400 italic">N/A</span>}
                 </span>
@@ -243,7 +243,7 @@ const MenuItemRow = ({
                 placeholder="Select a Parent Menu"
                 optionFilterProp="children"
                 onChange={(value) => setEditedParentId(value)}
-                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-gray-300"
                 allowClear
                 value={getParentTitle(editedParentId)}
               >
@@ -257,7 +257,7 @@ const MenuItemRow = ({
                   ))}
               </Select>
             ) : (
-              <Tag className="bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 text-purple-700 font-medium px-3 py-1 rounded-full">
+              <Tag className="mave-tag-pill font-medium px-3 py-1">
                 {getParentTitle(menuItem.parent_id)}
               </Tag>
             )}
@@ -281,7 +281,7 @@ const MenuItemRow = ({
                     placeholder="Select a page"
                     optionFilterProp="children"
                     onChange={(value) => setEditedLink(value)}
-                    className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                    className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-gray-300"
                     value={editedLink || undefined}
                   >
                     {pages.map((page) => (
@@ -294,7 +294,7 @@ const MenuItemRow = ({
                   <Input
                     value={editedLink}
                     onChange={(e) => setEditedLink(e.target.value)}
-                    className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                    className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-gray-400 focus:border-black transition-all"
                     placeholder="Enter custom link"
                     prefix={<LinkOutlined className="text-gray-400" />}
                   />
@@ -303,12 +303,12 @@ const MenuItemRow = ({
             ) : (
               <Tooltip title={menuItem.link}>
                 <div className="flex items-center gap-2">
-                  <LinkOutlined className="text-blue-500 text-xs" />
+                  <LinkOutlined className="text-gray-800 text-xs" />
                   <a
                     href={menuItem.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 underline text-sm truncate font-medium"
+                    className="text-gray-800 hover:text-gray-800 underline text-sm truncate font-medium"
                   >
                     {menuItem.link.length > 25
                       ? menuItem.link.slice(0, 25) + "..."
@@ -327,7 +327,7 @@ const MenuItemRow = ({
                   <Button
                     icon={<CheckCircleOutlined />}
                     onClick={handleUpdate}
-                    className="h-10 px-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-gradient-to-r from-gray-600 to-emerald-500 hover:from-gray-600 hover:to-emerald-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Update
                   </Button>
@@ -348,7 +348,7 @@ const MenuItemRow = ({
                   <Button
                     icon={<EditOutlined />}
                     onClick={() => setEditingItemId(menuItem.id)}
-                    className="h-10 px-4 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-black hover:bg-gray-800 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Edit
                   </Button>
@@ -361,13 +361,13 @@ const MenuItemRow = ({
                   cancelText="Cancel"
                   okButtonProps={{
                     danger: true,
-                    className: "bg-red-500 hover:bg-red-600 border-red-500",
+                    className: "bg-gray-200 hover:bg-gray-200 border-gray-400",
                   }}
                 >
                   <Tooltip title="Delete menu item">
                     <Button
                       icon={<DeleteOutlined />}
-                      className="h-10 px-4 bg-red-500 hover:bg-red-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                      className="h-10 px-4 mave-delete-button"
                     >
                       Delete
                     </Button>

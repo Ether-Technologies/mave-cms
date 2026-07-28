@@ -58,9 +58,9 @@ const SEOFields = ({ seo, setSeo }) => {
           <h4 className="text-lg font-medium">SEO Score</h4>
           <span className="text-sm text-gray-500">
             {seoScore >= 80 ? (
-              <CheckCircleOutlined className="text-green-500" />
+              <CheckCircleOutlined className="text-gray-800" />
             ) : (
-              <WarningOutlined className="text-yellow-500" />
+              <WarningOutlined className="text-black" />
             )}
           </span>
         </div>

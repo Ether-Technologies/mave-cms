@@ -72,10 +72,10 @@ export default function AverageRequests() {
       },
       stroke: {
         width: 2,
-        colors: ["#FCB813"],
+        colors: ["#000000"],
       },
       fill: {
-        colors: ["#FCB813"],
+        colors: ["#000000"],
         opacity: 1,
       },
       xaxis: {

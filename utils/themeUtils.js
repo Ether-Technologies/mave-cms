@@ -1,17 +1,34 @@
-// utils/themeUtils.js
+// utils/themeUtils.js — backward-compatible API for theme / CMS settings
 
-export const setThemeColors = (themeColor, themeAccent) => {
-  const root = document.documentElement;
+import {
+  applyBrandColors,
+  clearBrandColors,
+  readTokensFromDocument,
+  buildAntdTheme,
+  getCssVar,
+} from "../config/maveDesignTokens";
 
-  // Update CSS variables
-  root.style.setProperty("--theme", themeColor);
-  root.style.setProperty("--theme-dark", themeAccent);
-
-  // Update other related variables if necessary
-  root.style.setProperty("--themelite", `${themeColor}64`);
-  root.style.setProperty("--themes", themeColor);
-  root.style.setProperty("--maveyellow", themeColor);
-  root.style.setProperty("--themes-transparent", "#ffefe9"); // This seems static; adjust if needed
-  root.style.setProperty("--themes-light", `${themeColor}25`);
-  // Add more variables as needed
+export {
+  applyBrandColors,
+  clearBrandColors,
+  readTokensFromDocument,
+  buildAntdTheme,
+  getCssVar,
 };
+
+/** @deprecated Use applyBrandColors — kept for existing imports */
+export const setThemeColors = (primary, accent) => {
+  if (primary) {
+    applyBrandColors(primary, accent);
+  } else {
+    clearBrandColors();
+  }
+};
+
+export function applyThemeFromSettings(themecolor, themeaccent) {
+  if (themecolor) {
+    applyBrandColors(themecolor, themeaccent || themecolor);
+  } else {
+    clearBrandColors();
+  }
+}

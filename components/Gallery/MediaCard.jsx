@@ -29,7 +29,7 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
       icon={<EyeOutlined />}
       onClick={() => handlePreview(media)}
       key="preview"
-      className="hover:text-green-500"
+      className="hover:text-gray-800"
     />,
     <Popconfirm
       title="Are you sure you want to delete this media?"
@@ -43,7 +43,7 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
         type="link"
         icon={<DeleteOutlined />}
         danger
-        className="hover:text-red-500"
+        className="hover:text-gray-800"
       />
     </Popconfirm>,
   ];
@@ -214,7 +214,7 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
             <div className="text-4xl mb-2">
               {isOfficeDoc ? (
                 <svg
-                  className="w-16 h-16 mx-auto text-yellow-500"
+                  className="w-16 h-16 mx-auto text-black"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -222,7 +222,7 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
                 </svg>
               ) : (
                 <svg
-                  className="w-16 h-16 mx-auto text-red-500"
+                  className="w-16 h-16 mx-auto text-gray-800"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >

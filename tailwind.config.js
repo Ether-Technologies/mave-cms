@@ -4,7 +4,6 @@ module.exports = {
   content: [
     "./pages/**/*.{js,jsx,ts,tsx}",
     "./components/**/*.{js,jsx,ts,tsx}",
-    // Add other directories if needed
   ],
   theme: {
     extend: {
@@ -16,22 +15,50 @@ module.exports = {
         "theme-dark": "var(--theme-dark)",
         themelite: "var(--themelite)",
         themes: "var(--themes)",
-        white: "#ffffff",
-        black: "#343434",
-        bggray: "#E8E8E9",
-        themelight: "#fef08a",
-        themedark: "#ffa17c",
-        darkgray: "#797B7E",
-        themetransparent: "#f3ecf8",
+        accent: "var(--accent)",
+        "accent-hover": "var(--accent-hover)",
+        "accent-subtle": "var(--accent-subtle)",
+        mave: {
+          primary: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
+          inverse: "var(--text-inverse)",
+          accent: "var(--accent)",
+          "accent-hover": "var(--accent-hover)",
+          border: "var(--border-default)",
+          "border-strong": "var(--border-strong)",
+        },
+        surface: {
+          base: "var(--surface-base)",
+          raised: "var(--surface-raised)",
+          sunken: "var(--surface-sunken)",
+        },
+        border: {
+          DEFAULT: "var(--border-default)",
+          strong: "var(--border-strong)",
+          muted: "var(--border-muted)",
+        },
+        white: "var(--white)",
+        black: "var(--black)",
+        bggray: "var(--gray)",
+        themelight: "var(--accent-muted)",
+        themedark: "var(--accent-hover)",
+        darkgray: "var(--gray-dark)",
+        themetransparent: "var(--themes-transparent)",
+      },
+      borderRadius: {
+        DEFAULT: "var(--border-radius)",
+        lg: "var(--radius-lg)",
+        xl: "var(--radius-lg)",
+      },
+      boxShadow: {
+        shell: "var(--shadow-sm)",
+        card: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
       },
       spacing: {
         80: "20rem",
         260: "65rem",
-      },
-      borderRadius: {
-        xl: "1rem",
-      },
-      spacing: {
         "5%": "5%",
       },
     },

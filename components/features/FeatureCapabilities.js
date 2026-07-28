@@ -22,9 +22,9 @@ const FeatureCapabilities = ({ capabilities }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                         viewport={{ once: true }}
-                        className="flex items-center gap-3 p-5 rounded-xl bg-gradient-to-r from-yellow-50/50 to-orange-50/50 hover:from-yellow-100/50 hover:to-orange-100/50 transition-all duration-300"
+                        className="flex items-center gap-3 p-5 rounded-xl bg-gradient-to-r from-gray-200/50 to-gray-300/50 hover:from-gray-200/50 hover:to-gray-300/50 transition-all duration-300"
                     >
-                        <span className="w-2 h-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400"></span>
+                        <span className="w-2 h-2 rounded-full bg-gradient-to-r from-gray-200 to-gray-300"></span>
                         <span className="text-xl text-gray-700">{capability}</span>
                     </motion.div>
                 ))}

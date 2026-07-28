@@ -32,7 +32,7 @@ const CardsHeader = ({
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
             <div className="relative group">
-              <div className="border-2 border-gray-200 bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 rounded-2xl p-3.5 hover:bg-gradient-to-br hover:from-yellow-100 hover:via-amber-100 hover:to-orange-100 transition-all duration-300 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transform">
+              <div className="border-2 border-gray-200 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-300 rounded-2xl p-3.5 hover:bg-gradient-to-br hover:from-gray-200 hover:via-gray-300 hover:to-gray-300 transition-all duration-300 cursor-pointer shadow-md hover:shadow-xl hover:scale-105 transform">
                 <Image
                   src="/icons/mave/cards.svg"
                   width={30}
@@ -41,7 +41,7 @@ const CardsHeader = ({
                   className="w-7.5 h-7.5"
                 />
               </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-gray-200 to-gray-400 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
             </div>
             <div className="flex flex-col">
               <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
@@ -49,14 +49,14 @@ const CardsHeader = ({
               </h2>
               {uniqueTags && uniqueTags.length > 0 && (
                 <div className="flex items-center gap-1.5 mt-2">
-                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-50 to-amber-50 px-3 py-1.5 rounded-full border border-yellow-200 hover:shadow-sm transition-all">
-                    <TagsOutlined className="text-yellow-600 text-xs" />
+                  <div className="flex items-center gap-1.5 bg-zinc-100 px-3 py-1.5 rounded-full border border-zinc-200 text-zinc-700 hover:bg-zinc-50 transition-colors">
+                    <TagsOutlined className="text-gray-700 text-xs" />
                     <Badge
                       count={uniqueTags.length}
                       showZero
-                      className="[&_.ant-badge-count]:bg-yellow-500 [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:min-w-[20px] [&_.ant-badge-count]:h-5 [&_.ant-badge-count]:leading-5 [&_.ant-badge-count]:shadow-sm"
+                      className="mave-item-count-badge [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:min-w-[20px] [&_.ant-badge-count]:h-5 [&_.ant-badge-count]:leading-5 [&_.ant-badge-count]:shadow-sm"
                     />
-                    <span className="text-xs font-medium text-yellow-700 ml-1">
+                    <span className="text-xs font-medium text-gray-700 ml-1">
                       Tags
                     </span>
                   </div>
@@ -68,7 +68,7 @@ const CardsHeader = ({
             <Button
               icon={<PlusCircleOutlined />}
               onClick={onAddCard}
-              className="h-11 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
+              className="h-11 px-6 bg-black hover:bg-gray-800 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
               size="large"
             >
               Create Card
@@ -103,7 +103,7 @@ const CardsHeader = ({
                 onClick={() => setSortType("desc")}
                 className={`px-4 py-1.5 rounded-lg font-medium transition-all ${
                   sortType === "desc"
-                    ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-md"
+                    ? "bg-black text-white shadow-md"
                     : "text-gray-600 hover:text-gray-800 hover:bg-white"
                 }`}
               >
@@ -115,7 +115,7 @@ const CardsHeader = ({
                 onClick={() => setSortType("asc")}
                 className={`px-4 py-1.5 rounded-lg font-medium transition-all ${
                   sortType === "asc"
-                    ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-md"
+                    ? "bg-black text-white shadow-md"
                     : "text-gray-600 hover:text-gray-800 hover:bg-white"
                 }`}
               >
@@ -159,7 +159,7 @@ const CardsHeader = ({
             <div className="flex-1 lg:flex-none">
               <Input
                 placeholder="Search cards by title..."
-                className="w-full lg:w-80 h-10 border-2 border-gray-200 rounded-xl shadow-sm bg-gradient-to-r from-white to-gray-50 hover:border-gray-300 focus:border-yellow-400 transition-all [&_.ant-input]:bg-transparent [&_.ant-input]:font-medium [&_.ant-input]:placeholder:text-gray-400"
+                className="w-full lg:w-80 h-10 border-2 border-gray-200 rounded-xl shadow-sm bg-gradient-to-r from-white to-gray-50 hover:border-gray-300 focus:border-black transition-all [&_.ant-input]:bg-transparent [&_.ant-input]:font-medium [&_.ant-input]:placeholder:text-gray-400"
                 allowClear
                 onChange={(e) => onSearch(e.target.value)}
                 prefix={<SearchOutlined className="text-gray-500" />}

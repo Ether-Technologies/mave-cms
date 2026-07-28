@@ -221,7 +221,7 @@ const HeadersSection = ({
           items={headers.map((header) => header.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="bg-orange-100 p-4 rounded-lg flex flex-row flex-wrap gap-4 border-2 border-gray-400">
+          <div className="bg-gray-800 p-4 rounded-lg flex flex-row flex-wrap gap-4 border-2 border-gray-400">
             {headers.map((colObj, index) => (
               <SortableHeaderItem
                 key={colObj.id}

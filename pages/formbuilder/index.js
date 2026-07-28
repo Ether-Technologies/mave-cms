@@ -31,15 +31,15 @@ export default function FormBuilder() {
           <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
             {/* Header */}
             <div className="text-center mb-8 animate-fade-in-up">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full mb-6 transform hover:scale-105 transition-transform duration-300">
-                <ThunderboltOutlined className="text-[#fcb813]" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full mb-6 transform hover:scale-105 transition-transform duration-300">
+                <ThunderboltOutlined className="text-[#000000]" />
                 <span className="text-sm font-medium text-gray-700">
                   Powerful Form Builder
                 </span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4
-               bg-gradient-to-r from-[#fcb813] via-[#e3a611] to-orange-500 bg-clip-text 
+               bg-gradient-to-r from-[#000000] via-[#525252] to-gray-300 bg-clip-text 
                text-transparent animate-gradient">
                 Create Beautiful Forms
               </h1>
@@ -51,9 +51,9 @@ export default function FormBuilder() {
               {/* CTA Button */}
               <button
                 onClick={() => router.push("/formbuilder/create-form")}
-                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#fcb813] to-[#e3a611] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#000000] to-[#525252] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-[#e3a611] to-[#fcb813] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="absolute inset-0 bg-gradient-to-r from-[#525252] to-[#000000] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <PlusOutlined className="relative z-10 text-lg group-hover:rotate-90 transition-transform duration-300" />
                 <span className="relative z-10">Create New Form</span>
                 <div className="absolute right-0 top-0 h-full w-0 group-hover:w-full bg-white/10 transition-all duration-300"></div>
@@ -63,11 +63,11 @@ export default function FormBuilder() {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-12 animate-fade-in-up animation-delay-200">
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                <div className="text-3xl font-bold text-[#fcb813] mb-1">∞</div>
+                <div className="text-3xl font-bold text-[#000000] mb-1">∞</div>
                 <div className="text-sm text-gray-600">Unlimited Forms</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                <div className="text-3xl font-bold text-[#e3a611] mb-1">⚡</div>
+                <div className="text-3xl font-bold text-[#525252] mb-1">⚡</div>
                 <div className="text-sm text-gray-600">Lightning Fast</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">

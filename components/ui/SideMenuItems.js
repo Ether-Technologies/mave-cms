@@ -56,11 +56,11 @@ const MenuErrorBoundary = ({ children, fallback }) => {
   if (hasError) {
     return fallback || (
       <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-        <ExclamationCircleOutlined className="text-2xl text-red-500 mb-2" />
+        <ExclamationCircleOutlined className="text-2xl text-gray-700 mb-2" />
         <p className="text-gray-600 mb-2">Something went wrong with the menu</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
         >
           Reload
         </button>
@@ -357,7 +357,7 @@ const SideMenuItems = ({
       return (
         <Item
           key={item.id.toString()}
-          className={`border-2 ${token ? "border-yellow-400" : "border-gray-400"}`}
+          className={`border-2 ${token ? "border-gray-800" : "border-gray-400"}`}
         >
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-6 h-6">
@@ -417,7 +417,7 @@ const SideMenuItems = ({
               key="login"
               icon={<LoginOutlined />}
               onClick={handleLoginClick}
-              className="border-2 border-gray-400 mt-4 hover:border-blue-400 transition-colors"
+              className="border-2 border-gray-400 mt-4 hover:border-gray-600 transition-colors"
             >
               {!collapsed && <span>Login</span>}
             </Item>

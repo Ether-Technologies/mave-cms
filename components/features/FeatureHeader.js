@@ -10,7 +10,7 @@ const FeatureHeader = ({ feature }) => {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-6 mb-8"
         >
-            <div className="p-4 rounded-xl bg-gradient-to-br from-yellow-50 to-white border border-yellow-100">
+            <div className="p-4 rounded-xl bg-gradient-to-br from-gray-200 to-white border border-gray-300">
                 <Image
                     src={feature.icon}
                     alt={feature.title}
@@ -19,7 +19,7 @@ const FeatureHeader = ({ feature }) => {
                     className="filter brightness-0 opacity-60"
                 />
             </div>
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-orange-500 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-200 to-gray-300 bg-clip-text text-transparent">
                 {feature.title}
             </h2>
         </motion.div>

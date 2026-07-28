@@ -25,7 +25,7 @@ const MessageInput = ({
             icon={<SendOutlined />}
             onClick={handleSendMessage}
             loading={loading}
-            className="bg-theme hover:bg-yellow-600 text-white"
+            className="bg-theme hover:bg-gray-200 text-white"
           >
             Send
           </Button>

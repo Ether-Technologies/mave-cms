@@ -12,11 +12,11 @@ const InsertionIndicator = ({ isVisible, position = "bottom" }) => {
       }`}
     >
       <div className="flex items-center justify-center">
-        <div className="flex-1 h-0.5 bg-yellow-400 rounded-full"></div>
-        <div className="mx-2 px-2 py-1 bg-yellow-400 text-white text-xs font-medium rounded-full">
+        <div className="flex-1 h-0.5 bg-gray-200 rounded-full"></div>
+        <div className="mx-2 px-2 py-1 bg-gray-200 text-white text-xs font-medium rounded-full">
           Drop here
         </div>
-        <div className="flex-1 h-0.5 bg-yellow-400 rounded-full"></div>
+        <div className="flex-1 h-0.5 bg-gray-200 rounded-full"></div>
       </div>
     </div>
   );
