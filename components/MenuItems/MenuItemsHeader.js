@@ -32,6 +32,7 @@ const MenuItemsHeader = ({
   filterOptions,
   applyFilters,
   resetFilters,
+  compact = false,
 }) => {
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -58,7 +59,7 @@ const MenuItemsHeader = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {!compact && (
       <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl shadow-lg border border-gray-200/50 p-6 backdrop-blur-sm">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
@@ -98,6 +99,21 @@ const MenuItemsHeader = ({
           </div>
         </div>
       </div>
+      )}
+      {compact && (
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <Button
+            icon={<PlusCircleOutlined />}
+            onClick={onAddMenuItem}
+            className="h-10 px-5 bg-black hover:bg-gray-800 text-white border-0 font-semibold rounded-xl"
+          >
+            Create menu item
+          </Button>
+          <Tooltip title="Copy menu items API">
+            <Button icon={<CopyOutlined />} onClick={handleCopyEndpoint} />
+          </Tooltip>
+        </div>
+      )}
 
       {/* Controls Section */}
       <div className="bg-gradient-to-br from-white to-gray-50/30 rounded-2xl shadow-md border border-gray-200/50 p-6 backdrop-blur-sm">

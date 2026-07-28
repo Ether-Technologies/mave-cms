@@ -149,6 +149,93 @@ body::-webkit-scrollbar-track {
   background-color: transparent;
 }
 
+/* Navigation workspace — smooth scroll + visible scrollbars */
+.navigation-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af rgba(0, 0, 0, 0.06);
+}
+
+.navigation-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.navigation-scroll::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.navigation-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+
+.navigation-scroll::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 9999px;
+}
+
+.navigation-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af rgba(0, 0, 0, 0.06);
+}
+
+.navigation-scroll-x::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.navigation-scroll-x::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 9999px;
+}
+
+.navigation-scroll-x::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 9999px;
+}
+
+.navigation-workspace {
+  height: clamp(420px, calc(100vh - 13.5rem), 900px);
+  min-height: 0;
+}
+
+.navigation-workspace > [class*="col-span"] {
+  min-height: 0;
+  height: 100%;
+  max-height: clamp(280px, 45vh, 900px);
+}
+
+@media (min-width: 1024px) {
+  .navigation-workspace > [class*="col-span"] {
+    max-height: none;
+  }
+}
+
+.navigation-all-items-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: clamp(480px, calc(100vh - 12rem), 960px);
+}
+
+.navigation-all-items-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
 /* Fluid Typography and Spacing */
 .text-fluid-sm {
   font-size: clamp(0.75rem, 1vw, 0.875rem);

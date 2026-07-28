@@ -20,10 +20,11 @@ const NavbarHeader = ({
   handleSelectAll,
   allSelected,
   onShowChange,
+  compact = false,
 }) => {
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {!compact && (
       <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl shadow-lg border border-gray-200/50 p-6 backdrop-blur-sm">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
@@ -68,12 +69,35 @@ const NavbarHeader = ({
           </div>
         </div>
       </div>
+      )}
+      {compact && (
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <Button
+            icon={<PlusCircleOutlined />}
+            onClick={onAddNavbar}
+            className="h-10 px-5 bg-black hover:bg-gray-800 text-white border-0 font-semibold rounded-xl"
+          >
+            Create navbar
+          </Button>
+          <Tooltip title="Copy navbars API">
+            <Button
+              icon={<CopyOutlined />}
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `${process.env.NEXT_PUBLIC_API_BASE_URL}/navbars`
+                );
+                message.success("API Endpoint copied to clipboard");
+              }}
+            />
+          </Tooltip>
+        </div>
+      )}
 
       {/* Controls Section */}
       <div className="bg-gradient-to-br from-white to-gray-50/30 rounded-2xl shadow-md border border-gray-200/50 p-6 backdrop-blur-sm">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           {/* Left Controls */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-wrap">
             <Button
               icon={<CheckCircleFilled />}
               className="h-10 px-5 bg-gradient-to-r from-white to-gray-50 text-gray-700 hover:text-gray-700 font-semibold border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:shadow-md transition-all"
@@ -94,7 +118,7 @@ const NavbarHeader = ({
                       : "text-gray-600 hover:text-gray-800 hover:bg-white"
                     }`}
                 >
-                  Newest
+                  DESC
                 </Button>
                 <Button
                   type={sortType === "asc" ? "primary" : "text"}
@@ -105,7 +129,7 @@ const NavbarHeader = ({
                       : "text-gray-600 hover:text-gray-800 hover:bg-white"
                     }`}
                 >
-                  Oldest
+                  ASC
                 </Button>
               </div>
             </div>
@@ -114,7 +138,6 @@ const NavbarHeader = ({
           {/* Right Controls */}
           <div className="flex items-center gap-4 w-full lg:w-auto flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-gray-700">Show:</span>
               <Select
                 defaultValue="10"
                 className="w-24 [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-xl [&_.ant-select-selector]:shadow-sm [&_.ant-select-selector]:bg-gradient-to-r [&_.ant-select-selector]:from-white [&_.ant-select-selector]:to-gray-50 hover:[&_.ant-select-selector]:border-gray-300 [&_.ant-select-selector]:font-medium"

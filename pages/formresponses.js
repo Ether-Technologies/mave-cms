@@ -47,7 +47,7 @@ const FormResponses = () => {
                   },
                   {
                     title: "Menus Items",
-                    onClick: () => router.push("/menuitems"),
+                    onClick: () => router.push("/menus?tab=items"),
                   },
                   {
                     title: "Menus",

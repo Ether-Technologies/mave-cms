@@ -13,15 +13,9 @@
             },
             {
                 "id": 4,
-                "icon": "/icons/mave/menuitems.svg",
-                "link": "/menuitems",
-                "title": "Menu Items"
-            },
-            {
-                "id": 6,
                 "icon": "/icons/mave/menus.svg",
                 "link": "/menus",
-                "title": "Menus"
+                "title": "Navigation"
             },
             {
                 "id": 7,

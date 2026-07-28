@@ -350,7 +350,7 @@ const Footer = () => {
                 title: "Components",
               },
               {
-                title: "Menu Items",
+                title: "Navigation",
                 menu: {
                   items: [
                     {
@@ -358,11 +358,7 @@ const Footer = () => {
                       onClick: () => router.push("/gallery"),
                     },
                     {
-                      title: "Menus Items",
-                      onClick: () => router.push("/menuitems"),
-                    },
-                    {
-                      title: "Menus",
+                      title: "Navigation",
                       onClick: () => router.push("/menus"),
                     },
                     {
