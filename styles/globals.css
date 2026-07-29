@@ -17,7 +17,7 @@
   --themes: #3498db;
   --maveyellow: #3498db;
   --themes-transparent: #ebf5fb;
-  --themes-light: #f1622a25;
+  --themes-light: #3498db25;
   --success: #008f39;
   --lightorange: rgba(255, 108, 50, 0.2);
   --lightblue: #9012ff20;
@@ -322,8 +322,24 @@ video {
 
 .ant-menu-light .ant-menu-item-selected,
 .ant-menu-light > .ant-menu .ant-menu-item-selected {
-  background-color: var(--transparentwhite); /* BG color of active submenu */
+  background-color: var(--transparentwhite);
   color: var(--black);
+}
+
+/* Sidebar: active items use project theme color */
+.ant-layout-sider .ant-menu-light .ant-menu-item-selected,
+.ant-layout-sider .ant-menu-light > .ant-menu .ant-menu-item-selected {
+  background-color: var(--theme-transparent);
+  color: var(--theme) !important;
+}
+
+.ant-layout-sider .ant-menu-light .ant-menu-item-selected .ant-menu-title-content,
+.ant-layout-sider .ant-menu-light .ant-menu-item-selected span {
+  color: var(--theme) !important;
+}
+
+.ant-layout-sider .ant-menu-light .ant-menu-item-selected::after {
+  border-right: 3px solid var(--theme);
 }
 
 .ant-layout .ant-layout-sider-children .ant-menu.ant-menu-inline-collapsed {
@@ -352,9 +368,14 @@ video {
   background-color: var(--white);
 }
 
-/* Target the selected main menu submenu title */
+/* Selected submenu section title (sidebar uses theme color) */
+.ant-layout-sider .ant-menu-submenu-selected > .ant-menu-submenu-title,
+.ant-layout-sider .ant-menu-submenu-selected > .ant-menu-submenu-title .ant-menu-title-content {
+  color: var(--theme) !important;
+}
+
 .ant-menu-submenu-selected > .ant-menu-submenu-title {
-  color: var(--gray-dark) !important; /* Ensure text color remains readable */
+  color: var(--gray-dark) !important;
 }
 
 .ant-radio-wrapper .ant-radio-checked .ant-radio-inner,

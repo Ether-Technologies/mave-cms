@@ -354,7 +354,10 @@ const SideMenuItems = ({
             }
             className="border-2 border-gray-200 mb-2"
           >
-            {item.submenu.map((subItem) => (
+            {item.submenu.map((subItem) => {
+              const isActive =
+                selectedMenuItem === subItem.id.toString();
+              return (
               <Item key={subItem.id.toString()} className="">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-5 h-5">
@@ -368,12 +371,17 @@ const SideMenuItems = ({
                       }}
                     />
                   </div>
-                  <span className="text-md font-semibold text-gray-500">
+                  <span
+                    className={`text-md font-semibold ${
+                      isActive ? "text-[var(--theme)]" : "text-gray-500"
+                    }`}
+                  >
                     {subItem.title}
                   </span>
                 </div>
               </Item>
-            ))}
+            );
+            })}
           </SubMenu>
         );
       }
@@ -403,7 +411,7 @@ const SideMenuItems = ({
       console.error("Error rendering menu item:", error, item);
       return null;
     }
-  }, [collapsed, token]);
+  }, [collapsed, token, selectedMenuItem]);
 
   // Show loading state during initialization
   if (isInitializing) {
