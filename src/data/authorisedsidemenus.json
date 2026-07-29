@@ -54,6 +54,12 @@
                 "icon": "/icons/mave/forms.svg",
                 "link": "/pages",
                 "title": "Pages"
+            },
+            {
+                "id": 13,
+                "icon": "/icons/mave/footer.svg",
+                "link": "/footers",
+                "title": "Footers"
             }
         ]
     },

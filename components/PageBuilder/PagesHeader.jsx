@@ -38,12 +38,17 @@ const PagesHeader = ({
   handleFilter,
   onRefresh,
   title = "Pages",
+  section = "all",
   totalPages = 0,
   totalSubpages = 0,
   totalFooters = 0,
 }) => {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
+
+  const showPagesSection = section === "all" || section === "pages";
+  const showFootersSection = section === "all" || section === "footers";
+  const showTypeFilter = section === "all";
 
   const handleSearch = (value) => {
     setSearchValue(value);
@@ -73,11 +78,15 @@ const PagesHeader = ({
     //   label: "Subpages Only",
     //   icon: <SettingOutlined />,
     // },
-    {
-      key: "footers",
-      label: "Footers Only",
-      icon: <SettingOutlined />,
-    },
+    ...(showFootersSection && section === "all"
+      ? [
+          {
+            key: "footers",
+            label: "Footers Only",
+            icon: <SettingOutlined />,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -93,7 +102,11 @@ const PagesHeader = ({
                 onClick={() => router.push("/build-with-ai")}
               >
                 <Image
-                  src="/icons/mave/forms.svg"
+                  src={
+                    section === "footers"
+                      ? "/icons/mave/footer.svg"
+                      : "/icons/mave/forms.svg"
+                  }
                   width={30}
                   height={30}
                   alt={title}
@@ -108,6 +121,7 @@ const PagesHeader = ({
                 {title}
               </h1>
               <div className="flex items-center gap-3 mt-2">
+                {showPagesSection && (
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-50 to-amber-50 px-3 py-1.5 rounded-full border border-yellow-200 hover:shadow-sm transition-all">
                   <FileTextOutlined className="text-yellow-600 text-xs" />
                   <Badge
@@ -119,6 +133,7 @@ const PagesHeader = ({
                     Pages
                   </span>
                 </div>
+                )}
                 {/* Subpages count hidden — subpages tab disabled on Pages section
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-50 to-violet-50 px-3 py-1.5 rounded-full border border-purple-200 hover:shadow-sm transition-all">
                   <AppstoreOutlined className="text-purple-600 text-xs" />
@@ -132,6 +147,7 @@ const PagesHeader = ({
                   </span>
                 </div>
                 */}
+                {showFootersSection && (
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-1.5 rounded-full border border-teal-200 hover:shadow-sm transition-all">
                   <LayoutOutlined className="text-teal-600 text-xs" />
                   <Badge
@@ -143,6 +159,7 @@ const PagesHeader = ({
                     Footers
                   </span>
                 </div>
+                )}
               </div>
             </div>
           </div>
@@ -160,6 +177,7 @@ const PagesHeader = ({
               </Button>
             ) : (
               <div className="flex items-center gap-3">
+                {showPagesSection && (
                 <Button
                   icon={<PlusCircleOutlined />}
                   className="h-11 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
@@ -168,6 +186,8 @@ const PagesHeader = ({
                 >
                   Create Page
                 </Button>
+                )}
+                {showFootersSection && onFooterCreate && (
                 <Button
                   icon={<PlusCircleOutlined />}
                   className="h-11 px-6 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
@@ -176,6 +196,17 @@ const PagesHeader = ({
                 >
                   Create Footer
                 </Button>
+                )}
+                {section === "footers" && onCreate && !onFooterCreate && (
+                <Button
+                  icon={<PlusCircleOutlined />}
+                  className="h-11 px-6 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
+                  onClick={onCreate}
+                  size="large"
+                >
+                  Create Footer
+                </Button>
+                )}
                 <Tooltip title="Refresh Data">
                   <Button
                     icon={<ReloadOutlined />}
@@ -189,9 +220,11 @@ const PagesHeader = ({
                     icon={<CopyOutlined />}
                     className="h-11 w-11 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 text-gray-600 hover:text-gray-800 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all rounded-xl"
                     onClick={() => {
-                      navigator.clipboard.writeText(
-                        `${process.env.NEXT_PUBLIC_API_BASE_URL}/pages`
-                      );
+                      const endpoint =
+                        section === "footers"
+                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/pages?type=Footer`
+                          : `${process.env.NEXT_PUBLIC_API_BASE_URL}/pages`;
+                      navigator.clipboard.writeText(endpoint);
                       message.success("API Endpoint copied to clipboard");
                     }}
                     size="large"
@@ -240,6 +273,7 @@ const PagesHeader = ({
             </div>
 
             {/* Filter Control */}
+            {showTypeFilter && handleFilter && (
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-gray-700">
                 Filter:
@@ -259,6 +293,7 @@ const PagesHeader = ({
                 </Button>
               </Dropdown>
             </div>
+            )}
           </div>
 
           {/* Right Controls - Items per page and Search */}
@@ -282,7 +317,13 @@ const PagesHeader = ({
             {/* Search */}
             <div className="flex-1 lg:flex-none">
               <Input
-                placeholder="Search pages, footers..."
+                placeholder={
+                  section === "footers"
+                    ? "Search footers..."
+                    : section === "pages"
+                      ? "Search pages..."
+                      : "Search pages, footers..."
+                }
                 className="w-full lg:w-80 h-10 border-2 border-gray-200 rounded-xl shadow-sm bg-gradient-to-r from-white to-gray-50 hover:border-gray-300 focus:border-yellow-400 transition-all [&_.ant-input]:bg-transparent [&_.ant-input]:font-medium [&_.ant-input]:placeholder:text-gray-400"
                 allowClear
                 value={searchValue}
