@@ -6,12 +6,6 @@
         "icon": "/icons/mave/component.svg",
         "submenu": [
             {
-                "id": 3,
-                "icon": "/icons/mave/media.svg",
-                "link": "/gallery",
-                "title": "Media Library"
-            },
-            {
                 "id": 4,
                 "icon": "/icons/mave/menuitems.svg",
                 "link": "/menuitems",
@@ -30,16 +24,22 @@
                 "title": "Navbars"
             },
             {
-                "id": 8,
-                "icon": "/icons/mave/slider.svg",
-                "link": "/sliders",
-                "title": "Sliders"
+                "id": 3,
+                "icon": "/icons/mave/media.svg",
+                "link": "/gallery",
+                "title": "Media Library"
             },
             {
                 "id": 9,
                 "icon": "/icons/mave/cards.svg",
                 "link": "/cards",
                 "title": "Cards"
+            },
+            {
+                "id": 8,
+                "icon": "/icons/mave/slider.svg",
+                "link": "/sliders",
+                "title": "Sliders"
             }
         ]
     },
