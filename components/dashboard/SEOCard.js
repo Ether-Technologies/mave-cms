@@ -27,18 +27,18 @@ export default function SEOCard() {
             <div className="mb-6">
                 <div className="flex justify-between items-center mb-3">
                     <span className="text-sm font-medium text-gray-700">SEO Health Score</span>
-                    <span className="text-2xl font-bold text-[#fcb813]">82%</span>
+                    <span className="text-2xl font-bold text-[#3498db]">82%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: "82%" }}
                         transition={{ delay: 0.6, duration: 1 }}
-                        className="bg-gradient-to-r from-[#fcb813] to-[#e3a611] h-2 rounded-full"
+                        className="bg-gradient-to-r from-[#3498db] to-[#2980b9] h-2 rounded-full"
                     ></motion.div>
                 </div>
                 <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                    <GlobalOutlined className="text-[#fcb813]" />
+                    <GlobalOutlined className="text-[#3498db]" />
                     82% of your pages are fully optimized
                 </p>
             </div>

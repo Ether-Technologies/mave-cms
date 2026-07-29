@@ -8,8 +8,8 @@ export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState({
-    themecolor: "#fcb813", // Default theme color
-    themeaccent: "#e3a611", // Default theme accent
+    themecolor: "#3498db", // Default theme color
+    themeaccent: "#2980b9", // Default theme accent
   });
 
   useEffect(() => {

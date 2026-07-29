@@ -11,7 +11,7 @@ export const setThemeColors = (themeColor, themeAccent) => {
   root.style.setProperty("--themelite", `${themeColor}64`);
   root.style.setProperty("--themes", themeColor);
   root.style.setProperty("--maveyellow", themeColor);
-  root.style.setProperty("--themes-transparent", "#ffefe9"); // This seems static; adjust if needed
+  root.style.setProperty("--themes-transparent", "#ebf5fb"); // Light brand tint
   root.style.setProperty("--themes-light", `${themeColor}25`);
   // Add more variables as needed
 };

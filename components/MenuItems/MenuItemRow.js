@@ -180,7 +180,7 @@ const MenuItemRow = ({
       className={`
         bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border-2 
         transition-all duration-300 hover:shadow-xl
-        ${isSelected ? 'border-yellow-400 ring-2 ring-yellow-200' : 'border-gray-200 hover:border-gray-300'}
+        ${isSelected ? 'border-brand ring-2 ring-blue-200' : 'border-gray-200 hover:border-gray-300'}
         ${isEditing ? 'ring-2 ring-blue-200 border-blue-300' : ''}
       `}
     >
@@ -201,13 +201,13 @@ const MenuItemRow = ({
               <Input
                 value={editedTitleEn}
                 onChange={(e) => setEditedTitleEn(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
                 placeholder="Item Name"
                 prefix={<MenuOutlined className="text-gray-400" />}
               />
             ) : (
               <div className="flex items-center gap-2">
-                <MenuOutlined className="text-yellow-500" />
+                <MenuOutlined className="text-brand" />
                 <span className="font-semibold text-gray-800 truncate">
                   {menuItem.title}
                 </span>
@@ -221,7 +221,7 @@ const MenuItemRow = ({
               <Input
                 value={editedTitleBn}
                 onChange={(e) => setEditedTitleBn(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
                 placeholder="আইটেম নাম"
                 prefix={<GlobalOutlined className="text-gray-400" />}
               />
@@ -243,7 +243,7 @@ const MenuItemRow = ({
                 placeholder="Select a Parent Menu"
                 optionFilterProp="children"
                 onChange={(value) => setEditedParentId(value)}
-                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
                 allowClear
                 value={getParentTitle(editedParentId)}
               >
@@ -281,7 +281,7 @@ const MenuItemRow = ({
                     placeholder="Select a page"
                     optionFilterProp="children"
                     onChange={(value) => setEditedLink(value)}
-                    className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                    className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
                     value={editedLink || undefined}
                   >
                     {pages.map((page) => (
@@ -294,7 +294,7 @@ const MenuItemRow = ({
                   <Input
                     value={editedLink}
                     onChange={(e) => setEditedLink(e.target.value)}
-                    className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                    className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
                     placeholder="Enter custom link"
                     prefix={<LinkOutlined className="text-gray-400" />}
                   />
@@ -348,7 +348,7 @@ const MenuItemRow = ({
                   <Button
                     icon={<EditOutlined />}
                     onClick={() => setEditingItemId(menuItem.id)}
-                    className="h-10 px-4 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Edit
                   </Button>

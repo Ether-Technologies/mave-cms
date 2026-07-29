@@ -27,7 +27,7 @@ const PageHeader = ({
             {isEditing ? "Page Builder" : "Page Preview"}
           </h1>
           {isDirty && isEditing && (
-            <div className="flex items-center gap-2 text-yellow-500">
+            <div className="flex items-center gap-2 text-brand">
               <ExclamationCircleOutlined />
               <span className="text-sm">Unsaved changes</span>
             </div>

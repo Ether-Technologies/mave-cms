@@ -64,7 +64,7 @@ export default function StatsOverview({ data, loading }) {
                             />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                            <span className="text-[#fcb813] font-medium">{stat.change}</span> from last month
+                            <span className="text-[#3498db] font-medium">{stat.change}</span> from last month
                         </p>
                     </div>
                 </motion.div>

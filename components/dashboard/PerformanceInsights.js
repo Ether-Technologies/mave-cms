@@ -31,12 +31,12 @@ export default function PerformanceInsights() {
                     <AreaChart data={chartData}>
                         <defs>
                             <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#fcb813" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#fcb813" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#3498db" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#3498db" stopOpacity={0} />
                             </linearGradient>
                             <linearGradient id="colorEngagement" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#e3a611" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#e3a611" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#2980b9" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#2980b9" stopOpacity={0} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -65,7 +65,7 @@ export default function PerformanceInsights() {
                         <Area
                             type="monotone"
                             dataKey="views"
-                            stroke="#fcb813"
+                            stroke="#3498db"
                             strokeWidth={2}
                             fillOpacity={0.2}
                             fill="url(#colorViews)"
@@ -73,7 +73,7 @@ export default function PerformanceInsights() {
                         <Area
                             type="monotone"
                             dataKey="engagement"
-                            stroke="#e3a611"
+                            stroke="#2980b9"
                             strokeWidth={2}
                             fillOpacity={0.2}
                             fill="url(#colorEngagement)"

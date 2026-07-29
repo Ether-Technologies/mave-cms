@@ -401,22 +401,22 @@ export const activityLog = [
 export const activityIcons = [
   {
     id: 1,
-    icon: <FileFilled className="text-[1.4rem] text-[#E3A611]" />,
+    icon: <FileFilled className="text-[1.4rem] text-[#2980b9]" />,
     backgroundColor: "#FFF4DC",
   },
   {
     id: 2,
-    icon: <FileImageFilled className="text-[1.4rem] text-[#E3A611]" />,
+    icon: <FileImageFilled className="text-[1.4rem] text-[#2980b9]" />,
     backgroundColor: "#FFF4DC",
   },
   {
     id: 3,
-    icon: <MessageFilled className="text-[1.4rem] text-[#E3A611]" />,
+    icon: <MessageFilled className="text-[1.4rem] text-[#2980b9]" />,
     backgroundColor: "#FFF4DC",
   },
   {
     id: 4,
-    icon: <ContactsFilled className="text-[1.4rem] text-[#E3A611]" />,
+    icon: <ContactsFilled className="text-[1.4rem] text-[#2980b9]" />,
     backgroundColor: "#FFF4DC",
   },
 ];

@@ -42,7 +42,7 @@ const BusinessBenefits = () => {
         {
             title: "Business Growth",
             icon: "🌱",
-            gradient: "from-yellow-400 to-orange-500",
+            gradient: "from-brand to-orange-500",
             items: [
                 "Market expansion",
                 "Revenue growth",

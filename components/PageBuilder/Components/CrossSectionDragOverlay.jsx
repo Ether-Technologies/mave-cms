@@ -11,9 +11,9 @@ const CrossSectionDragOverlay = ({ activeId, activeComponent }) => {
 
   return (
     <DragOverlay>
-      <div className="component-wrapper mb-2 bg-white rounded-lg shadow-lg border-2 border-yellow-400 opacity-90 transform rotate-2 scale-105 transition-all duration-200">
+      <div className="component-wrapper mb-2 bg-white rounded-lg shadow-lg border-2 border-brand opacity-90 transform rotate-2 scale-105 transition-all duration-200">
         <div className="p-4">
-          <div className="text-xs text-yellow-600 font-medium mb-2 uppercase tracking-wide">
+          <div className="text-xs text-brand-dark font-medium mb-2 uppercase tracking-wide">
             Moving {activeComponent.type || "Component"}
           </div>
           <div className="text-sm text-gray-700">

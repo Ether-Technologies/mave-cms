@@ -381,7 +381,7 @@ const SideMenuItems = ({
       return (
         <Item
           key={item.id.toString()}
-          className={`border-2 ${token ? "border-yellow-400" : "border-gray-400"}`}
+          className={`border-2 ${token ? "border-brand" : "border-gray-400"}`}
         >
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-6 h-6">

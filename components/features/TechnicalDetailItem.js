@@ -18,9 +18,9 @@ const TechnicalDetailItem = ({ title, items, type = 'list' }) => {
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ delay: idx * 0.1 }}
                             viewport={{ once: true }}
-                            className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-yellow-50/50 to-orange-50/50 hover:from-yellow-100/50 hover:to-orange-100/50 transition-all duration-300"
+                            className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-orange-50/50 hover:from-blue-100/50 hover:to-orange-100/50 transition-all duration-300"
                         >
-                            <span className="w-2 h-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400"></span>
+                            <span className="w-2 h-2 rounded-full bg-gradient-to-r from-brand to-orange-400"></span>
                             <span className="text-lg text-gray-700">{item}</span>
                         </motion.div>
                     ))}
@@ -41,7 +41,7 @@ const TechnicalDetailItem = ({ title, items, type = 'list' }) => {
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ delay: idx * 0.1 }}
                             viewport={{ once: true }}
-                            className="p-5 rounded-xl bg-gradient-to-r from-yellow-50/50 to-orange-50/50 hover:from-yellow-100/50 hover:to-orange-100/50 transition-all duration-300"
+                            className="p-5 rounded-xl bg-gradient-to-r from-blue-50/50 to-orange-50/50 hover:from-blue-100/50 hover:to-orange-100/50 transition-all duration-300"
                         >
                             <div className="text-xl font-medium text-gray-800 mb-3">{item.name}</div>
                             <div className="flex flex-wrap gap-3">

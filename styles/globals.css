@@ -10,13 +10,13 @@
   --black: #343434;
   --gray: #f5f5f5;
   --gray-dark: #797b7e;
-  --theme: #fcb813;
-  --theme-dark: #e3a611;
-  --themelite: #fcb61364;
-  --theme-transparent: #f3ecf8;
-  --themes: #fcb813;
-  --maveyellow: #fcb813;
-  --themes-transparent: #ffefe9;
+  --theme: #3498db;
+  --theme-dark: #2980b9;
+  --themelite: #3498db64;
+  --theme-transparent: #ebf5fb;
+  --themes: #3498db;
+  --maveyellow: #3498db;
+  --themes-transparent: #ebf5fb;
   --themes-light: #f1622a25;
   --success: #008f39;
   --lightorange: rgba(255, 108, 50, 0.2);
@@ -339,8 +339,12 @@ video {
   border-bottom-color: var(--theme);
 }
 
+.ant-menu-light .ant-menu-sub.ant-menu-inline {
+  background-color: var(--gray) !important;
+}
+
 .ant-menu .ant-menu-submenu-selected {
-  background-color: var(--theme);
+  background-color: var(--gray);
 }
 
 .ant-menu .ant-menu-submenu-selected > .ant-menu-submenu-title,
@@ -493,7 +497,7 @@ a:hover {
 
 .login-content p {
   font-size: 18px;
-  color: #fcb813;
+  color: #3498db;
 }
 
 .input-field {
@@ -561,7 +565,7 @@ a:hover {
 }
 
 .item {
-  background-color: #fcb813;
+  background-color: #3498db;
   border-radius: 15px;
   display: flex;
   padding: 1rem 3rem 1rem 3rem;

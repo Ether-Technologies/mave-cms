@@ -87,11 +87,11 @@ const MenusList = ({
 
       {/* Selection Summary */}
       {selectedMenuIds.length > 0 && (
-        <div className="fixed bottom-6 right-6 bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-6 py-3 rounded-xl shadow-2xl animate-in slide-in-from-bottom">
+        <div className="fixed bottom-6 right-6 bg-gradient-to-r from-brand to-brand-dark text-white px-6 py-3 rounded-xl shadow-2xl animate-in slide-in-from-bottom">
           <div className="flex items-center gap-2">
             <Badge
               count={selectedMenuIds.length}
-              className="[&_.ant-badge-count]:bg-white [&_.ant-badge-count]:text-yellow-600 [&_.ant-badge-count]:font-bold"
+              className="[&_.ant-badge-count]:bg-white [&_.ant-badge-count]:text-brand-dark [&_.ant-badge-count]:font-bold"
             />
             <span className="font-semibold">
               {selectedMenuIds.length === 1 ? 'menu' : 'menus'} selected

@@ -77,7 +77,7 @@ const DraggableMediaItem = ({ media, index, moveItem, removeMedia }) => {
           <div className="text-center">
             <Typography.Text
               strong
-              className="group-hover:text-yellow-600 transition-colors duration-200"
+              className="group-hover:text-brand-dark transition-colors duration-200"
             >
               {media.title ||
                 (fileType === "application/pdf"

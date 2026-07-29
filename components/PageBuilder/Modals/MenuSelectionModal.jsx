@@ -54,7 +54,7 @@ const MenuSelectionModal = ({ onSelectMenu, selectedMenu }) => {
             <List.Item
               className={`p-4 border rounded-md cursor-pointer my-4 hover:bg-gray-50 ${
                 selectedMenu?.id === menu.id
-                  ? "bg-yellow-50 border-yellow-200"
+                  ? "bg-blue-50 border-blue-200"
                   : ""
               }`}
               onClick={() => onSelectMenu(menu)}

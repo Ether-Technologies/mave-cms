@@ -60,13 +60,13 @@ const BasicDetails = ({ form }) => {
                 objectFit="cover"
                 className={`border ${
                   form.getFieldValue("coverImage") === media.id
-                    ? "border-yellow-500"
+                    ? "border-brand"
                     : "border-gray-300"
                 }`}
                 onClick={() => form.setFieldsValue({ coverImage: media.id })}
               />
               {form.getFieldValue("coverImage") === media.id && (
-                <span className="absolute top-0 left-0 bg-yellow-500 text-white px-1 text-xs">
+                <span className="absolute top-0 left-0 bg-brand text-white px-1 text-xs">
                   Cover
                 </span>
               )}

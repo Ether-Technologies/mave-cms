@@ -177,7 +177,7 @@ const PagePreview = ({ pageId, pageData: propPageData, open, setOpen }) => {
               <div className="text-sm text-gray-500">Preview Mode</div>
               <button
                 onClick={handleEditPage}
-                className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-brand-dark transition-colors"
               >
                 <EditOutlined />
                 Edit Page

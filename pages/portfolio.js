@@ -19,13 +19,13 @@ const Portfolio = () => {
                 <meta name="description" content="Explore the powerful features of Mave CMS - A modern headless content management system" />
             </Head>
 
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-yellow-50">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
                 {/* Hero Section */}
                 <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
                     {/* Background Elements */}
                     <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-100/30 via-transparent to-purple-100/30"></div>
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-200/20 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-transparent to-purple-100/30"></div>
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-200/20 via-transparent to-transparent"></div>
 
                     {/* Content */}
                     <motion.div
@@ -55,7 +55,7 @@ const Portfolio = () => {
                             transition={{ delay: 0.4, duration: 0.5 }}
                             className="space-y-6"
                         >
-                            <p className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+                            <p className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-brand-dark via-blue-500 to-brand bg-clip-text text-transparent">
                                 AI Powered Modern Headless Content Management System
                             </p>
                             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -87,7 +87,7 @@ const Portfolio = () => {
                                 rel="noopener noreferrer"
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-xl text-white hover:shadow-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                                className="px-8 py-4 bg-gradient-to-r from-brand to-brand rounded-xl text-white hover:shadow-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                             >
                                 Visit Website
                             </motion.a>
@@ -100,13 +100,13 @@ const Portfolio = () => {
 
                 {/* Features Grid */}
                 <div className="relative py-20">
-                    <div className="absolute inset-0 bg-gradient-to-b from-white via-yellow-50/50 to-white"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50/50 to-white"></div>
                     <div className="max-w-7xl mx-auto px-4 relative">
                         <motion.h2
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-400 bg-clip-text text-transparent text-center mb-16"
+                            className="text-4xl font-bold bg-gradient-to-r from-brand-dark to-brand bg-clip-text text-transparent text-center mb-16"
                         >
                             Powerful Features
                         </motion.h2>

@@ -43,7 +43,7 @@ const PageInfoDisplay = ({ page }) => {
           <Link href={`/page-builder/${page.id}`}>
             <div className="cursor-pointer flex gap-1 items-center">
               <span className="font-semibold text-theme">Link:</span>
-              <span className="text-yellow-500 hover:underline">
+              <span className="text-brand hover:underline">
                 /{page.slug}
               </span>
             </div>

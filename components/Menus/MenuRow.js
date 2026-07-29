@@ -99,7 +99,7 @@ const MenuRow = ({
       className={`
         bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border-2 
         transition-all duration-300 hover:shadow-xl
-        ${isSelected ? 'border-yellow-400 ring-2 ring-yellow-200' : 'border-gray-200 hover:border-gray-300'}
+        ${isSelected ? 'border-brand ring-2 ring-blue-200' : 'border-gray-200 hover:border-gray-300'}
         ${isEditing ? 'ring-2 ring-blue-200 border-blue-300' : ''}
       `}
     >
@@ -120,13 +120,13 @@ const MenuRow = ({
               <Input
                 value={editedMenuName}
                 onChange={(e) => setEditedMenuName(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-yellow-300 focus:border-yellow-400 transition-all"
+                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
                 placeholder="Menu name"
                 prefix={<MenuOutlined className="text-gray-400" />}
               />
             ) : (
               <div className="flex items-center gap-2">
-                <MenuOutlined className="text-yellow-500" />
+                <MenuOutlined className="text-brand" />
                 <span className="font-semibold text-gray-800 truncate">
                   {menu.name}
                 </span>
@@ -144,7 +144,7 @@ const MenuRow = ({
                 placeholder="Select menu items"
                 value={editedMenuItemsIds}
                 onChange={(values) => setEditedMenuItemsIds(values)}
-                className="w-full [&_.ant-select-selector]:min-h-[40px] [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-yellow-300"
+                className="w-full [&_.ant-select-selector]:min-h-[40px] [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
                 optionFilterProp="children"
                 maxTagCount="responsive"
               >
@@ -159,7 +159,7 @@ const MenuRow = ({
                 <div className="flex items-center gap-2 mb-2">
                   <Badge
                     count={menuItemsCount}
-                    className="[&_.ant-badge-count]:bg-yellow-500 [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs"
+                    className="[&_.ant-badge-count]:bg-brand [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs"
                     showZero
                   />
                   <span className="text-xs text-gray-500 font-medium">
@@ -171,7 +171,7 @@ const MenuRow = ({
                     {displayedItems?.map((menuItem) => (
                       <Tag
                         key={menuItem.id}
-                        className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 text-gray-700 font-medium px-3 py-1 rounded-full text-xs"
+                        className="bg-gradient-to-r from-blue-50 to-blue-50 border-blue-200 text-gray-700 font-medium px-3 py-1 rounded-full text-xs"
                       >
                         {menuItem.title}
                       </Tag>
@@ -181,7 +181,7 @@ const MenuRow = ({
                         type="link"
                         size="small"
                         onClick={() => setShowAllItems(true)}
-                        className="text-yellow-600 hover:text-yellow-700 font-medium text-xs px-2"
+                        className="text-brand-dark hover:text-blue-700 font-medium text-xs px-2"
                       >
                         +{menuItemsCount - 3} more
                       </Button>
@@ -191,7 +191,7 @@ const MenuRow = ({
                         type="link"
                         size="small"
                         onClick={() => setShowAllItems(false)}
-                        className="text-yellow-600 hover:text-yellow-700 font-medium text-xs px-2"
+                        className="text-brand-dark hover:text-blue-700 font-medium text-xs px-2"
                       >
                         Show less
                       </Button>
@@ -233,7 +233,7 @@ const MenuRow = ({
                   <Button
                     icon={<EditOutlined />}
                     onClick={() => setEditingMenuId(menu.id)}
-                    className="h-10 px-4 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+                    className="h-10 px-4 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
                   >
                     Edit
                   </Button>

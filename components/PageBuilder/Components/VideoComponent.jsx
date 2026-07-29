@@ -220,7 +220,7 @@ const VideoComponent = ({
               />
             </div>
             {googleDriveFallbackIndex > 0 && (
-              <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs">
+              <div className="absolute top-2 right-2 bg-brand text-white px-2 py-1 rounded text-xs">
                 Using fallback {googleDriveFallbackIndex + 1}
               </div>
             )}

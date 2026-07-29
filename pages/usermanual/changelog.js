@@ -76,13 +76,13 @@ const Changelog = () => {
       default:
         return {
           color: "#1890ff",
-          bgColor: "bg-yellow-50/70",
-          borderColor: "border-yellow-200",
-          hoverBorder: "hover:border-yellow-400",
-          icon: <PlusCircleOutlined className="text-yellow-500" />,
+          bgColor: "bg-blue-50/70",
+          borderColor: "border-blue-200",
+          hoverBorder: "hover:border-brand",
+          icon: <PlusCircleOutlined className="text-brand" />,
           title: "Update",
-          titleIcon: <CheckCircleOutlined className="text-yellow-500" />,
-          className: "hover:shadow-yellow-100",
+          titleIcon: <CheckCircleOutlined className="text-brand" />,
+          className: "hover:shadow-blue-100",
         };
     }
   };

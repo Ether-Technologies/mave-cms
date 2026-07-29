@@ -31,8 +31,8 @@ const GeneralSettings = ({ config, id }) => {
   const theme_options = [
     {
       name: "Default",
-      theme: "#fcb813",
-      accent: "#e3a611",
+      theme: "#3498db",
+      accent: "#2980b9",
     },
     {
       name: "Orange",
@@ -51,8 +51,8 @@ const GeneralSettings = ({ config, id }) => {
     },
     {
       name: "Blue",
-      theme: "#fcb813",
-      accent: "#e3a611",
+      theme: "#3498db",
+      accent: "#2980b9",
     },
     {
       name: "Green",

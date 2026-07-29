@@ -24,7 +24,7 @@ export default function WelcomeCard({ userData }) {
             title: "New Post",
             icon: <PlusOutlined />,
             link: "/blogs",
-            gradient: "from-[#fcb813] to-[#e3a611]",
+            gradient: "from-[#3498db] to-[#2980b9]",
         },
         {
             title: "New Page",

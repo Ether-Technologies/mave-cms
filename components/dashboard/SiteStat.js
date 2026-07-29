@@ -14,7 +14,7 @@ export const weekData = [
 export const monthsData = [
   ["Factor", "Number", { role: "style" }],
   ["Visitors", 1134, "#FF6633"],
-  ["Users", 1000, "#fcb813"],
+  ["Users", 1000, "#3498db"],
   ["Page Views", 1234, "#8833FF"],
   ["Bounce Rate", 500, "#2EE6CA"],
 ];

@@ -44,7 +44,7 @@ const FloatingActionButtons = ({
           loading={loading}
           className={`shadow-lg hover:shadow-xl transition-all duration-300 ${
             isDirty
-              ? "bg-yellow-500 hover:bg-yellow-600 border-yellow-500 hover:border-yellow-600"
+              ? "bg-brand hover:bg-brand-dark border-brand hover:border-brand-dark"
               : "bg-green-500 hover:bg-green-600 border-green-500 hover:border-green-600"
           }`}
           style={{
@@ -62,7 +62,7 @@ const FloatingActionButtons = ({
           }
         />
         {isDirty && (
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-brand rounded-full flex items-center justify-center">
             <div className="w-2 h-2 bg-white rounded-full"></div>
           </div>
         )}
@@ -74,7 +74,7 @@ const FloatingActionButtons = ({
         icon={<EyeOutlined />}
         size="large"
         onClick={onPreview}
-        className="shadow-lg hover:shadow-xl transition-all duration-300 bg-yellow-500 hover:bg-yellow-600 border-yellow-500 hover:border-yellow-600"
+        className="shadow-lg hover:shadow-xl transition-all duration-300 bg-brand hover:bg-brand-dark border-brand hover:border-brand-dark"
         style={{
           width: "40px",
           height: "40px",

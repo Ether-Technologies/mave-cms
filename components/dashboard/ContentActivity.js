@@ -88,7 +88,7 @@ export default function ContentActivity() {
                         transition={{ delay: 0.6 + index * 0.1 }}
                         className="flex gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0"
                     >
-                        <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-[#fcb813] to-[#e3a611] rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                        <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-[#3498db] to-[#2980b9] rounded-full flex items-center justify-center text-white font-semibold text-xs">
                             {getInitials(activity.user)}
                         </div>
 
@@ -104,7 +104,7 @@ export default function ContentActivity() {
                                 {activity.status && (
                                     <span className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${activity.status === "published"
                                         ? "bg-green-100 text-green-700"
-                                        : "bg-yellow-100 text-yellow-700"
+                                        : "bg-blue-100 text-blue-700"
                                         }`}>
                                         {activity.status}
                                     </span>

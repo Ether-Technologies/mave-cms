@@ -368,7 +368,7 @@ export default function BuildWithAI() {
                 type="primary"
                 onClick={handleSendModification}
                 loading={loading}
-                className="bg-theme hover:bg-yellow-600 text-white"
+                className="bg-theme hover:bg-brand-dark text-white"
               >
                 Send
               </Button>

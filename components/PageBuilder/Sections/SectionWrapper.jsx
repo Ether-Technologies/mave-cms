@@ -165,7 +165,7 @@ const SectionWrapper = ({
                 icon={<CopyOutlined />}
                 onClick={handleDuplicateClick}
                 size="small"
-                className="mavebutton hover:bg-yellow-600"
+                className="mavebutton hover:bg-brand-dark"
                 title="Duplicate Section"
               />
             )}

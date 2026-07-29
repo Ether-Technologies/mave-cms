@@ -350,8 +350,8 @@ const FormEditor = ({ formId }) => {
                 </p>
 
                 {!formId ? (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
-                    <p className="text-yellow-800">
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                    <p className="text-blue-800">
                       ⚠️ Please save the form first before testing. The form needs to be created to get a form ID.
                     </p>
                   </div>

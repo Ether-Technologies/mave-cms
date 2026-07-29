@@ -11,11 +11,11 @@ const SocialMediaLinks = () => {
   return (
     <div className="flex gap-4">
       <FacebookOutlined
-        className="text-2xl text-yellow-600 cursor-pointer"
+        className="text-2xl text-brand-dark cursor-pointer"
         onClick={() => window.open("https://facebook.com", "_blank")}
       />
       <LinkedinOutlined
-        className="text-2xl text-yellow-700 cursor-pointer"
+        className="text-2xl text-blue-700 cursor-pointer"
         onClick={() => window.open("https://linkedin.com", "_blank")}
       />
       <InstagramFilled

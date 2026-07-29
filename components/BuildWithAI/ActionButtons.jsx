@@ -23,7 +23,7 @@ const ActionButtons = ({
       </Button>
       {/* <Button
         onClick={handleModify}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white"
+        className="bg-brand hover:bg-brand-dark text-white"
       >
         Modify
       </Button> */}

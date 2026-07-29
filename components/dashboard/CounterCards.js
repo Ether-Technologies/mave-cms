@@ -36,10 +36,10 @@ export default function CounterCards({ data, loading }) {
 
   const getGradient = (index) => {
     const gradients = [
-      "from-[#fcb813] to-[#e3a611]",
+      "from-[#3498db] to-[#2980b9]",
       "from-orange-500 to-orange-600",
       "from-gray-600 to-gray-700",
-      "from-[#fcb813] to-orange-500",
+      "from-[#3498db] to-orange-500",
       "from-orange-600 to-gray-600",
       "from-gray-700 to-gray-800",
       "from-blue-500 to-blue-600",

@@ -65,7 +65,7 @@ const ChatMessage = ({ message, onResend, onRegenerate }) => {
                   <Button
                     type="primary"
                     onClick={onResend}
-                    className="bg-theme hover:bg-yellow-600 text-white"
+                    className="bg-theme hover:bg-brand-dark text-white"
                   >
                     Resend
                   </Button>

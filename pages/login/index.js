@@ -102,7 +102,7 @@ export default function Login() {
 
           {/* Welcome Text */}
           <motion.div variants={itemVariants} className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-brand via-brand-dark to-blue-600 bg-clip-text text-transparent mb-2">
               Welcome Back
             </h1>
             <p className="text-gray-600 text-sm">
@@ -122,7 +122,7 @@ export default function Login() {
               <Link href="/signup">
                 <motion.span
                   whileHover={{ scale: 1.05 }}
-                  className="font-semibold text-yellow-500 hover:text-yellow-600 cursor-pointer transition-colors"
+                  className="font-semibold text-brand hover:text-brand-dark cursor-pointer transition-colors"
                 >
                   Sign Up
                 </motion.span>
@@ -135,7 +135,7 @@ export default function Login() {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 block
-                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/70 hover:bg-white/90 hover:border-yellow-300 transition-all rounded-xl shadow-sm hover:shadow-md"
+                className="flex justify-center items-center gap-3 h-12 border-2 border-gray-200 bg-white/70 hover:bg-white/90 hover:border-blue-300 transition-all rounded-xl shadow-sm hover:shadow-md"
                 onClick={() => message.info("Coming soon")}
               >
                 <Image
@@ -171,7 +171,7 @@ export default function Login() {
               >
                 <Button
                   block
-                  className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  className="h-12 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
                   onClick={handleDemoLogin}
                 >
                   Get In
@@ -202,7 +202,7 @@ export default function Login() {
                         <MailOutlined className="text-lg text-gray-400 mr-2" />
                       }
                       placeholder="Email address"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-blue-300 focus:border-brand transition-all bg-white/70"
                     />
                   </motion.div>
                 </Form.Item>
@@ -218,7 +218,7 @@ export default function Login() {
                   <motion.div whileFocus={{ scale: 1.01 }}>
                     <Input.Password
                       placeholder="Password"
-                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-yellow-300 focus:border-yellow-400 transition-all bg-white/70"
+                      className="h-12 rounded-xl border-2 border-gray-200 hover:border-blue-300 focus:border-brand transition-all bg-white/70"
                       prefix={
                         <LockOutlined className="text-lg text-gray-400 mr-2" />
                       }
@@ -239,7 +239,7 @@ export default function Login() {
                   >
                     <Button
                       block
-                      className="h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      className="h-12 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white text-base font-semibold border-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
                       htmlType="submit"
                     >
                       Sign In
@@ -258,13 +258,13 @@ export default function Login() {
             <p className="text-xs text-gray-500">
               By signing in, you agree to our{" "}
               <Link href="/terms">
-                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                <span className="text-brand hover:text-brand-dark font-medium cursor-pointer">
                   Terms
                 </span>
               </Link>{" "}
               and{" "}
               <Link href="/privacy">
-                <span className="text-yellow-500 hover:text-yellow-600 font-medium cursor-pointer">
+                <span className="text-brand hover:text-brand-dark font-medium cursor-pointer">
                   Privacy Policy
                 </span>
               </Link>
@@ -309,7 +309,7 @@ export default function Login() {
               >
                 Build. Manage. Scale.
                 <span
-                  className="block text-yellow-400 mt-2"
+                  className="block text-brand mt-2"
                   style={{ WebkitTextStroke: "1px rgba(75, 85, 99, 0.5)" }}
                 >
                   With Mave CMS
@@ -330,7 +330,7 @@ export default function Login() {
                 >
                   <Button
                     icon={<RocketOutlined />}
-                    className="h-12 px-6 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
+                    className="h-12 px-6 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
                     onClick={() => router.push("/usermanual/changelog")}
                   >
                     What's New
@@ -356,7 +356,7 @@ export default function Login() {
 
       {/* Floating Elements */}
       <motion.div
-        className="absolute top-10 left-20 w-20 h-20 bg-yellow-400/20 rounded-full blur-2xl"
+        className="absolute top-10 left-20 w-20 h-20 bg-brand/20 rounded-full blur-2xl"
         animate={{
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.6, 0.3],
@@ -368,7 +368,7 @@ export default function Login() {
         }}
       />
       <motion.div
-        className="absolute bottom-20 left-40 w-32 h-32 bg-amber-400/20 rounded-full blur-3xl"
+        className="absolute bottom-20 left-40 w-32 h-32 bg-brand-dark/20 rounded-full blur-3xl"
         animate={{
           scale: [1.2, 1, 1.2],
           opacity: [0.4, 0.7, 0.4],

@@ -99,7 +99,7 @@ const UserProfile = () => {
     return (
       <div className="relative w-full p-6 rounded-2xl backdrop-blur-md bg-white/30 border border-white/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/40">
         <div className="flex items-center mb-2">
-          <div className="w-10 h-10 rounded-full bg-yellow-500/90 flex items-center justify-center mr-3">
+          <div className="w-10 h-10 rounded-full bg-brand/90 flex items-center justify-center mr-3">
             <span className="text-white text-lg">{icon}</span>
           </div>
           <Text strong className="text-gray-700">
@@ -113,7 +113,7 @@ const UserProfile = () => {
               onChange={(e) => handleInputChange(fieldName, e.target.value)}
               placeholder={`Enter your ${label.toLowerCase()}`}
               size="large"
-              className="rounded-lg border-gray-200 bg-white/50 hover:border-yellow-300 focus:border-yellow-400 transition-all duration-300"
+              className="rounded-lg border-gray-200 bg-white/50 hover:border-blue-300 focus:border-brand transition-all duration-300"
             />
           ) : (
             <div className="text-base text-gray-600 py-2">{value}</div>
@@ -127,7 +127,7 @@ const UserProfile = () => {
     return (
       <div className="relative w-full p-6 rounded-2xl backdrop-blur-md bg-white/30 border border-white/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/40">
         <div className="flex items-center mb-2">
-          <div className="w-10 h-10 rounded-full bg-yellow-500/90 flex items-center justify-center mr-3">
+          <div className="w-10 h-10 rounded-full bg-brand/90 flex items-center justify-center mr-3">
             <span className="text-white text-lg">{icon}</span>
           </div>
           <Text strong className="text-gray-700">
@@ -158,7 +158,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white p-8 animate-fadeIn">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-8 animate-fadeIn">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
@@ -176,7 +176,7 @@ const UserProfile = () => {
           <div className="space-y-6">
             <div className="relative w-full p-6 rounded-2xl backdrop-blur-md bg-white/30 border border-white/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/40">
               <div className="flex items-center mb-2">
-                <div className="w-10 h-10 rounded-full bg-yellow-500/90 flex items-center justify-center mr-3">
+                <div className="w-10 h-10 rounded-full bg-brand/90 flex items-center justify-center mr-3">
                   <span className="text-white text-lg">
                     <CrownOutlined />
                   </span>
@@ -214,7 +214,7 @@ const UserProfile = () => {
             onClick={() => setIsPasswordModalVisible(true)}
             icon={<LockOutlined />}
             size="large"
-            className="rounded-full border-yellow-500 text-yellow-500 hover:border-yellow-600 hover:text-yellow-600 px-8 h-12 backdrop-blur-md bg-white/50"
+            className="rounded-full border-brand text-brand hover:border-brand-dark hover:text-brand-dark px-8 h-12 backdrop-blur-md bg-white/50"
           >
             Change Password
           </Button>
@@ -226,7 +226,7 @@ const UserProfile = () => {
                 loading={loading}
                 icon={<CheckOutlined />}
                 size="large"
-                className="rounded-full bg-yellow-500 hover:bg-yellow-600 border-yellow-500 px-8 h-12"
+                className="rounded-full bg-brand hover:bg-brand-dark border-brand px-8 h-12"
               >
                 Save Changes
               </Button>
@@ -245,7 +245,7 @@ const UserProfile = () => {
               onClick={() => setModifyMode(true)}
               icon={<EditOutlined />}
               size="large"
-              className="rounded-full bg-yellow-500 hover:bg-yellow-600 border-yellow-500 px-8 h-12"
+              className="rounded-full bg-brand hover:bg-brand-dark border-brand px-8 h-12"
             >
               Edit Profile
             </Button>
@@ -255,7 +255,7 @@ const UserProfile = () => {
         <Drawer
           title={
             <div className="flex items-center">
-              <LockOutlined className="text-yellow-500 mr-2" />
+              <LockOutlined className="text-brand mr-2" />
               <span>Change Password</span>
             </div>
           }
@@ -281,7 +281,7 @@ const UserProfile = () => {
                 type="primary"
                 onClick={() => form.submit()}
                 size="large"
-                className="rounded-full bg-yellow-500 hover:bg-yellow-600 border-yellow-500 px-8 h-12"
+                className="rounded-full bg-brand hover:bg-brand-dark border-brand px-8 h-12"
               >
                 Confirm Change
               </Button>
@@ -312,7 +312,7 @@ const UserProfile = () => {
               <Input.Password
                 size="large"
                 placeholder="Enter your current password"
-                className="rounded-lg border-gray-200 bg-white/50 hover:border-yellow-300 focus:border-yellow-400"
+                className="rounded-lg border-gray-200 bg-white/50 hover:border-blue-300 focus:border-brand"
               />
             </Form.Item>
 
@@ -327,7 +327,7 @@ const UserProfile = () => {
               <Input.Password
                 size="large"
                 placeholder="Enter your new password"
-                className="rounded-lg border-gray-200 bg-white/50 hover:border-yellow-300 focus:border-yellow-400"
+                className="rounded-lg border-gray-200 bg-white/50 hover:border-blue-300 focus:border-brand"
               />
             </Form.Item>
 
@@ -352,7 +352,7 @@ const UserProfile = () => {
               <Input.Password
                 size="large"
                 placeholder="Confirm your new password"
-                className="rounded-lg border-gray-200 bg-white/50 hover:border-yellow-300 focus:border-yellow-400"
+                className="rounded-lg border-gray-200 bg-white/50 hover:border-blue-300 focus:border-brand"
               />
             </Form.Item>
           </Form>

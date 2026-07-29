@@ -60,7 +60,7 @@ const SEOFields = ({ seo, setSeo }) => {
             {seoScore >= 80 ? (
               <CheckCircleOutlined className="text-green-500" />
             ) : (
-              <WarningOutlined className="text-yellow-500" />
+              <WarningOutlined className="text-brand" />
             )}
           </span>
         </div>

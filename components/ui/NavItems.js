@@ -143,7 +143,7 @@ export default function NavItems({
         </div>
         <div
           className="px-2 py-1 rounded-xl text-sm font-semibold text-white cursor-pointer
-            bg-gradient-to-r from-yellow-500 to-orange-500
+            bg-gradient-to-r from-brand to-blue-600
             hover:from-orange-500 hover:to-red-500
             transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
           onClick={(e) => {
@@ -168,7 +168,7 @@ export default function NavItems({
                     className={`px-3.5 py-1 rounded-lg text-base font-semibold cursor-pointer
                       ${topNavData && item === topNavData[topNavData.length - 1] ? "flex gap-2 text-white maveaibutton" : "mavetopnavbutton"}
                       transition-all duration-300 transform hover:scale-105 ${selectedMenuItem === item.name
-                        ? "underline decoration-yellow-500 decoration-2 underline-offset-8 text-gray-800"
+                        ? "underline decoration-brand decoration-2 underline-offset-8 text-gray-800"
                         : "text-gray-400 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 hover:text-gray-900"
                       }`}
                     onClick={() => setSelectedMenuItem(item.name)}
@@ -252,7 +252,7 @@ export default function NavItems({
             <Badge count={3} size="default" color="#A259FF80">
               <div
                 className="w-10 h-10 flex items-center justify-center rounded-lg
-                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-yellow-50 hover:to-orange-50
+                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-50
                 cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
               >
                 <BellOutlined className="text-gray-600 hover:text-orange-500 text-lg transition-colors duration-300" />
@@ -274,7 +274,7 @@ export default function NavItems({
             <Dropdown menu={{ items: userItems }} placement="bottomRight">
               <div
                 className="w-10 h-10 flex items-center justify-center rounded-xl
-                  bg-gradient-to-r from-yellow-500 to-orange-500
+                  bg-gradient-to-r from-brand to-blue-600
                   hover:from-orange-500 hover:to-red-500
                   cursor-pointer transition-all duration-300 transform hover:scale-110
                   shadow-md hover:shadow-xl mr-8"
@@ -290,7 +290,7 @@ export default function NavItems({
             icon={<LoginOutlined className="text-base" />}
             onClick={() => router.push("/login")}
             className="h-10 px-6 text-white border-0 font-semibold rounded-lg text-base
-              bg-gradient-to-r from-yellow-500 to-orange-500
+              bg-gradient-to-r from-brand to-blue-600
               hover:from-orange-500 hover:to-red-500
               transition-all duration-300 transform hover:scale-105
               shadow-md hover:shadow-xl"

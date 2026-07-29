@@ -38,20 +38,20 @@ function MyApp({ Component, pageProps }) {
           </ThemeProvider>
         </MenuRefreshProvider>
       </AuthProvider>
-      <footer className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/60 border-t border-yellow-500/30 shadow-lg shadow-yellow-500/10">
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-amber-500/5 to-orange-500/5"></div>
+      <footer className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/60 border-t border-brand/30 shadow-lg shadow-brand/10">
+        <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-brand-dark/5 to-blue-600/5"></div>
         <div className="relative max-w-7xl mx-auto px-6 py-2">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Left Section - Copyright */}
             <div className="flex items-center gap-2 text-white/80">
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 animate-pulse"></div>
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-brand to-brand-dark animate-pulse"></div>
               <span className="text-sm">
                 © {new Date().getFullYear()}{" "}
                 <a
                   href="https://www.linkedin.com/in/atiq-israk/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 bg-clip-text text-transparent hover:from-yellow-300 hover:via-amber-300 hover:to-orange-300 transition-all duration-300"
+                  className="font-semibold bg-gradient-to-r from-brand via-blue-400 to-blue-500 bg-clip-text text-transparent hover:from-blue-300 hover:via-blue-400 hover:to-blue-500 transition-all duration-300"
                 >
                   MAVE CMS
                 </a>
@@ -59,12 +59,12 @@ function MyApp({ Component, pageProps }) {
             </div>
 
             {/* Center Section - Divider */}
-            <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-yellow-500/60 to-transparent"></div>
+            <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-brand/60 to-transparent"></div>
 
             {/* Right Section - Powered By */}
             <div className="flex items-center gap-3 text-white/80 text-sm">
               <span className="font-light">All rights reserved</span>
-              <span className="text-yellow-500/50">•</span>
+              <span className="text-brand/50">•</span>
               <span className="font-light">Powered by</span>
               <a
                 href="https://www.ethertech.ltd"

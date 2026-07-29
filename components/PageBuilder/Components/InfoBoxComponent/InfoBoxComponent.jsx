@@ -653,7 +653,7 @@ const InfoBoxComponent = ({
                             href={item.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-yellow-600 hover:underline"
+                            className="text-brand-dark hover:underline"
                           >
                             {item.link}
                           </a>

@@ -165,7 +165,7 @@ const SectionList = ({
                     <Button
                       icon={<PlusOutlined />}
                       onClick={() => onAddSectionAtPosition(0)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                      className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
                         transition-all duration-200 px-2 py-1 text-sm group"
                       size="small"
                     >
@@ -201,7 +201,7 @@ const SectionList = ({
                     <Button
                       icon={<PlusOutlined />}
                       onClick={() => onAddSectionAtPosition(index + 1)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white border-2 border-yellow-500 
+                      className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
                         transition-all duration-200 px-2 py-1 text-sm group"
                       size="small"
                     >
