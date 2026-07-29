@@ -3,12 +3,11 @@
 import {
   SearchOutlined,
   LoginOutlined,
-  BellOutlined,
   SettingOutlined,
   UserOutlined,
   DeploymentUnitOutlined,
 } from "@ant-design/icons";
-import { Input, Layout, Dropdown, Button, Badge } from "antd";
+import { Input, Layout, Dropdown, Button } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Changelog from "../../pages/usermanual/changelog.json";
@@ -249,7 +248,7 @@ export default function NavItems({
               )}
             </div>
 
-            {/* Notification Bell */}
+            {/* Notification Bell — hidden
             <Badge count={3} size="default" color="#A259FF80">
               <div
                 className="w-10 h-10 flex items-center justify-center rounded-lg 
@@ -259,6 +258,7 @@ export default function NavItems({
                 <BellOutlined className="text-gray-600 hover:text-orange-500 text-lg transition-colors duration-300" />
               </div>
             </Badge>
+            */}
 
             {/* Settings */}
             <div
