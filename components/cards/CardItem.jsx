@@ -1,8 +1,15 @@
 // components/cards/CardItem.jsx
 import React from "react";
-import { Card, Button, Popconfirm, List, Tag } from "antd";
+import { Card, Button, Popconfirm, List, Tag, Badge } from "antd";
 import { EyeOutlined, DeleteOutlined } from "@ant-design/icons";
 import Image from "next/image";
+
+const idBadgeStyle = {
+  backgroundColor: "#f0f0f0",
+  color: "#666",
+  fontSize: "12px",
+  fontWeight: "500",
+};
 
 const tagColors = [
   "magenta",
@@ -178,7 +185,12 @@ const CardItem = ({ card, viewType, onDeleteCard, onPreviewCard }) => {
       >
         <Card.Meta
           className="pt-10"
-          title={card?.title_en || "Title Unavailable"}
+          title={
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge count={`ID-${card.id}`} style={idBadgeStyle} />
+              <span>{card?.title_en || "Title Unavailable"}</span>
+            </div>
+          }
           description={
             <>
               {/* <div
@@ -219,7 +231,12 @@ const CardItem = ({ card, viewType, onDeleteCard, onPreviewCard }) => {
             />
           </div>
         }
-        title={card?.title_en || "Title Unavailable"}
+        title={
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge count={`ID-${card.id}`} style={idBadgeStyle} />
+            <span>{card?.title_en || "Title Unavailable"}</span>
+          </div>
+        }
         description={
           <>
             <div

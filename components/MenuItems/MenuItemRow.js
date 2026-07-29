@@ -167,6 +167,12 @@ const MenuItemRow = ({
   };
 
   const isSelected = selectedItemIds.includes(menuItem.id);
+  const idBadgeStyle = {
+    backgroundColor: "#f0f0f0",
+    color: "#666",
+    fontSize: "12px",
+    fontWeight: "500",
+  };
 
   const getParentTitle = (parentId) => {
     // parentId is string. Convert it to number
@@ -198,15 +204,19 @@ const MenuItemRow = ({
           {/* Item Name (English) */}
           <div className="col-span-2">
             {isEditing ? (
-              <Input
-                value={editedTitleEn}
-                onChange={(e) => setEditedTitleEn(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
-                placeholder="Item Name"
-                prefix={<MenuOutlined className="text-gray-400" />}
-              />
-            ) : (
               <div className="flex items-center gap-2">
+                <Badge count={`ID-${menuItem.id}`} style={idBadgeStyle} />
+                <Input
+                  value={editedTitleEn}
+                  onChange={(e) => setEditedTitleEn(e.target.value)}
+                  className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
+                  placeholder="Item Name"
+                  prefix={<MenuOutlined className="text-gray-400" />}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge count={`ID-${menuItem.id}`} style={idBadgeStyle} />
                 <MenuOutlined className="text-brand" />
                 <span className="font-semibold text-gray-800 truncate">
                   {menuItem.title}

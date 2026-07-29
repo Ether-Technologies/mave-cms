@@ -107,6 +107,12 @@ const NavbarRow = ({
   };
 
   const isSelected = selectedNavbarIds.includes(navbar.id);
+  const idBadgeStyle = {
+    backgroundColor: "#f0f0f0",
+    color: "#666",
+    fontSize: "12px",
+    fontWeight: "500",
+  };
   const menuItemsCount = navbar.menu?.menu_items?.length || 0;
   const [showAllItems, setShowAllItems] = useState(false);
   const displayedItems = showAllItems
@@ -137,6 +143,7 @@ const NavbarRow = ({
           <div className="col-span-3">
             {isEditing ? (
               <div className="space-y-2">
+                <Badge count={`ID-${navbar.id}`} style={idBadgeStyle} />
                 <Input
                   value={editedNavbarTitleEn}
                   onChange={(e) => setEditedNavbarTitleEn(e.target.value)}
@@ -156,7 +163,8 @@ const NavbarRow = ({
               </div>
             ) : (
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge count={`ID-${navbar.id}`} style={idBadgeStyle} />
                   <MenuOutlined className="text-brand" />
                   <span className="font-semibold text-gray-800 truncate">
                     {navbar.title_en}

@@ -1,8 +1,15 @@
 import React from "react";
-import { Carousel, Button, Popconfirm, Space, Card, Tag } from "antd";
+import { Carousel, Button, Popconfirm, Space, Card, Tag, Badge } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { capitalize } from "lodash";
+
+const idBadgeStyle = {
+  backgroundColor: "#f0f0f0",
+  color: "#666",
+  fontSize: "12px",
+  fontWeight: "500",
+};
 
 const ImageSlider = ({
   slider,
@@ -90,9 +97,12 @@ const ImageSlider = ({
           className="media-card-meta flex flex-col sm:flex-row justify-between items-start sm:items-center"
           direction="vertical"
         >
-          <h3 className="text-lg font-semibold truncate max-w-xs">
-            {slider.title_en || "Title Unavailable"}
-          </h3>
+          <div className="flex items-center gap-2 flex-wrap max-w-xs">
+            <Badge count={`ID-${slider.id}`} style={idBadgeStyle} />
+            <h3 className="text-lg font-semibold truncate m-0">
+              {slider.title_en || "Title Unavailable"}
+            </h3>
+          </div>
           <h5 className="text-md text-gray-400 font-bold">
             {capitalize(slider.type) || "Type Unavailable"}
           </h5>

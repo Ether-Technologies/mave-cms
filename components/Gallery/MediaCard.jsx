@@ -1,9 +1,16 @@
 import React from "react";
-import { Card, Button, Tag, Popconfirm } from "antd";
+import { Card, Button, Tag, Popconfirm, Badge } from "antd";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import Image from "next/image";
 
 const { Meta } = Card;
+
+const idBadgeStyle = {
+  backgroundColor: "#f0f0f0",
+  color: "#666",
+  fontSize: "12px",
+  fontWeight: "500",
+};
 
 const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
   // Render tags with horizontal scroll and consistent height
@@ -246,7 +253,12 @@ const MediaCard = ({ media, mediaType, handleDelete, handlePreview }) => {
     >
       <Meta
         className="pt-6"
-        title={media.title || media.file_name}
+        title={
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge count={`ID-${media.id}`} style={idBadgeStyle} />
+            <span className="truncate">{media.title || media.file_name}</span>
+          </div>
+        }
         description={
           <>
             <p className="text-gray-500 text-sm truncate">{media.file_name}</p>

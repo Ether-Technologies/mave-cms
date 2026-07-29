@@ -89,6 +89,12 @@ const MenuRow = ({
   };
 
   const isSelected = selectedMenuIds.includes(menu.id);
+  const idBadgeStyle = {
+    backgroundColor: "#f0f0f0",
+    color: "#666",
+    fontSize: "12px",
+    fontWeight: "500",
+  };
   const menuItemsCount = menu.menu_items?.length || 0;
   const displayedItems = showAllItems
     ? menu.menu_items
@@ -117,15 +123,19 @@ const MenuRow = ({
           {/* Menu Name */}
           <div className="col-span-4">
             {isEditing ? (
-              <Input
-                value={editedMenuName}
-                onChange={(e) => setEditedMenuName(e.target.value)}
-                className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
-                placeholder="Menu name"
-                prefix={<MenuOutlined className="text-gray-400" />}
-              />
-            ) : (
               <div className="flex items-center gap-2">
+                <Badge count={`ID-${menu.id}`} style={idBadgeStyle} />
+                <Input
+                  value={editedMenuName}
+                  onChange={(e) => setEditedMenuName(e.target.value)}
+                  className="w-full h-10 border-2 border-gray-200 rounded-lg hover:border-blue-300 focus:border-brand transition-all"
+                  placeholder="Menu name"
+                  prefix={<MenuOutlined className="text-gray-400" />}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge count={`ID-${menu.id}`} style={idBadgeStyle} />
                 <MenuOutlined className="text-brand" />
                 <span className="font-semibold text-gray-800 truncate">
                   {menu.name}
