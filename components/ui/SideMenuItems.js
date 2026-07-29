@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import AuthorizedSideMenuData from "../../src/data/authorisedsidemenus.json";
 import UnAuthorizedSideMenuData from "../../src/data/unauthorisedsidemenu.json";
 import NiloyLabs from "../../src/data/niloy.json";
-import Godfather from "../../src/data/godfather.json";
+// import Godfather from "../../src/data/godfather.json"; // E-Labs sidebar
 import Ecommerce from "../../src/data/ecommerce.json";
 import Image from "next/image";
 import instance from "../../axios";
@@ -95,14 +95,18 @@ const useMenuData = (token, user, isUuroTravels) => {
       setIsInitializing(true);
 
       if (token && user) {
+        // User Manual sidebar disabled (see authorisedsidemenus.json)
+        const baseMenu = AuthorizedSideMenuData.filter(
+          (item) => item.title !== "User Manual"
+        );
         // Only set ecommerce data if client is uurotravels
-        const baseMenu = [...AuthorizedSideMenuData];
         if (isUuroTravels) {
           baseMenu.push(...Ecommerce);
         }
 
         setSideMenuData(baseMenu);
-        setGodfatherData(Godfather);
+        // setGodfatherData(Godfather); // E-Labs sidebar disabled
+        setGodfatherData([]);
       } else {
         setSideMenuData(UnAuthorizedSideMenuData);
         setGodfatherData([]);

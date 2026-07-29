@@ -124,7 +124,7 @@ export default function NavItems({
 
   return (
     <Layout.Header
-      className="fixed w-full h-16 flex items-center justify-between px-3 
+      className="fixed w-full h-16 flex items-center justify-between px-3
     md:px-4 lg:px-6 bg-white border-b border-gray-200 z-50"
     >
       {/* Logo and Version */}
@@ -142,9 +142,9 @@ export default function NavItems({
           />
         </div>
         <div
-          className="px-2 py-1 rounded-xl text-sm font-semibold text-white cursor-pointer 
-            bg-gradient-to-r from-yellow-500 to-orange-500 
-            hover:from-orange-500 hover:to-red-500 
+          className="px-2 py-1 rounded-xl text-sm font-semibold text-white cursor-pointer
+            bg-gradient-to-r from-yellow-500 to-orange-500
+            hover:from-orange-500 hover:to-red-500
             transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
@@ -251,8 +251,8 @@ export default function NavItems({
             {/* Notification Bell — hidden
             <Badge count={3} size="default" color="#A259FF80">
               <div
-                className="w-10 h-10 flex items-center justify-center rounded-lg 
-                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-yellow-50 hover:to-orange-50 
+                className="w-10 h-10 flex items-center justify-center rounded-lg
+                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-yellow-50 hover:to-orange-50
                 cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
               >
                 <BellOutlined className="text-gray-600 hover:text-orange-500 text-lg transition-colors duration-300" />
@@ -262,7 +262,7 @@ export default function NavItems({
 
             {/* Settings */}
             <div
-              className="w-10 h-10 flex items-center justify-center rounded-lg 
+              className="w-10 h-10 flex items-center justify-center rounded-lg
                 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50
                 cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
               onClick={() => router.push("/settings/cms-settings")}
@@ -273,10 +273,10 @@ export default function NavItems({
             {/* User Dropdown */}
             <Dropdown menu={{ items: userItems }} placement="bottomRight">
               <div
-                className="w-10 h-10 flex items-center justify-center rounded-xl 
-                  bg-gradient-to-r from-yellow-500 to-orange-500 
-                  hover:from-orange-500 hover:to-red-500 
-                  cursor-pointer transition-all duration-300 transform hover:scale-110 
+                className="w-10 h-10 flex items-center justify-center rounded-xl
+                  bg-gradient-to-r from-yellow-500 to-orange-500
+                  hover:from-orange-500 hover:to-red-500
+                  cursor-pointer transition-all duration-300 transform hover:scale-110
                   shadow-md hover:shadow-xl mr-8"
               >
                 <UserOutlined className="text-white text-lg" />
@@ -290,9 +290,9 @@ export default function NavItems({
             icon={<LoginOutlined className="text-base" />}
             onClick={() => router.push("/login")}
             className="h-10 px-6 text-white border-0 font-semibold rounded-lg text-base
-              bg-gradient-to-r from-yellow-500 to-orange-500 
-              hover:from-orange-500 hover:to-red-500 
-              transition-all duration-300 transform hover:scale-105 
+              bg-gradient-to-r from-yellow-500 to-orange-500
+              hover:from-orange-500 hover:to-red-500
+              transition-all duration-300 transform hover:scale-105
               shadow-md hover:shadow-xl"
             style={{
               background: "linear-gradient(to right, #eab308, #f97316)",

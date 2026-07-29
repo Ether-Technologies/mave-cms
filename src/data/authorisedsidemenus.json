@@ -96,27 +96,6 @@
         ]
     },
     {
-        "id": 21,
-        "menu": "Settings",
-        "title": "Settings",
-        "icon": "/icons/mave/settings.svg",
-        "link": "settings",
-        "submenu": [
-            {
-                "id": 22,
-                "icon": "/icons/mave/settings.svg",
-                "link": "/settings/cms-settings",
-                "title": "CMS Settings"
-            },
-            {
-                "id": 24,
-                "icon": "/icons/mave/user-settings.svg",
-                "link": "/settings/users-settings",
-                "title": "User Settings"
-            }
-        ]
-    },
-    {
         "id": 25,
         "menu": "Tools",
         "title": "Tools",
@@ -134,6 +113,27 @@
                 "icon": "/icons/mave/feedback.svg",
                 "link": "/formbuilder/form-responses",
                 "title": "Responses"
+            }
+        ]
+    },
+    {
+        "id": 21,
+        "menu": "Settings",
+        "title": "Settings",
+        "icon": "/icons/mave/settings.svg",
+        "link": "settings",
+        "submenu": [
+            {
+                "id": 22,
+                "icon": "/icons/mave/settings.svg",
+                "link": "/settings/cms-settings",
+                "title": "CMS Settings"
+            },
+            {
+                "id": 24,
+                "icon": "/icons/mave/user-settings.svg",
+                "link": "/settings/users-settings",
+                "title": "User Settings"
             }
         ]
     }
