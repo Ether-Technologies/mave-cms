@@ -13,7 +13,8 @@ import CreateFooterModal from "../../components/PageBuilder/CreateFooterModal";
 const Pages = () => {
   const [allPages, setAllPages] = useState([]);
   const [typePages, setTypePages] = useState([]);
-  const [typeSubpages, setTypeSubpages] = useState([]);
+  // Subpages tab disabled on Pages section
+  // const [typeSubpages, setTypeSubpages] = useState([]);
   const [typeFooters, setTypeFooters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -35,9 +36,9 @@ const Pages = () => {
   // Memoized paginated data
   const paginatedData = useMemo(() => ({
     pages: sortedTypePages.slice(0, itemsPerPage),
-    subpages: typeSubpages.slice(0, itemsPerPage),
+    // subpages: typeSubpages.slice(0, itemsPerPage),
     footers: typeFooters.slice(0, itemsPerPage),
-  }), [sortedTypePages, typeSubpages, typeFooters, itemsPerPage]);
+  }), [sortedTypePages, typeFooters, itemsPerPage]);
 
   // Fetch pages with caching
   const fetchPages = useCallback(async () => {
@@ -48,7 +49,7 @@ const Pages = () => {
       if (response.data) {
         setAllPages(response.data);
         setTypePages(response.data.filter(page => page.type === "Page"));
-        setTypeSubpages(response.data.filter(page => page.type === "Subpage"));
+        // setTypeSubpages(response.data.filter(page => page.type === "Subpage"));
         setTypeFooters(response.data.filter(page => page.type === "Footer"));
       } else {
         message.error("Failed to fetch pages.");
@@ -163,7 +164,7 @@ const Pages = () => {
   const handlePageSearch = useCallback((searchText) => {
     if (!searchText.trim()) {
       setTypePages(allPages.filter(page => page.type === "Page"));
-      setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
+      // setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
       setTypeFooters(allPages.filter(page => page.type === "Footer"));
       return;
     }
@@ -173,7 +174,7 @@ const Pages = () => {
     );
 
     setTypePages(filteredPages.filter(page => page.type === "Page"));
-    setTypeSubpages(filteredPages.filter(page => page.type === "Subpage"));
+    // setTypeSubpages(filteredPages.filter(page => page.type === "Subpage"));
     setTypeFooters(filteredPages.filter(page => page.type === "Footer"));
   }, [allPages]);
 
@@ -183,25 +184,25 @@ const Pages = () => {
     switch (filterType) {
       case 'all':
         setTypePages(allPages.filter(page => page.type === "Page"));
-        setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
+        // setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
         setTypeFooters(allPages.filter(page => page.type === "Footer"));
         message.success("Showing all pages");
         break;
       case 'pages':
         setTypePages(allPages.filter(page => page.type === "Page"));
-        setTypeSubpages([]);
+        // setTypeSubpages([]);
         setTypeFooters([]);
         message.success("Showing pages only");
         break;
-      case 'subpages':
-        setTypePages([]);
-        setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
-        setTypeFooters([]);
-        message.success("Showing subpages only");
-        break;
+      // case 'subpages':
+      //   setTypePages([]);
+      //   setTypeSubpages(allPages.filter(page => page.type === "Subpage"));
+      //   setTypeFooters([]);
+      //   message.success("Showing subpages only");
+      //   break;
       case 'footers':
         setTypePages([]);
-        setTypeSubpages([]);
+        // setTypeSubpages([]);
         setTypeFooters(allPages.filter(page => page.type === "Footer"));
         message.success("Showing footers only");
         break;
@@ -249,7 +250,7 @@ const Pages = () => {
         handleFilter={handleFilter}
         onRefresh={fetchPages}
         totalPages={typePages.length}
-        totalSubpages={typeSubpages.length}
+        // totalSubpages={typeSubpages.length}
         totalFooters={typeFooters.length}
       />
 
@@ -269,7 +270,7 @@ const Pages = () => {
 
       <PagesTabs
         typePages={paginatedData.pages}
-        typeSubpages={paginatedData.subpages}
+        // typeSubpages={paginatedData.subpages}
         typeFooters={paginatedData.footers}
         handleExpand={handleExpand}
         expandedPageId={expandedPageId}

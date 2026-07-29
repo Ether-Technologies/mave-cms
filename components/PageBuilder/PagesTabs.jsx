@@ -8,7 +8,7 @@ const { TabPane } = Tabs;
 
 const PagesTabs = ({
   typePages,
-  typeSubpages,
+  // typeSubpages,
   typeFooters,
   handleExpand,
   expandedPageId,
@@ -19,7 +19,7 @@ const PagesTabs = ({
 }) => {
   const tabs = [
     { key: "1", tab: "Pages", data: typePages },
-    { key: "2", tab: "Subpages", data: typeSubpages },
+    // { key: "2", tab: "Subpages", data: typeSubpages },
     { key: "3", tab: "Footers", data: typeFooters },
   ];
 

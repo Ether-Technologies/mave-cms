@@ -9,7 +9,7 @@ import {
   ReloadOutlined,
   SettingOutlined,
   FileTextOutlined,
-  AppstoreOutlined,
+  // AppstoreOutlined,
   LayoutOutlined,
 } from "@ant-design/icons";
 import {
@@ -68,11 +68,11 @@ const PagesHeader = ({
       label: "Pages Only",
       icon: <SettingOutlined />,
     },
-    {
-      key: "subpages",
-      label: "Subpages Only",
-      icon: <SettingOutlined />,
-    },
+    // {
+    //   key: "subpages",
+    //   label: "Subpages Only",
+    //   icon: <SettingOutlined />,
+    // },
     {
       key: "footers",
       label: "Footers Only",
@@ -119,6 +119,7 @@ const PagesHeader = ({
                     Pages
                   </span>
                 </div>
+                {/* Subpages count hidden — subpages tab disabled on Pages section
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-50 to-violet-50 px-3 py-1.5 rounded-full border border-purple-200 hover:shadow-sm transition-all">
                   <AppstoreOutlined className="text-purple-600 text-xs" />
                   <Badge
@@ -130,6 +131,7 @@ const PagesHeader = ({
                     Subpages
                   </span>
                 </div>
+                */}
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-1.5 rounded-full border border-teal-200 hover:shadow-sm transition-all">
                   <LayoutOutlined className="text-teal-600 text-xs" />
                   <Badge
@@ -280,7 +282,7 @@ const PagesHeader = ({
             {/* Search */}
             <div className="flex-1 lg:flex-none">
               <Input
-                placeholder="Search pages, subpages, footers..."
+                placeholder="Search pages, footers..."
                 className="w-full lg:w-80 h-10 border-2 border-gray-200 rounded-xl shadow-sm bg-gradient-to-r from-white to-gray-50 hover:border-gray-300 focus:border-yellow-400 transition-all [&_.ant-input]:bg-transparent [&_.ant-input]:font-medium [&_.ant-input]:placeholder:text-gray-400"
                 allowClear
                 value={searchValue}

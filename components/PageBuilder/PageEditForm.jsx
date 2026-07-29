@@ -168,7 +168,7 @@ const PageEditForm = ({ page, onSubmit, onCancel }) => {
           size="large"
         >
           <Radio value="Page">Page</Radio>
-          <Radio value="Subpage">Subpage</Radio>
+          {/* <Radio value="Subpage">Subpage</Radio> */}
         </Radio.Group>
       </div>
 
