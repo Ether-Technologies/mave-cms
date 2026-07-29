@@ -1,11 +1,11 @@
 // components/dashboard/welcomeCard.js
 import React from "react";
 import { motion } from "framer-motion";
-import { PlusOutlined, FileAddOutlined, CloudUploadOutlined, EyeOutlined, ShareAltOutlined } from "@ant-design/icons";
-import { useRouter } from "next/router";
+// import { PlusOutlined, FileAddOutlined, CloudUploadOutlined } from "@ant-design/icons";
+// import { useRouter } from "next/router";
 
 export default function WelcomeCard({ userData }) {
-    const router = useRouter();
+    // const router = useRouter();
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -19,26 +19,27 @@ export default function WelcomeCard({ userData }) {
         return `Today at ${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
     };
 
-    const welcomeCard = [
-        {
-            title: "New Post",
-            icon: <PlusOutlined />,
-            link: "/blogs",
-            gradient: "from-[#3498db] to-[#2980b9]",
-        },
-        {
-            title: "New Page",
-            icon: <FileAddOutlined />,
-            link: "/page-builder",
-            gradient: "from-orange-500 to-orange-600",
-        },
-        {
-            title: "Upload Media",
-            icon: <CloudUploadOutlined />,
-            link: "/gallery",
-            gradient: "from-gray-600 to-gray-700",
-        },
-    ];
+    // Quick actions hidden — New Post, New Page, Upload Media
+    // const welcomeCard = [
+    //     {
+    //         title: "New Post",
+    //         icon: <PlusOutlined />,
+    //         link: "/blogs",
+    //         gradient: "from-[#3498db] to-[#2980b9]",
+    //     },
+    //     {
+    //         title: "New Page",
+    //         icon: <FileAddOutlined />,
+    //         link: "/page-builder",
+    //         gradient: "from-orange-500 to-orange-600",
+    //     },
+    //     {
+    //         title: "Upload Media",
+    //         icon: <CloudUploadOutlined />,
+    //         link: "/gallery",
+    //         gradient: "from-gray-600 to-gray-700",
+    //     },
+    // ];
 
     return (
         <motion.div
@@ -57,7 +58,7 @@ export default function WelcomeCard({ userData }) {
                     </p>
                 </div>
 
-                {/* Welcome Card */}
+                {/* Welcome Card — quick action buttons commented out
                 <div className="flex flex-col sm:flex-row gap-3">
                     {welcomeCard.map((action, index) => (
                         <motion.button
@@ -83,6 +84,7 @@ export default function WelcomeCard({ userData }) {
                         </motion.button>
                     ))}
                 </div>
+                */}
             </div>
         </motion.div>
     );
