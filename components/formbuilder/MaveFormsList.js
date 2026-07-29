@@ -1,6 +1,6 @@
 // components/formbuilder/MaveFormsList.jsx
 import React, { useState, useEffect, useContext } from "react";
-import { Drawer, Popconfirm, Input, Spin, Button, Badge, Tooltip, message } from "antd";
+import { Drawer, Popconfirm, Input, Spin, Button, Badge } from "antd";
 import {
   SearchOutlined,
   EyeOutlined,
@@ -10,14 +10,13 @@ import {
   AppstoreOutlined,
   UnorderedListOutlined,
   CloseOutlined,
-  CopyOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import instance from "../../axios";
 import MaveFormElements from "./MaveFormElements";
 import { FormBuilderContext } from "../../src/context/FormBuilderContext";
 
-const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
+const MaveFormsList = ({ onSelectForm, selectedFormId, onFormCountChange }) => {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [changeFormsView, setChangeFormsView] = useState(false);
@@ -46,7 +45,9 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
       setError(null);
       const response = await instance.get("/form_builder");
       if (response.status === 200) {
-        setForms(response.data);
+        const list = response.data ?? [];
+        setForms(list);
+        onFormCountChange?.(list.length);
       } else {
         setError("Failed to fetch forms");
       }
@@ -60,7 +61,11 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
   const handleDeleteForm = async (formId) => {
     try {
       await instance.delete(`/form_builder/${formId}`);
-      setForms((prev) => prev.filter((f) => f.id !== formId));
+      setForms((prev) => {
+        const next = prev.filter((f) => f.id !== formId);
+        onFormCountChange?.(next.length);
+        return next;
+      });
       if (selectedFormId === formId) {
         onSelectForm(null);
         reset();
@@ -75,13 +80,6 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
       form.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       form.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const copyFormBuilderApi = () => {
-    navigator.clipboard.writeText(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/form_builder`
-    );
-    message.success("API endpoint copied to clipboard");
-  };
 
   if (loading) {
     return (
@@ -123,16 +121,17 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
   }
 
   return (
-    <div className="w-full">
-      {/* Search and View Toggle */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="w-full space-y-6">
+      {/* Controls — matches Cards/Menus/Gallery layout */}
+      <div className="bg-gradient-to-br from-white to-gray-50/30 rounded-2xl shadow-md border border-gray-200/50 p-6 backdrop-blur-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="relative w-full sm:w-96 group">
           <Input
             placeholder="Search forms..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            prefix={<SearchOutlined className="text-gray-400 group-hover:text-[#3498db] transition-colors duration-200" />}
-            className="rounded-lg border-gray-200 hover:border-[#3498db] focus:border-[#3498db] transition-all duration-200 shadow-sm hover:shadow-md"
+            prefix={<SearchOutlined className="text-gray-400 group-hover:text-brand transition-colors duration-200" />}
+            className="rounded-xl border-2 border-gray-200 hover:border-gray-300 focus:border-brand transition-all h-10 shadow-sm bg-gradient-to-r from-white to-gray-50 [&_.ant-input]:bg-transparent [&_.ant-input]:font-medium"
             size="large"
             suffix={
               searchQuery && (
@@ -146,19 +145,13 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Tooltip title="Copy form builder API endpoint">
-            <Button
-              icon={<CopyOutlined />}
-              size="large"
-              className="border-gray-200 hover:border-[#3498db] hover:text-[#3498db]"
-              onClick={copyFormBuilderApi}
-            />
-          </Tooltip>
+          <span className="text-sm font-semibold text-gray-700 hidden sm:inline">View:</span>
+          <div className="flex items-center bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl p-1 shadow-sm border border-gray-200">
           <button
             onClick={() => setChangeFormsView(false)}
             className={`p-2.5 rounded-lg transition-all duration-200 ${!changeFormsView
-              ? "bg-gradient-to-r from-[#3498db] to-[#2980b9] text-white shadow-md"
-              : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+              ? "bg-gradient-to-r from-brand to-brand-dark text-white shadow-md"
+              : "text-gray-600 hover:text-gray-800 hover:bg-white"
               }`}
           >
             <AppstoreOutlined className="text-lg" />
@@ -166,16 +159,18 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
           <button
             onClick={() => setChangeFormsView(true)}
             className={`p-2.5 rounded-lg transition-all duration-200 ${changeFormsView
-              ? "bg-gradient-to-r from-[#3498db] to-[#2980b9] text-white shadow-md"
-              : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+              ? "bg-gradient-to-r from-brand to-brand-dark text-white shadow-md"
+              : "text-gray-600 hover:text-gray-800 hover:bg-white"
               }`}
           >
             <UnorderedListOutlined className="text-lg" />
           </button>
+          </div>
         </div>
       </div>
+      </div>
 
-      {/* Results Count */}
+      <div className="bg-gradient-to-br from-white to-gray-50/30 rounded-2xl shadow-md border border-gray-200/50 p-6 backdrop-blur-sm">
       {searchQuery && (
         <div className="mb-4 text-sm text-gray-600 animate-fade-in">
           Found {filteredForms.length} {filteredForms.length === 1 ? "form" : "forms"}
@@ -344,6 +339,8 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
           ))}
         </div>
       )}
+
+      </div>
 
       {/* Enhanced Drawer */}
       <Drawer

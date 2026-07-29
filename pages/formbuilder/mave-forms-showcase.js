@@ -1,9 +1,8 @@
 // pages/formbuilder/mave-forms-showcase.js
 import React, { useState } from "react";
 import MaveFormsList from "../../components/formbuilder/MaveFormsList";
-import { FormBuilderProvider } from "../../src/context/FormBuilderContext";
 
-const MaveFormsShowcase = () => {
+const MaveFormsShowcase = ({ onFormCountChange }) => {
   const [selectedFormId, setSelectedFormId] = useState(null);
 
   const handleSelectForm = (formId) => {
@@ -11,14 +10,13 @@ const MaveFormsShowcase = () => {
   };
 
   return (
-    <FormBuilderProvider>
-      <div className="w-full">
-        <MaveFormsList
-          onSelectForm={handleSelectForm}
-          selectedFormId={selectedFormId}
-        />
-      </div>
-    </FormBuilderProvider>
+    <div className="w-full">
+      <MaveFormsList
+        onSelectForm={handleSelectForm}
+        selectedFormId={selectedFormId}
+        onFormCountChange={onFormCountChange}
+      />
+    </div>
   );
 };
 
