@@ -1,6 +1,7 @@
 // components/formbuilder/builder/FormEditor.js
 import React, { useEffect, useState, useContext } from "react";
 import { Tabs, Card, Button, Popconfirm } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
 import BuilderPanel from "./BuilderPanel";
 import ElementPanel from "./ElementPanel";
 import { FormBuilderContext } from "../../../src/context/FormBuilderContext";
@@ -325,14 +326,30 @@ const FormEditor = ({ formId }) => {
               <label className="block text-gray-700 font-bold mb-2">
                 Action URL <span className="text-sm text-gray-500">(Auto-generated)</span>
               </label>
-              <input
-                className="border rounded w-full p-2 mb-4 bg-gray-100 cursor-not-allowed"
-                type="url"
-                placeholder={formId ? "Action URL will appear after form creation" : "Save form to generate Action URL"}
-                value={formAttributes.action_url || ""}
-                readOnly
-                disabled
-              />
+              <div className="flex gap-2 mb-4">
+                <input
+                  className="border rounded w-full p-2 bg-gray-100 cursor-not-allowed"
+                  type="url"
+                  placeholder={formId ? "Action URL will appear after form creation" : "Save form to generate Action URL"}
+                  value={formAttributes.action_url || ""}
+                  readOnly
+                  disabled
+                />
+                {(formAttributes.action_url || formId) && (
+                  <Button
+                    icon={<CopyOutlined />}
+                    onClick={() => {
+                      const endpoint =
+                        formAttributes.action_url ||
+                        `${process.env.NEXT_PUBLIC_API_BASE_URL}/form-submission?form_id=${formId}`;
+                      navigator.clipboard.writeText(endpoint);
+                      message.success("Form submission API endpoint copied");
+                    }}
+                  >
+                    Copy
+                  </Button>
+                )}
+              </div>
               {!formId && (
                 <p className="text-sm text-gray-500 mb-4">
                   💡 The Action URL will be automatically generated after you save the form.

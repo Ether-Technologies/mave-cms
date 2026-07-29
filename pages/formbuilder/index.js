@@ -1,11 +1,18 @@
 // pages/formbuilder/index.js
-import { Button } from "antd";
+import { Button, message } from "antd";
 import router from "next/router";
 import MaveFormsShowcase from "./mave-forms-showcase";
 import { FormBuilderProvider } from "../../src/context/FormBuilderContext";
-import { PlusOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { PlusOutlined, ThunderboltOutlined, CopyOutlined } from "@ant-design/icons";
+
+const FORM_BUILDER_API = `${process.env.NEXT_PUBLIC_API_BASE_URL}/form_builder`;
 
 export default function FormBuilder() {
+  const copyFormBuilderApi = () => {
+    navigator.clipboard.writeText(FORM_BUILDER_API);
+    message.success("API endpoint copied to clipboard");
+  };
+
   return (
     <FormBuilderProvider>
       <div className="py-10 mb-10 min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
@@ -48,7 +55,8 @@ export default function FormBuilder() {
                 Design, customize, and deploy forms in minutes with our intuitive drag-and-drop builder
               </p>
 
-              {/* CTA Button */}
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={() => router.push("/formbuilder/create-form")}
                 className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#3498db] to-[#2980b9] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
@@ -58,6 +66,16 @@ export default function FormBuilder() {
                 <span className="relative z-10">Create New Form</span>
                 <div className="absolute right-0 top-0 h-full w-0 group-hover:w-full bg-white/10 transition-all duration-300"></div>
               </button>
+              <Button
+                type="default"
+                size="large"
+                icon={<CopyOutlined />}
+                onClick={copyFormBuilderApi}
+                className="h-[52px] px-6 font-semibold rounded-xl border-2 border-gray-200 hover:border-[#3498db] hover:text-[#3498db]"
+              >
+                Copy API Endpoint
+              </Button>
+              </div>
             </div>
 
             {/* Stats Cards */}

@@ -1,6 +1,6 @@
 // components/formbuilder/MaveFormsList.jsx
 import React, { useState, useEffect, useContext } from "react";
-import { Drawer, Popconfirm, Input, Spin, Button, Badge } from "antd";
+import { Drawer, Popconfirm, Input, Spin, Button, Badge, Tooltip, message } from "antd";
 import {
   SearchOutlined,
   EyeOutlined,
@@ -10,6 +10,7 @@ import {
   AppstoreOutlined,
   UnorderedListOutlined,
   CloseOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import instance from "../../axios";
@@ -75,6 +76,13 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
       form.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const copyFormBuilderApi = () => {
+    navigator.clipboard.writeText(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/form_builder`
+    );
+    message.success("API endpoint copied to clipboard");
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center py-20">
@@ -138,6 +146,14 @@ const MaveFormsList = ({ onSelectForm, selectedFormId }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Tooltip title="Copy form builder API endpoint">
+            <Button
+              icon={<CopyOutlined />}
+              size="large"
+              className="border-gray-200 hover:border-[#3498db] hover:text-[#3498db]"
+              onClick={copyFormBuilderApi}
+            />
+          </Tooltip>
           <button
             onClick={() => setChangeFormsView(false)}
             className={`p-2.5 rounded-lg transition-all duration-200 ${!changeFormsView
