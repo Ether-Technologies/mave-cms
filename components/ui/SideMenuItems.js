@@ -35,6 +35,19 @@ const CONSTANTS = {
   SUCCESS_MESSAGES: {
     CUSTOM_MODELS_LOADED: "Custom models loaded successfully",
   },
+  // Sidebar entries hidden from Creator Studio (custom models from API)
+  HIDDEN_SIDEBAR_MODEL_NAMES: new Set([
+    "blog",
+    "blogs",
+    "customer",
+    "customers",
+    "product",
+    "products",
+    "employee",
+    "employees",
+    "author",
+    "authors",
+  ]),
 };
 
 // Error Boundary Component
@@ -201,7 +214,14 @@ const SideMenuItems = ({
         );
 
         if (creatorStudioMenu) {
-          const customModelItems = customModels.map((model) => ({
+          const customModelItems = customModels
+            .filter(
+              (model) =>
+                !CONSTANTS.HIDDEN_SIDEBAR_MODEL_NAMES.has(
+                  model.model_name?.toLowerCase()
+                )
+            )
+            .map((model) => ({
             id: `${CONSTANTS.CUSTOM_MODEL_PREFIX}${model.id}`,
             icon: CONSTANTS.CUSTOM_MODEL_ICON,
             link: `/custom-models/${model.id}`,

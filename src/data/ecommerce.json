@@ -18,12 +18,6 @@
                 "title": "Packages"
             },
             {
-                "id": 107,
-                "icon": "/icons/mave/customers.svg",
-                "link": "/ecommerce/customers",
-                "title": "Customers"
-            },
-            {
                 "id": 108,
                 "icon": "/icons/mave/orders.svg",
                 "link": "/ecommerce/orders",
