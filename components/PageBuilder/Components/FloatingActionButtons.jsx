@@ -15,25 +15,7 @@ const FloatingActionButtons = ({
   if (!isEditing) return null;
 
   return (
-    <div className="fixed bottom-6 right-2 z-50 flex flex-col items-end gap-3">
-      {/* Status Indicator */}
-      <div className="bg-white rounded-lg shadow-lg p-3 mb-2 text-xs text-gray-600">
-        <div className="flex items-center gap-2">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              isDirty ? "bg-orange-500" : "bg-green-500"
-            }`}
-          ></div>
-          <span>{isDirty ? "Unsaved changes" : "All changes saved"}</span>
-        </div>
-        {lastSaved && (
-          <div className="text-gray-400 mt-1">
-            Last saved: {new Date(lastSaved).toLocaleTimeString()}
-          </div>
-        )}
-        <div className="text-gray-400 mt-1">Ctrl/⌘+S to save</div>
-      </div>
-
+    <div className="fixed top-[78%] -translate-y-1/2 right-2 z-50 flex flex-col items-end gap-3">
       {/* Save Button */}
       <div className="relative">
         <Button
@@ -85,6 +67,24 @@ const FloatingActionButtons = ({
         }}
         title="Preview Page"
       />
+
+      {/* Status Indicator */}
+      <div className="bg-white rounded-lg shadow-lg p-3 mt-2 text-xs text-gray-600">
+        <div className="flex items-center gap-2">
+          <div
+            className={`w-2 h-2 rounded-full ${
+              isDirty ? "bg-orange-500" : "bg-green-500"
+            }`}
+          ></div>
+          <span>{isDirty ? "Unsaved changes" : "All changes saved"}</span>
+        </div>
+        {lastSaved && (
+          <div className="text-gray-400 mt-1">
+            Last saved: {new Date(lastSaved).toLocaleTimeString()}
+          </div>
+        )}
+        <div className="text-gray-400 mt-1">Ctrl/⌘+S to save</div>
+      </div>
     </div>
   );
 };
