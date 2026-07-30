@@ -9,6 +9,7 @@ import SliderTypeTabs from "./SliderForm/SliderTypeTabs";
 import MediaSelector from "./SliderForm/MediaSelector";
 import CardSelector from "./SliderForm/CardSelector";
 import FormActions from "./SliderForm/FormActions";
+import { orderByIds } from "./SliderForm/orderByIds";
 
 const SliderForm = ({
   form,
@@ -68,7 +69,9 @@ const SliderForm = ({
               type: slider.type,
               // tags: slider.additional?.tags || [],
             });
-            setSelectedMedia(slider.medias || []);
+            setSelectedMedia(
+              orderByIds(slider.medias || [], slider.media_ids || [])
+            );
             setSelectedCards(slider.card_ids || []);
             setType(slider.type);
           }
@@ -208,7 +211,6 @@ const SliderForm = ({
               selectedCards={selectedCards}
               setSelectedCards={setSelectedCards}
               cards={cards}
-              cardPlaceholder={cardPlaceholder}
             />
           </Form.Item>
         )}

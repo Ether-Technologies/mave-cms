@@ -1,6 +1,7 @@
 import React from "react";
 import { Carousel, Typography } from "antd";
 import Image from "next/image";
+import { orderByIds } from "../../../slider/SliderForm/orderByIds";
 
 const { Text } = Typography;
 
@@ -86,23 +87,31 @@ const SliderRenderer = React.memo(({ sliderData, config = {} }) => {
   );
 
   if (sliderData.type === "image" && sliderData.medias?.length > 0) {
+    const orderedMedias = orderByIds(
+      sliderData.medias,
+      sliderData.media_ids || []
+    );
     return (
       <div className="w-full">
         <h2 className="text-xl font-bold text-theme pb-4">
           {sliderData.title_en || "Slider Title"}
         </h2>
-        {renderCarousel(renderSliderImages(sliderData.medias))}
+        {renderCarousel(renderSliderImages(orderedMedias))}
       </div>
     );
   }
 
   if (sliderData.type === "card" && sliderData.cards?.length > 0) {
+    const orderedCards = orderByIds(
+      sliderData.cards,
+      sliderData.card_ids || []
+    );
     return (
       <div className="w-full">
         <h2 className="text-xl font-bold text-theme pb-4">
           {sliderData.title_en || "Slider Title"}
         </h2>
-        {renderCarousel(renderCardSlider(sliderData.cards))}
+        {renderCarousel(renderCardSlider(orderedCards))}
       </div>
     );
   }

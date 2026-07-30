@@ -5,6 +5,7 @@ import instance from "../../axios";
 import SliderList from "../../components/slider/SliderList";
 import SliderForm from "../../components/slider/SliderForm";
 import SlidersHeader from "../../components/slider/SlidersHeader";
+import { orderByIds } from "../../components/slider/SliderForm/orderByIds";
 
 const Sliders = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -202,7 +203,9 @@ const Sliders = () => {
       });
 
       // Update media/cards in local state
-      setSelectedMedia(foundSlider.medias || []);
+      setSelectedMedia(
+        orderByIds(foundSlider.medias || [], foundSlider.media_ids || [])
+      );
       setSelectedCards(foundSlider.card_ids || []);
       setType(foundSlider.type);
     }

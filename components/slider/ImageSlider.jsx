@@ -3,6 +3,7 @@ import { Carousel, Button, Popconfirm, Space, Card, Tag, Badge } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { capitalize } from "lodash";
+import { orderByIds } from "./SliderForm/orderByIds";
 
 const idBadgeStyle = {
   backgroundColor: "#f0f0f0",
@@ -46,6 +47,7 @@ const ImageSlider = ({
   ];
 
   const hasMedia = Array.isArray(slider.medias) && slider.medias.length > 0;
+  const orderedMedias = orderByIds(slider.medias || [], slider.media_ids || []);
 
   return (
     <Card
@@ -59,7 +61,7 @@ const ImageSlider = ({
             nextArrow={<CustomNextArrow />}
             className="mb-4"
           >
-            {slider.medias.map((media) => (
+            {orderedMedias.map((media) => (
               <div key={media.id}>
                 <Image
                   src={

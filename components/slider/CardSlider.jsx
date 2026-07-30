@@ -12,6 +12,7 @@ import {
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { capitalize } from "lodash";
+import { orderByIds } from "./SliderForm/orderByIds";
 
 const { Title } = Typography;
 
@@ -56,6 +57,7 @@ const CardSlider = ({
   ];
 
   const hasCards = Array.isArray(slider.cards) && slider.cards.length > 0;
+  const orderedCards = orderByIds(slider.cards || [], slider.card_ids || []);
 
   return (
     <Card
@@ -63,7 +65,7 @@ const CardSlider = ({
       cover={
         hasCards ? (
           <Carousel autoplay className="mb-4">
-            {slider.cards.map((card) => (
+            {orderedCards.map((card) => (
               <div key={card.id}>
                 <div
                   className="flex flex-col items-center justify-center bg-gray-200 pt-6"
