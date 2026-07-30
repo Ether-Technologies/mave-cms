@@ -30,9 +30,9 @@ const Section = ({
   onSectionDuplicate,
   onSectionDelete,
   isEditing = false,
-  onCrossSectionDragEnd,
   dragOverSection,
   activeId,
+  isDraggingSection = false,
 }) => {
   const dispatch = useDispatch();
 
@@ -70,7 +70,7 @@ const Section = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.35 : 1,
   };
 
   // Combine refs for both sortable and droppable
@@ -186,11 +186,11 @@ const Section = ({
       <div
         ref={combinedRef}
         style={style}
-        className={`section-container bg-white shadow-md rounded-lg p-4 mb-6 transition-all duration-200 ${
-          isOver
-            ? "ring-2 ring-brand ring-opacity-70 bg-blue-50 shadow-lg scale-[1.02]"
+        className={`section-container bg-white shadow-md rounded-lg p-4 mb-6 ${
+          isOver && !isDraggingSection
+            ? "ring-2 ring-brand ring-offset-2 bg-blue-50/50"
             : ""
-        }`}
+        } ${isDragging ? "shadow-lg" : ""}`}
       >
         <div className="section-header flex items-center justify-between mb-4 pb-2 border-b">
           <div className="flex items-center gap-2 flex-1">
@@ -198,8 +198,9 @@ const Section = ({
             <div
               {...listeners}
               {...attributes}
-              className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 cursor-move"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-grab active:cursor-grabbing touch-none"
               style={{ position: "relative", zIndex: 50 }}
+              title="Drag to reorder section"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
@@ -280,7 +281,7 @@ const Section = ({
           isVisible={
             isEditing &&
             activeId &&
-            !String(activeId).startsWith("section-") &&
+            !isDraggingSection &&
             dragOverSection === (sectionIndex || index) &&
             section.data.length === 0
           }
@@ -295,7 +296,6 @@ const Section = ({
           onEditingStateChange={handleComponentEditingStateChange}
           sectionIndex={sectionIndex || index}
           isEditing={isEditing}
-          onCrossSectionDragEnd={onCrossSectionDragEnd}
         />
 
         {/* Insertion indicator at the bottom */}
@@ -303,7 +303,7 @@ const Section = ({
           isVisible={
             isEditing &&
             activeId &&
-            !String(activeId).startsWith("section-") &&
+            !isDraggingSection &&
             dragOverSection === (sectionIndex || index) &&
             section.data.length > 0
           }

@@ -1,15 +1,32 @@
 // components/PageBuilder/Components/PageContent.jsx
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { DndContext, DragOverlay, closestCorners } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  sortableKeyboardCoordinates,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { useDispatch } from "react-redux";
 import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
 import SectionList from "../Sections/SectionList";
 import { useCrossSectionDragAndDrop } from "../hooks/useCrossSectionDragAndDrop";
 import { useSectionDragAndDrop } from "../Sections/hooks/useSectionDragAndDrop";
-import CrossSectionDragOverlay from "./CrossSectionDragOverlay";
+import PageBuilderDragOverlay from "./PageBuilderDragOverlay";
+import {
+  buildDndLookup,
+  isSectionDragId,
+  resolveDropSectionIndex,
+} from "../utils/pageBuilderDndUtils";
 
 const PageContent = ({
   pageData,
@@ -27,118 +44,128 @@ const PageContent = ({
     sections: pageData?.body,
     onSectionsUpdate,
   });
+
   const [activeId, setActiveId] = useState(null);
   const [activeComponent, setActiveComponent] = useState(null);
+  const [activeSection, setActiveSection] = useState(null);
   const [dragOverSection, setDragOverSection] = useState(null);
+  const [isDraggingSection, setIsDraggingSection] = useState(false);
+
+  const dndLookupRef = useRef(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const resetDragState = useCallback(() => {
+    setActiveId(null);
+    setActiveComponent(null);
+    setActiveSection(null);
+    setDragOverSection(null);
+    setIsDraggingSection(false);
+    dndLookupRef.current = null;
+  }, []);
 
   const handleDragStart = useCallback(
     (event) => {
       const { active } = event;
+      const activeIdStr = String(active.id);
       setActiveId(active.id);
 
-      // Find the active component for better drag overlay
-      if (active.id && !String(active.id).startsWith("section-")) {
-        // Find the component being dragged
-        for (let i = 0; i < pageData.body.length; i++) {
-          const section = pageData.body[i];
-          const component = section.data.find((comp) => {
-            const componentId =
-              comp._id ?? `component-${i}-${section.data.indexOf(comp)}`;
-            return String(active.id) === String(componentId);
-          });
-          if (component) {
-            setActiveComponent({
-              ...component,
-              sectionIndex: i,
-              type: component.type || "Component",
-            });
-            break;
-          }
-        }
+      const lookup = buildDndLookup(pageData?.body || []);
+      dndLookupRef.current = lookup;
+
+      if (lookup.sectionIdToIndex.has(activeIdStr)) {
+        const sectionIndex = lookup.sectionIdToIndex.get(activeIdStr);
+        const section = pageData.body[sectionIndex];
+        setActiveSection({
+          ...section,
+          sectionIndex,
+        });
+        setIsDraggingSection(true);
+        return;
+      }
+
+      const location = lookup.componentMap.get(activeIdStr);
+      if (location) {
+        setActiveComponent({
+          ...location.component,
+          sectionIndex: location.sectionIndex,
+          type: location.component.type || "Component",
+        });
       }
     },
     [pageData]
   );
 
-  const handleDragOver = useCallback(
-    (event) => {
-      const { over } = event;
-      if (over) {
-        const overId = over.id;
+  const handleDragOver = useCallback((event) => {
+    const { over, active } = event;
 
-        if (String(overId).startsWith("section-drop-")) {
-          const sectionIndex = parseInt(
-            String(overId).replace("section-drop-", ""),
-            10
-          );
-          setDragOverSection(sectionIndex);
-        } else if (String(overId).startsWith("component-")) {
-          // Find which section this component belongs to
-          for (let i = 0; i < pageData.body.length; i++) {
-            const section = pageData.body[i];
-            const component = section.data.find((comp) => {
-              const componentId =
-                comp._id ?? `component-${i}-${section.data.indexOf(comp)}`;
-              return String(overId) === String(componentId);
-            });
-            if (component) {
-              setDragOverSection(i);
-              break;
-            }
-          }
-        }
-      } else {
-        setDragOverSection(null);
-      }
-    },
-    [pageData]
-  );
+    if (!over) {
+      setDragOverSection(null);
+      return;
+    }
+
+    const lookup = dndLookupRef.current;
+    if (!lookup) {
+      setDragOverSection(null);
+      return;
+    }
+
+    if (lookup.sectionIdToIndex.has(String(active.id))) {
+      setDragOverSection(null);
+      return;
+    }
+
+    const overIdStr = String(over.id);
+    let targetSection = -1;
+
+    if (overIdStr.startsWith("section-drop-")) {
+      targetSection = parseInt(overIdStr.replace("section-drop-", ""), 10);
+    } else if (lookup.componentMap.has(overIdStr)) {
+      targetSection = lookup.componentMap.get(overIdStr).sectionIndex;
+    }
+
+    setDragOverSection(targetSection >= 0 ? targetSection : null);
+  }, []);
 
   const handleWithinSectionDrag = useCallback(
     (event, sectionIndex) => {
       const { active, over } = event;
-      const activeId = active.id;
-      const overId = over?.id;
-
-      if (!overId || activeId === overId) {
-        return;
-      }
+      if (!over || active.id === over.id) return;
 
       const section = pageData.body[sectionIndex];
       if (!section) return;
 
-      // Find component indices within the section
       const activeIndex = section.data.findIndex((comp, idx) => {
         const componentId = comp._id ?? `component-${sectionIndex}-${idx}`;
-        return String(activeId) === String(componentId);
+        return String(active.id) === String(componentId);
       });
 
       const overIndex = section.data.findIndex((comp, idx) => {
         const componentId = comp._id ?? `component-${sectionIndex}-${idx}`;
-        return String(overId) === String(componentId);
+        return String(over.id) === String(componentId);
       });
 
       if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex) {
         return;
       }
 
-      // Reorder components within the section
-      const newComponents = [...section.data];
-      const [reorderedItem] = newComponents.splice(activeIndex, 1);
-      newComponents.splice(overIndex, 0, reorderedItem);
+      const newComponents = arrayMove(section.data, activeIndex, overIndex);
 
-      // Update the section - create a deep copy of the body array
-      const updatedPageData = {
-        ...pageData,
-        body: [...pageData.body],
-      };
-      updatedPageData.body[sectionIndex] = {
-        ...section,
-        data: newComponents,
-      };
-
-      // Dispatch the update
-      dispatch(setPageData(updatedPageData));
+      dispatch(
+        setPageData({
+          ...pageData,
+          body: pageData.body.map((s, i) =>
+            i === sectionIndex ? { ...s, data: newComponents } : s
+          ),
+        })
+      );
       dispatch(setIsDirty(true));
     },
     [pageData, dispatch]
@@ -146,83 +173,66 @@ const PageContent = ({
 
   const handleDragEnd = useCallback(
     (event) => {
-      setActiveId(null);
-      setActiveComponent(null);
-      setDragOverSection(null);
-
       const { active, over } = event;
-      const activeId = active.id;
-      const overId = over?.id;
 
-      // Check if this is a section drag
-      if (String(activeId).startsWith("section-")) {
+      if (isSectionDragId(active.id, pageData?.body || [])) {
+        resetDragState();
         onSectionDragEnd(event);
         return;
       }
 
-      // Check if this is a within-section component drag
-      if (activeId && overId && !String(activeId).startsWith("section-")) {
-        // Find source section
-        let sourceSectionIndex = -1;
-        for (let i = 0; i < pageData.body.length; i++) {
-          const section = pageData.body[i];
-          const component = section.data.find((comp) => {
-            const componentId =
-              comp._id ?? `component-${i}-${section.data.indexOf(comp)}`;
-            return String(activeId) === String(componentId);
-          });
-          if (component) {
-            sourceSectionIndex = i;
-            break;
-          }
-        }
-
-        // Find destination section
-        let destinationSectionIndex = -1;
-        if (String(overId).startsWith("section-drop-")) {
-          destinationSectionIndex = parseInt(
-            String(overId).replace("section-drop-", ""),
-            10
-          );
-        } else {
-          for (let i = 0; i < pageData.body.length; i++) {
-            const section = pageData.body[i];
-            const component = section.data.find((comp) => {
-              const componentId =
-                comp._id ?? `component-${i}-${section.data.indexOf(comp)}`;
-              return String(overId) === String(componentId);
-            });
-            if (component) {
-              destinationSectionIndex = i;
-              break;
-            }
-          }
-        }
-
-        // If same section, it's a within-section drag - delegate to section handler
-        if (
-          sourceSectionIndex === destinationSectionIndex &&
-          sourceSectionIndex !== -1
-        ) {
-          // This is a within-section drag, we need to handle it differently
-          // Let's create a custom within-section handler
-          handleWithinSectionDrag(event, sourceSectionIndex);
-          return;
-        }
+      if (!over || active.id === over.id) {
+        resetDragState();
+        return;
       }
 
-      // Otherwise, it's a cross-section drag
+      const lookup = buildDndLookup(pageData?.body || []);
+      const sourceLocation = lookup.componentMap.get(String(active.id));
+
+      if (!sourceLocation) {
+        resetDragState();
+        return;
+      }
+
+      const destinationSectionIndex = resolveDropSectionIndex(
+        over.id,
+        pageData?.body || []
+      );
+
+      if (
+        destinationSectionIndex !== -1 &&
+        sourceLocation.sectionIndex === destinationSectionIndex
+      ) {
+        handleWithinSectionDrag(event, sourceLocation.sectionIndex);
+        resetDragState();
+        return;
+      }
+
+      resetDragState();
       onCrossSectionDragEnd(event);
     },
-    [onCrossSectionDragEnd, onSectionDragEnd, pageData, handleWithinSectionDrag]
+    [
+      pageData,
+      onSectionDragEnd,
+      onCrossSectionDragEnd,
+      handleWithinSectionDrag,
+      resetDragState,
+    ]
   );
+
+  const handleDragCancel = useCallback(() => {
+    resetDragState();
+  }, [resetDragState]);
 
   return (
     <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      modifiers={[restrictToVerticalAxis]}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
-      collisionDetection={closestCorners}
+      onDragCancel={handleDragCancel}
     >
       <div className="bg-gray-50 min-h-screen">
         <div className="p-6">
@@ -236,9 +246,9 @@ const PageContent = ({
                 onEditingStateChange={onEditingStateChange}
                 onAddSectionAtPosition={onAddSectionAtPosition}
                 isEditing={isEditing}
-                onCrossSectionDragEnd={onCrossSectionDragEnd}
                 dragOverSection={dragOverSection}
                 activeId={activeId}
+                isDraggingSection={isDraggingSection}
               />
               {isEditing && (
                 <div className="text-center py-8">
@@ -276,10 +286,9 @@ const PageContent = ({
         </div>
       </div>
 
-      {/* Enhanced Drag Overlay */}
-      <CrossSectionDragOverlay
-        activeId={activeId}
+      <PageBuilderDragOverlay
         activeComponent={activeComponent}
+        activeSection={activeSection}
       />
     </DndContext>
   );

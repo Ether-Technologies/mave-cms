@@ -10,7 +10,6 @@ import {
 import Section from "./Section";
 import { useDispatch, useSelector } from "react-redux";
 import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
-import { useSectionDragAndDrop } from "./hooks/useSectionDragAndDrop";
 
 const { Title } = Typography;
 
@@ -24,9 +23,9 @@ const SectionList = ({
   onSectionDelete,
   onAddSectionAtPosition,
   isEditing = false,
-  onCrossSectionDragEnd,
   dragOverSection,
   activeId,
+  isDraggingSection = false,
 }) => {
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
@@ -99,29 +98,6 @@ const SectionList = ({
     [pageData, sectionIndex, dispatch]
   );
 
-  // Handle sections update
-  const handleSectionsUpdate = useCallback(
-    (updatedSections) => {
-      if (setSections) {
-        setSections(updatedSections);
-      } else {
-        const updatedPageData = {
-          ...pageData,
-          body: updatedSections,
-        };
-        dispatch(setPageData(updatedPageData));
-        dispatch(setIsDirty(true));
-      }
-    },
-    [setSections, pageData, dispatch]
-  );
-
-  // Use section drag and drop hook
-  const { onDragEnd } = useSectionDragAndDrop({
-    sections: sections || pageData?.body,
-    onSectionsUpdate: handleSectionsUpdate,
-  });
-
   if (section) {
     return (
       <Section
@@ -135,9 +111,9 @@ const SectionList = ({
         onSectionDuplicate={onSectionDuplicate}
         onSectionDelete={onSectionDelete}
         isEditing={isEditing}
-        onCrossSectionDragEnd={onCrossSectionDragEnd}
         dragOverSection={dragOverSection}
         activeId={activeId}
+        isDraggingSection={isDraggingSection}
       />
     );
   }
@@ -190,9 +166,9 @@ const SectionList = ({
                   onSectionDuplicate={onSectionDuplicate}
                   onSectionDelete={onSectionDelete}
                   isEditing={isEditing}
-                  onCrossSectionDragEnd={onCrossSectionDragEnd}
                   dragOverSection={dragOverSection}
                   activeId={activeId}
+                  isDraggingSection={isDraggingSection}
                 />
 
                 {/* Add Section Button between sections */}

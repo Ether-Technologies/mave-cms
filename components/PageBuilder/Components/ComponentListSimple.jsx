@@ -1,19 +1,12 @@
 // components/PageBuilder/Components/ComponentListSimple.jsx
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import ComponentSelectorModal from "../Modals/ComponentSelectorModal";
-
-// Custom hooks
 import { useComponentOperations } from "./hooks/useComponentOperations";
-import { useDragAndDrop } from "./hooks/useDragAndDrop";
-
-// Components
 import ComponentList from "./components/ComponentList";
 
 const ComponentListSimple = ({
@@ -24,21 +17,12 @@ const ComponentListSimple = ({
   onComponentDuplicate,
   onEditingStateChange,
   isEditing = false,
-  onCrossSectionDragEnd,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [componentsState, setComponents] = useState(components);
-  const [localIsEditing, setLocalIsEditing] = useState(false);
   const [addComponentPosition, setAddComponentPosition] = useState(null);
 
-  useEffect(() => {
-    setComponents(components);
-  }, [components]);
-
-  // Handle editing state changes from components
   const handleComponentEditingStateChange = useCallback(
     (editing) => {
-      setLocalIsEditing(editing);
       if (onEditingStateChange) {
         onEditingStateChange(editing);
       }
@@ -46,24 +30,17 @@ const ComponentListSimple = ({
     [onEditingStateChange]
   );
 
-  // Use custom hooks for operations
   const {
     addComponent,
     handleComponentUpdate,
     handleComponentDelete,
     handleComponentDuplicate,
   } = useComponentOperations({
-    componentsState,
+    componentsState: components,
     sectionIndex,
     onComponentsUpdate,
     onComponentDelete,
     onComponentDuplicate,
-  });
-
-  const { onDragEnd } = useDragAndDrop({
-    componentsState,
-    sectionIndex,
-    onComponentsUpdate: handleComponentsUpdate,
   });
 
   const handleAddComponent = useCallback(
@@ -75,20 +52,13 @@ const ComponentListSimple = ({
     [addComponent, addComponentPosition]
   );
 
-  // Handle components update from drag and drop
-  const handleComponentsUpdate = useCallback(
-    (updatedComponents) => {
-      setComponents(updatedComponents);
-      if (onComponentsUpdate) {
-        onComponentsUpdate(updatedComponents);
-      }
-    },
-    [onComponentsUpdate]
-  );
-
-  // Create sortable items array
-  const sortableItems = componentsState.map(
-    (component, index) => component._id || `component-${sectionIndex}-${index}`
+  const sortableItems = useMemo(
+    () =>
+      components.map(
+        (component, index) =>
+          component._id || `component-${sectionIndex}-${index}`
+      ),
+    [components, sectionIndex]
   );
 
   return (
@@ -97,9 +67,8 @@ const ComponentListSimple = ({
         items={sortableItems}
         strategy={verticalListSortingStrategy}
       >
-        {/* Component List */}
         <ComponentList
-          componentsState={componentsState}
+          componentsState={components}
           sectionIndex={sectionIndex}
           onComponentUpdate={handleComponentUpdate}
           onComponentDelete={handleComponentDelete}
@@ -107,14 +76,12 @@ const ComponentListSimple = ({
           onEditingStateChange={handleComponentEditingStateChange}
           onAddComponent={(position) => {
             setIsModalVisible(true);
-            // Store the position where component should be added
             setAddComponentPosition(position);
           }}
           isEditing={isEditing}
         />
       </SortableContext>
 
-      {/* Component Selector Modal */}
       <ComponentSelectorModal
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}

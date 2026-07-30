@@ -7,16 +7,17 @@ const InsertionIndicator = ({ isVisible, position = "bottom" }) => {
 
   return (
     <div
-      className={`insertion-indicator w-full transition-all duration-200 ${
-        position === "top" ? "mb-2" : "mt-2"
+      className={`insertion-indicator w-full ${
+        position === "top" ? "mb-3" : "mt-3"
       }`}
+      aria-hidden="true"
     >
-      <div className="flex items-center justify-center">
-        <div className="flex-1 h-0.5 bg-brand rounded-full"></div>
-        <div className="mx-2 px-2 py-1 bg-brand text-white text-xs font-medium rounded-full">
+      <div className="flex items-center justify-center gap-2">
+        <div className="flex-1 h-1 bg-brand/30 rounded-full" />
+        <div className="px-3 py-1.5 bg-brand text-white text-xs font-semibold rounded-full shadow-sm">
           Drop here
         </div>
-        <div className="flex-1 h-0.5 bg-brand rounded-full"></div>
+        <div className="flex-1 h-1 bg-brand/30 rounded-full" />
       </div>
     </div>
   );
