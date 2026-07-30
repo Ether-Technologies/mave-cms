@@ -38,13 +38,12 @@ function MyApp({ Component, pageProps }) {
           </ThemeProvider>
         </MenuRefreshProvider>
       </AuthProvider>
-      <footer className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/60 border-t border-brand/30 shadow-lg shadow-brand/10">
-        <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-brand-dark/5 to-blue-600/5"></div>
-        <div className="relative max-w-7xl mx-auto px-6 py-2">
+      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-2">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Left Section - Copyright */}
-            <div className="flex items-center gap-2 text-white/80">
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-brand to-brand-dark animate-pulse"></div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-brand to-brand-dark"></div>
               <span className="text-sm">
                 © {new Date().getFullYear()}{" "}
                 <a
@@ -58,13 +57,10 @@ function MyApp({ Component, pageProps }) {
               </span>
             </div>
 
-            {/* Center Section - Divider */}
-            <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-brand/60 to-transparent"></div>
-
             {/* Right Section - Powered By */}
-            <div className="flex items-center gap-3 text-white/80 text-sm">
+            <div className="flex items-center gap-3 text-gray-600 text-sm">
               <span className="font-light">All rights reserved</span>
-              <span className="text-brand/50">•</span>
+              <span className="text-gray-300">•</span>
               <span className="font-light">Powered by</span>
               <a
                 href="https://www.ethertech.ltd"
