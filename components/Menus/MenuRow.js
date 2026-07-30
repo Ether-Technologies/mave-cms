@@ -1,9 +1,8 @@
 // components/Menus/MenuRow.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Input,
-  Select,
   Button,
   Popconfirm,
   message,
@@ -13,7 +12,6 @@ import {
   Badge,
 } from "antd";
 import {
-  SyncOutlined,
   EditOutlined,
   DeleteOutlined,
   CloseCircleOutlined,
@@ -21,6 +19,7 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import instance from "../../axios";
+import SortableMenuItemsPicker from "./SortableMenuItemsPicker";
 
 const MenuRow = ({
   menu,
@@ -37,6 +36,13 @@ const MenuRow = ({
     menu.menu_items?.map((item) => item.id) || []
   );
   const [showAllItems, setShowAllItems] = useState(false);
+
+  useEffect(() => {
+    if (editingMenuId === menu.id) {
+      setEditedMenuName(menu.name);
+      setEditedMenuItemsIds(menu.menu_items?.map((item) => item.id) || []);
+    }
+  }, [editingMenuId, menu]);
 
   const handleUpdate = async () => {
     try {
@@ -110,7 +116,7 @@ const MenuRow = ({
       `}
     >
       <div className="p-4">
-        <div className="grid grid-cols-12 gap-4 items-center">
+        <div className={`grid grid-cols-12 gap-4 ${isEditing ? "items-start" : "items-center"}`}>
           {/* Checkbox */}
           <div className="col-span-1 flex items-center justify-center">
             <Checkbox
@@ -121,7 +127,7 @@ const MenuRow = ({
           </div>
 
           {/* Menu Name */}
-          <div className="col-span-4">
+          <div className={isEditing ? "col-span-7" : "col-span-4"}>
             {isEditing ? (
               <div className="flex items-center gap-2">
                 <Badge count={`ID-${menu.id}`} style={idBadgeStyle} />
@@ -144,27 +150,9 @@ const MenuRow = ({
             )}
           </div>
 
-          {/* Menu Items */}
-          <div className="col-span-4">
-            {isEditing ? (
-              <Select
-                allowClear
-                showSearch
-                mode="multiple"
-                placeholder="Select menu items"
-                value={editedMenuItemsIds}
-                onChange={(values) => setEditedMenuItemsIds(values)}
-                className="w-full [&_.ant-select-selector]:min-h-[40px] [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
-                optionFilterProp="children"
-                maxTagCount="responsive"
-              >
-                {menuItems?.map((menuItem) => (
-                  <Select.Option key={menuItem.id} value={menuItem.id}>
-                    {menuItem.title}
-                  </Select.Option>
-                ))}
-              </Select>
-            ) : (
+          {/* Menu Items (view mode only) */}
+          <div className={isEditing ? "hidden" : "col-span-4"}>
+            {!isEditing && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge
@@ -215,7 +203,7 @@ const MenuRow = ({
           </div>
 
           {/* Actions */}
-          <div className="col-span-3 flex gap-2 justify-end">
+          <div className={`${isEditing ? "col-span-4" : "col-span-3"} flex gap-2 justify-end`}>
             {isEditing ? (
               <>
                 <Tooltip title="Save changes">
@@ -272,6 +260,16 @@ const MenuRow = ({
             )}
           </div>
         </div>
+
+        {isEditing && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <SortableMenuItemsPicker
+              menuItems={menuItems}
+              value={editedMenuItemsIds}
+              onChange={setEditedMenuItemsIds}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

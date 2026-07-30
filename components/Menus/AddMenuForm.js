@@ -1,15 +1,20 @@
 // components/Menus/AddMenuForm.js
 
 import React, { useState } from "react";
-import { Row, Col, Input, Select, Button, message } from "antd";
+import { Input, Button, message } from "antd";
 import { PlusCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import instance from "../../axios";
+import SortableMenuItemsPicker from "./SortableMenuItemsPicker";
 
 const AddMenuForm = ({ menuItems, onCancel, fetchMenus }) => {
   const [newMenuName, setNewMenuName] = useState("");
   const [newMenuItemsIds, setNewMenuItemsIds] = useState([]);
 
   const handleAddMenu = async () => {
+    if (!newMenuName.trim()) {
+      message.warning("Please enter a menu name");
+      return;
+    }
     try {
       const newMenu = {
         name: newMenuName,
@@ -30,34 +35,29 @@ const AddMenuForm = ({ menuItems, onCancel, fetchMenus }) => {
 
   return (
     <div>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12} className="flex items-center">
-          <Input
-            placeholder="Enter Menu Name"
-            value={newMenuName}
-            onChange={(e) => setNewMenuName(e.target.value)}
-            className="w-full"
-          />
-        </Col>
-        <Col xs={24} md={12}>
-          <Select
-            allowClear
-            showSearch
-            mode="multiple"
-            placeholder="Select menu items"
-            value={newMenuItemsIds}
-            onChange={(values) => setNewMenuItemsIds(values)}
-            className="w-full"
-            optionFilterProp="children"
-          >
-            {menuItems?.map((menuItem) => (
-              <Select.Option key={menuItem.id} value={menuItem.id}>
-                {menuItem.title}
-              </Select.Option>
-            ))}
-          </Select>
-        </Col>
-      </Row>
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Menu Name
+        </label>
+        <Input
+          placeholder="Enter Menu Name"
+          value={newMenuName}
+          onChange={(e) => setNewMenuName(e.target.value)}
+          className="w-full h-10"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Menu Items — select and drag to order
+        </label>
+        <SortableMenuItemsPicker
+          menuItems={menuItems}
+          value={newMenuItemsIds}
+          onChange={setNewMenuItemsIds}
+        />
+      </div>
+
       <div className="flex justify-end mt-4 gap-5">
         <Button
           icon={<PlusCircleOutlined />}

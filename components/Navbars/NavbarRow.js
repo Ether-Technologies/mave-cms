@@ -1,6 +1,6 @@
 // components/Navbars/NavbarRow.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Input,
   Select,
@@ -13,7 +13,6 @@ import {
   Badge,
 } from "antd";
 import {
-  SyncOutlined,
   EditOutlined,
   DeleteOutlined,
   CloseCircleOutlined,
@@ -25,6 +24,7 @@ import {
 import instance from "../../axios";
 import Image from "next/image";
 import MediaSelectionModal from "../PageBuilder/Modals/MediaSelectionModal";
+import SortableMenuItemsPicker from "../Menus/SortableMenuItemsPicker";
 
 const NavbarRow = ({
   navbar,
@@ -46,8 +46,57 @@ const NavbarRow = ({
   );
   const [editedLogoId, setEditedLogoId] = useState(navbar?.logo?.id || null);
   const [editedMenuId, setEditedMenuId] = useState(navbar?.menu?.id || null);
+  const [editedMenuItemIds, setEditedMenuItemIds] = useState(
+    navbar.menu?.menu_items?.map((item) => item.id) || []
+  );
+  const [menuItems, setMenuItems] = useState([]);
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
-  const [selectedLogoMedia, setSelectedLogoMedia] = useState(null); // New state
+  const [selectedLogoMedia, setSelectedLogoMedia] = useState(null);
+
+  useEffect(() => {
+    if (editingNavbarId === navbar.id) {
+      setEditedNavbarTitleEn(navbar.title_en);
+      setEditedNavbarTitleBn(navbar.title_bn);
+      setEditedLogoId(navbar?.logo?.id || null);
+      setEditedMenuId(navbar?.menu?.id || null);
+      setEditedMenuItemIds(
+        navbar.menu?.menu_items?.map((item) => item.id) || []
+      );
+    }
+  }, [editingNavbarId, navbar]);
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        const response = await instance("/menuitems");
+        if (response.data) {
+          setMenuItems(response.data);
+        }
+      } catch (error) {
+        // silently fail — picker will show empty
+      }
+    };
+    if (editingNavbarId === navbar.id) {
+      fetchMenuItems();
+    }
+  }, [editingNavbarId, navbar.id]);
+
+  useEffect(() => {
+    if (!editedMenuId) {
+      setEditedMenuItemIds([]);
+      return;
+    }
+    const selectedMenu = menus.find((m) => m.id === editedMenuId);
+    if (selectedMenu?.menu_items?.length) {
+      setEditedMenuItemIds(selectedMenu.menu_items.map((item) => item.id));
+    } else if (selectedMenu?.menu_item_ids) {
+      setEditedMenuItemIds(selectedMenu.menu_item_ids);
+    } else {
+      setEditedMenuItemIds([]);
+    }
+    // Only reset item order when the assigned menu changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editedMenuId]);
 
   const handleUpdate = async () => {
     try {
@@ -62,6 +111,11 @@ const NavbarRow = ({
         updatedNavbar
       );
       if (response.status === 200) {
+        if (editedMenuId && editedMenuItemIds.length >= 0) {
+          await instance.put(`/menus/${editedMenuId}`, {
+            menu_item_ids: editedMenuItemIds,
+          });
+        }
         message.success("Navbar updated successfully");
         setNavbars((prevNavbars) =>
           prevNavbars?.map((item) =>
@@ -69,7 +123,7 @@ const NavbarRow = ({
           )
         );
         setEditingNavbarId(null);
-        setSelectedLogoMedia(null); // Reset selected logo media
+        setSelectedLogoMedia(null);
         fetchNavbars();
       } else {
         message.error("Error updating navbar");
@@ -129,7 +183,7 @@ const NavbarRow = ({
       `}
     >
       <div className="p-4">
-        <div className="grid grid-cols-12 gap-4 items-center">
+        <div className={`grid grid-cols-12 gap-4 ${isEditing ? "items-start" : "items-center"}`}>
           {/* Checkbox */}
           <div className="col-span-1 flex items-center justify-center">
             <Checkbox
@@ -251,24 +305,8 @@ const NavbarRow = ({
           </div>
 
           {/* Menu Items */}
-          <div className="col-span-3">
-            {isEditing ? (
-              <Select
-                showSearch
-                placeholder="Select a Menu"
-                optionFilterProp="children"
-                onChange={(value) => setEditedMenuId(value)}
-                className="w-full [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
-                allowClear
-                defaultValue={navbar?.menu?.id || null}
-              >
-                {menus?.map((menu) => (
-                  <Select.Option key={menu.id} value={menu.id}>
-                    {menu.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            ) : (
+          <div className={isEditing ? "hidden" : "col-span-3"}>
+            {!isEditing && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 mb-2">
                   <Tag className="bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 text-purple-700 font-semibold px-3 py-1 rounded-full">
@@ -319,7 +357,7 @@ const NavbarRow = ({
           </div>
 
           {/* Actions */}
-          <div className="col-span-3 flex gap-2 justify-end">
+          <div className={`${isEditing ? "col-span-3" : "col-span-3"} flex gap-2 justify-end`}>
             {isEditing ? (
               <>
                 <Tooltip title="Save changes">
@@ -379,6 +417,44 @@ const NavbarRow = ({
             )}
           </div>
         </div>
+
+        {isEditing && (
+          <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Assigned Menu
+              </label>
+              <Select
+                showSearch
+                placeholder="Select a Menu"
+                optionFilterProp="children"
+                value={editedMenuId}
+                onChange={(value) => setEditedMenuId(value)}
+                className="w-full max-w-md [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
+                allowClear
+              >
+                {menus?.map((menu) => (
+                  <Select.Option key={menu.id} value={menu.id}>
+                    {menu.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+
+            {editedMenuId && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Menu Items — select and drag to order
+                </label>
+                <SortableMenuItemsPicker
+                  menuItems={menuItems}
+                  value={editedMenuItemIds}
+                  onChange={setEditedMenuItemIds}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

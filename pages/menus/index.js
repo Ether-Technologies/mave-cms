@@ -122,7 +122,7 @@ const Menus = () => {
             <span>Add Menu</span>
           </div>
         }
-        width={800}
+        width={900}
       >
         <AddMenuForm
           menuItems={menuItems}
