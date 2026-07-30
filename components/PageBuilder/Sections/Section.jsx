@@ -11,6 +11,8 @@ import {
   EditOutlined,
   CheckOutlined,
   CloseOutlined,
+  UpOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
 import ComponentListSimple from "../Components/ComponentListSimple";
 import InsertionIndicator from "../Components/InsertionIndicator";
@@ -37,6 +39,7 @@ const Section = ({
   const dispatch = useDispatch();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [tempTitle, setTempTitle] = useState(
     section.title || `Section ${(sectionIndex || index) + 1}`
   );
@@ -181,19 +184,40 @@ const Section = ({
     setIsEditingTitle(false);
   };
 
+  const handleToggleCollapse = (e) => {
+    e.stopPropagation();
+    setIsCollapsed((prev) => !prev);
+  };
+
+  const componentCount = section.data?.length || 0;
+
   return (
     <>
       <div
         ref={combinedRef}
         style={style}
-        className={`section-container bg-white shadow-md rounded-lg p-4 mb-6 ${
+        className={`section-container bg-white shadow-md rounded-lg p-4 ${
+          isCollapsed ? "mb-3" : "mb-6"
+        } ${
           isOver && !isDraggingSection
             ? "ring-2 ring-brand ring-offset-2 bg-blue-50/50"
             : ""
         } ${isDragging ? "shadow-lg" : ""}`}
       >
-        <div className="section-header flex items-center justify-between mb-4 pb-2 border-b">
-          <div className="flex items-center gap-2 flex-1">
+        <div
+          className={`section-header flex items-center justify-between ${
+            isCollapsed ? "mb-0 pb-0 border-b-0" : "mb-4 pb-2 border-b"
+          }`}
+        >
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Button
+              type="text"
+              size="small"
+              icon={isCollapsed ? <DownOutlined /> : <UpOutlined />}
+              onClick={handleToggleCollapse}
+              className="text-gray-500 hover:text-brand shrink-0"
+              title={isCollapsed ? "Expand section" : "Collapse section"}
+            />
             {/* Drag Handle Icon - only this part should be draggable */}
             <div
               {...listeners}
@@ -226,10 +250,15 @@ const Section = ({
                 />
               </div>
             ) : (
-              <div className="flex items-center gap-2 flex-1">
-                <h3 className="text-lg font-semibold text-gray-800">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <h3 className="text-lg font-semibold text-gray-800 truncate">
                   {section.title || `Section ${(sectionIndex || index) + 1}`}
                 </h3>
+                {isCollapsed && (
+                  <span className="text-xs text-gray-400 shrink-0">
+                    {componentCount} component{componentCount === 1 ? "" : "s"}
+                  </span>
+                )}
                 <Button
                   icon={<EditOutlined />}
                   onClick={handleTitleEdit}
@@ -276,6 +305,8 @@ const Section = ({
           </div>
         </div>
 
+        {!isCollapsed && (
+          <>
         {/* Insertion indicator at the top */}
         <InsertionIndicator
           isVisible={
@@ -309,6 +340,8 @@ const Section = ({
           }
           position="bottom"
         />
+          </>
+        )}
       </div>
     </>
   );
