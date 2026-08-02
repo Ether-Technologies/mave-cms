@@ -2,8 +2,23 @@
 
 import React from "react";
 import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, AppstoreAddOutlined } from "@ant-design/icons";
 import DraggableComponent from "./DraggableComponent";
+
+const AddComponentDivider = ({ onClick, label = "Add Component" }) => (
+  <div className="flex items-center gap-3 py-3 my-1">
+    <div className="flex-1 border-t border-dashed border-emerald-100" />
+    <Button
+      icon={<PlusOutlined />}
+      onClick={onClick}
+      className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 font-medium shadow-sm"
+      size="small"
+    >
+      {label}
+    </Button>
+    <div className="flex-1 border-t border-dashed border-emerald-100" />
+  </div>
+);
 
 const ComponentList = ({
   componentsState,
@@ -18,27 +33,24 @@ const ComponentList = ({
   const isEmpty = !componentsState || componentsState.length === 0;
 
   return (
-    <div
-      className="components-container min-h-[100px] p-1 bg-gray-50 rounded-md"
-      style={{
-        minHeight: "100px",
-      }}
-    >
-      {/* Empty state with prominent Add Component button */}
+    <div className="components-container min-h-[80px] p-3 bg-emerald-50/30 border border-dashed border-emerald-100 rounded-lg">
       {isEditing && isEmpty && (
-        <div className="text-center py-8">
-          <div className="mb-4">
-            <p className="text-gray-500 mb-4">This section is empty</p>
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() => onAddComponent && onAddComponent(0)}
-              className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
-                transition-all duration-200 px-6 py-3 text-base font-semibold"
-              size="large"
-            >
-              Add Your First Component
-            </Button>
-          </div>
+        <div className="text-center py-6 px-4">
+          <AppstoreAddOutlined className="text-3xl text-emerald-300 mb-3" />
+          <p className="text-sm font-medium text-gray-700 mb-1">
+            No components yet
+          </p>
+          <p className="text-xs text-gray-500 mb-4">
+            Components are the content blocks inside a section (text, images, buttons, etc.)
+          </p>
+          <Button
+            icon={<PlusOutlined />}
+            onClick={() => onAddComponent && onAddComponent(0)}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 font-semibold shadow-sm"
+            size="large"
+          >
+            Add First Component
+          </Button>
         </div>
       )}
 
@@ -47,24 +59,10 @@ const ComponentList = ({
           <React.Fragment
             key={component._id || `component-${sectionIndex}-${index}`}
           >
-            {/* Add Component Button at the top for first component */}
             {isEditing && index === 0 && (
-              <div className="text-center py-2">
-                <Button
-                  icon={<PlusOutlined />}
-                  onClick={() => onAddComponent && onAddComponent(index)}
-                  className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
-                  transition-all duration-200 px-2 py-1 text-sm group"
-                  size="small"
-                >
-                  <span
-                    className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
-                  group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
-                  >
-                    Add Component
-                  </span>
-                </Button>
-              </div>
+              <AddComponentDivider
+                onClick={() => onAddComponent && onAddComponent(index)}
+              />
             )}
 
             <DraggableComponent
@@ -80,54 +78,26 @@ const ComponentList = ({
               isEditing={isEditing}
             />
 
-            {/* Add Component Button between components */}
             {isEditing && index < componentsState.length - 1 && (
-              <div className="text-center py-2">
-                <Button
-                  icon={<PlusOutlined />}
-                  onClick={() => onAddComponent && onAddComponent(index + 1)}
-                  className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
-                  transition-all duration-200 px-2 py-1 text-sm group"
-                  size="small"
-                >
-                  <span
-                    className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
-                  group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
-                  >
-                    Add Component
-                  </span>
-                </Button>
-              </div>
+              <AddComponentDivider
+                onClick={() => onAddComponent && onAddComponent(index + 1)}
+              />
             )}
           </React.Fragment>
         ))}
 
-      {/* Add Component Button at the end of the section - always show when editing and not empty */}
       {isEditing && !isEmpty && (
-        <div className="text-center py-2">
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() =>
-              onAddComponent && onAddComponent(componentsState.length)
-            }
-            className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
-              transition-all duration-200 px-2 py-1 text-sm group"
-            size="small"
-          >
-            <span
-              className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
-              group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
-            >
-              Add Component
-            </span>
-          </Button>
-        </div>
+        <AddComponentDivider
+          onClick={() =>
+            onAddComponent && onAddComponent(componentsState.length)
+          }
+          label="Add Component Below"
+        />
       )}
 
-      {/* Empty state message when no components and not editing */}
       {!isEditing && isEmpty && (
-        <div className="text-center py-8 text-gray-500">
-          <p>No components in this section</p>
+        <div className="text-center py-6 text-gray-400 text-sm">
+          No components in this section
         </div>
       )}
     </div>

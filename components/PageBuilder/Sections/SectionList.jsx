@@ -13,6 +13,21 @@ import { setPageData, setIsDirty } from "../../../store/slices/pageSlice";
 
 const { Title } = Typography;
 
+const AddSectionDivider = ({ onClick, label = "Add Section" }) => (
+  <div className="flex items-center gap-4 py-4">
+    <div className="flex-1 border-t border-dashed border-brand-light" />
+    <Button
+      icon={<PlusOutlined />}
+      onClick={onClick}
+      className="bg-brand hover:bg-brand-dark text-white border-0 font-semibold shadow-sm px-5"
+      size="middle"
+    >
+      {label}
+    </Button>
+    <div className="flex-1 border-t border-dashed border-brand-light" />
+  </div>
+);
+
 const SectionList = ({
   section,
   sectionIndex,
@@ -30,7 +45,6 @@ const SectionList = ({
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.page.pageData);
 
-  // Handle editing state changes
   const handleEditingStateChange = useCallback(
     (editing) => {
       if (onEditingStateChange) {
@@ -40,7 +54,6 @@ const SectionList = ({
     [onEditingStateChange]
   );
 
-  // Handle component updates
   const handleComponentUpdate = useCallback(
     (updatedComponent, componentIndex) => {
       if (pageData && sectionIndex !== undefined) {
@@ -56,7 +69,6 @@ const SectionList = ({
     [pageData, sectionIndex, dispatch]
   );
 
-  // Handle component deletion
   const handleComponentDelete = useCallback(
     (componentIndex) => {
       if (pageData && sectionIndex !== undefined) {
@@ -77,7 +89,6 @@ const SectionList = ({
     [pageData, sectionIndex, dispatch]
   );
 
-  // Handle component duplication
   const handleComponentDuplicate = useCallback(
     (componentIndex) => {
       if (pageData && sectionIndex !== undefined) {
@@ -128,31 +139,15 @@ const SectionList = ({
         items={sortableItems}
         strategy={verticalListSortingStrategy}
       >
-        <div className="space-y-4">
+        <div className="space-y-2">
           {sections.map((section, index) => {
             const currentSectionIndex = index;
             return (
               <React.Fragment
                 key={section._id || `section-${currentSectionIndex}`}
               >
-                {/* Add Section Button at the top for first section */}
                 {isEditing && index === 0 && (
-                  <div className="text-center">
-                    <Button
-                      icon={<PlusOutlined />}
-                      onClick={() => onAddSectionAtPosition(0)}
-                      className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
-                        transition-all duration-200 px-2 py-1 text-sm group"
-                      size="small"
-                    >
-                      <span
-                        className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
-                        group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
-                      >
-                        Add Section
-                      </span>
-                    </Button>
-                  </div>
+                  <AddSectionDivider onClick={() => onAddSectionAtPosition(0)} />
                 )}
 
                 <Section
@@ -171,24 +166,10 @@ const SectionList = ({
                   isDraggingSection={isDraggingSection}
                 />
 
-                {/* Add Section Button between sections */}
                 {isEditing && index < sections.length - 1 && (
-                  <div className="text-center">
-                    <Button
-                      icon={<PlusOutlined />}
-                      onClick={() => onAddSectionAtPosition(index + 1)}
-                      className="bg-brand hover:bg-brand-dark text-white border-2 border-brand 
-                        transition-all duration-200 px-2 py-1 text-sm group"
-                      size="small"
-                    >
-                      <span
-                        className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 
-                        group-hover:ml-1 transition-all duration-200 whitespace-nowrap"
-                      >
-                        Add Section
-                      </span>
-                    </Button>
-                  </div>
+                  <AddSectionDivider
+                    onClick={() => onAddSectionAtPosition(index + 1)}
+                  />
                 )}
               </React.Fragment>
             );
@@ -198,7 +179,6 @@ const SectionList = ({
     );
   }
 
-  // Default mode - show available sections or empty state
   return (
     <div className="p-4">
       <Title level={4} className="mb-4">
@@ -220,9 +200,7 @@ const SectionList = ({
           <Button
             icon={<PlusOutlined />}
             className="h-32 border-2 border-dashed border-gray-300 hover:border-theme transition-colors"
-            onClick={() => {
-              // Handle adding new section
-            }}
+            onClick={() => {}}
           >
             Add New Section
           </Button>
@@ -232,13 +210,7 @@ const SectionList = ({
           description="No sections available"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
-          <Button
-            icon={<PlusOutlined />}
-            type="primary"
-            onClick={() => {
-              // Handle adding new section
-            }}
-          >
+          <Button icon={<PlusOutlined />} type="primary" onClick={() => {}}>
             Add First Section
           </Button>
         </Empty>

@@ -13,6 +13,7 @@ import {
   CloseOutlined,
   UpOutlined,
   DownOutlined,
+  LayoutOutlined,
 } from "@ant-design/icons";
 import ComponentListSimple from "../Components/ComponentListSimple";
 import InsertionIndicator from "../Components/InsertionIndicator";
@@ -190,39 +191,41 @@ const Section = ({
   };
 
   const componentCount = section.data?.length || 0;
+  const sectionNumber = (sectionIndex || index) + 1;
+  const sectionTitle =
+    section.title || `Section ${sectionNumber}`;
 
   return (
     <>
       <div
         ref={combinedRef}
         style={style}
-        className={`section-container bg-white shadow-md rounded-lg p-4 ${
+        className={`section-container rounded-xl border border-brand-light bg-gradient-to-br from-brand-light/50 to-white shadow-sm overflow-hidden ${
           isCollapsed ? "mb-3" : "mb-6"
         } ${
           isOver && !isDraggingSection
-            ? "ring-2 ring-brand ring-offset-2 bg-blue-50/50"
+            ? "ring-2 ring-brand-light ring-offset-2 bg-brand-light/60"
             : ""
-        } ${isDragging ? "shadow-lg" : ""}`}
+        } ${isDragging ? "shadow-md opacity-90" : ""}`}
       >
         <div
-          className={`section-header flex items-center justify-between ${
-            isCollapsed ? "mb-0 pb-0 border-b-0" : "mb-4 pb-2 border-b"
+          className={`section-header flex items-center justify-between px-4 py-3 bg-brand-light border-b border-brand-light ${
+            isCollapsed ? "" : ""
           }`}
         >
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <Button
               type="text"
               size="small"
               icon={isCollapsed ? <DownOutlined /> : <UpOutlined />}
               onClick={handleToggleCollapse}
-              className="text-gray-500 hover:text-brand shrink-0"
+              className="text-brand hover:text-brand-dark hover:bg-brand-light shrink-0"
               title={isCollapsed ? "Expand section" : "Collapse section"}
             />
-            {/* Drag Handle Icon - only this part should be draggable */}
             <div
               {...listeners}
               {...attributes}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-grab active:cursor-grabbing touch-none"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-brand/60 hover:text-brand-dark hover:bg-brand-light cursor-grab active:cursor-grabbing touch-none shrink-0"
               style={{ position: "relative", zIndex: 50 }}
               title="Drag to reorder section"
             >
@@ -230,6 +233,12 @@ const Section = ({
                 <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1-.001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
               </svg>
             </div>
+
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-brand-light text-brand-dark text-xs font-bold uppercase tracking-wider shrink-0">
+              <LayoutOutlined />
+              Section {sectionNumber}
+            </span>
+
             {isEditingTitle ? (
               <div className="flex items-center gap-2 flex-1">
                 <Input
@@ -246,39 +255,37 @@ const Section = ({
                 <Button
                   icon={<CloseOutlined />}
                   onClick={handleTitleCancel}
-                  className="mavecancelbutton"
+                  className="text-brand border-brand-light hover:bg-brand-light"
                 />
               </div>
             ) : (
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <h3 className="text-lg font-semibold text-gray-800 truncate">
-                  {section.title || `Section ${(sectionIndex || index) + 1}`}
+                <h3 className="text-base font-semibold text-gray-800 truncate">
+                  {sectionTitle}
                 </h3>
-                {isCollapsed && (
-                  <span className="text-xs text-gray-400 shrink-0">
-                    {componentCount} component{componentCount === 1 ? "" : "s"}
-                  </span>
-                )}
+                <span className="text-xs text-brand shrink-0">
+                  {componentCount} component{componentCount === 1 ? "" : "s"}
+                </span>
                 <Button
                   icon={<EditOutlined />}
                   onClick={handleTitleEdit}
-                  size="middle"
-                  className="mavebutton"
+                  size="small"
+                  className="text-brand hover:text-brand-dark hover:bg-brand-light border-0 shrink-0"
                   style={{ position: "relative", zIndex: 10 }}
                 />
               </div>
             )}
           </div>
           <div
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 shrink-0"
             style={{ position: "relative", zIndex: 10 }}
           >
             {(onDuplicate || onSectionDuplicate) && (
               <Button
                 icon={<CopyOutlined />}
                 onClick={handleDuplicateClick}
-                size="middle"
-                className="mavebutton hover:bg-brand-dark"
+                size="small"
+                className="text-brand hover:text-brand-dark hover:bg-brand-light border-0"
                 title="Duplicate Section"
                 style={{ zIndex: 10, position: "relative" }}
               />
@@ -296,7 +303,7 @@ const Section = ({
                   icon={<DeleteOutlined />}
                   onClick={handleDeleteClick}
                   size="small"
-                  className="mavecancelbutton hover:bg-red-600"
+                  className="text-red-400 hover:text-red-600 hover:bg-red-50 border-0"
                   title="Delete Section"
                   style={{ zIndex: 10, position: "relative" }}
                 />
@@ -306,8 +313,11 @@ const Section = ({
         </div>
 
         {!isCollapsed && (
-          <>
-        {/* Insertion indicator at the top */}
+          <div className="p-4">
+            <div className="mb-3 flex items-center gap-2 text-xs font-medium text-brand uppercase tracking-wide">
+              <span className="w-2 h-2 rounded-full bg-brand" />
+              Components inside this section
+            </div>
         <InsertionIndicator
           isVisible={
             isEditing &&
@@ -329,7 +339,6 @@ const Section = ({
           isEditing={isEditing}
         />
 
-        {/* Insertion indicator at the bottom */}
         <InsertionIndicator
           isVisible={
             isEditing &&
@@ -340,7 +349,7 @@ const Section = ({
           }
           position="bottom"
         />
-          </>
+          </div>
         )}
       </div>
     </>

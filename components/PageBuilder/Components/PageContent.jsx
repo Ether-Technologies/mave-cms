@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef } from "react";
 import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, LayoutOutlined } from "@ant-design/icons";
 import {
   DndContext,
   closestCenter,
@@ -251,33 +251,39 @@ const PageContent = ({
                 isDraggingSection={isDraggingSection}
               />
               {isEditing && (
-                <div className="text-center py-8">
+                <div className="flex items-center gap-4 py-6 mt-2">
+                  <div className="flex-1 border-t border-dashed border-brand-light" />
                   <Button
                     icon={<PlusOutlined />}
                     onClick={onAddSection}
-                    className="bg-brand hover:bg-brand-dark text-white border-2 border-brand px-6 py-2 font-semibold"
+                    className="bg-brand hover:bg-brand-dark text-white border-0 px-6 py-2 font-semibold shadow-sm"
                     size="large"
                   >
-                    Add Section
+                    Add Section Below
                   </Button>
+                  <div className="flex-1 border-t border-dashed border-brand-light" />
                 </div>
               )}
             </>
           ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500">No sections found in this page.</p>
-              <p className="text-sm text-gray-400 mt-2">
-                Add sections to start building your page.
+            <div className="text-center py-16 px-6 bg-white rounded-2xl border border-dashed border-brand-light shadow-sm">
+              <LayoutOutlined className="text-5xl text-brand mb-4" />
+              <p className="text-lg font-semibold text-gray-800 mb-2">
+                Start building your page
+              </p>
+              <p className="text-sm text-gray-500 mb-2 max-w-md mx-auto">
+                A <strong className="text-brand">Section</strong> is a row or area on your page.
+                Inside each section, you add <strong className="text-emerald-500">Components</strong> like text, images, or buttons.
               </p>
               {isEditing && (
-                <div className="mt-4">
+                <div className="mt-6">
                   <Button
                     icon={<PlusOutlined />}
                     onClick={onAddSection}
-                    className="bg-brand hover:bg-brand-dark text-white border-2 border-brand px-6 py-2 font-semibold"
+                    className="bg-brand hover:bg-brand-dark text-white border-0 px-8 py-2 font-semibold shadow-sm"
                     size="large"
                   >
-                    Add Section
+                    Add First Section
                   </Button>
                 </div>
               )}
