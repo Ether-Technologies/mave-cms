@@ -204,7 +204,7 @@ export default function NavItems({
               <Input
                 placeholder="Search..."
                 prefix={<SearchOutlined className="text-gray-400 text-base" />}
-                className="w-48 h-10 rounded-xl text-base"
+                className="w-[28rem] h-10 rounded-xl text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery && setShowSearchResults(true)}
