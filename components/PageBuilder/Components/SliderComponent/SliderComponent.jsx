@@ -3,7 +3,6 @@ import { Modal, message, Button, Collapse, Switch, Form, Input } from "antd";
 import { EditOutlined, GlobalOutlined, CheckOutlined } from "@ant-design/icons";
 import SliderRenderer from "./SliderRenderer";
 import { useSliderRefresh } from "./SliderRefresh";
-import SliderConfig from "./SliderConfig";
 import SliderActions from "./SliderActions";
 import SliderSelectionModal from "../../Modals/SliderSelectionModal";
 import RichTextEditor from "../../../RichTextEditor";
@@ -20,8 +19,6 @@ const SliderComponent = ({
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sliderData, setSliderData] = useState(component._mave);
-  const [selectedSliderData, setSelectedSliderData] = useState(null);
-  // Removed showConfig state - not needed
   const [sliderConfig, setSliderConfig] = useState({
     autoplay: component._mave?.config?.autoplay ?? true,
     dots: component._mave?.config?.dots ?? false,
@@ -66,66 +63,48 @@ const SliderComponent = ({
     }
   }, [component._mave]);
 
-  // Handle selection from SliderSelectionModal
-  const handleSelectSlider = useCallback((selectedSlider) => {
-    setSelectedSliderData(selectedSlider);
-    setIsModalVisible(false);
-  }, []);
+  // Handle selection from SliderSelectionModal — link immediately to section
+  const handleSelectSlider = useCallback(
+    (selectedSlider) => {
+      if (
+        selectedSlider.type === "card" &&
+        (!selectedSlider.cards || selectedSlider.cards.length === 0)
+      ) {
+        Modal.error({
+          title: "Validation Error",
+          content: "Selected card slider has no cards.",
+        });
+        return;
+      }
 
-  // Handle Submit (Confirm) Changes
-  const handleSubmit = useCallback(() => {
-    if (!selectedSliderData) {
-      Modal.error({
-        title: "Validation Error",
-        content: "No slider selected.",
-      });
-      return;
-    }
+      if (
+        selectedSlider.type === "image" &&
+        (!selectedSlider.medias || selectedSlider.medias.length === 0)
+      ) {
+        Modal.error({
+          title: "Validation Error",
+          content: "Selected image slider has no images.",
+        });
+        return;
+      }
 
-    // Validate card slider data
-    if (
-      selectedSliderData.type === "card" &&
-      (!selectedSliderData.cards || selectedSliderData.cards.length === 0)
-    ) {
-      Modal.error({
-        title: "Validation Error",
-        content: "Selected card slider has no cards.",
-      });
-      return;
-    }
+      const config = selectedSlider.config || sliderConfig;
+      const linkedSlider = { ...selectedSlider, config };
 
-    // Validate image slider data
-    if (
-      selectedSliderData.type === "image" &&
-      (!selectedSliderData.medias || selectedSliderData.medias.length === 0)
-    ) {
-      Modal.error({
-        title: "Validation Error",
-        content: "Selected image slider has no images.",
-      });
-      return;
-    }
+      const updatedComponent = {
+        ...component,
+        _mave: linkedSlider,
+        id: selectedSlider.id,
+      };
 
-    const updatedComponent = {
-      ...component,
-      _mave: {
-        ...selectedSliderData,
-        config: sliderConfig,
-      },
-      id: selectedSliderData.id,
-    };
-
-    updateComponent(updatedComponent);
-    setSliderData(selectedSliderData);
-    setSelectedSliderData(null);
-    message.success("Slider updated successfully.");
-  }, [selectedSliderData, sliderConfig, component, updateComponent]);
-
-  // Handle Cancel Changes
-  const handleCancel = useCallback(() => {
-    setSelectedSliderData(null);
-    message.info("Slider update canceled.");
-  }, []);
+      updateComponent(updatedComponent);
+      setSliderData(linkedSlider);
+      setSliderConfig(config);
+      setIsModalVisible(false);
+      message.success("Slider linked to section successfully.");
+    },
+    [component, updateComponent, sliderConfig]
+  );
 
   // Handle Delete Component
   const handleDelete = useCallback(() => {
@@ -181,25 +160,20 @@ const SliderComponent = ({
     <div className="border p-4 rounded-md bg-white">
       <SliderActions
         sliderData={sliderData}
-        isEditing={!!selectedSliderData}
-        selectedSliderData={selectedSliderData}
+        isEditing={false}
+        selectedSliderData={null}
         isRefreshing={isRefreshing}
         pollingError={pollingError}
         onRefresh={handleManualRefresh}
         onEdit={() => setIsModalVisible(true)}
         onDuplicate={onDuplicateElement}
         onDelete={handleDelete}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
+        onSubmit={() => {}}
+        onCancel={() => {}}
       />
 
       <div className="flex flex-col md:flex-row items-start gap-4">
-        <div
-          className={`flex flex-col ${selectedSliderData ? "w-full md:w-1/2" : "w-full"}`}
-        >
-          {sliderData && selectedSliderData && (
-            <h4 className="mb-2 text-md font-semibold">Current Slider</h4>
-          )}
+        <div className="flex flex-col w-full">
           {sliderData ? (
             <div className="w-full relative">
               <SliderRenderer
@@ -217,25 +191,7 @@ const SliderComponent = ({
             </Button>
           )}
         </div>
-
-        {selectedSliderData && (
-          <div className="flex flex-col w-full md:w-1/2">
-            <h4 className="mb-2 text-md font-semibold">Selected Slider</h4>
-            <div className="w-full relative">
-              <SliderRenderer
-                sliderData={selectedSliderData}
-                config={selectedSliderData.config}
-              />
-            </div>
-          </div>
-        )}
       </div>
-
-      {selectedSliderData && (
-        <div className="mt-4">
-          <SliderConfig config={sliderConfig} setConfig={setSliderConfig} />
-        </div>
-      )}
 
       {/* Multi-Language Configuration */}
       {sliderData && !preview && (

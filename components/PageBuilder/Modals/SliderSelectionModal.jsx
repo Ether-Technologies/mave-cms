@@ -15,6 +15,7 @@ import {
   Typography,
   Select,
   Switch,
+  Form,
 } from "antd";
 import instance from "../../../axios";
 import Image from "next/image";
@@ -24,7 +25,9 @@ import {
   SortAscendingOutlined,
   SortDescendingOutlined,
   ArrowLeftOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
+import SliderForm from "../../slider/SliderForm";
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -47,6 +50,11 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
     speed: 500,
     height: 400,
   });
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [formType, setFormType] = useState("image");
+  const [selectedMedia, setSelectedMedia] = useState([]);
+  const [selectedCards, setSelectedCards] = useState([]);
   const pageSize = 6;
 
   useEffect(() => {
@@ -56,8 +64,44 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
       setSearchTerm("");
       setCurrentPage(1);
       setShowConfig(false);
+      setIsFormVisible(false);
+      setSelectedSlider(null);
     }
   }, [isVisible]);
+
+  const handleOpenCreateForm = () => {
+    form.resetFields();
+    setSelectedMedia([]);
+    setSelectedCards([]);
+    setFormType(activeTab);
+    setIsFormVisible(true);
+  };
+
+  const handleCancelForm = () => {
+    setIsFormVisible(false);
+    form.resetFields();
+    setSelectedMedia([]);
+    setSelectedCards([]);
+    setFormType("image");
+  };
+
+  const handleSliderCreated = async (createdSlider) => {
+    setIsFormVisible(false);
+    const sliders = await fetchSliders();
+    const sliderType = createdSlider.type || "image";
+    setActiveTab(sliderType);
+    filterAndSortSliders(sliders, sliderType, searchTerm, sortOrder);
+    setSelectedSlider(createdSlider);
+    setSliderConfig({
+      autoplay: true,
+      dots: true,
+      effect: "scroll",
+      speed: 500,
+      height: 400,
+    });
+    setShowConfig(true);
+    message.success("Slider created. Configure carousel settings and save.");
+  };
 
   const fetchSliders = async () => {
     setLoading(true);
@@ -66,10 +110,13 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
       const sliders = response.data || [];
       setSliderList(sliders);
       filterAndSortSliders(sliders, activeTab, searchTerm, sortOrder);
+      return sliders;
     } catch (error) {
       message.error("Failed to fetch sliders");
+      return [];
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const filterAndSortSliders = (sliders, type, search, order) => {
@@ -254,14 +301,24 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
                 />
               </Tooltip>
             </div>
-            <Input
-              placeholder="Search sliders..."
-              prefix={<SearchOutlined />}
-              value={searchTerm}
-              onChange={handleSearchChange}
-              allowClear
-              className="w-full md:w-64"
-            />
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <Input
+                placeholder="Search sliders..."
+                prefix={<SearchOutlined />}
+                value={searchTerm}
+                onChange={handleSearchChange}
+                allowClear
+                className="w-full md:w-64"
+              />
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleOpenCreateForm}
+                className="mavebutton whitespace-nowrap"
+              >
+                Create Slider
+              </Button>
+            </div>
           </div>
 
           <List
@@ -319,7 +376,23 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
               </List.Item>
             )}
             grid={{ gutter: 16, column: 3 }}
-            locale={{ emptyText: "No sliders found." }}
+            locale={{
+              emptyText: (
+                <div className="text-center py-8">
+                  <Text type="secondary">No sliders found.</Text>
+                  <div className="mt-4">
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={handleOpenCreateForm}
+                      className="mavebutton"
+                    >
+                      Create New Slider
+                    </Button>
+                  </div>
+                </div>
+              ),
+            }}
           />
 
           <div className="flex justify-end mt-4">
@@ -451,6 +524,21 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
           </div>
         </div>
       )}
+      <SliderForm
+        form={form}
+        type={formType}
+        setType={setFormType}
+        selectedMedia={selectedMedia}
+        setSelectedMedia={setSelectedMedia}
+        selectedCards={selectedCards}
+        setSelectedCards={setSelectedCards}
+        editingItemId={null}
+        onCancelEdit={handleCancelForm}
+        isFormVisible={isFormVisible}
+        setIsFormVisible={setIsFormVisible}
+        allTags={[]}
+        onSliderCreated={handleSliderCreated}
+      />
     </Drawer>
   );
 };
