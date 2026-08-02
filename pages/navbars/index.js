@@ -131,6 +131,11 @@ const Navbars = () => {
         handleSelectAll={handleSelectAll}
         allSelected={selectedNavbarIds.length === navbars.length}
         onShowChange={onShowChange}
+        onRefresh={() => {
+          fetchNavbars();
+          fetchMenus();
+          fetchMedia();
+        }}
       />
       <Modal
         open={isAddNavbarOpen}

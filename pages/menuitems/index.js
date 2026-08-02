@@ -270,6 +270,10 @@ const MenuItems = () => {
         }}
         applyFilters={applyFilters}
         resetFilters={resetFilters}
+        onRefresh={() => {
+          fetchMenuItems();
+          fetchPages();
+        }}
       />
 
       {/* Add Menu Item Modal */}

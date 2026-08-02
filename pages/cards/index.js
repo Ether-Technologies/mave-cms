@@ -272,6 +272,7 @@ const CardsPage = () => {
         uniqueTags={uniqueTags}
         selectedTag={selectedTag}
         handleTagFilterChange={handleTagFilterChange}
+        onRefresh={fetchData}
       />
 
       {isCreateCardFormVisible && (

@@ -24,7 +24,15 @@ const CardsHeader = ({
   uniqueTags,
   selectedTag,
   handleTagFilterChange,
+  onRefresh,
 }) => {
+  const handleRefresh = () => {
+    if (onRefresh) {
+      onRefresh();
+      message.success("Data refreshed successfully");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -73,6 +81,14 @@ const CardsHeader = ({
             >
               Create Card
             </Button>
+            <Tooltip title="Refresh Data">
+              <Button
+                icon={<ReloadOutlined />}
+                className="h-11 w-11 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 text-gray-600 hover:text-gray-800 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all rounded-xl hover:rotate-180"
+                onClick={handleRefresh}
+                size="large"
+              />
+            </Tooltip>
             <Tooltip title="Copy API Endpoint">
               <Button
                 icon={<CopyOutlined />}

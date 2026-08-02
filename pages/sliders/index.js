@@ -241,6 +241,7 @@ const Sliders = () => {
         allTags={allTags}
         selectedTag={selectedTag}
         setSelectedTag={setSelectedTag}
+        onRefresh={fetchSliders}
       />
 
       {/* Slider Form Modal */}

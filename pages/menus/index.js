@@ -111,6 +111,10 @@ const Menus = () => {
         handleSelectAll={handleSelectAll}
         allSelected={selectedMenuIds.length === menus.length}
         onShowChange={onShowChange}
+        onRefresh={() => {
+          fetchMenus();
+          fetchMenuItems();
+        }}
       />
       <Modal
         open={isAddMenuOpen}

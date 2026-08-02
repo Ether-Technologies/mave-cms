@@ -28,6 +28,7 @@ const Gallery = () => {
     editMedia,
     deleteMedia,
     isIndexedDBLoaded,
+    refreshMedia,
   } = useMediaData();
 
   // UI States for Modals
@@ -70,10 +71,9 @@ const Gallery = () => {
 
   // Callback function to update mediaAssets after upload
   const handleMediaUploadSuccess = (newMedia) => {
-    addMedia(newMedia); // Add the new media to the state and IndexedDB
-    handleUploadModalClose(); // Close the upload modal
-    // Refresh the media data
-    window.location.reload();
+    addMedia(newMedia);
+    handleUploadModalClose();
+    refreshMedia();
   };
 
   return (
@@ -122,7 +122,8 @@ const Gallery = () => {
         itemsPerPage={itemsPerPage}
         sortType={sortType}
         setSortType={handleSortTypeChange}
-        availableTags={uniqueTags} // Pass uniqueTags to GalleryHeader
+        availableTags={uniqueTags}
+        onRefresh={refreshMedia}
       />
 
       {/* Media Grid or Loading Spinner */}

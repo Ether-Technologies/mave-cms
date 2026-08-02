@@ -285,6 +285,23 @@ const useMediaData = () => {
     setCurrentPage(1); // Reset to first page on tag change
   };
 
+  const refreshMedia = useCallback(async () => {
+    await fetchFromAPI(
+      currentPage,
+      itemsPerPage,
+      sortType,
+      searchText,
+      selectedTag
+    );
+  }, [
+    currentPage,
+    itemsPerPage,
+    sortType,
+    searchText,
+    selectedTag,
+    fetchFromAPI,
+  ]);
+
   return {
     mediaAssets,
     totalMediaAssets,
@@ -303,6 +320,7 @@ const useMediaData = () => {
     editMedia,
     deleteMedia,
     isIndexedDBLoaded,
+    refreshMedia,
   };
 };
 
