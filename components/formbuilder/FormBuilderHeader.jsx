@@ -2,12 +2,19 @@
 
 import React from "react";
 import { Button, message, Tooltip, Badge } from "antd";
-import { PlusCircleOutlined, CopyOutlined } from "@ant-design/icons";
+import { PlusCircleOutlined, CopyOutlined, ReloadOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-const FormBuilderHeader = ({ formCount }) => {
+const FormBuilderHeader = ({ formCount, onRefresh }) => {
   const router = useRouter();
+
+  const handleRefresh = () => {
+    if (onRefresh) {
+      onRefresh();
+      message.success("Data refreshed successfully");
+    }
+  };
 
   const copyFormBuilderApi = () => {
     navigator.clipboard.writeText(
@@ -61,6 +68,14 @@ const FormBuilderHeader = ({ formCount }) => {
           >
             Create Form
           </Button>
+          <Tooltip title="Refresh Data">
+            <Button
+              icon={<ReloadOutlined />}
+              className="h-11 w-11 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 text-gray-600 hover:text-gray-800 border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all rounded-xl hover:rotate-180"
+              onClick={handleRefresh}
+              size="large"
+            />
+          </Tooltip>
           <Tooltip title="Copy API Endpoint">
             <Button
               icon={<CopyOutlined />}

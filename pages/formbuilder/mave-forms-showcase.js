@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import MaveFormsList from "../../components/formbuilder/MaveFormsList";
 
-const MaveFormsShowcase = ({ onFormCountChange }) => {
+const MaveFormsShowcase = ({ onFormCountChange, refreshRef }) => {
   const [selectedFormId, setSelectedFormId] = useState(null);
 
   const handleSelectForm = (formId) => {
@@ -15,6 +15,7 @@ const MaveFormsShowcase = ({ onFormCountChange }) => {
         onSelectForm={handleSelectForm}
         selectedFormId={selectedFormId}
         onFormCountChange={onFormCountChange}
+        refreshRef={refreshRef}
       />
     </div>
   );

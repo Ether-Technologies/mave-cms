@@ -1,5 +1,5 @@
 // components/formbuilder/MaveFormsList.jsx
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { Drawer, Popconfirm, Input, Spin, Button, Badge } from "antd";
 import {
   SearchOutlined,
@@ -17,7 +17,12 @@ import MaveFormElements from "./MaveFormElements";
 import { FormBuilderContext } from "../../src/context/FormBuilderContext";
 import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
-const MaveFormsList = ({ onSelectForm, selectedFormId, onFormCountChange }) => {
+const MaveFormsList = ({
+  onSelectForm,
+  selectedFormId,
+  onFormCountChange,
+  refreshRef,
+}) => {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [changeFormsView, setChangeFormsView] = useState(false);
@@ -28,21 +33,7 @@ const MaveFormsList = ({ onSelectForm, selectedFormId, onFormCountChange }) => {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
 
-  useEffect(() => {
-    fetchForms();
-  }, []);
-
-  useGlobalRefresh(fetchForms);
-
-  useEffect(() => {
-    if (selectedFormId) {
-      setDrawerVisible(true);
-    } else {
-      setDrawerVisible(false);
-    }
-  }, [selectedFormId]);
-
-  const fetchForms = async () => {
+  const fetchForms = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -59,7 +50,27 @@ const MaveFormsList = ({ onSelectForm, selectedFormId, onFormCountChange }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [onFormCountChange]);
+
+  useEffect(() => {
+    fetchForms();
+  }, [fetchForms]);
+
+  useGlobalRefresh(fetchForms);
+
+  useEffect(() => {
+    if (refreshRef) {
+      refreshRef.current = fetchForms;
+    }
+  }, [fetchForms, refreshRef]);
+
+  useEffect(() => {
+    if (selectedFormId) {
+      setDrawerVisible(true);
+    } else {
+      setDrawerVisible(false);
+    }
+  }, [selectedFormId]);
 
   const handleDeleteForm = async (formId) => {
     try {
