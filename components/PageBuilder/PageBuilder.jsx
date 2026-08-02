@@ -87,6 +87,7 @@ const PageBuilder = ({ pageId, editMode = false }) => {
         <>
           {/* Header */}
           <PageHeader
+            pageData={pageData}
             isEditing={isEditing}
             isDirty={isDirty}
             canUndo={canUndo}

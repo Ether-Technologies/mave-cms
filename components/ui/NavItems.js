@@ -15,6 +15,7 @@ import TopNavData from "../../src/data/topnavdata.json";
 import AuthorisedMenus from "../../src/data/authorisedsidemenus.json";
 import Link from "next/link";
 import Image from "next/image";
+import PageSearchDropdown from "./PageSearchDropdown";
 
 export default function NavItems({
   user,
@@ -185,8 +186,9 @@ export default function NavItems({
 
           {/* User Actions */}
           <div className="flex items-center gap-4 flex-shrink-0">
-            {/* Search Bar - Desktop only on larger screens */}
-            <div className="hidden xl:block mr-2 relative" ref={searchRef}>
+            {/* Search Bar + Pages dropdown - Desktop only on larger screens */}
+            <div className="hidden xl:flex items-center gap-2 mr-2">
+              <div className="relative" ref={searchRef}>
               <Input
                 placeholder="Search..."
                 prefix={<SearchOutlined className="text-gray-400 text-base" />}
@@ -246,6 +248,8 @@ export default function NavItems({
                   </div>
                 </div>
               )}
+              </div>
+              <PageSearchDropdown />
             </div>
 
             {/* Notification Bell — hidden

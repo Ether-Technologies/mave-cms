@@ -138,6 +138,12 @@ const PageCard = ({
                     {truncateText(page.page_name_bn, 25)}
                   </span>
                 )}
+                {page.slug && (
+                  <span className="text-xs text-brand mt-1 flex items-center gap-1">
+                    <GlobalOutlined />
+                    /{page.slug}
+                  </span>
+                )}
               </div>
             </div>
 
