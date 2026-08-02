@@ -1,16 +1,13 @@
 // components/PageBuilder/Components/PageHeader.jsx
 
 import React from "react";
-import { Button, Tooltip, message } from "antd";
+import { Button } from "antd";
 import {
   EyeOutlined,
   EditOutlined,
   UndoOutlined,
   RedoOutlined,
   ExclamationCircleOutlined,
-  CopyOutlined,
-  LinkOutlined,
-  GlobalOutlined,
 } from "@ant-design/icons";
 
 const PageHeader = ({
@@ -24,16 +21,6 @@ const PageHeader = ({
   onRedo,
 }) => {
   const pageName = pageData?.page_name_en || "Untitled Page";
-  const pageNameAlt = pageData?.page_name_bn;
-  const slug = pageData?.slug;
-  const pageUrl = slug ? `/${slug}` : null;
-
-  const handleCopyUrl = () => {
-    if (!pageUrl) return;
-    const fullUrl = `${window.location.origin}${pageUrl}`;
-    navigator.clipboard.writeText(fullUrl);
-    message.success("Page URL copied to clipboard");
-  };
 
   return (
     <div className="bg-white shadow-sm border-b px-6 py-4">
@@ -58,48 +45,6 @@ const PageHeader = ({
               </div>
             )}
           </div>
-
-          {(pageNameAlt || pageUrl || pageData?.type) && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
-              {pageNameAlt && (
-                <span className="flex items-center gap-1.5">
-                  <GlobalOutlined className="text-gray-400" />
-                  <span className="font-medium text-gray-500">Alt:</span>
-                  {pageNameAlt}
-                </span>
-              )}
-              {pageUrl && (
-                <span className="flex items-center gap-1.5 min-w-0">
-                  <LinkOutlined className="text-brand flex-shrink-0" />
-                  <code className="text-brand bg-blue-50 px-2 py-0.5 rounded truncate max-w-xs sm:max-w-md">
-                    {pageUrl}
-                  </code>
-                  <Tooltip title="Copy page URL">
-                    <button
-                      type="button"
-                      onClick={handleCopyUrl}
-                      className="p-1 rounded hover:bg-gray-100 text-gray-500 hover:text-brand transition-colors"
-                      aria-label="Copy page URL"
-                    >
-                      <CopyOutlined />
-                    </button>
-                  </Tooltip>
-                </span>
-              )}
-              {pageData?.type && (
-                <span>
-                  <span className="font-medium text-gray-500">Type:</span>{" "}
-                  {pageData.type}
-                </span>
-              )}
-              {pageData?.id && (
-                <span>
-                  <span className="font-medium text-gray-500">ID:</span>{" "}
-                  {pageData.id}
-                </span>
-              )}
-            </div>
-          )}
         </div>
         <div className="flex items-center gap-2">
           {isEditing ? (
