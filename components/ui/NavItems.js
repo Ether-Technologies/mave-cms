@@ -6,8 +6,9 @@ import {
   SettingOutlined,
   UserOutlined,
   DeploymentUnitOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
-import { Input, Layout, Dropdown, Button } from "antd";
+import { Input, Layout, Dropdown, Button, Tooltip, message } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Changelog from "../../pages/usermanual/changelog.json";
@@ -16,6 +17,7 @@ import AuthorisedMenus from "../../src/data/authorisedsidemenus.json";
 import Link from "next/link";
 import Image from "next/image";
 import PageSearchDropdown from "./PageSearchDropdown";
+import { useMenuRefresh } from "../../src/context/MenuRefreshContext";
 
 export default function NavItems({
   user,
@@ -33,6 +35,12 @@ export default function NavItems({
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchRef = useRef(null);
   const router = useRouter();
+  const { triggerGlobalRefresh } = useMenuRefresh();
+
+  const handleGlobalRefresh = () => {
+    triggerGlobalRefresh();
+    message.success("All data refreshed successfully");
+  };
 
   useEffect(() => {
     setTopNavData(TopNavData);
@@ -263,6 +271,18 @@ export default function NavItems({
               </div>
             </Badge>
             */}
+
+            {/* Refresh All Data */}
+            <Tooltip title="Refresh All Data">
+              <div
+                className="w-10 h-10 flex items-center justify-center rounded-lg
+                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50
+                cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md hover:rotate-180"
+                onClick={handleGlobalRefresh}
+              >
+                <ReloadOutlined className="text-gray-600 hover:text-indigo-500 text-lg transition-colors duration-300" />
+              </div>
+            </Tooltip>
 
             {/* Settings */}
             <div

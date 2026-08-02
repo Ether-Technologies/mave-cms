@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import instance from "../axios";
 import { cachedApiCall } from "../utils/apiUtils";
+import { useGlobalRefresh } from "../src/context/MenuRefreshContext";
 import WelcomeCard from "../components/dashboard/WelcomeCard";
 import StatsOverview from "../components/dashboard/StatsOverview";
 import PerformanceInsights from "../components/dashboard/PerformanceInsights";
@@ -20,11 +21,11 @@ const index = () => {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
 
-  const fetchData = async () => {
+  const fetchData = async (forceRefresh = false) => {
     try {
       setLoading(true);
 
-      // Use cached API calls to prevent excessive requests
+      const force = { force: forceRefresh };
       const [
         pages_response,
         media_response,
@@ -35,14 +36,14 @@ const index = () => {
         forms_response,
         footers_response,
       ] = await Promise.all([
-        cachedApiCall("pages", () => instance.get("/pages")),
-        cachedApiCall("media", () => instance.get("/media")),
-        cachedApiCall("menus", () => instance.get("/menus")),
-        cachedApiCall("navbars", () => instance.get("/navbars")),
-        cachedApiCall("sliders", () => instance.get("/sliders")),
-        cachedApiCall("cards", () => instance.get("/cards")),
-        cachedApiCall("forms", () => instance.get("/forms")),
-        cachedApiCall("footers", () => instance.get("/footers")),
+        cachedApiCall("pages", () => instance.get("/pages"), undefined, force),
+        cachedApiCall("media", () => instance.get("/media"), undefined, force),
+        cachedApiCall("menus", () => instance.get("/menus"), undefined, force),
+        cachedApiCall("navbars", () => instance.get("/navbars"), undefined, force),
+        cachedApiCall("sliders", () => instance.get("/sliders"), undefined, force),
+        cachedApiCall("cards", () => instance.get("/cards"), undefined, force),
+        cachedApiCall("forms", () => instance.get("/forms"), undefined, force),
+        cachedApiCall("footers", () => instance.get("/footers"), undefined, force),
       ]);
 
       setData({
@@ -68,6 +69,8 @@ const index = () => {
       ? setUserData(JSON.parse(localStorage.getItem("user")))
       : setUserData(null);
   }, []);
+
+  useGlobalRefresh(() => fetchData(true));
 
   // console.log("Data: ", data);
 

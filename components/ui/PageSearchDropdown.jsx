@@ -11,6 +11,7 @@ import {
 import { useRouter } from "next/router";
 import instance from "../../axios";
 import { cachedApiCall } from "../../utils/apiUtils";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const PageSearchDropdown = () => {
   const router = useRouter();
@@ -19,12 +20,14 @@ const PageSearchDropdown = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchPages = useCallback(async () => {
-    if (pages.length > 0) return;
+  const fetchPages = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true);
-      const response = await cachedApiCall("pages", () =>
-        instance.get("/pages")
+      const response = await cachedApiCall(
+        "pages",
+        () => instance.get("/pages"),
+        undefined,
+        { force: forceRefresh }
       );
       if (response.data) {
         setPages(
@@ -38,13 +41,15 @@ const PageSearchDropdown = () => {
     } finally {
       setLoading(false);
     }
-  }, [pages.length]);
+  }, []);
 
   useEffect(() => {
     if (open) {
       fetchPages();
     }
   }, [open, fetchPages]);
+
+  useGlobalRefresh(() => fetchPages(true));
 
   const filteredPages = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();

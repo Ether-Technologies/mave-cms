@@ -7,6 +7,7 @@ import CardsHeader from "../../components/cards/CardsHeader";
 import CardsList from "../../components/cards/CardsList";
 import CreateCardForm from "../../components/cards/CreateCardForm";
 import CardsPreviewModal from "../../components/cards/CardsPreviewModal";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const CardsPage = () => {
   const [loading, setLoading] = useState(false);
@@ -78,6 +79,8 @@ const CardsPage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useGlobalRefresh(fetchData);
 
   // -------------------------
   //   Collect Unique Tags

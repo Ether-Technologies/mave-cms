@@ -8,6 +8,7 @@ import Loader from "../../components/Loader";
 import MenusHeader from "../../components/Menus/MenusHeader";
 import AddMenuForm from "../../components/Menus/AddMenuForm";
 import MenusList from "../../components/Menus/MenusList";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const Menus = () => {
   useEffect(() => {
@@ -58,6 +59,11 @@ const Menus = () => {
     fetchMenus();
     fetchMenuItems();
   }, []);
+
+  useGlobalRefresh(() => {
+    fetchMenus();
+    fetchMenuItems();
+  });
 
   useEffect(() => {
     const results = initialMenus.filter((menu) =>

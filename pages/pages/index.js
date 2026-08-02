@@ -4,6 +4,7 @@ import { message, Spin } from "antd";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import instance from "../../axios";
 import { cachedApiCall } from "../../utils/apiUtils";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 import { useRouter } from "next/router";
 import PagesHeader from "../../components/PageBuilder/PagesHeader";
 import CreatePageModal from "../../components/PageBuilder/CreatePageModal";
@@ -58,6 +59,8 @@ const Pages = () => {
   useEffect(() => {
     fetchPages();
   }, [fetchPages]);
+
+  useGlobalRefresh(() => fetchPages(true));
 
   const handleExpand = useCallback((pageId) => {
     setExpandedPageId((prevId) => (prevId === pageId ? null : pageId));

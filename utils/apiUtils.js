@@ -99,6 +99,10 @@ export const debouncedApiCall = (key, apiCall, delay = 2000) => {
 const apiCache = new Map();
 const CACHE_DURATION = 30000; // 30 seconds
 
+export const clearAllApiCache = () => {
+  apiCache.clear();
+};
+
 export const cachedApiCall = async (
   key,
   apiCall,

@@ -4,6 +4,7 @@ import { message, Spin } from "antd";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import instance from "../../axios";
 import { cachedApiCall } from "../../utils/apiUtils";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 import { useRouter } from "next/router";
 import PagesHeader from "../../components/PageBuilder/PagesHeader";
 import CreateFooterModal from "../../components/PageBuilder/CreateFooterModal";
@@ -47,6 +48,8 @@ const Footers = () => {
   useEffect(() => {
     fetchFooters();
   }, [fetchFooters]);
+
+  useGlobalRefresh(() => fetchFooters(true));
 
   const sortedFooters = useMemo(() => {
     return [...footers].sort((a, b) =>

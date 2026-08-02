@@ -6,6 +6,7 @@ import SliderList from "../../components/slider/SliderList";
 import SliderForm from "../../components/slider/SliderForm";
 import SlidersHeader from "../../components/slider/SlidersHeader";
 import { orderByIds } from "../../components/slider/SliderForm/orderByIds";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const Sliders = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -88,6 +89,8 @@ const Sliders = () => {
   useEffect(() => {
     fetchSliders();
   }, []);
+
+  useGlobalRefresh(fetchSliders);
 
   // Handle search input change
   const handleSearchChange = (e) => {

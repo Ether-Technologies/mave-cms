@@ -7,6 +7,7 @@ import PreviewModal from "./PreviewModal";
 import UploadMediaTabs from "./UploadMediaTabs";
 import useMediaData from "../../hooks/useMediaData";
 import { setPageTitle } from "../../global/constants/pageTitle";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const Gallery = () => {
   // Use the custom hook to manage media data
@@ -43,6 +44,8 @@ const Gallery = () => {
   useEffect(() => {
     setPageTitle("Media Library");
   }, []);
+
+  useGlobalRefresh(refreshMedia);
 
   // Extract unique tags from mediaAssets
   useEffect(() => {

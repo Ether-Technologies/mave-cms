@@ -8,7 +8,7 @@ import Loader from "../../components/Loader";
 import NavbarHeader from "../../components/Navbars/NavbarHeader";
 import AddNavbarForm from "../../components/Navbars/AddNavbarForm";
 import NavbarsList from "../../components/Navbars/NavbarsList";
-import { set } from "lodash";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const Navbars = () => {
   useEffect(() => {
@@ -74,6 +74,12 @@ const Navbars = () => {
     fetchMenus();
     fetchMedia();
   }, []);
+
+  useGlobalRefresh(() => {
+    fetchNavbars();
+    fetchMenus();
+    fetchMedia();
+  });
 
   useEffect(() => {
     const results = initialNavbars.filter((navbar) =>

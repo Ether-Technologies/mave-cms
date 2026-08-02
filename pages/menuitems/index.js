@@ -8,6 +8,7 @@ import Loader from "../../components/Loader";
 import MenuItemsHeader from "../../components/MenuItems/MenuItemsHeader";
 import AddMenuItemForm from "../../components/MenuItems/AddMenuItemForm";
 import MenuItemsList from "../../components/MenuItems/MenuItemsList";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const LOCAL_KEY_ITEMS = "mave_menuItems";
 const LOCAL_KEY_PAGES = "mave_pages";
@@ -119,6 +120,11 @@ const MenuItems = () => {
     fetchPages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useGlobalRefresh(() => {
+    fetchMenuItems();
+    fetchPages();
+  });
 
   // Whenever sortType changes, re-sort local data (avoid extra server calls)
   useEffect(() => {
