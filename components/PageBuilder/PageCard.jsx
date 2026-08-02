@@ -127,24 +127,11 @@ const PageCard = ({
                 }}
               />
 
-              <div className="flex flex-col">
-                <Tooltip title={page.page_name_en} placement="top">
-                  <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors cursor-pointer">
-                    {truncateText(page.page_name_en, 30)}
-                  </h3>
-                </Tooltip>
-                {page.page_name_bn && (
-                  <span className="text-sm text-gray-500 mt-1">
-                    {truncateText(page.page_name_bn, 25)}
-                  </span>
-                )}
-                {page.slug && (
-                  <span className="text-xs text-brand mt-1 flex items-center gap-1">
-                    <GlobalOutlined />
-                    /{page.slug}
-                  </span>
-                )}
-              </div>
+              <Tooltip title={page.page_name_en} placement="top">
+                <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors cursor-pointer">
+                  {truncateText(page.page_name_en, 30)}
+                </h3>
+              </Tooltip>
             </div>
 
             <div className="flex items-center space-x-2">
