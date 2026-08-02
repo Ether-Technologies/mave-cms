@@ -21,11 +21,14 @@ const Footers = () => {
 
   const router = useRouter();
 
-  const fetchFooters = useCallback(async () => {
+  const fetchFooters = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true);
-      const response = await cachedApiCall("footers-pages", () =>
-        instance.get("/pages?type=Footer")
+      const response = await cachedApiCall(
+        "footers-pages",
+        () => instance.get("/pages?type=Footer"),
+        undefined,
+        { force: forceRefresh }
       );
       if (response.data) {
         setAllFooters(response.data);
@@ -130,7 +133,7 @@ const Footers = () => {
 
         if (response.status === 201) {
           message.success("Footer duplicated successfully.");
-          fetchFooters();
+          fetchFooters(true);
         }
       } catch (error) {
         console.error("Error duplicating footer:", error);
@@ -224,7 +227,7 @@ const Footers = () => {
         sortType={sortType}
         setSortType={setSortType}
         onShowChange={handleShowChange}
-        onRefresh={fetchFooters}
+        onRefresh={() => fetchFooters(true)}
         title="Footers"
         totalFooters={footers.length}
       />
@@ -233,7 +236,7 @@ const Footers = () => {
         visible={createFooterModalVisible}
         onCancel={closeCreateFooterModal}
         onFooterCreated={handleFooterCreated}
-        fetchPages={fetchFooters}
+        fetchPages={() => fetchFooters(true)}
       />
 
       <RenderPages

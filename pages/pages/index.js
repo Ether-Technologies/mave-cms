@@ -31,10 +31,15 @@ const Pages = () => {
     [sortedTypePages, itemsPerPage]
   );
 
-  const fetchPages = useCallback(async () => {
+  const fetchPages = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true);
-      const response = await cachedApiCall("pages", () => instance.get("/pages"));
+      const response = await cachedApiCall(
+        "pages",
+        () => instance.get("/pages"),
+        undefined,
+        { force: forceRefresh }
+      );
 
       if (response.data) {
         setAllPages(response.data);
@@ -107,7 +112,7 @@ const Pages = () => {
 
         if (response.status === 201) {
           message.success("Page duplicated successfully.");
-          fetchPages();
+          fetchPages(true);
         }
       } catch (error) {
         console.error("Error duplicating page:", error);
@@ -228,7 +233,7 @@ const Pages = () => {
         sortType={sortType}
         setSortType={setSortType}
         onShowChange={handleShowChange}
-        onRefresh={fetchPages}
+        onRefresh={() => fetchPages(true)}
         totalPages={typePages.length}
       />
 
@@ -236,7 +241,7 @@ const Pages = () => {
         visible={createModalVisible}
         onCancel={closeCreateModal}
         onPageCreated={handlePageCreated}
-        fetchPages={fetchPages}
+        fetchPages={() => fetchPages(true)}
       />
 
       <RenderPages

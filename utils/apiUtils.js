@@ -99,11 +99,20 @@ export const debouncedApiCall = (key, apiCall, delay = 2000) => {
 const apiCache = new Map();
 const CACHE_DURATION = 30000; // 30 seconds
 
-export const cachedApiCall = async (key, apiCall, duration = CACHE_DURATION) => {
+export const cachedApiCall = async (
+  key,
+  apiCall,
+  duration = CACHE_DURATION,
+  { force = false } = {}
+) => {
+  if (force) {
+    apiCache.delete(key);
+  }
+
   const now = Date.now();
   const cached = apiCache.get(key);
 
-  if (cached && (now - cached.timestamp) < duration) {
+  if (cached && now - cached.timestamp < duration) {
     return cached.data;
   }
 
@@ -111,7 +120,7 @@ export const cachedApiCall = async (key, apiCall, duration = CACHE_DURATION) => 
     const data = await apiCall();
     apiCache.set(key, {
       data,
-      timestamp: now
+      timestamp: now,
     });
     return data;
   } catch (error) {
