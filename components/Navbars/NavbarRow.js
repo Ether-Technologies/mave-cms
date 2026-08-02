@@ -216,22 +216,12 @@ const NavbarRow = ({
                 />
               </div>
             ) : (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge count={`ID-${navbar.id}`} style={idBadgeStyle} />
-                  <MenuOutlined className="text-brand" />
-                  <span className="font-semibold text-gray-800 truncate">
-                    {navbar.title_en}
-                  </span>
-                </div>
-                {navbar.title_bn && (
-                  <div className="flex items-center gap-2 ml-5">
-                    <GlobalOutlined className="text-blue-500 text-xs" />
-                    <span className="text-sm text-gray-600 truncate">
-                      {navbar.title_bn}
-                    </span>
-                  </div>
-                )}
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge count={`ID-${navbar.id}`} style={idBadgeStyle} />
+                <MenuOutlined className="text-brand" />
+                <span className="font-semibold text-gray-800 truncate">
+                  {navbar.title_en}
+                </span>
               </div>
             )}
           </div>
