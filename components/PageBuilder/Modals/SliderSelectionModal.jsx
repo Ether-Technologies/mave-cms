@@ -26,6 +26,7 @@ import {
   SortDescendingOutlined,
   ArrowLeftOutlined,
   PlusOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import SliderForm from "../../slider/SliderForm";
 
@@ -74,6 +75,7 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
     setSelectedMedia([]);
     setSelectedCards([]);
     setFormType(activeTab);
+    form.setFieldsValue({ type: activeTab });
     setIsFormVisible(true);
   };
 
@@ -87,11 +89,13 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
 
   const handleSliderCreated = async (createdSlider) => {
     setIsFormVisible(false);
-    const sliders = await fetchSliders();
+    const { sliders } = await fetchSliders();
     const sliderType = createdSlider.type || "image";
     setActiveTab(sliderType);
     filterAndSortSliders(sliders, sliderType, searchTerm, sortOrder);
-    setSelectedSlider(createdSlider);
+    const fullSlider =
+      sliders.find((slider) => slider.id === createdSlider.id) || createdSlider;
+    setSelectedSlider(fullSlider);
     setSliderConfig({
       autoplay: true,
       dots: true,
@@ -110,10 +114,10 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
       const sliders = response.data || [];
       setSliderList(sliders);
       filterAndSortSliders(sliders, activeTab, searchTerm, sortOrder);
-      return sliders;
+      return { success: true, sliders };
     } catch (error) {
       message.error("Failed to fetch sliders");
-      return [];
+      return { success: false, sliders: [] };
     } finally {
       setLoading(false);
     }
@@ -157,6 +161,13 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
     filterAndSortSliders(sliderList, activeTab, searchTerm, order);
   };
 
+  const handleReload = async () => {
+    const { success } = await fetchSliders();
+    if (success) {
+      message.success("Sliders refreshed successfully");
+    }
+  };
+
   const handleSliderSelect = (item) => {
     if (item.type === "card" && (!item.cards || item.cards.length === 0)) {
       message.error("Selected card slider has no cards");
@@ -168,6 +179,7 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
     }
 
     setSelectedSlider(item);
+    setActiveTab(item.type || "image");
     setShowConfig(true);
   };
 
@@ -300,6 +312,14 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
                   className={sortOrder === "desc" ? "mavebutton" : ""}
                 />
               </Tooltip>
+              <Tooltip title="Reload sliders">
+                <Button
+                  icon={<ReloadOutlined spin={loading} />}
+                  onClick={handleReload}
+                  disabled={loading}
+                  className="mavebutton"
+                />
+              </Tooltip>
             </div>
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Input
@@ -338,7 +358,7 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
                       width={600}
                       height={600}
                     >
-                      {activeTab === "image" ? (
+                      {(item.type || activeTab) === "image" ? (
                         item.medias && item.medias.length > 0 ? (
                           renderSliderImages(item.medias)
                         ) : (
@@ -417,7 +437,7 @@ const SliderSelectionModal = ({ isVisible, onClose, onSelectSlider }) => {
                 speed={sliderConfig.speed}
                 className="rounded-lg"
               >
-                {activeTab === "image" ? (
+                {(selectedSlider?.type || activeTab) === "image" ? (
                   selectedSlider?.medias && selectedSlider.medias.length > 0 ? (
                     renderSliderImages(selectedSlider.medias)
                   ) : (

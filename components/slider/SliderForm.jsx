@@ -25,6 +25,7 @@ const SliderForm = ({
   isFormVisible,
   setIsFormVisible,
   allTags,
+  onSliderCreated,
 }) => {
   const [isMediaModalVisible, setIsMediaModalVisible] = useState(false);
   const [cards, setCards] = useState([]);
@@ -80,14 +81,14 @@ const SliderForm = ({
         }
       };
       populateForm();
-    } else {
-      // Reset form when creating a new slider
-      form.resetFields();
-      setSelectedMedia([]);
-      setSelectedCards([]);
-      setType("image");
     }
-  }, [editingItemId, form, setType]);
+  }, [editingItemId, form, setType, setSelectedMedia, setSelectedCards]);
+
+  useEffect(() => {
+    if (isFormVisible && !editingItemId) {
+      form.setFieldsValue({ type });
+    }
+  }, [isFormVisible, editingItemId, type, form]);
 
   const handleTypeChange = (value) => {
     setType(value);
@@ -101,12 +102,13 @@ const SliderForm = ({
   };
 
   const handleSubmit = async (values) => {
+    const sliderType = values.type || type;
     const payload = {
       title_en: values.title_en,
       title_bn: values.title_bn,
       description_en: values.description_en,
       description_bn: values.description_bn,
-      type: values.type,
+      type: sliderType,
     };
 
     // if (values.tags) {
@@ -116,11 +118,11 @@ const SliderForm = ({
     //   };
     // }
 
-    if (values.type === "image") {
+    if (sliderType === "image") {
       payload.media_ids = selectedMedia?.map((media) => media.id);
       // Ensure card_ids are cleared
       payload.card_ids = [];
-    } else if (values.type === "card") {
+    } else if (sliderType === "card") {
       payload.card_ids = selectedCards;
       // Ensure media_ids are cleared
       payload.media_ids = [];
@@ -141,7 +143,11 @@ const SliderForm = ({
         const response = await instance.post("/sliders", payload);
         if (response.status === 201) {
           message.success("Slider created successfully.");
-          fetchSliders();
+          if (onSliderCreated) {
+            onSliderCreated(response.data);
+          } else if (fetchSliders) {
+            fetchSliders();
+          }
           form.resetFields();
           setSelectedMedia([]);
           setSelectedCards([]);
