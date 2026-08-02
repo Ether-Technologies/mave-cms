@@ -6,24 +6,33 @@ import React, {
   useContext,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
-import { clearAllApiCache } from "../../utils/apiUtils";
+import { refreshAllData } from "../../utils/refreshAllData";
 
 const MenuRefreshContext = createContext();
 
 export const MenuRefreshProvider = ({ children }) => {
   const [refreshMenu, setRefreshMenu] = useState(false);
   const [globalRefresh, setGlobalRefresh] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const triggerMenuRefresh = () => {
     setRefreshMenu((prev) => !prev);
   };
 
-  const triggerGlobalRefresh = () => {
-    clearAllApiCache();
-    setRefreshMenu((prev) => !prev);
-    setGlobalRefresh((prev) => prev + 1);
-  };
+  const triggerGlobalRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+
+    setIsRefreshing(true);
+    try {
+      await refreshAllData();
+      setRefreshMenu((prev) => !prev);
+      setGlobalRefresh((prev) => prev + 1);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing]);
 
   return (
     <MenuRefreshContext.Provider
@@ -32,6 +41,7 @@ export const MenuRefreshProvider = ({ children }) => {
         triggerMenuRefresh,
         globalRefresh,
         triggerGlobalRefresh,
+        isRefreshing,
       }}
     >
       {children}

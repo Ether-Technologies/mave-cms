@@ -35,11 +35,15 @@ export default function NavItems({
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchRef = useRef(null);
   const router = useRouter();
-  const { triggerGlobalRefresh } = useMenuRefresh();
+  const { triggerGlobalRefresh, isRefreshing } = useMenuRefresh();
 
-  const handleGlobalRefresh = () => {
-    triggerGlobalRefresh();
-    message.success("All data refreshed successfully");
+  const handleGlobalRefresh = async () => {
+    try {
+      await triggerGlobalRefresh();
+      message.success("All data refreshed successfully");
+    } catch {
+      message.error("Failed to refresh data");
+    }
   };
 
   useEffect(() => {
@@ -273,14 +277,18 @@ export default function NavItems({
             */}
 
             {/* Refresh All Data */}
-            <Tooltip title="Refresh All Data">
+            <Tooltip title={isRefreshing ? "Refreshing..." : "Refresh All Data"}>
               <div
-                className="w-10 h-10 flex items-center justify-center rounded-lg
+                className={`w-10 h-10 flex items-center justify-center rounded-lg
                 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50
-                cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md hover:rotate-180"
-                onClick={handleGlobalRefresh}
+                transition-all duration-300 transform shadow-sm hover:shadow-md
+                ${isRefreshing ? "cursor-wait opacity-70" : "cursor-pointer hover:scale-110 hover:rotate-180"}`}
+                onClick={isRefreshing ? undefined : handleGlobalRefresh}
               >
-                <ReloadOutlined className="text-gray-600 hover:text-indigo-500 text-lg transition-colors duration-300" />
+                <ReloadOutlined
+                  spin={isRefreshing}
+                  className="text-gray-600 hover:text-indigo-500 text-lg transition-colors duration-300"
+                />
               </div>
             </Tooltip>
 

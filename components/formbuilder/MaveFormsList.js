@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import instance from "../../axios";
 import MaveFormElements from "./MaveFormElements";
 import { FormBuilderContext } from "../../src/context/FormBuilderContext";
+import { useGlobalRefresh } from "../../src/context/MenuRefreshContext";
 
 const MaveFormsList = ({ onSelectForm, selectedFormId, onFormCountChange }) => {
   const [forms, setForms] = useState([]);
@@ -30,6 +31,8 @@ const MaveFormsList = ({ onSelectForm, selectedFormId, onFormCountChange }) => {
   useEffect(() => {
     fetchForms();
   }, []);
+
+  useGlobalRefresh(fetchForms);
 
   useEffect(() => {
     if (selectedFormId) {

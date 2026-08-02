@@ -1,8 +1,9 @@
 // context/ThemeContext.js
 
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useCallback } from "react";
 import instance from "../../axios";
 import { setThemeColors } from "../../utils/themeUtils";
+import { useGlobalRefresh } from "./MenuRefreshContext";
 
 export const ThemeContext = createContext();
 
@@ -12,25 +13,27 @@ export const ThemeProvider = ({ children }) => {
     themeaccent: "#2980b9", // Default theme accent
   });
 
-  useEffect(() => {
-    const fetchTheme = async () => {
-      try {
-        const response = await instance.get("/settings/general"); // Adjust the endpoint as needed
+  const fetchTheme = useCallback(async () => {
+    try {
+      const response = await instance.get("/settings/general");
 
-        if (response.data && response.data.config) {
-          const { themecolor, themeaccent } = response.data.config;
-          if (themecolor && themeaccent) {
-            setTheme({ themecolor, themeaccent });
-            setThemeColors(themecolor, themeaccent);
-          }
+      if (response.data && response.data.config) {
+        const { themecolor, themeaccent } = response.data.config;
+        if (themecolor && themeaccent) {
+          setTheme({ themecolor, themeaccent });
+          setThemeColors(themecolor, themeaccent);
         }
-      } catch (error) {
-        console.error("Failed to fetch theme settings:", error);
       }
-    };
-
-    fetchTheme();
+    } catch (error) {
+      console.error("Failed to fetch theme settings:", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchTheme();
+  }, [fetchTheme]);
+
+  useGlobalRefresh(fetchTheme);
 
   const updateTheme = (themecolor, themeaccent) => {
     setTheme({ themecolor, themeaccent });
