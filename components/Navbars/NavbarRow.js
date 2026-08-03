@@ -53,6 +53,20 @@ const NavbarRow = ({
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [selectedLogoMedia, setSelectedLogoMedia] = useState(null);
 
+  const findMenuById = (menuId, menusList = menus) =>
+    menusList.find((menu) => String(menu.id) === String(menuId));
+
+  const resolveMenuForUpdate = async (menuId) => {
+    let menu = findMenuById(menuId) || navbar.menu;
+    if (menu?.name) {
+      return menu;
+    }
+
+    const response = await instance("/menus");
+    const freshMenus = Array.isArray(response.data) ? response.data : [];
+    return freshMenus.find((item) => String(item.id) === String(menuId));
+  };
+
   useEffect(() => {
     if (editingNavbarId === navbar.id) {
       setEditedNavbarTitleEn(navbar.title_en);
@@ -86,7 +100,7 @@ const NavbarRow = ({
       setEditedMenuItemIds([]);
       return;
     }
-    const selectedMenu = menus.find((m) => m.id === editedMenuId);
+    const selectedMenu = findMenuById(editedMenuId);
     if (selectedMenu?.menu_items?.length) {
       setEditedMenuItemIds(selectedMenu.menu_items.map((item) => item.id));
     } else if (selectedMenu?.menu_item_ids) {
@@ -112,10 +126,13 @@ const NavbarRow = ({
       );
       if (response.status === 200) {
         if (editedMenuId) {
-          const selectedMenu =
-            menus.find((m) => m.id === editedMenuId) || navbar.menu;
+          const menu = await resolveMenuForUpdate(editedMenuId);
+          if (!menu?.name) {
+            message.error("Selected menu could not be found. Please re-select the menu.");
+            return;
+          }
           await instance.put(`/menus/${editedMenuId}`, {
-            name: selectedMenu?.name,
+            name: menu.name,
             menu_item_ids: editedMenuItemIds,
           });
         }

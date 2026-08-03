@@ -22,6 +22,28 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isAddMenuItemOpen, setIsAddMenuItemOpen] = useState(false);
+  const [selectedMenuName, setSelectedMenuName] = useState("");
+
+  const findMenuById = useCallback(
+    (menuId, menusList = menus) =>
+      menusList.find((menu) => String(menu.id) === String(menuId)),
+    [menus]
+  );
+
+  const resolveMenuForUpdate = useCallback(
+    async (menuId) => {
+      let menu = findMenuById(menuId);
+      if (menu?.name) {
+        return menu;
+      }
+
+      const response = await instance("/menus");
+      const freshMenus = Array.isArray(response.data) ? response.data : [];
+      menu = freshMenus.find((item) => String(item.id) === String(menuId));
+      return menu;
+    },
+    [findMenuById]
+  );
 
   const fetchMenuItems = useCallback(async () => {
     try {
@@ -55,7 +77,7 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
       setNewMenuItemIds([]);
       return;
     }
-    const selectedMenu = menus.find((m) => m.id === newMenuId);
+    const selectedMenu = findMenuById(newMenuId);
     if (selectedMenu?.menu_items?.length) {
       setNewMenuItemIds(selectedMenu.menu_items.map((item) => item.id));
     } else if (selectedMenu?.menu_item_ids) {
@@ -63,7 +85,10 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
     } else {
       setNewMenuItemIds([]);
     }
-  }, [newMenuId, menus]);
+    if (selectedMenu?.name) {
+      setSelectedMenuName(selectedMenu.name);
+    }
+  }, [newMenuId, menus, findMenuById]);
 
   const resetForm = () => {
     setNewNavbarTitleEn("");
@@ -71,6 +96,7 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
     setNewLogoId(null);
     setNewMenuId(null);
     setNewMenuItemIds([]);
+    setSelectedMenuName("");
     setSelectedMedia(null);
     setMediaModalVisible(false);
     setIsAddMenuOpen(false);
@@ -88,6 +114,13 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
       return;
     }
     try {
+      const menu = await resolveMenuForUpdate(newMenuId);
+      const menuName = menu?.name || selectedMenuName;
+      if (!menuName) {
+        message.error("Selected menu could not be found. Please re-select the menu.");
+        return;
+      }
+
       const newNavbar = {
         title_en: newNavbarTitleEn,
         title_bn: newNavbarTitleBn,
@@ -96,13 +129,10 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
       };
       const response = await instance.post("/navbars", newNavbar);
       if (response.status === 201) {
-        if (newMenuId) {
-          const selectedMenu = menus.find((m) => m.id === newMenuId);
-          await instance.put(`/menus/${newMenuId}`, {
-            name: selectedMenu?.name,
-            menu_item_ids: newMenuItemIds,
-          });
-        }
+        await instance.put(`/menus/${newMenuId}`, {
+          name: menuName,
+          menu_item_ids: newMenuItemIds,
+        });
         message.success("Navbar created successfully");
         fetchNavbars();
         fetchMenus?.();
@@ -134,7 +164,10 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
           />
         </Col>
         <Col xs={24} md={12}>
-          <Button onClick={() => setMediaModalVisible(true)}>
+          <Button
+            onClick={() => setMediaModalVisible(true)}
+            className="h-10 px-4 bg-gradient-to-r from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 text-gray-700 border-2 border-gray-200 hover:border-blue-300 font-semibold shadow-sm hover:shadow-md transition-all rounded-lg"
+          >
             {newLogoId ? "Change Logo" : "Select Logo"}
           </Button>
           {newLogoId && selectedMedia ? (
@@ -164,7 +197,7 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
             <Button
               icon={<PlusCircleOutlined />}
               onClick={() => setIsAddMenuOpen(true)}
-              className="h-8 text-xs"
+              className="h-9 px-4 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg text-xs"
             >
               Create Menu
             </Button>
@@ -173,7 +206,11 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
             showSearch
             placeholder="Select a Menu"
             optionFilterProp="children"
-            onChange={(value) => setNewMenuId(value)}
+            onChange={(value) => {
+              setNewMenuId(value ?? null);
+              const menu = findMenuById(value);
+              setSelectedMenuName(menu?.name || "");
+            }}
             className="w-full max-w-md [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
             allowClear
             value={newMenuId}
@@ -195,7 +232,7 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
               <Button
                 icon={<PlusCircleOutlined />}
                 onClick={() => setIsAddMenuItemOpen(true)}
-                className="h-8 text-xs"
+                className="h-9 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg text-xs"
               >
                 Create Item
               </Button>
@@ -213,14 +250,14 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
         <Button
           icon={<CloseCircleOutlined />}
           onClick={handleCancel}
-          className="bg-gray-500 border-2 border-gray-600 py-5 font-bold text-lg text-white"
+          className="h-11 px-6 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-xl"
         >
           Cancel
         </Button>
         <Button
           icon={<PlusCircleOutlined />}
           onClick={handleAddNavbar}
-          className="mavebutton"
+          className="h-11 px-6 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white border-0 font-semibold shadow-md hover:shadow-xl transition-all rounded-xl"
         >
           Create Navbar
         </Button>
