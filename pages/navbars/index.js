@@ -142,6 +142,7 @@ const Navbars = () => {
           fetchMenus();
           fetchMedia();
         }}
+        itemCount={initialNavbars.length}
       />
       <Modal
         open={isAddNavbarOpen}

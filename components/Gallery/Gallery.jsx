@@ -127,6 +127,7 @@ const Gallery = () => {
         setSortType={handleSortTypeChange}
         availableTags={uniqueTags}
         onRefresh={refreshMedia}
+        itemCount={totalMediaAssets}
       />
 
       {/* Media Grid or Loading Spinner */}

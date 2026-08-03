@@ -26,6 +26,7 @@ const GalleryHeader = ({
   setSortType,
   availableTags,
   onRefresh,
+  itemCount,
 }) => {
   const router = useRouter();
   const [tagValue, setTagValue] = React.useState(null);
@@ -67,8 +68,20 @@ const GalleryHeader = ({
               <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                 Gallery
               </h2>
-              {availableTags && availableTags.length > 0 && (
-                <div className="flex items-center gap-1.5 mt-2">
+              <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                {typeof itemCount === "number" && (
+                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-blue-50 to-blue-50 px-3 py-1.5 rounded-full border border-blue-200 hover:shadow-sm transition-all">
+                    <Badge
+                      count={itemCount}
+                      showZero
+                      className="[&_.ant-badge-count]:bg-brand [&_.ant-badge-count]:text-white [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:min-w-[20px] [&_.ant-badge-count]:h-5 [&_.ant-badge-count]:leading-5 [&_.ant-badge-count]:shadow-sm"
+                    />
+                    <span className="text-xs font-medium text-blue-700 ml-1">
+                      Media
+                    </span>
+                  </div>
+                )}
+                {availableTags && availableTags.length > 0 && (
                   <div className="flex items-center gap-1.5 bg-gradient-to-r from-blue-50 to-blue-50 px-3 py-1.5 rounded-full border border-blue-200 hover:shadow-sm transition-all">
                     <TagsOutlined className="text-brand-dark text-xs" />
                     <Badge
@@ -80,8 +93,8 @@ const GalleryHeader = ({
                       Tags
                     </span>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-3 mt-4 md:mt-0">

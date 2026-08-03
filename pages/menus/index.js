@@ -121,6 +121,7 @@ const Menus = () => {
           fetchMenus();
           fetchMenuItems();
         }}
+        itemCount={initialMenus.length}
       />
       <Modal
         open={isAddMenuOpen}

@@ -280,6 +280,7 @@ const MenuItems = () => {
           fetchMenuItems();
           fetchPages();
         }}
+        itemCount={allMenuItems.length}
       />
 
       {/* Add Menu Item Modal */}
