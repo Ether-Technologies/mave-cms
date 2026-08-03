@@ -16,7 +16,6 @@ import TopNavData from "../../src/data/topnavdata.json";
 import AuthorisedMenus from "../../src/data/authorisedsidemenus.json";
 import Link from "next/link";
 import Image from "next/image";
-import PageSearchDropdown from "./PageSearchDropdown";
 import { useMenuRefresh } from "../../src/context/MenuRefreshContext";
 
 export default function NavItems({
@@ -198,7 +197,7 @@ export default function NavItems({
 
           {/* User Actions */}
           <div className="flex items-center gap-4 flex-shrink-0">
-            {/* Search Bar + Pages dropdown - Desktop only on larger screens */}
+            {/* Search Bar - Desktop only on larger screens */}
             <div className="hidden xl:flex items-center gap-2 mr-2">
               <div className="relative" ref={searchRef}>
               <Input
@@ -261,7 +260,6 @@ export default function NavItems({
                 </div>
               )}
               </div>
-              <PageSearchDropdown />
             </div>
 
             {/* Notification Bell — hidden
