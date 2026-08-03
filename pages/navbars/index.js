@@ -147,6 +147,7 @@ const Navbars = () => {
       <Modal
         open={isAddNavbarOpen}
         onCancel={handleCancelAddNavbar}
+        destroyOnClose
         footer={null}
         title={
           <div className="flex items-center gap-2">
@@ -154,14 +155,16 @@ const Navbars = () => {
             <span>Add Navbar</span>
           </div>
         }
-        width={800}
+        width={900}
       >
-        <AddNavbarForm
-          menus={menus}
-          media={media}
-          onCancel={handleCancelAddNavbar}
-          fetchNavbars={fetchNavbars}
-        />
+        {isAddNavbarOpen && (
+          <AddNavbarForm
+            menus={menus}
+            media={media}
+            onCancel={handleCancelAddNavbar}
+            fetchNavbars={fetchNavbars}
+          />
+        )}
       </Modal>
       {loading ? (
         <div className="flex justify-center items-center h-64">

@@ -1,10 +1,11 @@
 // components/Navbars/AddNavbarForm.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Select, Button, message } from "antd";
 import { PlusCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import instance from "../../axios";
 import MediaSelectionModal from "../PageBuilder/Modals/MediaSelectionModal";
+import SortableMenuItemsPicker from "../Menus/SortableMenuItemsPicker";
 import Image from "next/image";
 
 const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
@@ -12,8 +13,54 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
   const [newNavbarTitleBn, setNewNavbarTitleBn] = useState("");
   const [newLogoId, setNewLogoId] = useState(null);
   const [newMenuId, setNewMenuId] = useState(null);
+  const [newMenuItemIds, setNewMenuItemIds] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        const response = await instance("/menuitems");
+        if (response.data) {
+          setMenuItems(response.data);
+        }
+      } catch (error) {
+        // silently fail — picker will show empty
+      }
+    };
+    fetchMenuItems();
+  }, []);
+
+  useEffect(() => {
+    if (!newMenuId) {
+      setNewMenuItemIds([]);
+      return;
+    }
+    const selectedMenu = menus.find((m) => m.id === newMenuId);
+    if (selectedMenu?.menu_items?.length) {
+      setNewMenuItemIds(selectedMenu.menu_items.map((item) => item.id));
+    } else if (selectedMenu?.menu_item_ids) {
+      setNewMenuItemIds(selectedMenu.menu_item_ids);
+    } else {
+      setNewMenuItemIds([]);
+    }
+  }, [newMenuId, menus]);
+
+  const resetForm = () => {
+    setNewNavbarTitleEn("");
+    setNewNavbarTitleBn("");
+    setNewLogoId(null);
+    setNewMenuId(null);
+    setNewMenuItemIds([]);
+    setSelectedMedia(null);
+    setMediaModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    resetForm();
+    onCancel();
+  };
 
   const handleAddNavbar = async () => {
     if (!newNavbarTitleEn || !newLogoId || !newMenuId) {
@@ -29,8 +76,14 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
       };
       const response = await instance.post("/navbars", newNavbar);
       if (response.status === 201) {
+        if (newMenuId && newMenuItemIds.length >= 0) {
+          await instance.put(`/menus/${newMenuId}`, {
+            menu_item_ids: newMenuItemIds,
+          });
+        }
         message.success("Navbar created successfully");
         fetchNavbars();
+        resetForm();
         onCancel();
       } else {
         message.error("Error creating navbar");
@@ -77,13 +130,19 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
             </div>
           ) : null}
         </Col>
-        <Col xs={24} md={12}>
+      </Row>
+
+      <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Assigned Menu
+          </label>
           <Select
             showSearch
             placeholder="Select a Menu"
             optionFilterProp="children"
             onChange={(value) => setNewMenuId(value)}
-            className="w-full"
+            className="w-full max-w-md [&_.ant-select-selector]:h-10 [&_.ant-select-selector]:border-2 [&_.ant-select-selector]:border-gray-200 [&_.ant-select-selector]:rounded-lg hover:[&_.ant-select-selector]:border-blue-300"
             allowClear
             value={newMenuId}
           >
@@ -93,12 +152,26 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
               </Select.Option>
             ))}
           </Select>
-        </Col>
-      </Row>
+        </div>
+
+        {newMenuId && (
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Menu Items — select and drag to order
+            </label>
+            <SortableMenuItemsPicker
+              menuItems={menuItems}
+              value={newMenuItemIds}
+              onChange={setNewMenuItemIds}
+            />
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-end mt-4 gap-4">
         <Button
           icon={<CloseCircleOutlined />}
-          onClick={onCancel}
+          onClick={handleCancel}
           className="bg-gray-500 border-2 border-gray-600 py-5 font-bold text-lg text-white"
         >
           Cancel
