@@ -160,6 +160,7 @@ const Navbars = () => {
         {isAddNavbarOpen && (
           <AddNavbarForm
             menus={menus}
+            fetchMenus={fetchMenus}
             media={media}
             onCancel={handleCancelAddNavbar}
             fetchNavbars={fetchNavbars}

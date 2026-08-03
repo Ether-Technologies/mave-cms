@@ -111,8 +111,11 @@ const NavbarRow = ({
         updatedNavbar
       );
       if (response.status === 200) {
-        if (editedMenuId && editedMenuItemIds.length >= 0) {
+        if (editedMenuId) {
+          const selectedMenu =
+            menus.find((m) => m.id === editedMenuId) || navbar.menu;
           await instance.put(`/menus/${editedMenuId}`, {
+            name: selectedMenu?.name,
             menu_item_ids: editedMenuItemIds,
           });
         }

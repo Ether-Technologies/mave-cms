@@ -1,36 +1,54 @@
 // components/Navbars/AddNavbarForm.js
 
-import React, { useState, useEffect } from "react";
-import { Row, Col, Input, Select, Button, message } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Row, Col, Input, Select, Button, message, Modal } from "antd";
 import { PlusCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import instance from "../../axios";
 import MediaSelectionModal from "../PageBuilder/Modals/MediaSelectionModal";
 import SortableMenuItemsPicker from "../Menus/SortableMenuItemsPicker";
+import AddMenuForm from "../Menus/AddMenuForm";
+import AddMenuItemForm from "../MenuItems/AddMenuItemForm";
 import Image from "next/image";
 
-const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
+const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => {
   const [newNavbarTitleEn, setNewNavbarTitleEn] = useState("");
   const [newNavbarTitleBn, setNewNavbarTitleBn] = useState("");
   const [newLogoId, setNewLogoId] = useState(null);
   const [newMenuId, setNewMenuId] = useState(null);
   const [newMenuItemIds, setNewMenuItemIds] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
+  const [pages, setPages] = useState([]);
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [isAddMenuItemOpen, setIsAddMenuItemOpen] = useState(false);
+
+  const fetchMenuItems = useCallback(async () => {
+    try {
+      const response = await instance("/menuitems");
+      if (response.data) {
+        setMenuItems(response.data);
+      }
+    } catch (error) {
+      // silently fail — picker will show empty
+    }
+  }, []);
+
+  const fetchPages = useCallback(async () => {
+    try {
+      const response = await instance("/pages");
+      if (response.data) {
+        setPages(response.data);
+      }
+    } catch (error) {
+      // silently fail
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const response = await instance("/menuitems");
-        if (response.data) {
-          setMenuItems(response.data);
-        }
-      } catch (error) {
-        // silently fail — picker will show empty
-      }
-    };
     fetchMenuItems();
-  }, []);
+    fetchPages();
+  }, [fetchMenuItems, fetchPages]);
 
   useEffect(() => {
     if (!newMenuId) {
@@ -55,6 +73,8 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
     setNewMenuItemIds([]);
     setSelectedMedia(null);
     setMediaModalVisible(false);
+    setIsAddMenuOpen(false);
+    setIsAddMenuItemOpen(false);
   };
 
   const handleCancel = () => {
@@ -76,13 +96,16 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
       };
       const response = await instance.post("/navbars", newNavbar);
       if (response.status === 201) {
-        if (newMenuId && newMenuItemIds.length >= 0) {
+        if (newMenuId) {
+          const selectedMenu = menus.find((m) => m.id === newMenuId);
           await instance.put(`/menus/${newMenuId}`, {
+            name: selectedMenu?.name,
             menu_item_ids: newMenuItemIds,
           });
         }
         message.success("Navbar created successfully");
         fetchNavbars();
+        fetchMenus?.();
         resetForm();
         onCancel();
       } else {
@@ -134,9 +157,18 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
 
       <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Assigned Menu
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-semibold text-gray-700">
+              Assigned Menu
+            </label>
+            <Button
+              icon={<PlusCircleOutlined />}
+              onClick={() => setIsAddMenuOpen(true)}
+              className="h-8 text-xs"
+            >
+              Create Menu
+            </Button>
+          </div>
           <Select
             showSearch
             placeholder="Select a Menu"
@@ -156,9 +188,18 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
 
         {newMenuId && (
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Menu Items — select and drag to order
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Menu Items — select and drag to order
+              </label>
+              <Button
+                icon={<PlusCircleOutlined />}
+                onClick={() => setIsAddMenuItemOpen(true)}
+                className="h-8 text-xs"
+              >
+                Create Item
+              </Button>
+            </div>
             <SortableMenuItemsPicker
               menuItems={menuItems}
               value={newMenuItemIds}
@@ -181,9 +222,10 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
           onClick={handleAddNavbar}
           className="mavebutton"
         >
-          Create
+          Create Navbar
         </Button>
       </div>
+
       <MediaSelectionModal
         isVisible={mediaModalVisible}
         onClose={() => setMediaModalVisible(false)}
@@ -196,6 +238,53 @@ const AddNavbarForm = ({ menus, media, onCancel, fetchNavbars }) => {
           setMediaModalVisible(false);
         }}
       />
+
+      <Modal
+        open={isAddMenuOpen}
+        onCancel={() => setIsAddMenuOpen(false)}
+        destroyOnClose
+        footer={null}
+        title={
+          <div className="flex items-center gap-2">
+            <img src="/icons/mave/menus.svg" alt="Menus" className="w-6" />
+            <span>Add Menu</span>
+          </div>
+        }
+        width={900}
+        zIndex={1100}
+      >
+        {isAddMenuOpen && (
+          <AddMenuForm
+            menuItems={menuItems}
+            onCancel={() => setIsAddMenuOpen(false)}
+            fetchMenus={fetchMenus}
+          />
+        )}
+      </Modal>
+
+      <Modal
+        open={isAddMenuItemOpen}
+        onCancel={() => setIsAddMenuItemOpen(false)}
+        destroyOnClose
+        footer={null}
+        title={
+          <div className="flex items-center gap-2">
+            <img src="/icons/mave/menuitems.svg" alt="Menu Items" className="w-6" />
+            <span>Add Menu Item</span>
+          </div>
+        }
+        width={900}
+        zIndex={1100}
+      >
+        {isAddMenuItemOpen && (
+          <AddMenuItemForm
+            pages={pages}
+            menuItems={menuItems}
+            onCancel={() => setIsAddMenuItemOpen(false)}
+            fetchMenuItems={fetchMenuItems}
+          />
+        )}
+      </Modal>
     </div>
   );
 };
