@@ -1,8 +1,10 @@
 // components/slider/SliderForm.jsx
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Drawer, Form, Modal, message } from "antd";
 import MediaSelectionModal from "../PageBuilder/Modals/MediaSelectionModal";
+import UploadMediaTabs from "../Gallery/UploadMediaTabs";
+import CreateCardForm from "../cards/CreateCardForm";
 import instance from "../../axios";
 import BasicInfoForm from "./SliderForm/BasicInfoForm";
 import SliderTypeTabs from "./SliderForm/SliderTypeTabs";
@@ -28,31 +30,85 @@ const SliderForm = ({
   onSliderCreated,
 }) => {
   const [isMediaModalVisible, setIsMediaModalVisible] = useState(false);
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+  const [isCreateCardVisible, setIsCreateCardVisible] = useState(false);
   const [cards, setCards] = useState([]);
+  const [pages, setPages] = useState([]);
+  const [media, setMedia] = useState([]);
+
+  const fetchCards = useCallback(async () => {
+    try {
+      const response = await instance.get("/cards");
+      if (response.data) {
+        setCards(response.data);
+      }
+    } catch (error) {
+      message.error("Failed to fetch cards.");
+    }
+  }, []);
+
+  const fetchCardFormData = useCallback(async () => {
+    try {
+      const [mediaResponse, pagesResponse] = await Promise.all([
+        instance.get("/media"),
+        instance.get("/pages"),
+      ]);
+      if (mediaResponse.data) {
+        setMedia(mediaResponse.data);
+      }
+      if (pagesResponse.data) {
+        setPages(pagesResponse.data);
+      }
+    } catch (error) {
+      message.error("Failed to fetch card form data.");
+    }
+  }, []);
+
+  const uniqueTags = useMemo(() => {
+    const tags = new Set();
+    cards.forEach((card) => {
+      card.additional?.tags?.forEach((tag) => tags.add(tag));
+    });
+    return [...tags];
+  }, [cards]);
 
   // Define selectionMode as a constant
   const selectionMode = "multiple";
 
   useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const response = await instance.get("/cards");
-        if (response.data) {
-          setCards(response.data);
-        }
-      } catch (error) {
-        message.error("Failed to fetch cards.");
-      }
-    };
     fetchCards();
-  }, []);
+    fetchCardFormData();
+  }, [fetchCards, fetchCardFormData]);
 
-  // Ensure that when the form is closed, the media modal is also closed
   useEffect(() => {
     if (!isFormVisible) {
       setIsMediaModalVisible(false);
+      setIsUploadModalVisible(false);
+      setIsCreateCardVisible(false);
     }
   }, [isFormVisible]);
+
+  const handleImageUploadSuccess = (newMedia) => {
+    const uploadedItems = (Array.isArray(newMedia) ? newMedia : [newMedia]).filter(
+      Boolean
+    );
+
+    if (uploadedItems.length > 0) {
+      setSelectedMedia((prev) => {
+        const existingIds = new Set(prev.map((item) => item.id));
+        const additions = uploadedItems.filter((item) => !existingIds.has(item.id));
+        return [...prev, ...additions];
+      });
+      message.success("Image uploaded successfully.");
+    }
+
+    setIsUploadModalVisible(false);
+  };
+
+  const handleCardCreateSuccess = async () => {
+    await fetchCards();
+    setIsCreateCardVisible(false);
+  };
 
   // Prepopulate form fields and selections when editing
   useEffect(() => {
@@ -208,6 +264,7 @@ const SliderForm = ({
               selectedMedia={selectedMedia}
               setSelectedMedia={setSelectedMedia}
               setIsMediaModalVisible={setIsMediaModalVisible}
+              onCreateImage={() => setIsUploadModalVisible(true)}
               imagePlaceholder={imagePlaceholder}
             />
           </Form.Item>
@@ -217,6 +274,7 @@ const SliderForm = ({
               selectedCards={selectedCards}
               setSelectedCards={setSelectedCards}
               cards={cards}
+              onCreateCard={() => setIsCreateCardVisible(true)}
             />
           </Form.Item>
         )}
@@ -237,6 +295,33 @@ const SliderForm = ({
         }}
         selectionMode={selectionMode}
       />
+
+      <Modal
+        title="Upload Image"
+        open={isUploadModalVisible}
+        onCancel={() => setIsUploadModalVisible(false)}
+        destroyOnClose
+        footer={null}
+        width={800}
+        zIndex={1100}
+      >
+        {isUploadModalVisible && (
+          <UploadMediaTabs
+            onUploadSuccess={handleImageUploadSuccess}
+            addMedia={() => {}}
+          />
+        )}
+      </Modal>
+
+      {isCreateCardVisible && (
+        <CreateCardForm
+          pages={pages}
+          media={media}
+          uniqueTags={uniqueTags}
+          onCancel={() => setIsCreateCardVisible(false)}
+          onSuccess={handleCardCreateSuccess}
+        />
+      )}
     </Drawer>
   );
 };

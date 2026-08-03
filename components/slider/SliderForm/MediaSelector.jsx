@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "antd";
-import { UploadOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { UploadOutlined, CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import SortableOrderGrid from "./SortableOrderGrid";
 
@@ -10,16 +10,28 @@ const MediaSelector = ({
   selectedMedia,
   setSelectedMedia,
   setIsMediaModalVisible,
+  onCreateImage,
   imagePlaceholder,
 }) => (
   <div>
-    <Button
-      icon={<UploadOutlined />}
-      onClick={() => setIsMediaModalVisible(true)}
-      className="mavebutton"
-    >
-      Select Media
-    </Button>
+    <div className="flex flex-wrap gap-3 mb-4">
+      <Button
+        icon={<UploadOutlined />}
+        onClick={() => setIsMediaModalVisible(true)}
+        className="h-10 px-4 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+      >
+        Select Media
+      </Button>
+      {onCreateImage && (
+        <Button
+          icon={<PlusCircleOutlined />}
+          onClick={onCreateImage}
+          className="h-10 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg"
+        >
+          Create Image
+        </Button>
+      )}
+    </div>
     <SortableOrderGrid
       items={selectedMedia}
       onReorder={setSelectedMedia}
