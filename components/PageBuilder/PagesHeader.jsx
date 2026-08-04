@@ -9,7 +9,7 @@ import {
   ReloadOutlined,
   SettingOutlined,
   FileTextOutlined,
-  // AppstoreOutlined,
+  AppstoreOutlined,
   LayoutOutlined,
 } from "@ant-design/icons";
 import {
@@ -73,11 +73,11 @@ const PagesHeader = ({
       label: "Pages Only",
       icon: <SettingOutlined />,
     },
-    // {
-    //   key: "subpages",
-    //   label: "Subpages Only",
-    //   icon: <SettingOutlined />,
-    // },
+    {
+      key: "subpages",
+      label: "Subpages Only",
+      icon: <SettingOutlined />,
+    },
     ...(showFootersSection && section === "all"
       ? [
           {
@@ -134,7 +134,6 @@ const PagesHeader = ({
                   </span>
                 </div>
                 )}
-                {/* Subpages count hidden — subpages tab disabled on Pages section
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-50 to-violet-50 px-3 py-1.5 rounded-full border border-purple-200 hover:shadow-sm transition-all">
                   <AppstoreOutlined className="text-purple-600 text-xs" />
                   <Badge
@@ -146,7 +145,6 @@ const PagesHeader = ({
                     Subpages
                   </span>
                 </div>
-                */}
                 {showFootersSection && (
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-1.5 rounded-full border border-teal-200 hover:shadow-sm transition-all">
                   <LayoutOutlined className="text-teal-600 text-xs" />

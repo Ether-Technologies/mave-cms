@@ -103,7 +103,7 @@ const index = () => {
         </div>
 
         {/* Additional Dashboard Components */}
-        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <UserStat userData={userData} />
           <SiteStat data={data} />
         </div>
@@ -114,7 +114,7 @@ const index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Storage data={data} />
           <AverageRequests />
-        </div> */}
+        </div>
       </div>
     </main>
   );

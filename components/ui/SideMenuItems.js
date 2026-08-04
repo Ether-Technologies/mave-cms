@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import AuthorizedSideMenuData from "../../src/data/authorisedsidemenus.json";
 import UnAuthorizedSideMenuData from "../../src/data/unauthorisedsidemenu.json";
 import NiloyLabs from "../../src/data/niloy.json";
-// import Godfather from "../../src/data/godfather.json"; // E-Labs sidebar
+import Godfather from "../../src/data/godfather.json";
 import Ecommerce from "../../src/data/ecommerce.json";
 import Image from "next/image";
 import instance from "../../axios";
@@ -35,19 +35,6 @@ const CONSTANTS = {
   SUCCESS_MESSAGES: {
     CUSTOM_MODELS_LOADED: "Custom models loaded successfully",
   },
-  // Sidebar entries hidden from Creator Studio (custom models from API)
-  HIDDEN_SIDEBAR_MODEL_NAMES: new Set([
-    "blog",
-    "blogs",
-    "customer",
-    "customers",
-    "product",
-    "products",
-    "employee",
-    "employees",
-    "author",
-    "authors",
-  ]),
 };
 
 // Error Boundary Component
@@ -95,18 +82,14 @@ const useMenuData = (token, user, isUuroTravels) => {
       setIsInitializing(true);
 
       if (token && user) {
-        // User Manual sidebar disabled (see authorisedsidemenus.json)
-        const baseMenu = AuthorizedSideMenuData.filter(
-          (item) => item.title !== "User Manual"
-        );
+        const baseMenu = [...AuthorizedSideMenuData];
         // Only set ecommerce data if client is uurotravels
         if (isUuroTravels) {
           baseMenu.push(...Ecommerce);
         }
 
         setSideMenuData(baseMenu);
-        // setGodfatherData(Godfather); // E-Labs sidebar disabled
-        setGodfatherData([]);
+        setGodfatherData(Godfather);
       } else {
         setSideMenuData(UnAuthorizedSideMenuData);
         setGodfatherData([]);
@@ -218,14 +201,7 @@ const SideMenuItems = ({
         );
 
         if (creatorStudioMenu) {
-          const customModelItems = customModels
-            .filter(
-              (model) =>
-                !CONSTANTS.HIDDEN_SIDEBAR_MODEL_NAMES.has(
-                  model.model_name?.toLowerCase()
-                )
-            )
-            .map((model) => ({
+          const customModelItems = customModels.map((model) => ({
             id: `${CONSTANTS.CUSTOM_MODEL_PREFIX}${model.id}`,
             icon: CONSTANTS.CUSTOM_MODEL_ICON,
             link: `/custom-models/${model.id}`,

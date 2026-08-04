@@ -57,6 +57,12 @@
             },
             {
                 "id": 13,
+                "icon": "/icons/mave/blogs.svg",
+                "link": "/blogs",
+                "title": "Blogs"
+            },
+            {
+                "id": 14,
                 "icon": "/icons/mave/footer.svg",
                 "link": "/footers",
                 "title": "Footers"

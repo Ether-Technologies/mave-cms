@@ -7,8 +7,9 @@ import {
   UserOutlined,
   DeploymentUnitOutlined,
   ReloadOutlined,
+  BellOutlined,
 } from "@ant-design/icons";
-import { Input, Layout, Dropdown, Button, Tooltip, message } from "antd";
+import { Input, Layout, Dropdown, Button, Tooltip, message, Badge } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Changelog from "../../pages/usermanual/changelog.json";
@@ -262,7 +263,6 @@ export default function NavItems({
               </div>
             </div>
 
-            {/* Notification Bell — hidden
             <Badge count={3} size="default" color="#A259FF80">
               <div
                 className="w-10 h-10 flex items-center justify-center rounded-lg
@@ -272,7 +272,6 @@ export default function NavItems({
                 <BellOutlined className="text-gray-600 hover:text-orange-500 text-lg transition-colors duration-300" />
               </div>
             </Badge>
-            */}
 
             {/* Refresh All Data */}
             <Tooltip title={isRefreshing ? "Refreshing..." : "Refresh All Data"}>

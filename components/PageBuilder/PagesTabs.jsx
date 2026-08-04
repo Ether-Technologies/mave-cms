@@ -8,7 +8,7 @@ const { TabPane } = Tabs;
 
 const PagesTabs = ({
   typePages,
-  // typeSubpages,
+  typeSubpages,
   handleExpand,
   expandedPageId,
   handleDeletePage,
@@ -18,7 +18,7 @@ const PagesTabs = ({
 }) => {
   const tabs = [
     { key: "1", tab: "Pages", data: typePages },
-    // { key: "2", tab: "Subpages", data: typeSubpages },
+    { key: "2", tab: "Subpages", data: typeSubpages },
     // Footers tab moved to /footers (sidebar)
   ];
 
