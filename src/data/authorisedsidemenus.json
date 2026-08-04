@@ -40,6 +40,12 @@
                 "icon": "/icons/mave/slider.svg",
                 "link": "/sliders",
                 "title": "Sliders"
+            },
+            {
+                "id": 14,
+                "icon": "/icons/mave/footer.svg",
+                "link": "/footers",
+                "title": "Footers"
             }
         ]
     },
@@ -60,12 +66,6 @@
                 "icon": "/icons/mave/blogs.svg",
                 "link": "/blogs",
                 "title": "Blogs"
-            },
-            {
-                "id": 14,
-                "icon": "/icons/mave/footer.svg",
-                "link": "/footers",
-                "title": "Footers"
             }
         ]
     },

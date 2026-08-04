@@ -63,15 +63,6 @@ export const componentOptions = [
     tags: ["slider", "carousel", "media"],
   },
   {
-    type: "card",
-    name: "Card",
-    icon: "/icons/mave/cards.svg",
-    premium: false,
-    category: "Layout",
-    description: "Add card component",
-    tags: ["card", "layout", "container"],
-  },
-  {
     type: "footer",
     name: "Footer",
     icon: "/icons/mave/footer.svg",
@@ -79,6 +70,15 @@ export const componentOptions = [
     category: "Layout",
     description: "Add footer section",
     tags: ["footer", "layout", "bottom"],
+  },
+  {
+    type: "card",
+    name: "Card",
+    icon: "/icons/mave/cards.svg",
+    premium: false,
+    category: "Layout",
+    description: "Add card component",
+    tags: ["card", "layout", "container"],
   },
   {
     type: "video",
