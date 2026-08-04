@@ -10,7 +10,7 @@ import AddMenuForm from "../Menus/AddMenuForm";
 import AddMenuItemForm from "../MenuItems/AddMenuItemForm";
 import Image from "next/image";
 
-const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => {
+const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars, onNavbarCreated }) => {
   const [newNavbarTitleEn, setNewNavbarTitleEn] = useState("");
   const [newNavbarTitleBn, setNewNavbarTitleBn] = useState("");
   const [newLogoId, setNewLogoId] = useState(null);
@@ -134,8 +134,9 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars }) => 
           menu_item_ids: newMenuItemIds,
         });
         message.success("Navbar created successfully");
-        fetchNavbars();
+        fetchNavbars?.();
         fetchMenus?.();
+        onNavbarCreated?.(response.data);
         resetForm();
         onCancel();
       } else {

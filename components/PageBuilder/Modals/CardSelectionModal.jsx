@@ -22,7 +22,10 @@ import {
   SortDescendingOutlined,
   SearchOutlined,
   ArrowLeftOutlined,
+  PlusOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
+import CreateCardForm from "../../cards/CreateCardForm";
 
 const { Text } = Typography;
 
@@ -44,6 +47,10 @@ const CardSelectionModal = ({
     showImage: true,
     layout: "horizontal",
   });
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [pages, setPages] = useState([]);
+  const [media, setMedia] = useState([]);
+  const [uniqueTags, setUniqueTags] = useState([]);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,10 +59,12 @@ const CardSelectionModal = ({
   useEffect(() => {
     if (isVisible) {
       fetchCards();
+      fetchCardFormData();
       setSelectedCard(null);
       setSearchQuery("");
       setCurrentPage(1);
       setShowConfig(false);
+      setIsFormVisible(false);
     }
   }, [isVisible]);
 
@@ -68,10 +77,58 @@ const CardSelectionModal = ({
     try {
       const response = await instance.get("/cards");
       setCardList(response.data);
+      return response.data;
     } catch (error) {
       message.error("Failed to fetch cards");
+      return [];
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const fetchCardFormData = async () => {
+    try {
+      const [mediaResponse, pagesResponse, cardsResponse] = await Promise.all([
+        instance.get("/media"),
+        instance.get("/pages"),
+        instance.get("/cards"),
+      ]);
+      if (mediaResponse.data) {
+        setMedia(mediaResponse.data);
+      }
+      if (pagesResponse.data) {
+        setPages(pagesResponse.data);
+      }
+      if (cardsResponse.data) {
+        const tags = new Set();
+        cardsResponse.data.forEach((card) => {
+          card.additional?.tags?.forEach((tag) => tags.add(tag));
+        });
+        setUniqueTags([...tags]);
+      }
+    } catch (error) {
+      message.error("Failed to fetch card form data");
+    }
+  };
+
+  const handleCardCreated = async (createdCard) => {
+    setIsFormVisible(false);
+    const cards = await fetchCards();
+    const fullCard =
+      cards.find((card) => card.id === createdCard.id) || createdCard;
+    setSelectedCard(fullCard);
+    setCardConfig({
+      showDescription: true,
+      showImage: true,
+      layout: "horizontal",
+    });
+    setShowConfig(true);
+    message.success("Card created. Configure display settings and save.");
+  };
+
+  const handleReload = async () => {
+    await fetchCards();
+    message.success("Cards refreshed");
   };
 
   const filterAndSortCards = () => {
@@ -209,15 +266,33 @@ const CardSelectionModal = ({
                   className={sortOrder === "desc" ? "mavebutton" : ""}
                 />
               </Tooltip>
+              <Tooltip title="Reload cards">
+                <Button
+                  icon={<ReloadOutlined spin={loading} />}
+                  onClick={handleReload}
+                  disabled={loading}
+                  className="mavebutton"
+                />
+              </Tooltip>
             </div>
-            <Input
-              placeholder="Search cards..."
-              prefix={<SearchOutlined />}
-              value={searchQuery}
-              onChange={handleSearchChange}
-              allowClear
-              className="w-full md:w-64"
-            />
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <Input
+                placeholder="Search cards..."
+                prefix={<SearchOutlined />}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                allowClear
+                className="w-full md:w-64"
+              />
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => setIsFormVisible(true)}
+                className="mavebutton whitespace-nowrap"
+              >
+                Create Card
+              </Button>
+            </div>
           </div>
 
           <List
@@ -252,7 +327,23 @@ const CardSelectionModal = ({
                 </div>
               </List.Item>
             )}
-            locale={{ emptyText: "No cards found" }}
+            locale={{
+              emptyText: (
+                <div className="text-center py-8">
+                  <Text type="secondary">No cards found.</Text>
+                  <div className="mt-4">
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() => setIsFormVisible(true)}
+                      className="mavebutton"
+                    >
+                      Create New Card
+                    </Button>
+                  </div>
+                </div>
+              ),
+            }}
           />
 
           <div className="flex justify-end mt-4">
@@ -358,6 +449,16 @@ const CardSelectionModal = ({
             </div>
           </div>
         </div>
+      )}
+
+      {isFormVisible && (
+        <CreateCardForm
+          onSuccess={handleCardCreated}
+          onCancel={() => setIsFormVisible(false)}
+          pages={pages}
+          media={media}
+          uniqueTags={uniqueTags}
+        />
       )}
     </Drawer>
   );

@@ -123,12 +123,12 @@ const CreateCardForm = ({ onSuccess, onCancel, pages, media, uniqueTags }) => {
         additional,
       };
 
-      await instance.post("/cards", payload);
+      const response = await instance.post("/cards", payload);
       message.success("Card created successfully.");
       form.resetFields();
       setSelectedMedia(null);
       setLinkType("independent");
-      onSuccess();
+      onSuccess(response.data);
     } catch (error) {
       console.error("Create Card Error:", error);
       message.error("Failed to create card.");

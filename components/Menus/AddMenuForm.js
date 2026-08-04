@@ -6,7 +6,7 @@ import { PlusCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import instance from "../../axios";
 import SortableMenuItemsPicker from "./SortableMenuItemsPicker";
 
-const AddMenuForm = ({ menuItems, onCancel, fetchMenus }) => {
+const AddMenuForm = ({ menuItems, onCancel, fetchMenus, onMenuCreated }) => {
   const [newMenuName, setNewMenuName] = useState("");
   const [newMenuItemsIds, setNewMenuItemsIds] = useState([]);
 
@@ -23,7 +23,8 @@ const AddMenuForm = ({ menuItems, onCancel, fetchMenus }) => {
       const response = await instance.post("/menus", newMenu);
       if (response.status === 201) {
         message.success("Menu created successfully");
-        fetchMenus();
+        fetchMenus?.();
+        onMenuCreated?.(response.data);
         onCancel();
       } else {
         message.error("Error creating menu");
