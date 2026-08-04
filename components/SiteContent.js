@@ -14,7 +14,7 @@ const SiteContent = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState("light");
   const [isMobile, setIsMobile] = useState(false);
-  const { user, token, logout, loading } = useAuth();
+  const { user, token, organization, logout, loading } = useAuth();
   const router = useRouter();
   const currentRoute = router.pathname;
   const { refreshMenu } = useMenuRefresh();
@@ -136,6 +136,7 @@ const SiteContent = ({ children }) => {
         <NavItems
           user={user}
           token={token}
+          organization={organization}
           handleLogout={logout}
           theme={theme}
           setTheme={setTheme}

@@ -10,6 +10,7 @@ const AuthContext = createContext();
 const initialState = {
   user: null,
   token: null,
+  organization: null,
   loading: true,
 };
 
@@ -20,6 +21,7 @@ function authReducer(state, action) {
         ...state,
         user: action.payload.user,
         token: action.payload.token,
+        organization: action.payload.organization,
         loading: false,
       };
     case "LOGIN_SUCCESS":
@@ -27,6 +29,7 @@ function authReducer(state, action) {
         ...state,
         user: action.payload.user,
         token: action.payload.token,
+        organization: action.payload.organization,
         loading: false,
       };
     case "LOGOUT":
@@ -34,6 +37,7 @@ function authReducer(state, action) {
         ...state,
         user: null,
         token: null,
+        organization: null,
         loading: false,
       };
     case "SET_LOADING":
@@ -62,15 +66,20 @@ export const AuthProvider = ({ children }) => {
     try {
       const storedToken = localStorage.getItem("token");
       const storedUser = localStorage.getItem("user");
+      const storedOrganization = localStorage.getItem("organization");
 
       if (storedToken && storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
+          const parsedOrganization = storedOrganization
+            ? JSON.parse(storedOrganization)
+            : parsedUser.organization || null;
           dispatch({
             type: "INITIALIZE",
             payload: {
               token: storedToken,
               user: parsedUser,
+              organization: parsedOrganization,
             },
           });
         } catch (parseError) {
@@ -78,6 +87,7 @@ export const AuthProvider = ({ children }) => {
           // Clear invalid data
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          localStorage.removeItem("organization");
           dispatch({ type: "SET_LOADING", payload: false });
         }
       } else {
@@ -107,16 +117,19 @@ export const AuthProvider = ({ children }) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
       const response = await instance.post("admin/login", { email, password });
-      const { token, user } = response.data;
+      const { token, user, organization } = response.data;
 
       // Store token and user in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+      if (organization) {
+        localStorage.setItem("organization", JSON.stringify(organization));
+      }
 
       // Dispatch login success
       dispatch({
         type: "LOGIN_SUCCESS",
-        payload: { token, user },
+        payload: { token, user, organization },
       });
 
       message.success("Login successful!");
@@ -124,7 +137,13 @@ export const AuthProvider = ({ children }) => {
       // Redirect after state updates
       router.push(callback || "/");
     } catch (error) {
-      message.error("Invalid credentials. Please try again.");
+      const isNetworkError = !error?.response;
+      const apiMessage = isNetworkError
+        ? "Network error: cannot reach the API. Make sure the backend is running at http://127.0.0.1:8000"
+        : error?.response?.data?.message ||
+          error?.message ||
+          "Login failed. Please try again.";
+      message.error(apiMessage);
       dispatch({ type: "SET_LOADING", payload: false });
     }
   };
@@ -133,6 +152,7 @@ export const AuthProvider = ({ children }) => {
     // Remove token and user from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("organization");
 
     // Dispatch logout
     dispatch({ type: "LOGOUT" });
@@ -146,6 +166,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user: state.user,
         token: state.token,
+        organization: state.organization,
         loading: state.loading,
         login,
         logout,

@@ -55,6 +55,11 @@ export default function WelcomeCard({ userData }) {
                     <p className="text-gray-600 text-sm sm:text-base">
                         Last login: <span className="font-medium text-gray-700">{getLastLogin()}</span>
                     </p>
+                    {userData?.organization?.name && (
+                        <p className="text-indigo-600 text-sm sm:text-base mt-1 font-semibold">
+                            Organization: {userData.organization.name}
+                        </p>
+                    )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">

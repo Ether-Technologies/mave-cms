@@ -1,6 +1,6 @@
 // pages/login.js
 
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, message, Collapse } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -35,6 +35,22 @@ export default function Login() {
 
   const handleDemoLogin = () => {
     login("demouser@mave.com", "Demo@Mave2025", callback);
+  };
+
+  const demoOrganizations = [
+    { name: "Default Organization", email: "admin1@mave.local", password: "password" },
+    { name: "Acme Corporation", email: "admin@acme.demo", password: "password" },
+    { name: "Beta Industries", email: "admin@beta.demo", password: "password" },
+    { name: "Gamma Solutions", email: "admin@gamma.demo", password: "password" },
+    { name: "Delta Media Group", email: "admin@delta.demo", password: "password" },
+    { name: "Echo Travel Agency", email: "admin@echo.demo", password: "password" },
+  ];
+
+  const [form] = Form.useForm();
+
+  const fillDemoLogin = (email, password) => {
+    form.setFieldsValue({ email, password });
+    login(email, password, callback);
   };
 
   if (loading) return <Loader />;
@@ -179,6 +195,7 @@ export default function Login() {
               </motion.div>
             ) : (
               <Form
+                form={form}
                 name="login"
                 initialValues={{
                   remember: true,
@@ -248,6 +265,38 @@ export default function Login() {
                 </Form.Item>
               </Form>
             )}
+          </motion.div>
+
+          {/* Demo organizations */}
+          <motion.div variants={itemVariants} className="mt-4">
+            <Collapse
+              ghost
+              items={[
+                {
+                  key: "demo-orgs",
+                  label: (
+                    <span className="text-sm font-semibold text-brand">
+                      Try a demo organization (6 workspaces)
+                    </span>
+                  ),
+                  children: (
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {demoOrganizations.map((org) => (
+                        <button
+                          key={org.email}
+                          type="button"
+                          onClick={() => fillDemoLogin(org.email, org.password)}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 hover:border-brand hover:bg-brand/5 transition-colors"
+                        >
+                          <p className="text-sm font-semibold text-gray-800">{org.name}</p>
+                          <p className="text-xs text-gray-500">{org.email}</p>
+                        </button>
+                      ))}
+                    </div>
+                  ),
+                },
+              ]}
+            />
           </motion.div>
 
           {/* Additional Info */}

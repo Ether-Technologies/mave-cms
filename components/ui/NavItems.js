@@ -22,6 +22,7 @@ import { useMenuRefresh } from "../../src/context/MenuRefreshContext";
 export default function NavItems({
   user,
   token,
+  organization,
   handleLogout,
   theme,
   setTheme,
@@ -168,6 +169,15 @@ export default function NavItems({
             ? `v${changeLogs[0].version}`
             : "v1.0"}
         </div>
+        {organization?.name && (
+          <div
+            className="hidden md:block px-3 py-1 rounded-xl text-xs font-semibold text-white
+              bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md max-w-[180px] truncate"
+            title={organization.name}
+          >
+            {organization.name}
+          </div>
+        )}
       </div>
 
       {user && token ? (

@@ -65,9 +65,17 @@ const index = () => {
 
   useEffect(() => {
     fetchData();
-    localStorage.getItem("user")
-      ? setUserData(JSON.parse(localStorage.getItem("user")))
-      : setUserData(null);
+    const storedUser = localStorage.getItem("user");
+    const storedOrganization = localStorage.getItem("organization");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      const parsedOrganization = storedOrganization
+        ? JSON.parse(storedOrganization)
+        : parsedUser.organization || null;
+      setUserData({ ...parsedUser, organization: parsedOrganization });
+    } else {
+      setUserData(null);
+    }
   }, []);
 
   useGlobalRefresh(() => fetchData(true));

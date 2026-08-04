@@ -338,13 +338,22 @@ export default function Signup() {
                     />
                   </motion.div>
                 </Form.Item>
-                <Form.Item name="company" className="mb-0">
+                <Form.Item
+                  name="company"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Company name required",
+                    },
+                  ]}
+                  className="mb-0"
+                >
                   <motion.div whileFocus={{ scale: 1.01 }}>
                     <Input
                       prefix={
                         <InsertRowLeftOutlined className="text-lg text-gray-400 mr-2" />
                       }
-                      placeholder="Company (optional)"
+                      placeholder="Company / Organization name"
                       className="h-12 rounded-xl border-2 border-gray-200 hover:border-blue-300 focus:border-brand transition-all bg-white/70"
                     />
                   </motion.div>

@@ -9,7 +9,7 @@ const MAX_RETRIES = 3;
 const requestTimestamps = new Map();
 
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000/api",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
@@ -22,10 +22,22 @@ instance.interceptors.request.use(
   (config) => {
     // Get token from localStorage
     const token = localStorage.getItem("token");
+    const organization = localStorage.getItem("organization");
 
     // If token exists, add it to the headers
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (organization) {
+      try {
+        const parsedOrganization = JSON.parse(organization);
+        if (parsedOrganization?.id) {
+          config.headers["X-Organization-Id"] = parsedOrganization.id;
+        }
+      } catch (error) {
+        console.error("Error parsing stored organization:", error);
+      }
     }
 
     // Handle custom base URL if needed
@@ -72,6 +84,7 @@ instance.interceptors.response.use(
       // Clear localStorage on unauthorized
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("organization");
 
       // Only redirect if we're not already on the login page
       if (
@@ -107,6 +120,7 @@ instance.interceptors.response.use(
 instance.logout = (redirectUrl = "/login") => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("organization");
   if (typeof window !== "undefined") {
     window.location.href = redirectUrl;
   }
