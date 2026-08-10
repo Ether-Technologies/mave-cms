@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Select, Modal, message, Progress } from "antd";
 import instance from "../../../axios";
+import { usePermissions } from "../../../src/hooks/usePermissions";
 
 const { Option } = Select;
 
@@ -13,23 +14,32 @@ const UserForm = ({
   currentUser,
 }) => {
   const [form] = Form.useForm();
-
+  const { hasPermission, isSuperAdmin } = usePermissions();
   const [loading, setLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0); // 0 to 100 scale for strength
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
-  // Check if current user has permission to create users
-  const canCreateUser = currentUser?.role_id === "1";
-
-  console.log("UserForm - Current User:", currentUser); // Debug log
-  console.log("UserForm - Can Create User:", canCreateUser); // Debug log
+  const canCreateUser =
+    isSuperAdmin || hasPermission("create_users") || hasPermission("admin_all");
 
   useEffect(() => {
-    // Only show error if modal is visible and user doesn't have permission
     if (visible && !canCreateUser) {
       message.error("You don't have permission to create users");
       onCancel();
     }
   }, [visible, canCreateUser, onCancel]);
+
+  useEffect(() => {
+    if (visible && roles?.length) {
+      const defaultRole =
+        roles.find((role) => role.title === "Editor") ||
+        roles.find((role) => role.title === "Viewer") ||
+        roles[0];
+
+      if (defaultRole) {
+        form.setFieldsValue({ role_id: defaultRole.id });
+      }
+    }
+  }, [visible, roles, form]);
 
   const handleCreateUser = async () => {
     if (!canCreateUser) {
@@ -40,12 +50,6 @@ const UserForm = ({
     try {
       const values = await form.validateFields();
       setLoading(true);
-
-      // Additional validation for admin permissions
-      if (values.role_id === 1 || values.role_id === "1") {
-        message.error("You don't have permission to create admin users");
-        return;
-      }
 
       const response = await instance.post("/admin/user", values);
       if (response.status === 201) {
@@ -67,7 +71,6 @@ const UserForm = ({
     }
   };
 
-  // Generate strong random password and fill both password and confirm password fields
   const passwordGenerator = () => {
     const randomPassword = Math.random().toString(36).slice(-8);
     form.setFieldsValue({
@@ -77,7 +80,6 @@ const UserForm = ({
     checkPasswordStrength(randomPassword);
   };
 
-  // Check password strength and set it to state
   const checkPasswordStrength = (password) => {
     if (!password) {
       setPasswordStrength(0);
@@ -93,9 +95,6 @@ const UserForm = ({
     setPasswordStrength(strength);
   };
 
-  console.log("Roles UserForm", roles);
-
-  // Only render if user has permission and modal is visible
   if (!visible || !canCreateUser) {
     return null;
   }
@@ -176,13 +175,12 @@ const UserForm = ({
         >
           Generate Password
         </Button>
-        {/* Display password strength as a progress bar */}
         <Progress
           percent={passwordStrength}
           showInfo={false}
           strokeColor={{
-            "0%": "#ff4d4f", // red for weak
-            "100%": "#52c41a", // green for strong
+            "0%": "#ff4d4f",
+            "100%": "#52c41a",
           }}
           style={{ marginTop: "8px" }}
         />
@@ -207,10 +205,13 @@ const UserForm = ({
           name="role_id"
           label="Role"
           rules={[{ required: true, message: "Please select the role!" }]}
-          initialValue="2"
         >
-          <Select disabled>
-            <Option value="2">User</Option>
+          <Select placeholder="Select a role">
+            {roles?.map((role) => (
+              <Option key={role.id} value={role.id}>
+                {role.title}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
       </Form>

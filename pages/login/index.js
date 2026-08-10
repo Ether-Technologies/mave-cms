@@ -38,6 +38,7 @@ export default function Login() {
   };
 
   const demoOrganizations = [
+    { name: "Platform Super Admin", email: "superadmin@mave.local", password: "password", highlight: true },
     { name: "Default Organization", email: "admin1@mave.local", password: "password" },
     { name: "Acme Corporation", email: "admin@acme.demo", password: "password" },
     { name: "Beta Industries", email: "admin@beta.demo", password: "password" },
@@ -286,9 +287,20 @@ export default function Login() {
                           key={org.email}
                           type="button"
                           onClick={() => fillDemoLogin(org.email, org.password)}
-                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 hover:border-brand hover:bg-brand/5 transition-colors"
+                          className={`w-full text-left px-3 py-2 rounded-lg border transition-colors ${
+                            org.highlight
+                              ? "border-brand bg-brand/10 hover:bg-brand/15"
+                              : "border-gray-200 hover:border-brand hover:bg-brand/5"
+                          }`}
                         >
-                          <p className="text-sm font-semibold text-gray-800">{org.name}</p>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {org.name}
+                            {org.highlight && (
+                              <span className="ml-2 text-xs font-normal text-brand">
+                                Full platform access
+                              </span>
+                            )}
+                          </p>
                           <p className="text-xs text-gray-500">{org.email}</p>
                         </button>
                       ))}

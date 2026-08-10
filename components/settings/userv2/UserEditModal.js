@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Button, Upload, Select, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import instance from "../../../axios";
+import { usePermissions } from "../../../src/hooks/usePermissions";
 
 const { Option } = Select;
 
@@ -14,16 +15,14 @@ const UserEditModal = ({
   currentUser,
 }) => {
   const [form] = Form.useForm();
+  const { hasPermission, isSuperAdmin } = usePermissions();
   const [avatar, setAvatar] = useState(user?.profile_picture);
   const [loading, setLoading] = useState(false);
 
-  // Check permissions
-  const isAdmin = currentUser?.role_id === "1";
+  const canManageUsers =
+    isSuperAdmin || hasPermission("edit_users") || hasPermission("admin_all");
   const isEditingSelf = currentUser?.id === user?.id;
-  const isEditingAdmin = user?.role_id === "1";
-
-  // Determine if the current user can edit this user
-  const canEdit = isAdmin || isEditingSelf; // Admin can edit anyone, users can edit themselves
+  const canEdit = canManageUsers || isEditingSelf;
 
   useEffect(() => {
     if (!canEdit) {
@@ -37,7 +36,7 @@ const UserEditModal = ({
         name: user.name,
         email: user.email,
         phone: user.phone,
-        role_id: user.role_id ? parseInt(user.role_id) : undefined,
+        role_id: user.role_id ? parseInt(user.role_id, 10) : undefined,
       });
       setAvatar(user.profile_picture);
     }
@@ -56,19 +55,9 @@ const UserEditModal = ({
     try {
       setLoading(true);
 
-      // Only check role change permissions if the role is being changed
-      if (values.role_id !== user.role_id) {
-        // Prevent changing role to admin
-        if (values.role_id === 1 || values.role_id === "1") {
-          message.error("You don't have permission to create admin users");
-          return;
-        }
-
-        // Prevent admin from changing their own role
-        if (isEditingSelf) {
-          message.error("You cannot change your own role");
-          return;
-        }
+      if (values.role_id !== user.role_id && isEditingSelf) {
+        message.error("You cannot change your own role");
+        return;
       }
 
       await instance.put(`/admin/user/${user.id}`, {
@@ -85,7 +74,6 @@ const UserEditModal = ({
     }
   };
 
-  // If user doesn't have permission, don't render the form
   if (!canEdit) {
     return null;
   }
@@ -137,11 +125,14 @@ const UserEditModal = ({
         </Form.Item>
         <Form.Item name="role_id" label="Role">
           <Select
-            disabled={isEditingSelf || isEditingAdmin}
-            allowClear={!isEditingSelf}
+            disabled={isEditingSelf || !canManageUsers}
+            placeholder="Select a role"
           >
-            <Option value="2">User</Option>
-            {isEditingAdmin && <Option value="1">Admin</Option>}
+            {roles?.map((role) => (
+              <Option key={role.id} value={role.id}>
+                {role.title}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
         <Form.Item label="Avatar">

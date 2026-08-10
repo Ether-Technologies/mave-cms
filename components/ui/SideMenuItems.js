@@ -12,6 +12,7 @@ import Ecommerce from "../../src/data/ecommerce.json";
 import Image from "next/image";
 import instance from "../../axios";
 import { useMenuRefresh } from "../../src/context/MenuRefreshContext";
+import { filterMenuByPermissions } from "../../utils/permissions";
 
 const { SubMenu, Item } = Menu;
 
@@ -218,7 +219,7 @@ const SideMenuItems = ({
         }
       }
 
-      return menuData;
+      return filterMenuByPermissions(menuData, user);
     } catch (error) {
       console.error("Error processing menu data:", error);
       return allMenuData;

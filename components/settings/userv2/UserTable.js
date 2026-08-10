@@ -17,6 +17,7 @@ import UserEditModal from "./UserEditModal";
 import UserViewModal from "./UserViewModal";
 import FilterDrawer from "./FilterDrawer";
 import instance from "../../../axios";
+import { usePermissions } from "../../../src/hooks/usePermissions";
 
 const { Option } = Select;
 
@@ -34,7 +35,19 @@ const UserTable = ({ users, fetchUsers, roles, currentUser }) => {
   }, [users]);
 
   // Check permissions
-  const isAdmin = currentUser?.role_id === "1";
+  const { hasPermission, isSuperAdmin } = usePermissions();
+  const isAdmin =
+    isSuperAdmin || hasPermission("edit_users") || hasPermission("admin_all");
+
+  const getRoleTitle = (roleId) => {
+    const role = roles?.find((item) => String(item.id) === String(roleId));
+    return role?.title || "N/A";
+  };
+
+  const isPrivilegedRole = (roleId) => {
+    const role = roles?.find((item) => String(item.id) === String(roleId));
+    return ["Super Admin", "Admin"].includes(role?.title);
+  };
 
   // Handle selection of all rows (not header)
   const handleSelectAll = () => {
@@ -79,8 +92,8 @@ const UserTable = ({ users, fetchUsers, roles, currentUser }) => {
   const handleDeleteUser = async (id) => {
     const targetUser = users.find((u) => u.id === id);
 
-    // Prevent deleting admin users
-    if (targetUser?.role_id === "1") {
+    // Prevent deleting privileged admin users
+    if (isPrivilegedRole(targetUser?.role_id)) {
       message.error("You cannot delete admin users");
       return;
     }
@@ -105,7 +118,7 @@ const UserTable = ({ users, fetchUsers, roles, currentUser }) => {
     // Prevent deleting if any selected user is an admin
     const hasAdmin = selectedRowKeys.some((id) => {
       const user = users.find((u) => u.id === id);
-      return user?.role_id === "1";
+      return isPrivilegedRole(user?.role_id);
     });
 
     if (hasAdmin) {
@@ -165,23 +178,14 @@ const UserTable = ({ users, fetchUsers, roles, currentUser }) => {
       title: "Role",
       dataIndex: "role_id",
       key: "role",
-      render: (role_id) => {
-        switch (role_id) {
-          case "1":
-            return "Admin";
-          case "2":
-            return "User";
-          default:
-            return "N/A";
-        }
-      },
+      render: (role_id) => getRoleTitle(role_id),
     },
     {
       title: "Actions",
       key: "actions",
       render: (_, record) => {
         const isSelf = record.id === currentUser?.id;
-        const isTargetAdmin = record.role_id === "1";
+        const isTargetAdmin = isPrivilegedRole(record.role_id);
         const canEdit = isAdmin && (!isTargetAdmin || isSelf);
         const canDelete = isAdmin && !isTargetAdmin && !isSelf;
 

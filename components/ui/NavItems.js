@@ -171,11 +171,24 @@ export default function NavItems({
         </div>
         {organization?.name && (
           <div
-            className="hidden md:block px-3 py-1 rounded-xl text-xs font-semibold text-white
-              bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md max-w-[180px] truncate"
-            title={organization.name}
+            className="hidden md:flex items-center gap-2"
           >
-            {organization.name}
+            {user?.is_super_admin && (
+              <div
+                className="px-3 py-1 rounded-xl text-xs font-semibold text-white
+                  bg-gradient-to-r from-amber-500 to-orange-600 shadow-md"
+                title="Platform Super Admin"
+              >
+                Super Admin
+              </div>
+            )}
+            <div
+              className="px-3 py-1 rounded-xl text-xs font-semibold text-white
+                bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md max-w-[180px] truncate"
+              title={organization.name}
+            >
+              {organization.name}
+            </div>
           </div>
         )}
       </div>

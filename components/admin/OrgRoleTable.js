@@ -7,14 +7,15 @@ import {
   Popconfirm,
   message,
 } from "antd";
-import { useEffect, useState } from "react";
-import instance from "../../../axios";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import instance from "../../axios";
+import { DeleteOutlined } from "@ant-design/icons";
 
-export default function RoleTable({
+export default function OrgRoleTable({
+  organizationId,
   roles,
   permissions,
-  fetchRolesPermissions,
+  fetchRoles,
   loading,
 }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,15 +34,16 @@ export default function RoleTable({
   const handleDeleteRole = async (id) => {
     try {
       setIsLoading(true);
-      const response = await instance.delete(`/roles/${id}`);
-      if (response.status === 200) {
-        fetchRolesPermissions();
-        message.success("Role deleted successfully");
-      } else {
-        console.error(response);
-      }
+      await instance.delete(
+        `/organizations/${organizationId}/roles/${id}`
+      );
+      fetchRoles();
+      message.success("Role deleted successfully");
     } catch (error) {
       console.error(error);
+      message.error(
+        error?.response?.data?.message || "Failed to delete role"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -75,9 +77,7 @@ export default function RoleTable({
       width: "20%",
       render: (record) => (
         <Button
-          onClick={() => {
-            expandPermissions(record);
-          }}
+          onClick={() => expandPermissions(record)}
           style={{
             width: "fit-content",
             backgroundColor: "var(--theme)",
@@ -102,31 +102,24 @@ export default function RoleTable({
           }}
         >
           <Switch
-            checked={status === 1}
+            checked={status === 1 || status === true}
             onChange={async (checked) => {
               try {
-                await instance.put(`/roles/${record.id}`, {
-                  status: checked ? 1 : 0,
-                });
-                fetchRolesPermissions();
+                await instance.put(
+                  `/organizations/${organizationId}/roles/${record.id}`,
+                  { status: checked ? 1 : 0 }
+                );
+                fetchRoles();
                 message.success("Role status updated successfully");
               } catch (error) {
                 console.error(error);
+                message.error("Failed to update role status");
               }
             }}
           />
-          <Button
-            icon={<EditOutlined />}
-            style={{
-              backgroundColor: "transparent",
-              color: "var(--theme)",
-              borderColor: "var(--theme)",
-            }}
-          />
-
           <Popconfirm
             title="Are you sure to delete this role?"
-            onConfirm={() => handleDeleteRole(record?.id)}
+            onConfirm={() => handleDeleteRole(record.id)}
             okButtonProps={{ danger: true }}
           >
             <Button
@@ -175,7 +168,6 @@ export default function RoleTable({
         rowKey={(record) => record.id}
       />
 
-      {/* Modal for displaying permissions */}
       <Modal
         title="Permissions"
         open={modalVisible}

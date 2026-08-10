@@ -1,22 +1,15 @@
-import { PlusCircleOutlined, UserSwitchOutlined } from "@ant-design/icons";
+import { BankOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import Link from "next/link";
-import UserForm from "./UserForm";
-import { usePermissions } from "../../../src/hooks/usePermissions";
 
-export default function UsersTopbar({
+export default function AdminTopbar({
   menuItems,
   active,
-  setCreateUser,
-  createUser,
-  fetchUsers,
-  roles,
-  currentUser,
+  title = "Administration",
+  actionLabel,
+  onAction,
+  showAction = false,
 }) {
-  const { hasPermission, isSuperAdmin } = usePermissions();
-  const canCreateUser =
-    isSuperAdmin || hasPermission("create_users") || hasPermission("admin_all");
-
   return (
     <div
       className="top-nav"
@@ -34,7 +27,7 @@ export default function UsersTopbar({
           gap: 10,
         }}
       >
-        <UserSwitchOutlined
+        <BankOutlined
           style={{
             fontSize: 30,
             border: "1px solid #f0f0f0",
@@ -48,7 +41,7 @@ export default function UsersTopbar({
             fontWeight: 500,
           }}
         >
-          User Management
+          {title}
         </h3>
       </div>
       <div
@@ -87,7 +80,7 @@ export default function UsersTopbar({
           gap: 10,
         }}
       >
-        {canCreateUser && (
+        {showAction && (
           <Button
             type="primary"
             style={{
@@ -96,20 +89,10 @@ export default function UsersTopbar({
               color: "white",
             }}
             icon={<PlusCircleOutlined />}
-            onClick={() => setCreateUser(true)}
-            disabled={active !== "1"}
+            onClick={onAction}
           >
-            Add User
+            {actionLabel}
           </Button>
-        )}
-        {createUser && (
-          <UserForm
-            visible={createUser}
-            onCancel={() => setCreateUser(false)}
-            fetchUsers={fetchUsers}
-            roles={roles}
-            currentUser={currentUser}
-          />
         )}
       </div>
     </div>

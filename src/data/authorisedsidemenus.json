@@ -148,5 +148,25 @@
                 "title": "User Settings"
             }
         ]
+    },
+    {
+        "id": 29,
+        "menu": "Administration",
+        "title": "Administration",
+        "icon": "/icons/mave/cms.svg",
+        "submenu": [
+            {
+                "id": 30,
+                "icon": "/icons/mave/cms.svg",
+                "link": "/admin/organizations",
+                "title": "Organizations"
+            },
+            {
+                "id": 31,
+                "icon": "/icons/mave/user-settings.svg",
+                "link": "/admin/roles",
+                "title": "Manage Roles"
+            }
+        ]
     }
 ]
