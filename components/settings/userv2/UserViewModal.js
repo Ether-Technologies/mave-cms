@@ -3,15 +3,12 @@ import { Modal, Table, Button, Avatar } from "antd";
 import moment from "moment";
 
 const UserViewModal = ({ visible, user, onCancel, onEdit }) => {
-  const getRoleName = (roleId) => {
-    switch (roleId) {
-      case "1":
-        return "Admin";
-      case "2":
-        return "User";
-      default:
-        return "N/A";
+  const getRoleName = () => {
+    if (user?.is_super_admin) {
+      return "Platform Super Admin";
     }
+
+    return user?.role_mave?.title || "No Role Assigned";
   };
 
   const columns = [
@@ -32,7 +29,7 @@ const UserViewModal = ({ visible, user, onCancel, onEdit }) => {
     { key: "name", field: "Name", value: user?.name || "N/A" },
     { key: "email", field: "Email", value: user?.email || "N/A" },
     { key: "phone", field: "Phone", value: user?.phone || "N/A" },
-    { key: "role", field: "Role", value: getRoleName(user?.role_id) },
+    { key: "role", field: "Role", value: getRoleName() },
     {
       key: "created",
       field: "Created At",

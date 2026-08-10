@@ -124,6 +124,8 @@ const UserProfile = () => {
   };
 
   const renderStatusField = (label, value, icon, status) => {
+    const isActive = status === 1 || status === "1" || status === true;
+
     return (
       <div className="relative w-full p-6 rounded-2xl backdrop-blur-md bg-white/30 border border-white/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/40">
         <div className="flex items-center mb-2">
@@ -136,25 +138,26 @@ const UserProfile = () => {
         </div>
         <div className="pl-[52px]">
           <Tag
-            color={status === "1" ? "success" : "error"}
+            color={isActive ? "success" : "error"}
             className="rounded-full px-4 py-1 text-sm"
           >
-            {status === "1" ? "Active" : "Inactive"}
+            {isActive ? "Active" : "Inactive"}
           </Tag>
         </div>
       </div>
     );
   };
 
-  const getRoleName = (roleId) => {
-    switch (roleId) {
-      case "1":
-        return "Super Admin";
-      case "2":
-        return "Admin";
-      default:
-        return "User";
+  const getRoleName = () => {
+    if (userData?.is_super_admin) {
+      return "Platform Super Admin";
     }
+
+    if (userData?.role_mave?.title) {
+      return userData.role_mave.title;
+    }
+
+    return "No Role Assigned";
   };
 
   return (
@@ -187,7 +190,7 @@ const UserProfile = () => {
               </div>
               <div className="pl-[52px]">
                 <Tag color="warning" className="rounded-full px-4 py-1 text-sm">
-                  {getRoleName(userData?.role_id)}
+                  {getRoleName()}
                 </Tag>
               </div>
             </div>
