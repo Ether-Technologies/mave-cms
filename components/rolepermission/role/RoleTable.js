@@ -22,11 +22,7 @@ export default function RoleTable({
   const [isLoading, setIsLoading] = useState(false);
 
   const expandPermissions = (role) => {
-    const permissionIds = role?.permission_ids || [];
-    const rolePermissions = permissions?.filter((permission) =>
-      permissionIds.includes(permission.id)
-    );
-    setSelectedPermissions(rolePermissions);
+    setSelectedPermissions(role?.permission_mave || []);
     setModalVisible(true);
   };
 
