@@ -199,13 +199,15 @@ export default function EditOrganization({
         rules={[{ required: true, message: "Please select a role" }]}
         extra="Update the primary admin user's role for this organization."
       >
-        <Select placeholder="Select role for admin user">
+        <Select placeholder="Select role for admin user" optionLabelProp="label">
           {roleTemplates.map((role) => (
-            <Select.Option key={role.title} value={role.title}>
-              <div>
-                <strong>{role.title}</strong>
+            <Select.Option key={role.title} value={role.title} label={role.title}>
+              <div style={{ padding: "4px 0" }}>
+                <div style={{ fontWeight: 600, lineHeight: 1.4 }}>{role.title}</div>
                 {role.description && (
-                  <div style={{ fontSize: 12, color: "#888" }}>{role.description}</div>
+                  <div style={{ fontSize: 12, color: "#888", lineHeight: 1.4, marginTop: 2 }}>
+                    {role.description}
+                  </div>
                 )}
               </div>
             </Select.Option>
