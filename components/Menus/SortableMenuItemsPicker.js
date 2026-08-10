@@ -110,8 +110,10 @@ const SortableItem = ({
       <span className="flex-1 text-sm font-medium text-gray-800 truncate">
         {item?.title || `Item #${id}`}
       </span>
-      {item?.title_bn && (
-        <Tag className="text-xs m-0 hidden sm:inline">{item.title_bn}</Tag>
+      {(item?.title_bn || item?.category) && (
+        <Tag className="text-xs m-0 hidden sm:inline">
+          {item.title_bn || item.category}
+        </Tag>
       )}
       <Button
         type="text"
@@ -138,6 +140,12 @@ const SortableMenuItemsPicker = ({
   value = [],
   onChange,
   compact = false,
+  availableLabel = "Available Items",
+  selectedLabel = "Menu Order",
+  availableSearchPlaceholder = "Search items...",
+  emptyAvailableDescription = "No items available",
+  emptySelectedDescription = "Add items from the left panel",
+  selectedHint = "Select multiple items, then drag to reposition them together",
 }) => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -252,7 +260,7 @@ const SortableMenuItemsPicker = ({
       <div className="border-2 border-gray-200 rounded-xl p-3 bg-gray-50">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">
-            Available Items
+            {availableLabel}
           </span>
           {availableSelected.length > 0 && (
             <Button
@@ -270,7 +278,7 @@ const SortableMenuItemsPicker = ({
           )}
         </div>
         <Input
-          placeholder="Search items..."
+          placeholder={availableSearchPlaceholder}
           prefix={<SearchOutlined className="text-gray-400" />}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -300,7 +308,7 @@ const SortableMenuItemsPicker = ({
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No items available"
+              description={emptyAvailableDescription}
               className="my-2"
             />
           )}
@@ -312,7 +320,7 @@ const SortableMenuItemsPicker = ({
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">
-              Menu Order
+              {selectedLabel}
             </span>
             <Tag className="m-0 text-xs">{value.length} items</Tag>
           </div>
@@ -383,14 +391,12 @@ const SortableMenuItemsPicker = ({
         ) : (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="Add items from the left panel"
+            description={emptySelectedDescription}
             className="my-4"
           />
         )}
 
-        <p className="text-xs text-gray-400 mt-2 italic">
-          Select multiple items, then drag to reposition them together
-        </p>
+        <p className="text-xs text-gray-400 mt-2 italic">{selectedHint}</p>
       </div>
     </div>
   );

@@ -206,7 +206,7 @@ export default function RoleTable({
           setEditModalVisible(false);
           setSelectedRole(null);
         }}
-        width={700}
+        width={960}
         destroyOnClose
       >
         <EditRole

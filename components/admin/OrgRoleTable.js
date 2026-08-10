@@ -209,7 +209,7 @@ export default function OrgRoleTable({
           setEditModalVisible(false);
           setSelectedRole(null);
         }}
-        width={700}
+        width={960}
         destroyOnClose
       >
         <EditRole

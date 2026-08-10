@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Form, Input, Switch, Button, message, Select } from "antd";
+import { Form, Input, Switch, Button, message } from "antd";
 import instance from "../../axios";
+import PermissionPicker from "../rolepermission/role/PermissionPicker";
 
 export default function OrgCreateRole({
   organizationId,
@@ -44,8 +45,7 @@ export default function OrgCreateRole({
     <Form
       form={form}
       name="create_org_role"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
+      layout="vertical"
       onFinish={createRole}
       autoComplete="off"
     >
@@ -79,25 +79,22 @@ export default function OrgCreateRole({
       <Form.Item
         label="Permissions"
         name="selectedPermissions"
-        rules={[{ required: true, message: "Please select permissions!" }]}
+        initialValue={[]}
+        rules={[
+          {
+            validator: (_, value) =>
+              value?.length
+                ? Promise.resolve()
+                : Promise.reject(
+                    new Error("Please select at least one permission!")
+                  ),
+          },
+        ]}
       >
-        <Select
-          mode="multiple"
-          placeholder="Select permissions"
-          style={{ width: "100%" }}
-          allowClear
-          showSearch
-          optionFilterProp="children"
-        >
-          {permissions?.map((permission) => (
-            <Select.Option key={permission.id} value={permission.id}>
-              {permission.title}
-            </Select.Option>
-          ))}
-        </Select>
+        <PermissionPicker permissions={permissions} />
       </Form.Item>
 
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+      <Form.Item>
         <Button
           type="primary"
           htmlType="submit"

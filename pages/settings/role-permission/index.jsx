@@ -167,7 +167,7 @@ export default function RolePermissionPage() {
             onCancel={() => {
               setModalVisible(false);
             }}
-            width={700}
+            width={960}
           >
             {activeTab === "role" ? (
               <CreateRole

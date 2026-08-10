@@ -155,7 +155,7 @@ export default function OrganizationDetailPage() {
         open={modalVisible}
         footer={null}
         onCancel={() => setModalVisible(false)}
-        width={700}
+        width={960}
         destroyOnClose
       >
         <OrgCreateRole
