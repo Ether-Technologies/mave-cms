@@ -18,6 +18,7 @@ import AuthorisedMenus from "../../src/data/authorisedsidemenus.json";
 import Link from "next/link";
 import Image from "next/image";
 import { useMenuRefresh } from "../../src/context/MenuRefreshContext";
+import OrganizationSelector from "../admin/OrganizationSelector";
 
 export default function NavItems({
   user,
@@ -169,27 +170,22 @@ export default function NavItems({
             ? `v${changeLogs[0].version}`
             : "v1.0"}
         </div>
-        {organization?.name && (
-          <div
-            className="hidden md:flex items-center gap-2"
-          >
-            {user?.is_super_admin && (
+        {user?.is_super_admin ? (
+          <OrganizationSelector />
+        ) : (
+          organization?.name && (
+            <div
+              className="hidden md:flex items-center gap-2"
+            >
               <div
                 className="px-3 py-1 rounded-xl text-xs font-semibold text-white
-                  bg-gradient-to-r from-amber-500 to-orange-600 shadow-md"
-                title="Platform Super Admin"
+                  bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md max-w-[180px] truncate"
+                title={organization.name}
               >
-                Super Admin
+                {organization.name}
               </div>
-            )}
-            <div
-              className="px-3 py-1 rounded-xl text-xs font-semibold text-white
-                bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md max-w-[180px] truncate"
-              title={organization.name}
-            >
-              {organization.name}
             </div>
-          </div>
+          )
         )}
       </div>
 
