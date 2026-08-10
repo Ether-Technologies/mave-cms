@@ -7,9 +7,10 @@ import {
   Popconfirm,
   message,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import instance from "../../../axios";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import EditRole from "./EditRole";
 
 export default function RoleTable({
   roles,
@@ -17,13 +18,20 @@ export default function RoleTable({
   fetchRolesPermissions,
   loading,
 }) {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const expandPermissions = (role) => {
     setSelectedPermissions(role?.permission_mave || []);
-    setModalVisible(true);
+    setViewModalVisible(true);
+  };
+
+  const openEditModal = (role) => {
+    setSelectedRole(role);
+    setEditModalVisible(true);
   };
 
   const handleDeleteRole = async (id) => {
@@ -71,9 +79,7 @@ export default function RoleTable({
       width: "20%",
       render: (record) => (
         <Button
-          onClick={() => {
-            expandPermissions(record);
-          }}
+          onClick={() => expandPermissions(record)}
           style={{
             width: "fit-content",
             backgroundColor: "var(--theme)",
@@ -113,6 +119,7 @@ export default function RoleTable({
           />
           <Button
             icon={<EditOutlined />}
+            onClick={() => openEditModal(record)}
             style={{
               backgroundColor: "transparent",
               color: "var(--theme)",
@@ -171,14 +178,13 @@ export default function RoleTable({
         rowKey={(record) => record.id}
       />
 
-      {/* Modal for displaying permissions */}
       <Modal
         title="Permissions"
-        open={modalVisible}
-        onOk={() => setModalVisible(false)}
-        onCancel={() => setModalVisible(false)}
+        open={viewModalVisible}
+        onOk={() => setViewModalVisible(false)}
+        onCancel={() => setViewModalVisible(false)}
         footer={[
-          <Button key="close" onClick={() => setModalVisible(false)}>
+          <Button key="close" onClick={() => setViewModalVisible(false)}>
             Close
           </Button>,
         ]}
@@ -189,6 +195,25 @@ export default function RoleTable({
           dataSource={selectedPermissions}
           rowKey={(record) => record.id}
           pagination={false}
+        />
+      </Modal>
+
+      <Modal
+        title="Edit Role"
+        open={editModalVisible}
+        footer={null}
+        onCancel={() => {
+          setEditModalVisible(false);
+          setSelectedRole(null);
+        }}
+        width={700}
+        destroyOnClose
+      >
+        <EditRole
+          role={selectedRole}
+          permissions={permissions}
+          setModalVisible={setEditModalVisible}
+          onSuccess={fetchRolesPermissions}
         />
       </Modal>
     </div>

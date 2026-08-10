@@ -9,7 +9,8 @@ import {
 } from "antd";
 import { useState } from "react";
 import instance from "../../axios";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import EditRole from "../rolepermission/role/EditRole";
 
 export default function OrgRoleTable({
   organizationId,
@@ -18,13 +19,20 @@ export default function OrgRoleTable({
   fetchRoles,
   loading,
 }) {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const expandPermissions = (role) => {
     setSelectedPermissions(role?.permission_mave || []);
-    setModalVisible(true);
+    setViewModalVisible(true);
+  };
+
+  const openEditModal = (role) => {
+    setSelectedRole(role);
+    setEditModalVisible(true);
   };
 
   const handleDeleteRole = async (id) => {
@@ -113,6 +121,15 @@ export default function OrgRoleTable({
               }
             }}
           />
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => openEditModal(record)}
+            style={{
+              backgroundColor: "transparent",
+              color: "var(--theme)",
+              borderColor: "var(--theme)",
+            }}
+          />
           <Popconfirm
             title="Are you sure to delete this role?"
             onConfirm={() => handleDeleteRole(record.id)}
@@ -166,11 +183,11 @@ export default function OrgRoleTable({
 
       <Modal
         title="Permissions"
-        open={modalVisible}
-        onOk={() => setModalVisible(false)}
-        onCancel={() => setModalVisible(false)}
+        open={viewModalVisible}
+        onOk={() => setViewModalVisible(false)}
+        onCancel={() => setViewModalVisible(false)}
         footer={[
-          <Button key="close" onClick={() => setModalVisible(false)}>
+          <Button key="close" onClick={() => setViewModalVisible(false)}>
             Close
           </Button>,
         ]}
@@ -181,6 +198,26 @@ export default function OrgRoleTable({
           dataSource={selectedPermissions}
           rowKey={(record) => record.id}
           pagination={false}
+        />
+      </Modal>
+
+      <Modal
+        title="Edit Role"
+        open={editModalVisible}
+        footer={null}
+        onCancel={() => {
+          setEditModalVisible(false);
+          setSelectedRole(null);
+        }}
+        width={700}
+        destroyOnClose
+      >
+        <EditRole
+          role={selectedRole}
+          permissions={permissions}
+          organizationId={organizationId}
+          setModalVisible={setEditModalVisible}
+          onSuccess={fetchRoles}
         />
       </Modal>
     </div>
