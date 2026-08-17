@@ -154,8 +154,13 @@ export default function EditOrganization({
         <Input placeholder="+1 555 0100" />
       </Form.Item>
 
+      <p style={{ color: "#888", marginBottom: 16 }}>
+        To add more users or change other user roles, open this organization and
+        use the Users section.
+      </p>
+
       <Form.Item
-        label="Admin Name"
+        label="Primary User Name"
         name="admin_name"
         rules={[{ required: true, message: "Please enter the admin name" }]}
       >

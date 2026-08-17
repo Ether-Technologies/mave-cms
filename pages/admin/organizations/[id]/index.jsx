@@ -12,6 +12,7 @@ import AdminTopbar from "../../../../components/admin/AdminTopbar";
 import { ADMIN_MENU_ITEMS } from "../../../../components/admin/adminMenuItems";
 import OrgRoleTable from "../../../../components/admin/OrgRoleTable";
 import OrgCreateRole from "../../../../components/admin/OrgCreateRole";
+import OrgUserTable from "../../../../components/admin/OrgUserTable";
 import { usePermissions } from "../../../../src/hooks/usePermissions";
 
 export default function OrganizationDetailPage() {
@@ -21,9 +22,12 @@ export default function OrganizationDetailPage() {
 
   const [organization, setOrganization] = useState(null);
   const [roles, setRoles] = useState([]);
+  const [users, setUsers] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [roleTemplates, setRoleTemplates] = useState([]);
 
   const canManage = canManagePlatform;
 
@@ -34,10 +38,41 @@ export default function OrganizationDetailPage() {
       const response = await instance.get(`/organizations/${id}`);
       if (response.status === 200) {
         setOrganization(response.data);
+        if (Array.isArray(response.data.users)) {
+          setUsers(response.data.users);
+        }
       }
     } catch (error) {
       console.error(error);
       message.error("Failed to load organization");
+    }
+  };
+
+  const fetchUsers = async () => {
+    if (!id) return;
+
+    try {
+      setUsersLoading(true);
+      const response = await instance.get(`/organizations/${id}/users`);
+      if (response.status === 200) {
+        setUsers(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to load users");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const fetchRoleTemplates = async () => {
+    try {
+      const response = await instance.get("/organizations/role-templates");
+      if (response.data?.length) {
+        setRoleTemplates(response.data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -74,6 +109,7 @@ export default function OrganizationDetailPage() {
       fetchOrganization();
       fetchRoles();
       fetchPermissions();
+      fetchRoleTemplates();
     }
   }, [canManage, id]);
 
@@ -119,7 +155,7 @@ export default function OrganizationDetailPage() {
             <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
               {organization?.slug && <Tag>{organization.slug}</Tag>}
               <Tag icon={<TeamOutlined />} color="blue">
-                {organization?.users_count ?? 0} users
+                {users.length || organization?.users_count || 0} users
               </Tag>
               <Tag color={organization?.is_active ? "green" : "red"}>
                 {organization?.is_active ? "Active" : "Inactive"}
@@ -140,7 +176,21 @@ export default function OrganizationDetailPage() {
           </Button>
         </div>
 
-        <h3 style={{ marginBottom: 16, fontWeight: 500 }}>Roles & Permissions</h3>
+        <h3 style={{ marginBottom: 16, fontWeight: 500 }}>Users</h3>
+        <OrgUserTable
+          organizationId={id}
+          users={users}
+          fetchUsers={() => {
+            fetchUsers();
+            fetchOrganization();
+          }}
+          loading={usersLoading}
+          roleTemplates={roleTemplates}
+        />
+
+        <h3 style={{ margin: "32px 0 16px", fontWeight: 500 }}>
+          Roles & Permissions
+        </h3>
         <OrgRoleTable
           organizationId={id}
           roles={roles}

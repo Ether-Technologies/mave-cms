@@ -76,7 +76,7 @@ export default function OrganizationsPage() {
         open={modalVisible}
         footer={null}
         onCancel={() => setModalVisible(false)}
-        width={560}
+        width={640}
         destroyOnClose
       >
         <CreateOrganization

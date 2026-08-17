@@ -123,7 +123,7 @@ export default function OrganizationTable({
               borderColor: "var(--theme)",
             }}
           >
-            Manage Roles
+            Users & Roles
           </Button>
           <Popconfirm
             title="Delete this organization?"
