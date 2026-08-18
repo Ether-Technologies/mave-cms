@@ -5,7 +5,6 @@ import { ArrowLeftOutlined, TeamOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import instance from "../../../../axios";
 import AdminTopbar from "../../../../components/admin/AdminTopbar";
-import { ADMIN_MENU_ITEMS } from "../../../../components/admin/adminMenuItems";
 import { usePermissions } from "../../../../src/hooks/usePermissions";
 
 export default function OrganizationViewPage() {
@@ -84,7 +83,7 @@ export default function OrganizationViewPage() {
 
   return (
     <div className="mavecontainer">
-      <AdminTopbar menuItems={ADMIN_MENU_ITEMS} active="1" />
+      <AdminTopbar title="Organizations" />
 
       <div style={{ marginTop: 24 }}>
         <Link href="/admin/organizations">

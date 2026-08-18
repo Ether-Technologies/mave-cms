@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Modal, message, Empty } from "antd";
 import instance from "../../../axios";
 import AdminTopbar from "../../../components/admin/AdminTopbar";
-import { ADMIN_MENU_ITEMS } from "../../../components/admin/adminMenuItems";
 import OrganizationTable from "../../../components/admin/OrganizationTable";
 import CreateOrganization from "../../../components/admin/CreateOrganization";
 import EditOrganization from "../../../components/admin/EditOrganization";
@@ -55,8 +54,7 @@ export default function OrganizationsPage() {
   return (
     <div className="mavecontainer">
       <AdminTopbar
-        menuItems={ADMIN_MENU_ITEMS}
-        active="1"
+        title="Organizations"
         actionLabel="Create Organization"
         showAction
         onAction={() => setModalVisible(true)}

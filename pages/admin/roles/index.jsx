@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Modal, Empty, Select, message } from "antd";
 import instance from "../../../axios";
 import AdminTopbar from "../../../components/admin/AdminTopbar";
-import { ADMIN_MENU_ITEMS } from "../../../components/admin/adminMenuItems";
 import OrgRoleTable from "../../../components/admin/OrgRoleTable";
 import OrgCreateRole from "../../../components/admin/OrgCreateRole";
 import { usePermissions } from "../../../src/hooks/usePermissions";
@@ -89,8 +88,7 @@ export default function AdminRolesPage() {
   return (
     <div className="mavecontainer">
       <AdminTopbar
-        menuItems={ADMIN_MENU_ITEMS}
-        active="2"
+        title="Manage Roles"
         actionLabel="Add Role"
         showAction={Boolean(selectedOrgId)}
         onAction={() => setModalVisible(true)}

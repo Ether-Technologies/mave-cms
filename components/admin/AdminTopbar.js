@@ -1,10 +1,7 @@
 import { BankOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import Link from "next/link";
 
 export default function AdminTopbar({
-  menuItems,
-  active,
   title = "Administration",
   actionLabel,
   onAction,
@@ -14,8 +11,8 @@ export default function AdminTopbar({
     <div
       className="top-nav"
       style={{
-        display: "grid",
-        gridTemplateColumns: "2fr 6fr 1fr",
+        display: "flex",
+        justifyContent: "space-between",
         alignItems: "center",
         borderBottom: "4px solid #f0f0f0",
       }}
@@ -43,35 +40,6 @@ export default function AdminTopbar({
         >
           {title}
         </h3>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: 40,
-            fontSize: 16,
-            fontWeight: 400,
-          }}
-        >
-          {menuItems?.map((item) => (
-            <div
-              key={item.key}
-              style={{
-                color: active === item.key ? "var(--maveyellow)" : "black",
-                textDecoration: active === item.key ? "underline" : "none",
-                textUnderlineOffset: 20,
-                fontWeight: 500,
-              }}
-            >
-              <Link href={item.link}>{item.title}</Link>
-            </div>
-          ))}
-        </div>
       </div>
       <div
         style={{
