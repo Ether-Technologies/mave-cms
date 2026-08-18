@@ -76,6 +76,12 @@ export default function OrganizationTable({
       render: (email) => email || "—",
     },
     {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      render: (phone) => phone || "—",
+    },
+    {
       title: "Users",
       dataIndex: "users_count",
       key: "users_count",
