@@ -1,33 +1,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Modal, Empty, Tag, Spin, message } from "antd";
-import {
-  ArrowLeftOutlined,
-  PlusCircleOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
+import { Button, Empty, Tag, Spin, message, Table, Descriptions } from "antd";
+import { ArrowLeftOutlined, TeamOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import instance from "../../../../axios";
 import AdminTopbar from "../../../../components/admin/AdminTopbar";
 import { ADMIN_MENU_ITEMS } from "../../../../components/admin/adminMenuItems";
-import OrgRoleTable from "../../../../components/admin/OrgRoleTable";
-import OrgCreateRole from "../../../../components/admin/OrgCreateRole";
-import OrgUserTable from "../../../../components/admin/OrgUserTable";
 import { usePermissions } from "../../../../src/hooks/usePermissions";
 
-export default function OrganizationDetailPage() {
+export default function OrganizationViewPage() {
   const router = useRouter();
   const { id } = router.query;
   const { canManagePlatform } = usePermissions();
 
   const [organization, setOrganization] = useState(null);
-  const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
-  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [usersLoading, setUsersLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [roleTemplates, setRoleTemplates] = useState([]);
 
   const canManage = canManagePlatform;
 
@@ -35,99 +23,64 @@ export default function OrganizationDetailPage() {
     if (!id) return;
 
     try {
-      const response = await instance.get(`/organizations/${id}`);
-      if (response.status === 200) {
-        setOrganization(response.data);
-        if (Array.isArray(response.data.users)) {
-          setUsers(response.data.users);
+      setLoading(true);
+      const orgResponse = await instance.get(`/organizations/${id}`);
+
+      if (orgResponse.status === 200) {
+        setOrganization(orgResponse.data);
+        if (Array.isArray(orgResponse.data.users)) {
+          setUsers(orgResponse.data.users);
         }
       }
     } catch (error) {
       console.error(error);
       message.error("Failed to load organization");
-    }
-  };
-
-  const fetchUsers = async () => {
-    if (!id) return;
-
-    try {
-      setUsersLoading(true);
-      const response = await instance.get(`/organizations/${id}/users`);
-      if (response.status === 200) {
-        setUsers(response.data);
-      }
-    } catch (error) {
-      console.error(error);
-      message.error("Failed to load users");
-    } finally {
-      setUsersLoading(false);
-    }
-  };
-
-  const fetchRoleTemplates = async () => {
-    try {
-      const response = await instance.get("/organizations/role-templates");
-      if (response.data?.length) {
-        setRoleTemplates(response.data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchRoles = async () => {
-    if (!id) return;
-
-    try {
-      setLoading(true);
-      const response = await instance.get(`/organizations/${id}/roles`);
-      if (response.status === 200) {
-        setRoles(response.data);
-      }
-    } catch (error) {
-      console.error(error);
-      message.error("Failed to load roles");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchPermissions = async () => {
-    try {
-      const response = await instance.get("/permissions");
-      if (response.status === 200) {
-        setPermissions(response.data);
-      }
-    } catch (error) {
-      console.error(error);
     }
   };
 
   useEffect(() => {
     if (canManage && id) {
       fetchOrganization();
-      fetchRoles();
-      fetchPermissions();
-      fetchRoleTemplates();
     }
   }, [canManage, id]);
 
   if (!canManage) {
     return (
       <div className="mavecontainer">
-        <Empty description="You do not have permission to manage organizations." />
+        <Empty description="You do not have permission to view organizations." />
       </div>
     );
   }
 
-  if (!id) {
+  if (!id || (loading && !organization)) {
     return (
       <div className="mavecontainer" style={{ textAlign: "center", padding: 48 }}>
         <Spin size="large" />
       </div>
     );
   }
+
+  const userColumns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Role",
+      key: "role",
+      render: (_, record) => (
+        <Tag color="blue">{record.role_mave?.title || "—"}</Tag>
+      ),
+    },
+  ];
 
   return (
     <div className="mavecontainer">
@@ -140,81 +93,50 @@ export default function OrganizationDetailPage() {
           </Button>
         </Link>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 24,
-          }}
-        >
-          <div>
-            <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 600 }}>
-              {organization?.name || "Organization"}
-            </h2>
-            <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
-              {organization?.slug && <Tag>{organization.slug}</Tag>}
-              <Tag icon={<TeamOutlined />} color="blue">
-                {users.length || organization?.users_count || 0} users
-              </Tag>
-              <Tag color={organization?.is_active ? "green" : "red"}>
-                {organization?.is_active ? "Active" : "Inactive"}
-              </Tag>
-            </div>
-          </div>
+        <h2 style={{ margin: "0 0 16px", fontSize: "1.5rem", fontWeight: 600 }}>
+          {organization?.name || "Organization"}
+        </h2>
 
-          <Button
-            type="primary"
-            icon={<PlusCircleOutlined />}
-            onClick={() => setModalVisible(true)}
-            style={{
-              backgroundColor: "var(--maveyellow)",
-              color: "white",
-            }}
-          >
-            Add Role
-          </Button>
-        </div>
+        <Descriptions
+          bordered
+          column={2}
+          size="middle"
+          style={{ marginBottom: 32 }}
+        >
+          <Descriptions.Item label="Name">
+            {organization?.name || "—"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Slug">
+            {organization?.slug || "—"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Email">
+            {organization?.email || "—"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Phone">
+            {organization?.phone || "—"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Status">
+            <Tag color={organization?.is_active ? "green" : "red"}>
+              {organization?.is_active ? "Active" : "Inactive"}
+            </Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label="Users">
+            <Tag icon={<TeamOutlined />} color="blue">
+              {users.length || organization?.users_count || 0}
+            </Tag>
+          </Descriptions.Item>
+        </Descriptions>
 
         <h3 style={{ marginBottom: 16, fontWeight: 500 }}>Users</h3>
-        <OrgUserTable
-          organizationId={id}
-          users={users}
-          fetchUsers={() => {
-            fetchUsers();
-            fetchOrganization();
-          }}
-          loading={usersLoading}
-          roleTemplates={roleTemplates}
-        />
-
-        <h3 style={{ margin: "32px 0 16px", fontWeight: 500 }}>
-          Roles & Permissions
-        </h3>
-        <OrgRoleTable
-          organizationId={id}
-          roles={roles}
-          permissions={permissions}
-          fetchRoles={fetchRoles}
+        <Table
+          columns={userColumns}
+          dataSource={users}
           loading={loading}
+          rowKey={(record) => record.id}
+          pagination={false}
+          locale={{ emptyText: "No users found" }}
         />
       </div>
-
-      <Modal
-        title="Create Role"
-        open={modalVisible}
-        footer={null}
-        onCancel={() => setModalVisible(false)}
-        width={960}
-        destroyOnClose
-      >
-        <OrgCreateRole
-          organizationId={id}
-          permissions={permissions}
-          setModalVisible={setModalVisible}
-          fetchRoles={fetchRoles}
-        />
-      </Modal>
     </div>
   );
 }

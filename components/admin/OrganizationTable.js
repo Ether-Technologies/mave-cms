@@ -8,7 +8,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { DeleteOutlined, EditOutlined, TeamOutlined, UserSwitchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, TeamOutlined, EyeOutlined } from "@ant-design/icons";
 import instance from "../../axios";
 
 export default function OrganizationTable({
@@ -121,7 +121,7 @@ export default function OrganizationTable({
             Edit
           </Button>
           <Button
-            icon={<UserSwitchOutlined />}
+            icon={<EyeOutlined />}
             onClick={() => router.push(`/admin/organizations/${record.id}`)}
             style={{
               backgroundColor: "var(--theme)",
@@ -129,7 +129,7 @@ export default function OrganizationTable({
               borderColor: "var(--theme)",
             }}
           >
-            Users & Roles
+            View
           </Button>
           <Popconfirm
             title="Delete this organization?"
