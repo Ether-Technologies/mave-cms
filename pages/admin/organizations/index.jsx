@@ -93,7 +93,7 @@ export default function OrganizationsPage() {
           setEditModalVisible(false);
           setSelectedOrganization(null);
         }}
-        width={560}
+        width={640}
         destroyOnClose
       >
         <EditOrganization
