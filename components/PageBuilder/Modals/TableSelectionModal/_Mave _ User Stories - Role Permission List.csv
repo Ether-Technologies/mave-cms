@@ -39,11 +39,6 @@ Viewer,,Edit Components,Permission to edit existing components,edit_components,,
 ,,Create Blog,Permission to create new blogs,create_blog,,react-dnd-html5-backend,npm i,npm i react-dnd-html5-backend
 ,,Edit Blogs,Permission to edit existing blogs,edit_blogs,,react-dnd,npm i,npm i react-dnd
 ,,Delete Blogs,Permission to delete blogs,delete_blogs,,react-dom,npm i,npm i react-dom
-,User Manual,View Changelog,Permission to view the changelog,view_changelog,,react-easy-crop,npm i,npm i react-easy-crop
-,,View Documentation,Permission to view documentation,view_documentation,,react-froala-wysiwyg,npm i,npm i react-froala-wysiwyg
-,,View User Guide,Permission to view user guide,view_user_guide,,react-google-charts,npm i,npm i react-google-charts
-,,View FAQ,Permission to view the FAQ,view_faq,,react-helmet,npm i,npm i react-helmet
-,,Access Support,Permission to access support,access_support,,react-markdown,npm i,npm i react-markdown
 ,Tools,Access Doc to API,Permission to access Doc to API tool,access_doc_to_api,,react-pdf,npm i,npm i react-pdf
 ,,Access Dynamic Form Builder,Permission to access Dynamic Form Builder,access_dynamic_form_builder,,react-quill,npm i,npm i react-quill
 ,,Access Humanpal,Permission to access Humanpal tool,access_humanpal,,react-slick,npm i,npm i react-slick

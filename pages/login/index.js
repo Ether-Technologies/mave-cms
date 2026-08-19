@@ -9,7 +9,6 @@ import {
   LockOutlined,
   MailOutlined,
   RadarChartOutlined,
-  RocketOutlined,
 } from "@ant-design/icons";
 import Router, { useRouter } from "next/router";
 import { useAuth } from "../../src/context/AuthContext";
@@ -337,18 +336,6 @@ export default function Login() {
                 content effortlessly, and scale with confidence.
               </motion.p>
               <motion.div variants={itemVariants} className="flex gap-4">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    icon={<RocketOutlined />}
-                    className="h-12 px-6 bg-gradient-to-r from-brand to-brand-dark hover:from-brand-dark hover:to-blue-600 text-white border-0 font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl"
-                    onClick={() => router.push("/usermanual/changelog")}
-                  >
-                    What's New
-                  </Button>
-                </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

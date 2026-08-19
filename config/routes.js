@@ -1,5 +1,5 @@
 // config/routes.js
-export const publicPages = ["/login", "/signup", "/usermanual/changelog", "/portfolio"];
+export const publicPages = ["/login", "/signup", "/portfolio"];
 
 export const allowSignup = process.env.NEXT_PUBLIC_ALLOW_SIGNUP === "true";
 

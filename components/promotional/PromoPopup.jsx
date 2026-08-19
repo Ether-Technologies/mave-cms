@@ -1,7 +1,7 @@
 import { Typography, Button } from "antd";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import changelog from "../../pages/usermanual/changelog.json";
+import changelog from "../../src/data/changelog.json";
 import { BugOutlined, GiftOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph } = Typography;
@@ -154,13 +154,6 @@ export default function PromoPopup() {
               }
             })()}
 
-            <Button
-              className="mavebutton mt-4"
-              href="/usermanual/changelog"
-              target="_blank"
-            >
-              View More
-            </Button>
           </div>
         </div>
       </div>

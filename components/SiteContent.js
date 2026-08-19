@@ -86,11 +86,9 @@ const SiteContent = ({ children }) => {
     } else if (
       isPublicPage &&
       token &&
-      currentRoute !== "/usermanual/changelog" &&
       currentRoute !== "/portfolio"
     ) {
       // Redirect to home if the user is authenticated and tries to access a public page
-      // EXCEPT for the changelog page
       router.push("/");
     } else if (currentRoute === "/signup" && !allowSignup) {
       // Redirect to login if signup is not allowed

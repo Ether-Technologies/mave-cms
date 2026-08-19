@@ -70,44 +70,6 @@
         ]
     },
     {
-        "id": 15,
-        "menu": "User Manual",
-        "title": "User Manual",
-        "icon": "/icons/mave/usermanual.svg",
-        "submenu": [
-            {
-                "id": 16,
-                "icon": "/icons/mave/changelog.svg",
-                "link": "/usermanual/changelog",
-                "title": "Changelog"
-            },
-            {
-                "id": 17,
-                "icon": "/icons/mave/documentation.svg",
-                "link": "/usermanual/documentation",
-                "title": "Docs"
-            },
-            {
-                "id": 18,
-                "icon": "/icons/mave/browser.svg",
-                "link": "/usermanual/userguide",
-                "title": "User Guide"
-            },
-            {
-                "id": 19,
-                "icon": "/icons/mave/faq.svg",
-                "link": "/usermanual/faq",
-                "title": "FAQ"
-            },
-            {
-                "id": 20,
-                "icon": "/icons/mave/headphones2.svg",
-                "link": "/usermanual/support",
-                "title": "Support"
-            }
-        ]
-    },
-    {
         "id": 25,
         "menu": "Tools",
         "title": "Tools",

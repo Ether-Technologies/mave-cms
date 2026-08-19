@@ -21,11 +21,6 @@ const ROUTE_PERMISSIONS = {
   "/admin/organizations/[id]": "manage_organizations",
   "/admin/users": "view_users",
   "/admin/roles": "manage_organizations",
-  "/usermanual/changelog": "view_changelog",
-  "/usermanual/documentation": "view_documentation",
-  "/usermanual/userguide": "view_user_guide",
-  "/usermanual/faq": "view_faq",
-  "/usermanual/support": "access_support",
 };
 
 export function isSuperAdmin(user) {

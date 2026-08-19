@@ -12,7 +12,7 @@ import {
 import { Input, Layout, Dropdown, Button, Tooltip, message, Badge } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
-import Changelog from "../../pages/usermanual/changelog.json";
+import Changelog from "../../src/data/changelog.json";
 import TopNavData from "../../src/data/topnavdata.json";
 import AuthorisedMenus from "../../src/data/authorisedsidemenus.json";
 import Link from "next/link";
@@ -157,14 +157,8 @@ export default function NavItems({
           />
         </div>
         <div
-          className="px-2 py-1 rounded-xl text-sm font-semibold text-white cursor-pointer
-            bg-gradient-to-r from-brand to-blue-600
-            hover:from-orange-500 hover:to-red-500
-            transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push("/usermanual/changelog");
-          }}
+          className="px-2 py-1 rounded-xl text-sm font-semibold text-white
+            bg-gradient-to-r from-brand to-blue-600 shadow-md"
         >
           {changeLogs && changeLogs.length > 0
             ? `v${changeLogs[0].version}`
