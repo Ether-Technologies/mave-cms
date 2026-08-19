@@ -18,12 +18,6 @@
                 "title": "Menus"
             },
             {
-                "id": 7,
-                "icon": "/icons/mave/navbar.svg",
-                "link": "/navbars",
-                "title": "Navbars"
-            },
-            {
                 "id": 3,
                 "icon": "/icons/mave/media.svg",
                 "link": "/gallery",
@@ -34,18 +28,6 @@
                 "icon": "/icons/mave/cards.svg",
                 "link": "/cards",
                 "title": "Cards"
-            },
-            {
-                "id": 8,
-                "icon": "/icons/mave/slider.svg",
-                "link": "/sliders",
-                "title": "Sliders"
-            },
-            {
-                "id": 14,
-                "icon": "/icons/mave/footer.svg",
-                "link": "/footers",
-                "title": "Footers"
             }
         ]
     },
@@ -60,6 +42,24 @@
                 "icon": "/icons/mave/forms.svg",
                 "link": "/pages",
                 "title": "Pages"
+            },
+            {
+                "id": 14,
+                "icon": "/icons/mave/footer.svg",
+                "link": "/footers",
+                "title": "Footers"
+            },
+            {
+                "id": 7,
+                "icon": "/icons/mave/navbar.svg",
+                "link": "/navbars",
+                "title": "Navbars"
+            },
+            {
+                "id": 8,
+                "icon": "/icons/mave/slider.svg",
+                "link": "/sliders",
+                "title": "Sliders"
             }
         ]
     },
