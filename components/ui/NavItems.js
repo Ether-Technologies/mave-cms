@@ -3,7 +3,6 @@
 import {
   SearchOutlined,
   LoginOutlined,
-  SettingOutlined,
   UserOutlined,
   DeploymentUnitOutlined,
   ReloadOutlined,
@@ -301,16 +300,6 @@ export default function NavItems({
                 />
               </div>
             </Tooltip>
-
-            {/* Settings */}
-            <div
-              className="w-10 h-10 flex items-center justify-center rounded-lg
-                bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50
-                cursor-pointer transition-all duration-300 transform hover:scale-110 shadow-sm hover:shadow-md"
-              onClick={() => router.push("/settings/cms-settings")}
-            >
-              <SettingOutlined className="text-gray-600 hover:text-indigo-500 text-lg transition-colors duration-300" />
-            </div>
 
             {/* User Dropdown */}
             <Dropdown menu={{ items: userItems }} placement="bottomRight">

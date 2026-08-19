@@ -3,7 +3,6 @@
 import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import debounce from "lodash/debounce";
-import instance from "../../../axios";
 
 const AUTOSAVE_DELAY = 30000; // 30 seconds
 
@@ -17,30 +16,7 @@ export const usePageEffects = ({
     onFetchData,
 }) => {
     const router = useRouter();
-    const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
-
-    // Fetch auto-save settings
-    useEffect(() => {
-        const fetchAutoSaveSettings = async () => {
-            try {
-                const response = await instance.get('/settings');
-                const settings = response.data;
-                const contentSettings = settings.find(setting => setting.type === 'content-settings');
-
-                if (contentSettings && contentSettings.config) {
-                    const enabled = contentSettings.config.autoSave !== null ? contentSettings.config.autoSave : false;
-                    setAutoSaveEnabled(enabled);
-                } else {
-                    setAutoSaveEnabled(false);
-                }
-            } catch (err) {
-                console.error("❌ usePageEffects: Error fetching auto-save settings:", err);
-                setAutoSaveEnabled(false);
-            }
-        };
-
-        fetchAutoSaveSettings();
-    }, []);
+    const [autoSaveEnabled] = useState(true);
 
     // Keyboard shortcuts
     useEffect(() => {

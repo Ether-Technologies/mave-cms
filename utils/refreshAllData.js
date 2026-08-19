@@ -14,8 +14,6 @@ const API_ENDPOINTS = [
   { key: "forms", url: "/forms" },
   { key: "form_builder", url: "/form_builder" },
   { key: "footers", url: "/footers" },
-  { key: "settings", url: "/settings" },
-  { key: "settings-general", url: "/settings/general" },
   { key: "roles", url: "/roles" },
   { key: "permissions", url: "/permissions" },
   { key: "generated-models", url: "/generated-models" },

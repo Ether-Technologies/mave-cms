@@ -11,7 +11,6 @@ const ROUTE_PERMISSIONS = {
   "/formbuilder": "access_dynamic_form_builder",
   "/formbuilder/form-responses": "view_form_responses",
   "/tools": "access_doc_to_api",
-  "/settings/cms-settings": "view_users",
   "/settings/users-settings": "view_users",
   "/settings/user-registration": "view_users",
   "/settings/access-control": "view_users",

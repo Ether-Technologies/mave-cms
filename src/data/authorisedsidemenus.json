@@ -85,21 +85,6 @@
         ]
     },
     {
-        "id": 21,
-        "menu": "Settings",
-        "title": "Settings",
-        "icon": "/icons/mave/settings.svg",
-        "link": "settings",
-        "submenu": [
-            {
-                "id": 22,
-                "icon": "/icons/mave/settings.svg",
-                "link": "/settings/cms-settings",
-                "title": "CMS Settings"
-            }
-        ]
-    },
-    {
         "id": 29,
         "menu": "Administration",
         "title": "Administration",

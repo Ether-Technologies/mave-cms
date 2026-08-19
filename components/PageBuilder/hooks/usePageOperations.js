@@ -20,46 +20,12 @@ import {
 export const usePageOperations = (pageId, pageData) => {
     const dispatch = useDispatch();
     const isDirty = useSelector((state) => state.page.isDirty);
-    const [autoSaveSettings, setAutoSaveSettings] = useState({
+    const [autoSaveSettings] = useState({
         autoSave: true,
         autoSaveInterval: 300 // 5 minutes default
     });
     const autoSaveTimerRef = useRef(null);
     const lastSaveTimeRef = useRef(null);
-
-    // Fetch auto-save settings from API
-    const fetchAutoSaveSettings = useCallback(async () => {
-        try {
-            const response = await instance.get('/settings');
-            const settings = response.data;
-
-            // Find content-settings configuration
-            const contentSettings = settings.find(setting => setting.type === 'content-settings');
-
-            if (contentSettings && contentSettings.config) {
-                const config = contentSettings.config;
-                const newSettings = {
-                    autoSave: config.autoSave !== null ? config.autoSave : true,
-                    autoSaveInterval: config.autoSaveInterval !== null ? config.autoSaveInterval : 300
-                };
-                setAutoSaveSettings(newSettings);
-            } else {
-                // Use defaults if no content-settings found
-                const defaultSettings = {
-                    autoSave: false,
-                    autoSaveInterval: 300
-                };
-                setAutoSaveSettings(defaultSettings);
-            }
-        } catch (err) {
-            console.error("❌ Error fetching auto-save settings:", err);
-            // Use defaults on error
-            setAutoSaveSettings({
-                autoSave: false,
-                autoSaveInterval: 300
-            });
-        }
-    }, []);
 
     // Auto-save function
     const performAutoSave = useCallback(async () => {
@@ -121,9 +87,6 @@ export const usePageOperations = (pageId, pageData) => {
     const fetchPageData = useCallback(async () => {
         try {
             dispatch(setLoading(true));
-
-            // Fetch auto-save settings first
-            await fetchAutoSaveSettings();
 
             // Always fetch fresh data from server for editing
             const response = await instance.get(`/pages/${pageId}`);
