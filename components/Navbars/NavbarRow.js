@@ -1,17 +1,7 @@
 // components/Navbars/NavbarRow.js
 
 import React, { useState, useEffect } from "react";
-import {
-  Input,
-  Select,
-  Button,
-  Popconfirm,
-  message,
-  Checkbox,
-  Tag,
-  Tooltip,
-  Badge,
-} from "antd";
+import { Input, Select, Button, Popconfirm, message, Checkbox, Tag, Tooltip, Badge, Modal } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -20,11 +10,13 @@ import {
   MenuOutlined,
   CheckCircleOutlined,
   GlobalOutlined,
+  PlusCircleOutlined,
 } from "@ant-design/icons";
 import instance from "../../axios";
 import Image from "next/image";
 import MediaSelectionModal from "../PageBuilder/Modals/MediaSelectionModal";
 import SortableMenuItemsPicker from "../Menus/SortableMenuItemsPicker";
+import AddMenuItemForm from "../MenuItems/AddMenuItemForm";
 
 const NavbarRow = ({
   navbar,
@@ -50,8 +42,10 @@ const NavbarRow = ({
     navbar.menu?.menu_items?.map((item) => item.id) || []
   );
   const [menuItems, setMenuItems] = useState([]);
+  const [pages, setPages] = useState([]);
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [selectedLogoMedia, setSelectedLogoMedia] = useState(null);
+  const [isAddMenuItemOpen, setIsAddMenuItemOpen] = useState(false);
 
   const findMenuById = (menuId, menusList = menus) =>
     menusList.find((menu) => String(menu.id) === String(menuId));
@@ -83,15 +77,26 @@ const NavbarRow = ({
     const fetchMenuItems = async () => {
       try {
         const response = await instance("/menuitems");
-        if (response.data) {
+        if (Array.isArray(response.data)) {
           setMenuItems(response.data);
         }
       } catch (error) {
         // silently fail — picker will show empty
       }
     };
+    const fetchPages = async () => {
+      try {
+        const response = await instance("/pages");
+        if (Array.isArray(response.data)) {
+          setPages(response.data);
+        }
+      } catch (error) {
+        // silently fail
+      }
+    };
     if (editingNavbarId === navbar.id) {
       fetchMenuItems();
+      fetchPages();
     }
   }, [editingNavbarId, navbar.id]);
 
@@ -453,9 +458,18 @@ const NavbarRow = ({
 
             {editedMenuId && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Menu Items — select and drag to order
-                </label>
+                <div className="flex items-center justify-between mb-2 max-w-full">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Menu Items — select and drag to order
+                  </label>
+                  <Button
+                    icon={<PlusCircleOutlined />}
+                    onClick={() => setIsAddMenuItemOpen(true)}
+                    className="h-9 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 font-semibold shadow-md hover:shadow-lg transition-all rounded-lg text-xs"
+                  >
+                    Create Item
+                  </Button>
+                </div>
                 <SortableMenuItemsPicker
                   menuItems={menuItems}
                   value={editedMenuItemIds}
@@ -466,6 +480,44 @@ const NavbarRow = ({
           </div>
         )}
       </div>
+      <Modal
+        open={isAddMenuItemOpen}
+        onCancel={() => setIsAddMenuItemOpen(false)}
+        destroyOnClose
+        footer={null}
+        title={
+          <div className="flex items-center gap-2">
+            <img src="/icons/mave/menuitems.svg" alt="Menu Items" className="w-6" />
+            <span>Add Menu Item</span>
+          </div>
+        }
+        width={900}
+        zIndex={1300}
+        getContainer={() => document.body}
+      >
+        {isAddMenuItemOpen && (
+          <AddMenuItemForm
+            pages={pages}
+            menuItems={menuItems}
+            onCancel={() => setIsAddMenuItemOpen(false)}
+            fetchMenuItems={async () => {
+              const response = await instance("/menuitems");
+              if (Array.isArray(response.data)) {
+                setMenuItems(response.data);
+              }
+            }}
+            onMenuItemCreated={(createdItems = []) => {
+              const ids = createdItems.map((item) => item.id).filter(Boolean);
+              if (ids.length) {
+                setEditedMenuItemIds((prev) => [
+                  ...prev,
+                  ...ids.filter((id) => !prev.includes(id)),
+                ]);
+              }
+            }}
+          />
+        )}
+      </Modal>
     </div>
   );
 };

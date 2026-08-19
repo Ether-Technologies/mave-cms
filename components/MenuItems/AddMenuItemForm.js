@@ -14,7 +14,13 @@ import instance from "../../axios";
 
 const { Option } = Select;
 
-const AddMenuItemForm = ({ pages, menuItems, onCancel, fetchMenuItems }) => {
+const AddMenuItemForm = ({
+  pages = [],
+  menuItems = [],
+  onCancel,
+  fetchMenuItems,
+  onMenuItemCreated,
+}) => {
   const [newMenuItemTitle, setNewMenuItemTitle] = useState("");
   const [newMenuItemTitleBn, setNewMenuItemTitleBn] = useState("");
   const [newMenuItemLink, setNewMenuItemLink] = useState("");
@@ -70,21 +76,34 @@ const AddMenuItemForm = ({ pages, menuItems, onCancel, fetchMenuItems }) => {
         title: newMenuItemTitle || "N/A",
         title_bn: newMenuItemTitleBn || "N/A",
         parent_id: newParentId || null,
-        link: newMenuItemLink?.trim() ? fullLink : "/",
+        link:
+          linkType === "independent" && newMenuItemLink?.trim()
+            ? newMenuItemLink.trim()
+            : fullLink,
       },
     ];
 
     try {
       const res = await instance.post("/menuitems", payload);
       if (res.status === 201) {
+        const created = Array.isArray(res.data)
+          ? res.data
+          : res.data
+            ? [res.data]
+            : [];
         message.success("Menu item added successfully");
-        fetchMenuItems();
+        await fetchMenuItems?.();
+        onMenuItemCreated?.(created);
         onCancel();
       } else {
         message.error("Error adding menu item");
       }
-    } catch {
-      message.error("Error adding menu item");
+    } catch (error) {
+      const apiMessage =
+        error?.response?.data?.message ||
+        (error?.response?.data?.errors &&
+          Object.values(error.response.data.errors).flat().join(" "));
+      message.error(apiMessage || "Error adding menu item");
     }
   };
 
@@ -118,8 +137,8 @@ const AddMenuItemForm = ({ pages, menuItems, onCancel, fetchMenuItems }) => {
             className="w-full mt-2"
             allowClear
           >
-            <Option value={null}>No Parent</Option>
-            {menuItems.map((m) => (
+            <Option value={undefined}>No Parent</Option>
+            {(Array.isArray(menuItems) ? menuItems : []).map((m) => (
               <Option key={m.id} value={m.id}>
                 {m.title}
               </Option>
@@ -146,7 +165,7 @@ const AddMenuItemForm = ({ pages, menuItems, onCancel, fetchMenuItems }) => {
               onChange={(value) => setNewMenuItemLink(value)}
               className="w-full mt-2"
             >
-              {pages.map((p) => (
+              {(Array.isArray(pages) ? pages : []).map((p) => (
                 <Option key={p.id} value={p.slug}>
                   {p.page_name_en}
                 </Option>

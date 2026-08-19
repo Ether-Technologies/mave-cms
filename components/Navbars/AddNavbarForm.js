@@ -48,7 +48,7 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars, onNav
   const fetchMenuItems = useCallback(async () => {
     try {
       const response = await instance("/menuitems");
-      if (response.data) {
+      if (Array.isArray(response.data)) {
         setMenuItems(response.data);
       }
     } catch (error) {
@@ -59,13 +59,40 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars, onNav
   const fetchPages = useCallback(async () => {
     try {
       const response = await instance("/pages");
-      if (response.data) {
+      if (Array.isArray(response.data)) {
         setPages(response.data);
       }
     } catch (error) {
       // silently fail
     }
   }, []);
+
+  const appendCreatedMenuItems = (createdItems = []) => {
+    const ids = createdItems.map((item) => item.id).filter(Boolean);
+    if (!ids.length) {
+      return;
+    }
+    setNewMenuItemIds((prev) => [
+      ...prev,
+      ...ids.filter((id) => !prev.includes(id)),
+    ]);
+  };
+
+  const handleMenuCreated = async (createdMenu) => {
+    await fetchMenus?.();
+    const menuId = createdMenu?.id;
+    if (!menuId) {
+      return;
+    }
+    setNewMenuId(menuId);
+    setSelectedMenuName(createdMenu.name || "");
+    const itemIds =
+      createdMenu.menu_items?.map((item) => item.id) ||
+      createdMenu.menu_item_ids ||
+      [];
+    setNewMenuItemIds(itemIds);
+    setIsAddMenuOpen(false);
+  };
 
   useEffect(() => {
     fetchMenuItems();
@@ -78,17 +105,22 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars, onNav
       return;
     }
     const selectedMenu = findMenuById(newMenuId);
-    if (selectedMenu?.menu_items?.length) {
+    if (!selectedMenu) {
+      return;
+    }
+    if (selectedMenu.menu_items?.length) {
       setNewMenuItemIds(selectedMenu.menu_items.map((item) => item.id));
-    } else if (selectedMenu?.menu_item_ids) {
+    } else if (selectedMenu.menu_item_ids) {
       setNewMenuItemIds(selectedMenu.menu_item_ids);
     } else {
       setNewMenuItemIds([]);
     }
-    if (selectedMenu?.name) {
+    if (selectedMenu.name) {
       setSelectedMenuName(selectedMenu.name);
     }
-  }, [newMenuId, menus, findMenuById]);
+    // Only reset when the selected menu changes so newly created items stay selected.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newMenuId]);
 
   const resetForm = () => {
     setNewNavbarTitleEn("");
@@ -289,13 +321,17 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars, onNav
           </div>
         }
         width={900}
-        zIndex={1100}
+        zIndex={1200}
+        getContainer={() => document.body}
       >
         {isAddMenuOpen && (
           <AddMenuForm
             menuItems={menuItems}
+            pages={pages}
+            fetchMenuItems={fetchMenuItems}
             onCancel={() => setIsAddMenuOpen(false)}
             fetchMenus={fetchMenus}
+            onMenuCreated={handleMenuCreated}
           />
         )}
       </Modal>
@@ -312,7 +348,8 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars, onNav
           </div>
         }
         width={900}
-        zIndex={1100}
+        zIndex={1300}
+        getContainer={() => document.body}
       >
         {isAddMenuItemOpen && (
           <AddMenuItemForm
@@ -320,6 +357,7 @@ const AddNavbarForm = ({ menus, fetchMenus, media, onCancel, fetchNavbars, onNav
             menuItems={menuItems}
             onCancel={() => setIsAddMenuItemOpen(false)}
             fetchMenuItems={fetchMenuItems}
+            onMenuItemCreated={appendCreatedMenuItems}
           />
         )}
       </Modal>
