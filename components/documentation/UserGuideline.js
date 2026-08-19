@@ -78,23 +78,11 @@ const UserGuideline = () => {
           <Steps direction="vertical" current={currentStep}>
             <Step
               title="Access Dashboard"
-              description="Click 'Dashboard' from the left navigation bar to view the main dashboard."
+              description="Open the home page to view live counts for pages, media, navbars, sliders, and other content."
             />
             <Step
-              title="View Analytics"
-              description="The dashboard displays Google Analytics data for your website."
-            />
-            <Step
-              title="Dealership Requests"
-              description="Navigate to the 'Dealership Requests' tab at the top to view requests."
-            />
-            <Step
-              title="Request Details"
-              description="Click the eye icon in the 7th column of the table to view detailed information about a request."
-            />
-            <Step
-              title="Update Request Status"
-              description="Click the pen icon in the last column of the table to update the status of a request."
+              title="Open content"
+              description="Click a stat card to go to that section, or use recent pages and activity to jump into an item."
             />
           </Steps>
         </div>

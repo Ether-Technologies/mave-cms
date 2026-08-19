@@ -1,30 +1,34 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import instance from "../axios";
 import { cachedApiCall } from "../utils/apiUtils";
 import { useGlobalRefresh } from "../src/context/MenuRefreshContext";
 import WelcomeCard from "../components/dashboard/WelcomeCard";
 import StatsOverview from "../components/dashboard/StatsOverview";
-import PerformanceInsights from "../components/dashboard/PerformanceInsights";
+import ContentInventory from "../components/dashboard/ContentInventory";
 import TrendingContent from "../components/dashboard/TrendingContent";
-import SeoInsights from "../components/dashboard/SeoInsights";
 import ContentActivity from "../components/dashboard/ContentActivity";
-import ContentCalendar from "../components/dashboard/ContentCalendar";
-import UserStat from "../components/dashboard/UserStat";
-import SiteStat from "../components/dashboard/SiteStat";
-import LatestEvents from "../components/dashboard/LatestEvents";
-import SiteSpeed from "../components/dashboard/SiteSpeed";
 import Storage from "../components/dashboard/Storage";
-import AverageRequests from "../components/dashboard/AverageRequests";
+import { asList } from "../components/dashboard/dashboardUtils";
 
-const index = () => {
-  const [data, setData] = useState({});
+const emptyData = {
+  pages: [],
+  media: [],
+  menus: [],
+  navbars: [],
+  sliders: [],
+  cards: [],
+  forms: [],
+  footers: [],
+};
+
+const Index = () => {
+  const [data, setData] = useState(emptyData);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
 
   const fetchData = async (forceRefresh = false) => {
     try {
       setLoading(true);
-
       const force = { force: forceRefresh };
       const [
         pages_response,
@@ -47,18 +51,18 @@ const index = () => {
       ]);
 
       setData({
-        pages: pages_response.data,
-        media: media_response.data,
-        menus: menus_response.data,
-        navbars: navbars_response.data,
-        sliders: sliders_response.data,
-        cards: cards_response.data,
-        forms: forms_response.data,
-        footers: footers_response.data,
+        pages: asList(pages_response.data),
+        media: asList(media_response.data),
+        menus: asList(menus_response.data),
+        navbars: asList(navbars_response.data),
+        sliders: asList(sliders_response.data),
+        cards: asList(cards_response.data),
+        forms: asList(forms_response.data),
+        footers: asList(footers_response.data),
       });
-      setLoading(false);
     } catch (error) {
       console.error(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -73,59 +77,31 @@ const index = () => {
         ? JSON.parse(storedOrganization)
         : parsedUser.organization || null;
       setUserData({ ...parsedUser, organization: parsedOrganization });
-    } else {
-      setUserData(null);
     }
   }, []);
 
   useGlobalRefresh(() => fetchData(true));
 
-  // console.log("Data: ", data);
-
   return (
     <main className="mavecontainer">
       <div className="flex flex-col gap-6">
-        {/* Quick Actions */}
         <WelcomeCard userData={userData} />
-
-        {/* Stats Overview */}
         <StatsOverview data={data} loading={loading} />
 
-        {/* Performance and Trending Content */}
         <div className="grid gap-6 lg:grid-cols-2">
-          <PerformanceInsights />
-          <TrendingContent />
+          <ContentInventory data={data} />
+          <TrendingContent pages={data.pages} />
         </div>
 
-        {/* SEO Insights */}
-        <SeoInsights />
-
-        {/* Content Activity and Calendar */}
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <ContentActivity />
+            <ContentActivity data={data} />
           </div>
-          <div>
-            <ContentCalendar />
-          </div>
-        </div>
-
-        {/* Additional Dashboard Components */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <UserStat userData={userData} />
-          <SiteStat data={data} />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <LatestEvents data={data} />
-          <SiteSpeed />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Storage data={data} />
-          <AverageRequests />
+          <Storage media={data.media} />
         </div>
       </div>
     </main>
   );
 };
 
-export default index;
+export default Index;
