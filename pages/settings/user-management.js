@@ -55,7 +55,7 @@ const UserManagementPage = () => {
                 // className="font-bold"
               >
                 <Menu.Item key="1">
-                  <Link href="/settings/users-settings">Users</Link>
+                  <Link href="/admin/users">Users</Link>
                 </Menu.Item>
                 <Menu.Item key="2">
                   <Link href="/settings/user-registration">Registration</Link>

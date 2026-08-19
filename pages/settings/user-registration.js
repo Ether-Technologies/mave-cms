@@ -12,7 +12,7 @@ export default function UserRegistrationPage() {
     {
       key: "1",
       title: "Users",
-      link: "/settings/users-settings",
+      link: "/admin/users",
     },
     {
       key: "2",

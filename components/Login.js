@@ -3,6 +3,7 @@ import { Button, Divider, Input, Modal, Space, message } from "antd";
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { useAuth } from "../src/context/AuthContext"; // Updated import
 import Loader from "./Loader";
+import DemoOrganizationPicker from "./auth/DemoOrganizationPicker";
 
 const Login = ({ open, setOpen }) => {
   // Check if demo mode is enabled
@@ -71,6 +72,14 @@ const Login = ({ open, setOpen }) => {
           <Button type="primary" block onClick={isDemoMode ? handleDemoLogin : handleLogin}>
             {isDemoMode ? "Get In" : "Login"}
           </Button>
+          <DemoOrganizationPicker
+            onSelect={(demoEmail, demoPassword) => {
+              setEmail(demoEmail);
+              setPassword(demoPassword);
+              login(demoEmail, demoPassword);
+              setOpen(false);
+            }}
+          />
         </Space>
       </div>
     </Modal>

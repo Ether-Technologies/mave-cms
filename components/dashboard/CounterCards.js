@@ -88,7 +88,7 @@ export default function CounterCards({ data, loading }) {
       change: "+2",
       trend: "up",
       period: "this week",
-      link: "/settings/users-settings",
+      link: "/admin/users",
     },
     {
       title: "Components",

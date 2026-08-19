@@ -140,12 +140,6 @@
                 "icon": "/icons/mave/settings.svg",
                 "link": "/settings/cms-settings",
                 "title": "CMS Settings"
-            },
-            {
-                "id": 24,
-                "icon": "/icons/mave/user-settings.svg",
-                "link": "/settings/users-settings",
-                "title": "User Settings"
             }
         ]
     },
@@ -155,6 +149,12 @@
         "title": "Administration",
         "icon": "/icons/mave/cms.svg",
         "submenu": [
+            {
+                "id": 32,
+                "icon": "/icons/mave/user-settings.svg",
+                "link": "/admin/users",
+                "title": "Users"
+            },
             {
                 "id": 30,
                 "icon": "/icons/mave/cms.svg",

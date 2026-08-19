@@ -19,6 +19,7 @@ const ROUTE_PERMISSIONS = {
   "/settings/role-permission": "create_roles",
   "/admin/organizations": "manage_organizations",
   "/admin/organizations/[id]": "manage_organizations",
+  "/admin/users": "view_users",
   "/admin/roles": "manage_organizations",
   "/usermanual/changelog": "view_changelog",
   "/usermanual/documentation": "view_documentation",
@@ -114,6 +115,10 @@ export function canAccessRoute(user, link) {
 
   if (link.startsWith("/admin/roles")) {
     return canManagePlatform(user);
+  }
+
+  if (link.startsWith("/admin/users")) {
+    return hasPermission(user, "view_users") || canManagePlatform(user);
   }
 
   let permission = ROUTE_PERMISSIONS[link];

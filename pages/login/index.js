@@ -1,6 +1,6 @@
 // pages/login.js
 
-import { Button, Form, Input, message, Collapse } from "antd";
+import { Button, Form, Input, message } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -15,6 +15,7 @@ import Router, { useRouter } from "next/router";
 import { useAuth } from "../../src/context/AuthContext";
 import Loader from "../../components/Loader";
 import { motion } from "framer-motion";
+import DemoOrganizationPicker from "../../components/auth/DemoOrganizationPicker";
 
 export default function Login() {
   const { login, loading } = useAuth();
@@ -36,16 +37,6 @@ export default function Login() {
   const handleDemoLogin = () => {
     login("demouser@mave.com", "Demo@Mave2025", callback);
   };
-
-  const demoOrganizations = [
-    { name: "Platform Super Admin", email: "superadmin@mave.local", password: "password", highlight: true },
-    { name: "Default Organization", email: "admin1@mave.local", password: "password" },
-    { name: "Acme Corporation", email: "admin@acme.demo", password: "password" },
-    { name: "Beta Industries", email: "admin@beta.demo", password: "password" },
-    { name: "Gamma Solutions", email: "admin@gamma.demo", password: "password" },
-    { name: "Delta Media Group", email: "admin@delta.demo", password: "password" },
-    { name: "Echo Travel Agency", email: "admin@echo.demo", password: "password" },
-  ];
 
   const [form] = Form.useForm();
 
@@ -89,7 +80,7 @@ export default function Login() {
     <div className="fixed inset-0 flex w-full h-screen overflow-hidden">
       {/* Left Panel - Login Form with Background */}
       <motion.div
-        className="relative w-full md:w-2/5 h-full flex items-center justify-center p-8 bg-cover bg-center bg-no-repeat"
+        className="relative w-full md:w-2/5 h-full flex items-start justify-center overflow-y-auto p-8 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/images/ui/lleftbg.png')" }}
         variants={containerVariants}
         initial="hidden"
@@ -99,7 +90,7 @@ export default function Login() {
         <div className="absolute inset-0 bg-black/20"></div>
 
         {/* Glassmorphism Container */}
-        <div className="relative z-10 w-full max-w-md backdrop-blur-md bg-white/80 rounded-3xl shadow-2xl border border-white/40 p-8 md:p-10">
+        <div className="relative z-10 w-full max-w-md my-auto backdrop-blur-md bg-white/80 rounded-3xl shadow-2xl border border-white/40 p-8 md:p-10">
           {/* Logo */}
           <motion.div
             variants={itemVariants}
@@ -268,47 +259,8 @@ export default function Login() {
             )}
           </motion.div>
 
-          {/* Demo organizations */}
           <motion.div variants={itemVariants} className="mt-4">
-            <Collapse
-              ghost
-              items={[
-                {
-                  key: "demo-orgs",
-                  label: (
-                    <span className="text-sm font-semibold text-brand">
-                      Try a demo organization (6 workspaces)
-                    </span>
-                  ),
-                  children: (
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {demoOrganizations.map((org) => (
-                        <button
-                          key={org.email}
-                          type="button"
-                          onClick={() => fillDemoLogin(org.email, org.password)}
-                          className={`w-full text-left px-3 py-2 rounded-lg border transition-colors ${
-                            org.highlight
-                              ? "border-brand bg-brand/10 hover:bg-brand/15"
-                              : "border-gray-200 hover:border-brand hover:bg-brand/5"
-                          }`}
-                        >
-                          <p className="text-sm font-semibold text-gray-800">
-                            {org.name}
-                            {org.highlight && (
-                              <span className="ml-2 text-xs font-normal text-brand">
-                                Full platform access
-                              </span>
-                            )}
-                          </p>
-                          <p className="text-xs text-gray-500">{org.email}</p>
-                        </button>
-                      ))}
-                    </div>
-                  ),
-                },
-              ]}
-            />
+            <DemoOrganizationPicker onSelect={fillDemoLogin} />
           </motion.div>
 
           {/* Additional Info */}
