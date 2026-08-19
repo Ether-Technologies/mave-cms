@@ -1,7 +1,7 @@
 // components/dashboard/welcomeCard.js
 import React from "react";
 import { motion } from "framer-motion";
-import { PlusOutlined, FileAddOutlined, CloudUploadOutlined } from "@ant-design/icons";
+import { FileAddOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
 
 export default function WelcomeCard({ userData }) {
@@ -20,12 +20,6 @@ export default function WelcomeCard({ userData }) {
     };
 
     const welcomeCard = [
-        {
-            title: "New Post",
-            icon: <PlusOutlined />,
-            link: "/blogs",
-            gradient: "from-[#3498db] to-[#2980b9]",
-        },
         {
             title: "New Page",
             icon: <FileAddOutlined />,

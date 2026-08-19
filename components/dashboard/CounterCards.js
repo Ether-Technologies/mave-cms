@@ -22,7 +22,7 @@ export default function CounterCards({ data, loading }) {
   const getIcon = (title) => {
     const iconMap = {
       "Total Pages": <FileTextOutlined className="text-2xl" />,
-      "Total Posts": <ReadOutlined className="text-2xl" />,
+      "Forms": <ReadOutlined className="text-2xl" />,
       "Media Files": <FileImageOutlined className="text-2xl" />,
       "Total Views": <EyeOutlined className="text-2xl" />,
       "Users": <UserOutlined className="text-2xl" />,
@@ -59,12 +59,12 @@ export default function CounterCards({ data, loading }) {
       link: "/pages",
     },
     {
-      title: "Total Posts",
+      title: "Forms",
       value: data?.forms?.length || 50,
       change: "+3 today",
       trend: "up",
       period: "from last month",
-      link: "/blogs",
+      link: "/formbuilder",
     },
     {
       title: "Media Files",

@@ -8,7 +8,7 @@ import {
 import Image from "next/image";
 import React from "react";
 
-export const activityLog = [
+const allActivityLog = [
   {
     categoryType: 1,
     category: "Page",
@@ -397,6 +397,8 @@ export const activityLog = [
       "The blog post 'Social Media Marketing Best Practices' was published by Lucas Rogers, offering tips for effective online engagement.",
   },
 ];
+
+export const activityLog = allActivityLog.filter((log) => log.category !== "Blog");
 
 export const activityIcons = [
   {

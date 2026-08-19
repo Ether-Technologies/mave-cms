@@ -60,12 +60,6 @@
                 "icon": "/icons/mave/forms.svg",
                 "link": "/pages",
                 "title": "Pages"
-            },
-            {
-                "id": 13,
-                "icon": "/icons/mave/blogs.svg",
-                "link": "/blogs",
-                "title": "Blogs"
             }
         ]
     },

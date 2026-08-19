@@ -10,8 +10,6 @@ const PageInfoDisplay = ({ page }) => {
   useEffect(() => {
     if (page?.type === "Event") {
       setType("Event");
-    } else if (page?.type === "Blog") {
-      setType("Blog");
     } else if (page?.type === "Footer") {
       setType("Footer");
     } else if (page?.type === "Page") {

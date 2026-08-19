@@ -8,7 +8,6 @@ const ROUTE_PERMISSIONS = {
   "/sliders": "view_sliders",
   "/footers": "view_footers",
   "/pages": "view_pages",
-  "/blogs": "view_blogs",
   "/formbuilder": "access_dynamic_form_builder",
   "/formbuilder/form-responses": "view_form_responses",
   "/tools": "access_doc_to_api",

@@ -7,7 +7,7 @@ export default function ContentActivity() {
     const activities = [
         {
             user: "John Doe",
-            action: "created a new blog post",
+            action: "created a new page",
             title: "The Future of AI in Content Management",
             time: "5 minutes ago",
             type: "create",
@@ -31,7 +31,7 @@ export default function ContentActivity() {
         },
         {
             user: "Emily Davis",
-            action: "published a post",
+            action: "published a page",
             title: "Best Practices for API Design",
             time: "3 hours ago",
             type: "publish",

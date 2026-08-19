@@ -35,10 +35,6 @@ Viewer,,Edit Components,Permission to edit existing components,edit_components,,
 ,,Create Page,Permission to create new pages,create_page,,react-apexcharts,npm i,npm i react-apexcharts
 ,,Edit Pages,Permission to edit existing pages,edit_pages,,react-beautiful-dnd,npm i,npm i react-beautiful-dnd
 ,,Delete Pages,Permission to delete pages,delete_pages,,react-copy-to-clipboard,npm i,npm i react-copy-to-clipboard
-,,View Blogs,Permission to view blogs,view_blogs,,react-countup,npm i,npm i react-countup
-,,Create Blog,Permission to create new blogs,create_blog,,react-dnd-html5-backend,npm i,npm i react-dnd-html5-backend
-,,Edit Blogs,Permission to edit existing blogs,edit_blogs,,react-dnd,npm i,npm i react-dnd
-,,Delete Blogs,Permission to delete blogs,delete_blogs,,react-dom,npm i,npm i react-dom
 ,Tools,Access Doc to API,Permission to access Doc to API tool,access_doc_to_api,,react-pdf,npm i,npm i react-pdf
 ,,Access Dynamic Form Builder,Permission to access Dynamic Form Builder,access_dynamic_form_builder,,react-quill,npm i,npm i react-quill
 ,,Access Humanpal,Permission to access Humanpal tool,access_humanpal,,react-slick,npm i,npm i react-slick

@@ -167,7 +167,6 @@ const ContentSettings = ({ config, id }) => {
               <Select placeholder="Select default content type">
                 <Option value="article">Article</Option>
                 <Option value="page">Page</Option>
-                <Option value="blog">Blog</Option>
                 <Option value="news">News</Option>
               </Select>
             </Form.Item>
