@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Empty, Tag, Spin, message, Table, Descriptions } from "antd";
-import { ArrowLeftOutlined, TeamOutlined } from "@ant-design/icons";
+import { Button, Empty, Tag, Spin, message, Table, Descriptions, Space, Typography, Popconfirm } from "antd";
+import { ArrowLeftOutlined, CopyOutlined, ReloadOutlined, TeamOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import instance from "../../../../axios";
 import AdminTopbar from "../../../../components/admin/AdminTopbar";
@@ -15,6 +15,7 @@ export default function OrganizationViewPage() {
   const [organization, setOrganization] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [regeneratingKey, setRegeneratingKey] = useState(false);
 
   const canManage = canManagePlatform;
 
@@ -36,6 +37,48 @@ export default function OrganizationViewPage() {
       message.error("Failed to load organization");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const copySiteKey = async () => {
+    if (!organization?.site_key) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(organization.site_key);
+      message.success("Site key copied");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to copy site key");
+    }
+  };
+
+  const regenerateSiteKey = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setRegeneratingKey(true);
+      const response = await instance.post(
+        `/organizations/${id}/regenerate-site-key`
+      );
+
+      if (response.status === 200) {
+        setOrganization((current) => ({
+          ...current,
+          site_key: response.data.site_key,
+        }));
+        message.success("Site key regenerated. Update the live website env.");
+      }
+    } catch (error) {
+      console.error(error);
+      message.error(
+        error?.response?.data?.message || "Failed to regenerate site key"
+      );
+    } finally {
+      setRegeneratingKey(false);
     }
   };
 
@@ -123,6 +166,37 @@ export default function OrganizationViewPage() {
             <Tag icon={<TeamOutlined />} color="blue">
               {users.length || organization?.users_count || 0}
             </Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label="Site key" span={2}>
+            <Space direction="vertical" size={8} style={{ width: "100%" }}>
+              <Typography.Text code copyable={false} style={{ wordBreak: "break-all" }}>
+                {organization?.site_key || "—"}
+              </Typography.Text>
+              <Space>
+                <Button
+                  icon={<CopyOutlined />}
+                  disabled={!organization?.site_key}
+                  onClick={copySiteKey}
+                >
+                  Copy
+                </Button>
+                <Popconfirm
+                  title="Regenerate site key?"
+                  description="The live website will stop working until you update MAVE_SITE_KEY."
+                  okText="Regenerate"
+                  cancelText="Cancel"
+                  onConfirm={regenerateSiteKey}
+                >
+                  <Button
+                    icon={<ReloadOutlined />}
+                    loading={regeneratingKey}
+                    danger
+                  >
+                    Regenerate
+                  </Button>
+                </Popconfirm>
+              </Space>
+            </Space>
           </Descriptions.Item>
         </Descriptions>
 
